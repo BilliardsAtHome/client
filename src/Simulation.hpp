@@ -1,25 +1,40 @@
-#ifndef BIL_RUNNER_H
-#define BIL_RUNNER_H
+#ifndef BAH_CLIENT_SIMULATION_H
+#define BAH_CLIENT_SIMULATION_H
 #include <libkiwi.h>
 #include <types.h>
+
+namespace bah {
 
 /**
  * @brief Billiards simulation runner
  */
-class BilRunner : public kiwi::DynamicSingleton<BilRunner>,
-                  public kiwi::IScnHook {
-    friend class kiwi::DynamicSingleton<BilRunner>;
+class Simulation : public kiwi::DynamicSingleton<Simulation>,
+                   public kiwi::IScnHook {
+    friend class kiwi::DynamicSingleton<Simulation>;
+
+public:
+    struct BreakInfo {
+        u32 seed;
+        int num;
+        int frame;
+        int aimU;
+        int aimL;
+        int aimR;
+        EGG::Vector2f pos;
+        f32 power;
+        bool foul;
+    };
 
 public:
     virtual void Configure(RPSysScene* scene);
     virtual void BeforeReset(RPSysScene* scene);
     virtual void AfterReset(RPSysScene* scene);
 
-    void Simulate();
+    void Tick();
     void OnEndShot();
 
     f32 GetCuePower() const {
-        return mIsReplay ? mBestBreak.power : mCuePower;
+        return mIsReplay ? mpBestBreak->power : mCuePower;
     }
 
     bool IsReplay() const {
@@ -32,8 +47,8 @@ public:
     }
 
 private:
-    BilRunner();
-    virtual ~BilRunner();
+    Simulation();
+    virtual ~Simulation();
 
 private:
     u32 mSeed;
@@ -50,21 +65,10 @@ private:
     EGG::Vector2f mCuePos;
     f32 mCuePower;
 
-    struct BreakInfo {
-        u32 seed;
-        int num;
-        int frame;
-        int aimU;
-        int aimL;
-        int aimR;
-        EGG::Vector2f pos;
-        f32 power;
-        bool foul;
-    } mBestBreak;
-
-    BreakInfo* mpBreakWork;
-
+    BreakInfo* mpBestBreak;
     bool mIsReplay;
 };
+
+} // namespace bah
 
 #endif

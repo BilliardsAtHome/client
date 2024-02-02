@@ -1,14 +1,15 @@
-#include "BilCue.hpp"
+#include "Simulation.hpp"
 
-#include "BilRunner.hpp"
+namespace bah {
+namespace {
 
 /**
  * @brief Force WAIT -> HOLD transition
  */
-static bool CanHoldCue() {
-    return BilRunner::GetInstance().IsAimingFinish();
+bool Cue_CanHold() {
+    return Simulation::GetInstance().IsAimingFinish();
 }
-KM_CALL(0x802bfbe0, CanHoldCue);
+KM_CALL(0x802bfbe0, Cue_CanHold);
 KM_WRITE_32(0x802bfbe4, 0x2C030000);
 
 /**
@@ -33,9 +34,15 @@ KM_WRITE_32(0x802bfbc4, 0x60000000);
 KM_WRITE_32(0x802bfbf4, 0x60000000);
 KM_WRITE_32(0x802bfc3c, 0x60000000);
 
-static f32 CuePowerCallback() {
-    return BilRunner::GetInstance().GetCuePower();
+/**
+ * @brief Redirect cue power calculation to the simulated value
+ */
+f32 Cue_GetPower() {
+    return Simulation::GetInstance().GetCuePower();
 }
-KM_CALL(0x802beff8, CuePowerCallback);
-KM_CALL(0x802bf070, CuePowerCallback);
-KM_CALL(0x802bf080, CuePowerCallback);
+KM_CALL(0x802beff8, Cue_GetPower);
+KM_CALL(0x802bf070, Cue_GetPower);
+KM_CALL(0x802bf080, Cue_GetPower);
+
+} // namespace
+} // namespace bah

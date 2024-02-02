@@ -1,18 +1,22 @@
-#include "BilRunner.hpp"
+#include "Simulation.hpp"
 
 #include <Pack/RPParty.h>
 #include <Pack/RPUtility.h>
 
-// ???
+/**
+ * I don't know what these values represent, but these are exactly what the game
+ * uses.
+ */
 #define CUE_AIM_X_AMT (0.0015707965f)
 #define CUE_AIM_Y_AMT (0.0062831859f)
 
-K_DYNAMIC_SINGLETON_IMPL(BilRunner);
+namespace bah {
+namespace {
 
 /**
  * @brief Count number of pocketed balls
  */
-static int GetNumPocket() {
+int GetNumPocket() {
     RPBilBallManager* m = RPBilBallManager::GetInstance();
     ASSERT(m != NULL);
 
@@ -37,9 +41,9 @@ static int GetNumPocket() {
 }
 
 /**
- * @brief Check for a foul
+ * @brief Check whether the current shot fouled
  */
-static int GetIsFoul() {
+bool GetIsFoul() {
     RPBilBallManager* m = RPBilBallManager::GetInstance();
     ASSERT(m != NULL);
 
@@ -47,30 +51,35 @@ static int GetIsFoul() {
     ASSERT(cueBall != NULL);
     ASSERT(cueBall->IsCueBall());
 
+    // Only way to foul on break is by pocketing the cue ball
     return cueBall->IsState(RPBilBall::EState_Pocket);
 }
 
+} // namespace
+
+K_DYNAMIC_SINGLETON_IMPL(Simulation);
+
 /**
- * Constructor
+ * @brief Constructor
  */
-BilRunner::BilRunner() : kiwi::IScnHook(RPSysSceneCreator::RP_BIL_SCENE) {}
+Simulation::Simulation() : kiwi::IScnHook(RPSysSceneCreator::RP_BIL_SCENE) {}
 
 /**
  * @brief Destructor
  */
-BilRunner::~BilRunner() {
-    delete mpBreakWork;
-    mpBreakWork = NULL;
+Simulation::~Simulation() {
+    delete mpBestBreak;
+    mpBestBreak = NULL;
 }
 
 /**
  * @brief Scene configure callback
  */
-void BilRunner::Configure(RPSysScene* scene) {
+void Simulation::Configure(RPSysScene* scene) {
 #pragma unused(scene)
     // Need 32 align because NAND is cool like that
-    mpBreakWork = new (32) BreakInfo();
-    ASSERT(mpBreakWork != NULL);
+    mpBestBreak = new (32) BreakInfo();
+    ASSERT(mpBestBreak != NULL);
 
     mSeed = 0;
     mSeedBackup = 0;
@@ -80,18 +89,18 @@ void BilRunner::Configure(RPSysScene* scene) {
 
     mCuePower = 150.0f;
 
-    mBestBreak.seed = 0xFFFFFFFF;
-    mBestBreak.num = 0;
-    mBestBreak.frame = 0xFFFFFFFF;
-    mBestBreak.pos = EGG::Vector2f(0.0f, 0.0f);
-    mBestBreak.power = 0.0f;
-    mBestBreak.foul = true;
+    mpBestBreak->seed = 0xFFFFFFFF;
+    mpBestBreak->num = 0;
+    mpBestBreak->frame = 0xFFFFFFFF;
+    mpBestBreak->pos = EGG::Vector2f(0.0f, 0.0f);
+    mpBestBreak->power = 0.0f;
+    mpBestBreak->foul = true;
 }
 
 /**
  * @brief Scene reset (before) callback
  */
-void BilRunner::BeforeReset(RPSysScene* scene) {
+void Simulation::BeforeReset(RPSysScene* scene) {
     // Next RNG
     mSeed = RPUtlRandom::getSeed();
 
@@ -100,14 +109,14 @@ void BilRunner::BeforeReset(RPSysScene* scene) {
         // Backup path for later.
         // Continuing after replay means we would follow the same path.
         mSeedBackup = mSeed;
-        RPUtlRandom::setSeed(mBestBreak.seed);
+        RPUtlRandom::setSeed(mpBestBreak->seed);
     }
 }
 
 /**
  * @brief Scene reset (after) callback
  */
-void BilRunner::AfterReset(RPSysScene* scene) {
+void Simulation::AfterReset(RPSysScene* scene) {
 #pragma unused(scene)
     mFrame = -1;
 
@@ -154,7 +163,7 @@ void BilRunner::AfterReset(RPSysScene* scene) {
 /**
  * @brief Run simulation tick
  */
-void BilRunner::Simulate() {
+void Simulation::Tick() {
     // Increment frame count (-1 means begin now)
     if (mFrame == -1) {
         mFrame = 0;
@@ -188,15 +197,15 @@ void BilRunner::Simulate() {
 
     // Override IR position
     if (wiiCtrl.Connected()) {
-        wiiCtrl.Raw().pos.x = mIsReplay ? mBestBreak.pos.x : mCuePos.x;
-        wiiCtrl.Raw().pos.y = mIsReplay ? mBestBreak.pos.y : mCuePos.y;
+        wiiCtrl.Raw().pos.x = mIsReplay ? mpBestBreak->pos.x : mCuePos.x;
+        wiiCtrl.Raw().pos.y = mIsReplay ? mpBestBreak->pos.y : mCuePos.y;
     }
 }
 
 /**
  * @brief End-of-shot callback
  */
-void BilRunner::OnEndShot() {
+void Simulation::OnEndShot() {
     // End replay
     if (mIsReplay) {
         mIsReplay = false;
@@ -217,18 +226,18 @@ void BilRunner::OnEndShot() {
     }
 
     // Prioritize bigger breaks over anything else
-    if (num > mBestBreak.num) {
+    if (num > mpBestBreak->num) {
         best = true;
     }
 
     // Break ties by frame count
-    if ((num == mBestBreak.num) && (mFrame < mBestBreak.frame)) {
+    if ((num == mpBestBreak->num) && (mFrame < mpBestBreak->frame)) {
         best = true;
     }
 
     // Break ties by non-foul
-    if ((num == mBestBreak.num) && (mFrame == mBestBreak.frame) &&
-        (mBestBreak.foul && !isFoul)) {
+    if ((num == mpBestBreak->num) && (mFrame == mpBestBreak->frame) &&
+        (mpBestBreak->foul && !isFoul)) {
         best = true;
     }
 
@@ -236,36 +245,36 @@ void BilRunner::OnEndShot() {
         /**
          * Save best break info
          */
-        mBestBreak.seed = mSeed;
-        mBestBreak.num = num;
-        mBestBreak.frame = mFrame;
-        mBestBreak.aimU = mCueAimUp;
-        mBestBreak.aimL = mCueAimLeft;
-        mBestBreak.aimR = mCueAimRight;
-        mBestBreak.pos = mCuePos;
-        mBestBreak.power = mCuePower;
-        mBestBreak.foul = isFoul;
+        mpBestBreak->seed = mSeed;
+        mpBestBreak->num = num;
+        mpBestBreak->frame = mFrame;
+        mpBestBreak->aimU = mCueAimUp;
+        mpBestBreak->aimL = mCueAimLeft;
+        mpBestBreak->aimR = mCueAimRight;
+        mpBestBreak->pos = mCuePos;
+        mpBestBreak->power = mCuePower;
+        mpBestBreak->foul = isFoul;
 
         /**
          * Dump to console
          */
         // clang-format off
         LOG("[New best break!]");
-        LOG_EX("    Seed:\t%08X", mBestBreak.seed);
-        LOG_EX("    Foul:\t%s",   mBestBreak.foul ? "true" : "false");
-        LOG_EX("    Num:\t%d",    mBestBreak.num);
-        LOG_EX("    Frame:\t%d",  mBestBreak.frame);
+        LOG_EX("    Seed:\t%08X", mpBestBreak->seed);
+        LOG_EX("    Foul:\t%s",   mpBestBreak->foul ? "true" : "false");
+        LOG_EX("    Num:\t%d",    mpBestBreak->num);
+        LOG_EX("    Frame:\t%d",  mpBestBreak->frame);
 
         LOG   ("    [Aim] (-1f):");
-        LOG_EX("        Up:\t%d",    mBestBreak.aimU);
-        LOG_EX("        Left:\t%d",  mBestBreak.aimL);
-        LOG_EX("        Right:\t%d", mBestBreak.aimR);
+        LOG_EX("        Up:\t%d",    mpBestBreak->aimU);
+        LOG_EX("        Left:\t%d",  mpBestBreak->aimL);
+        LOG_EX("        Right:\t%d", mpBestBreak->aimR);
 
         LOG_EX("    Pos:\t{X=%.2f (%08X), Y=%.2f (%08X)}",
-            mBestBreak.pos.x, *(u32*)&mBestBreak.pos.x, mBestBreak.pos.y, *(u32*)&mBestBreak.pos.y);
+            mpBestBreak->pos.x, *(u32*)&mpBestBreak->pos.x, mpBestBreak->pos.y, *(u32*)&mpBestBreak->pos.y);
         
         LOG_EX("    Power:\t%.2f (%08X)",
-            mBestBreak.power, *(u32*)&mBestBreak.power);
+            mpBestBreak->power, *(u32*)&mpBestBreak->power);
         // clang-format on
 
         /**
@@ -273,9 +282,6 @@ void BilRunner::OnEndShot() {
          */
         NANDFileInfo info;
         s32 result;
-
-        // Copy to workmem (aligned to 32)
-        std::memcpy(mpBreakWork, &mBestBreak, sizeof(BreakInfo));
 
         // Create NAND file
         result = NANDCreate("best.brk", NAND_PERM_RWALL, 0);
@@ -286,7 +292,7 @@ void BilRunner::OnEndShot() {
         ASSERT(result == NAND_RESULT_OK);
 
         // Write + commit NAND file
-        result = NANDWrite(&info, mpBreakWork, sizeof(mBestBreak));
+        result = NANDWrite(&info, mpBestBreak, sizeof(BreakInfo));
         NANDClose(&info);
         ASSERT_EX(result > 0, "NANDWrite failed (%d)", result);
 
@@ -294,3 +300,5 @@ void BilRunner::OnEndShot() {
         mIsReplay = true;
     }
 }
+
+} // namespace bah

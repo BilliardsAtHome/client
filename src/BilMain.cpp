@@ -1,20 +1,24 @@
 #include "BilMain.hpp"
 
-#include "BilRunner.hpp"
+#include "Simulation.hpp"
 
 #include <Pack/RPSystem.h>
 
+namespace bah {
+
 /**
- * @brief Shorten intro camera
+ * @brief Shorten intro camera (OPENINGDEMO state)
  */
 KM_WRITE_32(0x802c5b30, 0x60000000);
 
 /**
- * @brief Reset game state
+ * @brief Shot end callback
  */
 void BilMain::OnEndShot() {
-    BilRunner::GetInstance().OnEndShot();
+    // Let simulation record results
+    Simulation::GetInstance().OnEndShot();
 
+    // Reload the billiards scene
     RPSysSceneCreator::getInstance()->changeSceneAfterFade(
         RPSysSceneCreator::RP_BIL_SCENE);
 }
@@ -34,3 +38,5 @@ void BilMain::State_FOUL_enter() {
     OnEndShot();
 }
 KM_BRANCH_MF(0x802c563c, BilMain, State_FOUL_enter);
+
+} // namespace bah

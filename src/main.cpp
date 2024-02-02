@@ -1,4 +1,4 @@
-#include "BilRunner.hpp"
+#include "Simulation.hpp"
 
 #include <Pack/RPKernel.h>
 #include <Pack/RPUtility.h>
@@ -17,7 +17,7 @@ void KokeshiMain() {
                                       kiwi::MapFile::LinkType_Relocatable);
 #endif
     // Register our billiards hook
-    BilRunner::CreateInstance();
+    bah::Simulation::CreateInstance();
 
     // Enter game loop
     RPSysSystem::getInstance()->mainLoop();
