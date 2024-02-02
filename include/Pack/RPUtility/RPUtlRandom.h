@@ -18,6 +18,9 @@ public:
         return (f32)getU32() / 0x10000;
     }
 
+    static u32 getSeed() {
+        return sSeed;
+    }
     static void setSeed(u32 s) {
         sSeed = s;
     }
