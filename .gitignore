@@ -1,0 +1,32 @@
+#=========================================================#
+# IDE Configuration
+#=========================================================#
+# VSCode configuration
+.vscode/
+
+#=========================================================#
+# Base ROM
+#=========================================================#
+# Base ROM filesystem
+romfs/**
+# Base ROM executable(s)
+baserom*.dol
+
+#=========================================================#
+# Tools
+#=========================================================#
+# Kamek binaries
+tools/Kamek*.*
+# CodeWarrior
+tools/mwasmeppc.exe
+tools/mwcceppc.exe
+tools/mwldeppc.exe
+tools/lmgr*.dll
+# Compiled Python
+tools/**/*.pyc
+
+#=========================================================#
+# Build Artifacts
+#=========================================================#
+# Build artifacts
+build/**
