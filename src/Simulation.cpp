@@ -92,9 +92,6 @@ void Simulation::Configure(RPSysScene* scene) {
  * @brief Scene reset (before) callback
  */
 void Simulation::BeforeReset(RPSysScene* scene) {
-    // TODO: REMOVE THIS LOL
-    RPUtlRandom::setSeed(0x1b963533);
-
     // Reuse seed for replay
     if (mIsReplay) {
         RPUtlRandom::setSeed(mpBreakInfo->seed);
