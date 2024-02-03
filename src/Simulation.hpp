@@ -14,12 +14,26 @@ class Simulation : public kiwi::DynamicSingleton<Simulation>,
 
 public:
     struct BreakInfo {
+        /**
+         * @brief Constructor
+         */
+        BreakInfo()
+            : seed(0),
+              num(0),
+              frame(0),
+              up(0),
+              left(0),
+              right(0),
+              pos(),
+              power(0.0f),
+              foul(false) {}
+
         u32 seed;
-        int num;
+        u32 num;
         int frame;
-        int aimU;
-        int aimL;
-        int aimR;
+        int up;
+        int left;
+        int right;
         EGG::Vector2f pos;
         f32 power;
         bool foul;
@@ -31,19 +45,19 @@ public:
     virtual void AfterReset(RPSysScene* scene);
 
     void Tick();
+    void Save(const char* name);
     void OnEndShot();
 
     f32 GetCuePower() const {
-        return mIsReplay ? mpBestBreak->power : mCuePower;
+        return mpBreakInfo->power;
     }
 
     bool IsReplay() const {
         return mIsReplay;
     }
 
-    bool IsAimingFinish() const {
-        return mCueAimUpTimer <= 0 && mCueAimLeftTimer <= 0 &&
-               mCueAimRightTimer <= 0;
+    bool IsDoneAiming() const {
+        return mTimerUp <= 0 && mTimerLeft <= 0 && mTimerRight <= 0;
     }
 
 private:
@@ -51,21 +65,13 @@ private:
     virtual ~Simulation();
 
 private:
-    u32 mSeed;
-    u32 mSeedBackup;
-    int mFrame;
+    int mTimerUp;
+    int mTimerLeft;
+    int mTimerRight;
+    BreakInfo* mpBreakInfo;
 
-    int mCueAimUpTimer;
-    int mCueAimLeftTimer;
-    int mCueAimRightTimer;
-
-    int mCueAimUp;
-    int mCueAimLeft;
-    int mCueAimRight;
-    EGG::Vector2f mCuePos;
-    f32 mCuePower;
-
-    BreakInfo* mpBestBreak;
+    int mBestNum;
+    int mBestFrame;
     bool mIsReplay;
 };
 

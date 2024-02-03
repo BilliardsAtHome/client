@@ -2,13 +2,11 @@
 
 #include <Pack/RPParty.h>
 #include <Pack/RPUtility.h>
+#include <cmath>
+#include <libkiwi.h>
 
-/**
- * I don't know what these values represent, but these are exactly what the game
- * uses.
- */
-#define CUE_AIM_X_AMT (0.0015707965f)
-#define CUE_AIM_Y_AMT (0.0062831859f)
+#define CUE_TURN_SPEED_X 0.0015707965f // pi/2000
+#define CUE_TURN_SPEED_Y 0.0062831859f // pi/500
 
 namespace bah {
 namespace {
@@ -16,11 +14,11 @@ namespace {
 /**
  * @brief Count number of pocketed balls
  */
-int GetNumPocket() {
+u32 GetNumPocket() {
     RPBilBallManager* m = RPBilBallManager::GetInstance();
     ASSERT(m != NULL);
 
-    int num = 0;
+    u32 num = 0;
 
     for (int i = 0; i < RPBilBallManager::scBallNum; i++) {
         RPBilBall* ball = m->GetBall(i);
@@ -68,8 +66,8 @@ Simulation::Simulation() : kiwi::IScnHook(RPSysSceneCreator::RP_BIL_SCENE) {}
  * @brief Destructor
  */
 Simulation::~Simulation() {
-    delete mpBestBreak;
-    mpBestBreak = NULL;
+    delete mpBreakInfo;
+    mpBreakInfo = NULL;
 }
 
 /**
@@ -77,40 +75,34 @@ Simulation::~Simulation() {
  */
 void Simulation::Configure(RPSysScene* scene) {
 #pragma unused(scene)
-    // Need 32 align because NAND is cool like that
-    mpBestBreak = new (32) BreakInfo();
-    ASSERT(mpBestBreak != NULL);
+    mpBreakInfo = new (32) BreakInfo();
+    ASSERT(mpBreakInfo != NULL);
 
-    mSeed = 0;
-    mSeedBackup = 0;
-
-    mFrame = -1;
     mIsReplay = false;
 
-    mCuePower = 150.0f;
+    // TODO: Default to max power. Maybe configurable later?
+    mpBreakInfo->power = 150.0f;
 
-    mpBestBreak->seed = 0xFFFFFFFF;
-    mpBestBreak->num = 0;
-    mpBestBreak->frame = 0xFFFFFFFF;
-    mpBestBreak->pos = EGG::Vector2f(0.0f, 0.0f);
-    mpBestBreak->power = 0.0f;
-    mpBestBreak->foul = true;
+    // Dummy record will instantly be broken
+    mBestNum = 0;
+    mBestFrame = INT_MAX;
 }
 
 /**
  * @brief Scene reset (before) callback
  */
 void Simulation::BeforeReset(RPSysScene* scene) {
-    // Next RNG
-    mSeed = RPUtlRandom::getSeed();
+    // TODO: REMOVE THIS LOL
+    RPUtlRandom::setSeed(0x1b963533);
 
-    // Replay RNG
+    // Reuse seed for replay
     if (mIsReplay) {
-        // Backup path for later.
-        // Continuing after replay means we would follow the same path.
-        mSeedBackup = mSeed;
-        RPUtlRandom::setSeed(mpBestBreak->seed);
+        RPUtlRandom::setSeed(mpBreakInfo->seed);
+        return;
     }
+
+    // Record next seed
+    mpBreakInfo->seed = RPUtlRandom::getSeed();
 }
 
 /**
@@ -118,76 +110,76 @@ void Simulation::BeforeReset(RPSysScene* scene) {
  */
 void Simulation::AfterReset(RPSysScene* scene) {
 #pragma unused(scene)
-    mFrame = -1;
 
-    // Backup RNG
-    u32 seed = RPUtlRandom::getSeed();
+    // Just reload what we need to replay the shot
+    if (mIsReplay) {
+        mTimerUp = mpBreakInfo->up;
+        mTimerLeft = mpBreakInfo->left;
+        mTimerRight = mpBreakInfo->right;
+        return;
+    }
+
+    // Seeded by OS clock
+    kiwi::Random random;
+
+    // Reset frame count
+    mpBreakInfo->frame = 0;
 
     // Reset timers
-    mCueAimUp = mCueAimUpTimer = 0;
-    mCueAimLeft = mCueAimLeftTimer = 0;
-    mCueAimRight = mCueAimRightTimer = 0;
+    mTimerUp = mpBreakInfo->up = 0;
+    mTimerLeft = mpBreakInfo->left = 0;
+    mTimerRight = mpBreakInfo->right = 0;
 
     // 50% chance to aim up, 50% chance to aim sideways
-    if (RPUtlRandom::getF32() > 0.5f) {
+    if (random.Chance(0.5f)) {
         // Randomize aiming UP frames -> [0f, 35f]
-        mCueAimUp = RPUtlRandom::getU32(0, 35);
-        mCueAimUpTimer = mCueAimUp;
+        mTimerUp = mpBreakInfo->up = random.NextU32(35);
     } else {
         // Randomize aiming SIDEWAYS frames -> [0f, 12f]
         // 50% chance to aim left vs. aim right
-        if (RPUtlRandom::getF32() > 0.5f) {
-            mCueAimLeft = RPUtlRandom::getU32(0, 12);
-            mCueAimLeftTimer = mCueAimLeft;
+        if (random.Chance(0.5f)) {
+            mTimerLeft = mpBreakInfo->left = random.NextU32(12);
         } else {
-            mCueAimRight = RPUtlRandom::getU32(0, 12);
-            mCueAimRightTimer = mCueAimRight;
+            mTimerRight = mpBreakInfo->right = random.NextU32(12);
         }
     }
 
     // Base cue position
-    mCuePos = EGG::Vector2f(0.015f, 0.15f);
+    mpBreakInfo->pos = EGG::Vector2f(0.015f, 0.15f);
 
     // Randomize X pos -> [-0.015, +0.015]
-    mCuePos.x = RPUtlRandom::getF32() * mCuePos.x;
+    mpBreakInfo->pos.x *= random.NextF32();
     // 50% chance to flip
-    mCuePos.x *= RPUtlRandom::getF32() > 0.5f ? 1.0f : -1.0f;
+    mpBreakInfo->pos.x *= random.Sign();
 
     // Randomize Y pos -> [+0.15, +0.30]
-    mCuePos.y += RPUtlRandom::getF32() * 0.15f;
-
-    // Restore RNG
-    RPUtlRandom::setSeed(seed);
+    mpBreakInfo->pos.y += random.NextF32(0.15f);
 }
 
 /**
  * @brief Run simulation tick
  */
 void Simulation::Tick() {
-    // Increment frame count (-1 means begin now)
-    if (mFrame == -1) {
-        mFrame = 0;
-    } else {
-        mFrame++;
-    }
+    // Increment frame count
+    mpBreakInfo->frame++;
 
     // Aim cue
     RPBilCtrl* cueCtrl = RPBilCtrlManager::GetInstance()->GetCtrl();
     if (cueCtrl->CanCtrl()) {
         // Aim up
-        if (mCueAimUpTimer > 0) {
-            cueCtrl->TurnY(-CUE_AIM_Y_AMT);
-            mCueAimUpTimer--;
+        if (mTimerUp > 0) {
+            cueCtrl->TurnY(-CUE_TURN_SPEED_Y);
+            mTimerUp--;
         }
         // Aim left
-        else if (mCueAimLeftTimer > 0) {
-            cueCtrl->TurnX(CUE_AIM_X_AMT);
-            mCueAimLeftTimer--;
+        else if (mTimerLeft > 0) {
+            cueCtrl->TurnX(CUE_TURN_SPEED_X);
+            mTimerLeft--;
         }
         // Aim right
-        else if (mCueAimRightTimer > 0) {
-            cueCtrl->TurnX(-CUE_AIM_X_AMT);
-            mCueAimRightTimer--;
+        else if (mTimerRight > 0) {
+            cueCtrl->TurnX(-CUE_TURN_SPEED_X);
+            mTimerRight--;
         }
     }
 
@@ -197,9 +189,33 @@ void Simulation::Tick() {
 
     // Override IR position
     if (wiiCtrl.Connected()) {
-        wiiCtrl.Raw().pos.x = mIsReplay ? mpBestBreak->pos.x : mCuePos.x;
-        wiiCtrl.Raw().pos.y = mIsReplay ? mpBestBreak->pos.y : mCuePos.y;
+        wiiCtrl.Raw().pos.x = mpBreakInfo->pos.x;
+        wiiCtrl.Raw().pos.y = mpBreakInfo->pos.y;
     }
+}
+
+/**
+ * @brief Save current break info to the NAND
+ *
+ * @param name File name
+ */
+void Simulation::Save(const char* name) {
+    NANDFileInfo info;
+    s32 result;
+
+    // Create NAND file
+    result = NANDCreate(name, NAND_PERM_RWALL, 0);
+    ASSERT(result == NAND_RESULT_OK || result == NAND_RESULT_EXISTS);
+
+    // Open NAND file
+    result = NANDOpen(name, &info, NAND_ACCESS_WRITE);
+    ASSERT(result == NAND_RESULT_OK);
+
+    // Write + commit NAND file
+    result = NANDWrite(&info, mpBreakInfo, sizeof(BreakInfo));
+    NANDClose(&info);
+
+    ASSERT_EX(result > 0, "NANDWrite failed (%d)", result);
 }
 
 /**
@@ -209,96 +225,44 @@ void Simulation::OnEndShot() {
     // End replay
     if (mIsReplay) {
         mIsReplay = false;
-
-        // Restore backup
-        RPUtlRandom::setSeed(mSeedBackup);
         return;
     }
 
-    // Check for new best break
-    int num = GetNumPocket();
-    bool isFoul = GetIsFoul();
-    bool best = false;
+    // Record break results
+    mpBreakInfo->num = GetNumPocket();
+    mpBreakInfo->foul = GetIsFoul();
 
-    // Log 4 or better breaks for fun
-    if (num >= 4) {
-        LOG_EX("Notable break: %d pocketed in %df", num, mFrame);
-    }
+    // Best ball count (or 7+)
+    mIsReplay = (mpBreakInfo->num > mBestNum) || (mpBreakInfo->num >= 7);
+    // Tied ball count, best frame count
+    mIsReplay |=
+        (mpBreakInfo->num == mBestNum) && (mpBreakInfo->frame < mBestFrame);
 
-    // Prioritize bigger breaks over anything else
-    if (num > mpBestBreak->num) {
-        best = true;
-    }
+    // Record best shot
+    if (mIsReplay) {
+        mBestNum = mpBreakInfo->num;
+        mBestFrame = mpBreakInfo->frame;
 
-    // Break ties by frame count
-    if ((num == mpBestBreak->num) && (mFrame < mpBestBreak->frame)) {
-        best = true;
-    }
-
-    // Break ties by non-foul
-    if ((num == mpBestBreak->num) && (mFrame == mpBestBreak->frame) &&
-        (mpBestBreak->foul && !isFoul)) {
-        best = true;
-    }
-
-    if (best) {
-        /**
-         * Save best break info
-         */
-        mpBestBreak->seed = mSeed;
-        mpBestBreak->num = num;
-        mpBestBreak->frame = mFrame;
-        mpBestBreak->aimU = mCueAimUp;
-        mpBestBreak->aimL = mCueAimLeft;
-        mpBestBreak->aimR = mCueAimRight;
-        mpBestBreak->pos = mCuePos;
-        mpBestBreak->power = mCuePower;
-        mpBestBreak->foul = isFoul;
-
-        /**
-         * Dump to console
-         */
         // clang-format off
-        LOG("[New best break!]");
-        LOG_EX("    Seed:\t%08X", mpBestBreak->seed);
-        LOG_EX("    Foul:\t%s",   mpBestBreak->foul ? "true" : "false");
-        LOG_EX("    Num:\t%d",    mpBestBreak->num);
-        LOG_EX("    Frame:\t%d",  mpBestBreak->frame);
-
-        LOG   ("    [Aim] (-1f):");
-        LOG_EX("        Up:\t%d",    mpBestBreak->aimU);
-        LOG_EX("        Left:\t%d",  mpBestBreak->aimL);
-        LOG_EX("        Right:\t%d", mpBestBreak->aimR);
-
-        LOG_EX("    Pos:\t{X=%.2f (%08X), Y=%.2f (%08X)}",
-            mpBestBreak->pos.x, *(u32*)&mpBestBreak->pos.x, mpBestBreak->pos.y, *(u32*)&mpBestBreak->pos.y);
-        
-        LOG_EX("    Power:\t%.2f (%08X)",
-            mpBestBreak->power, *(u32*)&mpBestBreak->power);
+        LOG("brk = {");
+        LOG_EX("    seed:\t%08X",  mpBreakInfo->seed);
+        LOG_EX("    num:\t%d",     mpBreakInfo->num);
+        LOG_EX("    frame:\t%d",   mpBreakInfo->frame);
+        LOG_EX("    up:\t%d",      mpBreakInfo->up);
+        LOG_EX("    left:\t%d",    mpBreakInfo->left);
+        LOG_EX("    right:\t%d",   mpBreakInfo->right);
+        LOG_EX("    pos:\t{%08X, %08X}",
+                                   *(u32*)&mpBreakInfo->pos.x, *(u32*)&mpBreakInfo->pos.y);
+        LOG_EX("    power:\t%.2f", mpBreakInfo->power);
+        LOG_EX("    foul:\t%s",    mpBreakInfo->foul ? "true" : "false");
+        LOG("}");
         // clang-format on
 
-        /**
-         * Write to NAND
-         */
-        NANDFileInfo info;
-        s32 result;
-
-        // Create NAND file
-        result = NANDCreate("best.brk", NAND_PERM_RWALL, 0);
-        ASSERT(result == NAND_RESULT_OK || result == NAND_RESULT_EXISTS);
-
-        // Open NAND file
-        result = NANDOpen("best.brk", &info, NAND_ACCESS_WRITE);
-        ASSERT(result == NAND_RESULT_OK);
-
-        // Write + commit NAND file
-        result = NANDWrite(&info, mpBestBreak, sizeof(BreakInfo));
-        NANDClose(&info);
-        ASSERT_EX(result > 0, "NANDWrite failed (%d)", result);
-
-        // Replay new best break
-        mIsReplay = true;
+        Save("best.brk");
     }
+
+    // Save every break
+    Save("last.brk");
 }
 
 } // namespace bah

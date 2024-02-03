@@ -7,7 +7,7 @@ namespace {
  * @brief Force WAIT -> HOLD transition
  */
 bool Cue_CanHold() {
-    return Simulation::GetInstance().IsAimingFinish();
+    return Simulation::GetInstance().IsDoneAiming();
 }
 KM_CALL(0x802bfbe0, Cue_CanHold);
 KM_WRITE_32(0x802bfbe4, 0x2C030000);
