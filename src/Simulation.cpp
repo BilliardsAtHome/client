@@ -29,7 +29,6 @@ u32 GetNumPocket() {
             continue;
         }
 
-        // Check for POCKET state
         if (ball->IsState(RPBilBall::EState_Pocket)) {
             num++;
         }
@@ -119,10 +118,7 @@ void Simulation::AfterReset(RPSysScene* scene) {
     // Seeded by OS clock
     kiwi::Random random;
 
-    // Reset frame count
     mpBreakInfo->frame = 0;
-
-    // Reset timers
     mTimerUp = mpBreakInfo->up = 0;
     mTimerLeft = mpBreakInfo->left = 0;
     mTimerRight = mpBreakInfo->right = 0;
@@ -157,10 +153,8 @@ void Simulation::AfterReset(RPSysScene* scene) {
  * @brief Run simulation tick
  */
 void Simulation::Tick() {
-    // Increment frame count
     mpBreakInfo->frame++;
 
-    // Aim cue
     RPBilCtrl* cueCtrl = RPBilCtrlManager::GetInstance()->GetCtrl();
     if (cueCtrl->CanCtrl()) {
         // Aim up
@@ -180,7 +174,6 @@ void Simulation::Tick() {
         }
     }
 
-    // Access P1 remote
     kiwi::WiiCtrl& wiiCtrl =
         kiwi::CtrlMgr::GetInstance().GetWiiCtrl(kiwi::Player_1);
 
