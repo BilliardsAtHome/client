@@ -200,19 +200,18 @@ void Simulation::Save(const char* name) {
     NANDFileInfo info;
     s32 result;
 
-    // Create NAND file
     result = NANDCreate(name, NAND_PERM_RWALL, 0);
-    ASSERT(result == NAND_RESULT_OK || result == NAND_RESULT_EXISTS);
+    ASSERT_EX(result == NAND_RESULT_OK || result == NAND_RESULT_EXISTS,
+              "NANDCreate failed (%d)", result);
 
-    // Open NAND file
     result = NANDOpen(name, &info, NAND_ACCESS_WRITE);
-    ASSERT(result == NAND_RESULT_OK);
+    ASSERT_EX(result == NAND_RESULT_OK, "NANDOpen failed (%d)", result);
 
-    // Write + commit NAND file
     result = NANDWrite(&info, mpBreakInfo, sizeof(BreakInfo));
-    NANDClose(&info);
+    ASSERT_EX(result == sizeof(BreakInfo), "NANDWrite failed (%d)", result);
 
-    ASSERT_EX(result > 0, "NANDWrite failed (%d)", result);
+    result = NANDClose(&info);
+    ASSERT_EX(result == NAND_RESULT_OK, "NANDClose failed (%d)", result);
 }
 
 /**
