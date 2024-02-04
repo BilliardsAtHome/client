@@ -20,7 +20,7 @@ u32 GetNumPocket() {
 
     u32 num = 0;
 
-    for (int i = 0; i < RPBilBallManager::scBallNum; i++) {
+    for (int i = 0; i < RPBilBallManager::BALL_MAX; i++) {
         RPBilBall* ball = m->GetBall(i);
         ASSERT(ball != NULL);
 
@@ -44,12 +44,24 @@ bool GetIsFoul() {
     RPBilBallManager* m = RPBilBallManager::GetInstance();
     ASSERT(m != NULL);
 
+    // Cue ball pocketed?
     RPBilBall* cueBall = m->GetBall(0);
-    ASSERT(cueBall != NULL);
-    ASSERT(cueBall->IsCueBall());
+    ASSERT(cueBall != NULL && cueBall->IsCueBall());
+    if (cueBall->IsState(RPBilBall::EState_Pocket)) {
+        return true;
+    }
 
-    // Only way to foul on break is by pocketing the cue ball
-    return cueBall->IsState(RPBilBall::EState_Pocket);
+    // Ball shot off the table?
+    for (int i = 0; i < RPBilBallManager::BALL_MAX; i++) {
+        RPBilBall* ball = m->GetBall(i);
+        ASSERT(ball != NULL);
+
+        if (ball->IsState(RPBilBall::EState_OffTable)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace
@@ -91,6 +103,8 @@ void Simulation::Configure(RPSysScene* scene) {
  * @brief Scene reset (before) callback
  */
 void Simulation::BeforeReset(RPSysScene* scene) {
+#pragma unused(scene)
+
     // Reuse seed for replay
     if (mIsReplay) {
         RPUtlRandom::setSeed(mpBreakInfo->seed);
@@ -193,6 +207,8 @@ void Simulation::Save(const char* name) {
     NANDFileInfo info;
     s32 result;
 
+    ASSERT(name != NULL);
+
     result = NANDCreate(name, NAND_PERM_RWALL, 0);
     ASSERT_EX(result == NAND_RESULT_OK || result == NAND_RESULT_EXISTS,
               "NANDCreate failed (%d)", result);
@@ -220,6 +236,7 @@ void Simulation::OnEndShot() {
     // Record break results
     mpBreakInfo->num = GetNumPocket();
     mpBreakInfo->foul = GetIsFoul();
+    Save("last.brk");
 
     // Best ball count (or 7+)
     mIsReplay = (mpBreakInfo->num > mBestNum) || (mpBreakInfo->num >= 7);
@@ -233,7 +250,7 @@ void Simulation::OnEndShot() {
         mBestFrame = mpBreakInfo->frame;
 
         // clang-format off
-        LOG("brk = {");
+        LOG("BREAK = {");
         LOG_EX("    seed:\t%08X",  mpBreakInfo->seed);
         LOG_EX("    num:\t%d",     mpBreakInfo->num);
         LOG_EX("    frame:\t%d",   mpBreakInfo->frame);
@@ -249,9 +266,6 @@ void Simulation::OnEndShot() {
 
         Save("best.brk");
     }
-
-    // Save every break
-    Save("last.brk");
 }
 
 } // namespace bah

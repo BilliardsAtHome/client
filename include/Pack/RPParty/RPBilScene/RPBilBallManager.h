@@ -15,11 +15,11 @@ public:
     }
 
 public:
-    static const int scBallNum = 10;
+    static const int BALL_MAX = 10;
 
 private:
     char _00[0x7C];
-    RPBilBall* mBalls[scBallNum]; // at 0x7C
+    RPBilBall* mBalls[BALL_MAX]; // at 0x7C
 
     static RPBilBallManager* sInstance;
 };

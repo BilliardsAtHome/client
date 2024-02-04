@@ -6,7 +6,7 @@
 
 class RPBilBall {
 public:
-    enum EState { EState_Null, EState_Wait, EState_Pocket, EState_2 };
+    enum EState { EState_Null, EState_Wait, EState_Pocket, EState_OffTable };
 
     bool IsCueBall() const {
         return mId == 0;
