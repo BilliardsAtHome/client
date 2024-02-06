@@ -3,7 +3,9 @@
 #include <libkiwi/core/kiwiArray.hpp>
 #include <libkiwi/core/kiwiColor.hpp>
 #include <libkiwi/core/kiwiController.hpp>
+#include <libkiwi/core/kiwiIStream.hpp>
 #include <libkiwi/core/kiwiLinkList.hpp>
+#include <libkiwi/core/kiwiNandStream.hpp>
 #include <libkiwi/core/kiwiSTL.hpp>
 #include <libkiwi/core/kiwiSceneHookMgr.hpp>
 #include <libkiwi/core/kiwiString.hpp>

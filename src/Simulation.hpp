@@ -9,34 +9,25 @@ namespace bah {
  * @brief Billiards simulation runner
  */
 class Simulation : public kiwi::DynamicSingleton<Simulation>,
-                   public kiwi::IScnHook {
+                   public kiwi::ISceneHook {
     friend class kiwi::DynamicSingleton<Simulation>;
 
 public:
     struct BreakInfo {
-        /**
-         * @brief Constructor
-         */
-        BreakInfo()
-            : seed(0),
-              num(0),
-              frame(0),
-              up(0),
-              left(0),
-              right(0),
-              pos(),
-              power(0.0f),
-              foul(false) {}
+        BreakInfo();
+        void Read(kiwi::IStream& strm);
+        void Write(kiwi::IStream& strm);
 
         u32 seed;
+        u32 kseed;
         u32 num;
-        int frame;
+        u32 frame;
         int up;
         int left;
         int right;
         EGG::Vector2f pos;
         f32 power;
-        bool foul;
+        BOOL foul;
     };
 
 public:

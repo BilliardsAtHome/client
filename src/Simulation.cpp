@@ -71,7 +71,56 @@ K_DYNAMIC_SINGLETON_IMPL(Simulation);
 /**
  * @brief Constructor
  */
-Simulation::Simulation() : kiwi::IScnHook(RPSysSceneCreator::RP_BIL_SCENE) {}
+Simulation::BreakInfo::BreakInfo()
+    : seed(0),
+      kseed(0),
+      num(0),
+      frame(0),
+      up(0),
+      left(0),
+      right(0),
+      pos(),
+      power(0.0f),
+      foul(false) {}
+
+/**
+ * @brief Deserialize from stream
+ */
+void Simulation::BreakInfo::Read(kiwi::IStream& strm) {
+    seed = strm.Read_u32();
+    kseed = strm.Read_u32();
+    num = strm.Read_u32();
+    frame = strm.Read_u32();
+    up = strm.Read_s32();
+    left = strm.Read_s32();
+    right = strm.Read_s32();
+    pos.x = strm.Read_f32();
+    pos.y = strm.Read_f32();
+    power = strm.Read_f32();
+    foul = strm.Read_bool();
+}
+
+/**
+ * @brief Serialize to stream
+ */
+void Simulation::BreakInfo::Write(kiwi::IStream& strm) {
+    strm.Write_u32(seed);
+    strm.Write_u32(kseed);
+    strm.Write_u32(num);
+    strm.Write_u32(frame);
+    strm.Write_s32(up);
+    strm.Write_s32(left);
+    strm.Write_s32(right);
+    strm.Write_f32(pos.x);
+    strm.Write_f32(pos.y);
+    strm.Write_f32(power);
+    strm.Write_bool(foul);
+}
+
+/**
+ * @brief Constructor
+ */
+Simulation::Simulation() : kiwi::ISceneHook(RPSysSceneCreator::RP_BIL_SCENE) {}
 
 /**
  * @brief Destructor
@@ -86,7 +135,10 @@ Simulation::~Simulation() {
  */
 void Simulation::Configure(RPSysScene* scene) {
 #pragma unused(scene)
-    mpBreakInfo = new (32) BreakInfo();
+    if (mpBreakInfo == NULL) {
+        mpBreakInfo = new (32) BreakInfo();
+    }
+
     ASSERT(mpBreakInfo != NULL);
 
     mIsReplay = false;
@@ -189,7 +241,7 @@ void Simulation::Tick() {
     }
 
     kiwi::WiiCtrl& wiiCtrl =
-        kiwi::CtrlMgr::GetInstance().GetWiiCtrl(kiwi::Player_1);
+        kiwi::CtrlMgr::GetInstance().GetWiiCtrl(kiwi::EPlayer_1);
 
     // Override IR position
     if (wiiCtrl.Connected()) {
@@ -204,23 +256,12 @@ void Simulation::Tick() {
  * @param name File name
  */
 void Simulation::Save(const char* name) {
-    NANDFileInfo info;
-    s32 result;
-
     ASSERT(name != NULL);
 
-    result = NANDCreate(name, NAND_PERM_RWALL, 0);
-    ASSERT_EX(result == NAND_RESULT_OK || result == NAND_RESULT_EXISTS,
-              "NANDCreate failed (%d)", result);
+    kiwi::NandStream strm(name, kiwi::EOpenMode_Write, true);
+    ASSERT(strm.IsOpen());
 
-    result = NANDOpen(name, &info, NAND_ACCESS_WRITE);
-    ASSERT_EX(result == NAND_RESULT_OK, "NANDOpen failed (%d)", result);
-
-    result = NANDWrite(&info, mpBreakInfo, sizeof(BreakInfo));
-    ASSERT_EX(result == sizeof(BreakInfo), "NANDWrite failed (%d)", result);
-
-    result = NANDClose(&info);
-    ASSERT_EX(result == NAND_RESULT_OK, "NANDClose failed (%d)", result);
+    mpBreakInfo->Write(strm);
 }
 
 /**
