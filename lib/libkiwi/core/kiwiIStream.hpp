@@ -32,13 +32,8 @@ public:
     /**
      * @brief Destructor
      */
-    virtual ~IStream() {
-        if (mIsOpen) {
-            Close();
-        }
-    }
+    virtual ~IStream() {}
 
-    virtual bool IsEof() const = 0;
     virtual void Close() = 0;
 
     /**

@@ -31,11 +31,13 @@ public:
     /**
      * @brief Destructor
      */
-    virtual ~NandStream() {}
+    virtual ~NandStream() {
+        if (mIsOpen) {
+            Close();
+        }
+    }
 
     bool Open(const char* path, bool create = false);
-
-    virtual bool IsEof() const;
     virtual void Close();
 
     virtual void Seek(ESeekDir dir, s32 offset);

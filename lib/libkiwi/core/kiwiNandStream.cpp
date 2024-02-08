@@ -65,13 +65,6 @@ bool NandStream::Open(const char* path, bool create) {
 }
 
 /**
- * @brief Check whether the stream has hit the end of the file
- */
-bool NandStream::IsEof() const {
-    return mPosition >= GetSize();
-}
-
-/**
  * @brief Close stream
  */
 void NandStream::Close() {

@@ -82,7 +82,6 @@ IO_FUNC_DEF(bool);
 s32 IStream::Read(void* dst, u32 size) {
     K_ASSERT(dst != NULL);
     K_ASSERT_EX(IsOpen(), "Stream is not available");
-    K_ASSERT_EX(!IsEof(), "Cannot read past end of file");
     K_ASSERT_EX(CanRead(), "Stream does not support reading");
     K_ASSERT_EX(IsAlign(dst), "Buffer must be aligned to %d bytes", GetAlign());
 
@@ -104,7 +103,6 @@ s32 IStream::Read(void* dst, u32 size) {
 s32 IStream::Write(const void* src, u32 size) {
     K_ASSERT(src != NULL);
     K_ASSERT_EX(IsOpen(), "Stream is not available");
-    K_ASSERT_EX(!IsEof(), "Cannot write past end of file");
     K_ASSERT_EX(CanWrite(), "Stream does not support writing");
     K_ASSERT_EX(IsAlign(src), "Buffer must be aligned to %d bytes", GetAlign());
 
@@ -126,7 +124,6 @@ s32 IStream::Write(const void* src, u32 size) {
 s32 IStream::Peek(void* dst, u32 size) {
     K_ASSERT(dst != NULL);
     K_ASSERT_EX(IsOpen(), "Stream is not available");
-    K_ASSERT_EX(!IsEof(), "Cannot peek past end of file");
     K_ASSERT_EX(CanRead() && CanSeek(), "Stream does not support peeking");
     K_ASSERT_EX(IsAlign(dst), "Buffer must be aligned to %d bytes", GetAlign());
 
