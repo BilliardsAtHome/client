@@ -24,6 +24,7 @@
 #include <libkiwi/rvl/kiwiLibSO.hpp>
 #include <libkiwi/util/kiwiAutoLock.hpp>
 #include <libkiwi/util/kiwiBuildTarget.hpp>
+#include <libkiwi/util/kiwiChecksum.hpp>
 #include <libkiwi/util/kiwiDynamicSingleton.hpp>
 #include <libkiwi/util/kiwiMapFile.hpp>
 #include <libkiwi/util/kiwiNonCopyable.hpp>

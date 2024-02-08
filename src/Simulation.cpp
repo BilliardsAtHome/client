@@ -98,12 +98,25 @@ void Simulation::BreakInfo::Read(kiwi::IStream& strm) {
     pos.y = strm.Read_f32();
     power = strm.Read_f32();
     foul = strm.Read_bool();
+
+    // Checksum for integrity
+    kiwi::Checksum crc;
+    crc.Process(this, sizeof(BreakInfo));
+
+    u32 expected = crc.Result();
+    u32 got = strm.Read_u32();
+    K_WARN_EX(expected != got, "Checksum mismatch (expected %08X, got %08X)",
+              expected, got);
 }
 
 /**
  * @brief Serialize to stream
  */
 void Simulation::BreakInfo::Write(kiwi::IStream& strm) {
+    // Checksum for integrity
+    kiwi::Checksum crc;
+    crc.Process(this, sizeof(BreakInfo));
+
     strm.Write_u32(seed);
     strm.Write_u32(kseed);
     strm.Write_u32(num);
@@ -115,6 +128,7 @@ void Simulation::BreakInfo::Write(kiwi::IStream& strm) {
     strm.Write_f32(pos.y);
     strm.Write_f32(power);
     strm.Write_bool(foul);
+    strm.Write_u32(crc.Result());
 }
 
 /**
