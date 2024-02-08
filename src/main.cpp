@@ -14,7 +14,7 @@ void KokeshiMain() {
     kiwi::Nw4rException::CreateInstance();
     kiwi::MapFile::CreateInstance();
     kiwi::MapFile::GetInstance().Open(kokeshi::scMapfilePath,
-                                      kiwi::MapFile::LinkType_Relocatable);
+                                      kiwi::MapFile::ELinkType_Relocatable);
 #endif
     // Register our billiards hook
     bah::Simulation::CreateInstance();
