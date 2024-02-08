@@ -20,7 +20,7 @@ void BilMain::OnEndShot() {
 
     // Reload the billiards scene
     RPSysSceneCreator::getInstance()->changeSceneAfterFade(
-        RPSysSceneCreator::RP_BIL_SCENE);
+        RPSysSceneCreator::ESceneID_RPBilScene);
 }
 
 /**

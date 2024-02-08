@@ -134,7 +134,8 @@ void Simulation::BreakInfo::Write(kiwi::IStream& strm) {
 /**
  * @brief Constructor
  */
-Simulation::Simulation() : kiwi::ISceneHook(RPSysSceneCreator::RP_BIL_SCENE) {}
+Simulation::Simulation()
+    : kiwi::ISceneHook(RPSysSceneCreator::ESceneID_RPBilScene) {}
 
 /**
  * @brief Destructor
