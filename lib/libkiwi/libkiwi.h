@@ -4,6 +4,7 @@
 #include <libkiwi/core/kiwiController.hpp>
 #include <libkiwi/core/kiwiDvdStream.hpp>
 #include <libkiwi/core/kiwiIStream.hpp>
+#include <libkiwi/core/kiwiMemStream.hpp>
 #include <libkiwi/core/kiwiNandStream.hpp>
 #include <libkiwi/core/kiwiSceneHookMgr.hpp>
 #include <libkiwi/kernel/kiwiAssert.h>

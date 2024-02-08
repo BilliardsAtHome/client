@@ -13,25 +13,25 @@ public:
     /**
      * @brief Constructor
      *
-     * @param readOnly Read-only buffer
+     * @param buffer Buffer
      * @param size Buffer size
      * @param owns Whether the stream owns the buffer
      */
-    MemStream(const void* readOnly, u32 size, bool owns = false)
-        : FileStream(EOpenMode_Read), mBufferSize(size), mOwnsBuffer(owns) {
-        mBufferDataConst = static_cast<const u8*>(readOnly);
+    MemStream(void* buffer, u32 size, bool owns = false)
+        : FileStream(EOpenMode_RW), mBufferSize(size), mOwnsBuffer(owns) {
+        mBufferData = static_cast<u8*>(buffer);
     }
 
     /**
-     * @brief Constructor
+     * @brief Constructor (for const pointers)
      *
-     * @param readWrite Mutable buffer
+     * @param buffer Read-only buffer
      * @param size Buffer size
      * @param owns Whether the stream owns the buffer
      */
-    MemStream(void* readWrite, u32 size, bool owns = false)
+    MemStream(const void* buffer, u32 size, bool owns = false)
         : FileStream(EOpenMode_RW), mBufferSize(size), mOwnsBuffer(owns) {
-        mBufferData = static_cast<u8*>(readWrite);
+        mBufferData = static_cast<u8*>(const_cast<void*>(buffer));
     }
 
     /**
@@ -43,6 +43,9 @@ public:
         }
     }
 
+    /**
+     * @brief Close stream
+     */
     virtual void Close() {}
 
     virtual u32 GetSize() const {
@@ -56,7 +59,7 @@ public:
         return true;
     }
     virtual bool CanWrite() const {
-        return mOpenMode == EOpenMode_RW;
+        return true;
     }
     virtual bool CanPeek() const {
         return true;
@@ -73,10 +76,7 @@ private:
     virtual s32 PeekImpl(void* dst, u32 size);
 
 private:
-    union {
-        u8* mBufferData;
-        const u8* mBufferDataConst;
-    };
+    u8* mBufferData;
     u32 mBufferSize;
 
     bool mOwnsBuffer;
