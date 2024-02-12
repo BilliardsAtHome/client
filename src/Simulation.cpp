@@ -29,7 +29,10 @@ u32 GetNumPocket() {
             continue;
         }
 
-        if (ball->IsState(RPBilBall::EState_Pocket)) {
+        // *Technically* OffTable is different,
+        // but for our purposes we do not care.
+        if (ball->IsState(RPBilBall::EState_Pocket) ||
+            ball->IsState(RPBilBall::EState_OffTable)) {
             num++;
         }
     }
@@ -44,18 +47,17 @@ bool GetIsFoul() {
     RPBilBallManager* m = RPBilBallManager::GetInstance();
     ASSERT(m != NULL);
 
-    // Cue ball pocketed?
-    RPBilBall* cueBall = m->GetBall(0);
-    ASSERT(cueBall != NULL && cueBall->IsCueBall());
-    if (cueBall->IsState(RPBilBall::EState_Pocket)) {
-        return true;
-    }
-
-    // Ball shot off the table?
     for (int i = 0; i < RPBilBallManager::BALL_MAX; i++) {
         RPBilBall* ball = m->GetBall(i);
         ASSERT(ball != NULL);
 
+        // Cue ball pocketed?
+        if (i == 0 && ball->IsState(RPBilBall::EState_Pocket)) {
+            ASSERT(ball->IsCueBall());
+            return true;
+        }
+
+        // Ball shot off the table?
         if (ball->IsState(RPBilBall::EState_OffTable)) {
             return true;
         }
@@ -198,6 +200,7 @@ void Simulation::AfterReset(RPSysScene* scene) {
 
     // Seeded by OS clock
     kiwi::Random random;
+    mpBreakInfo->kseed = random.GetSeed();
 
     mpBreakInfo->frame = 0;
     mTimerUp = mpBreakInfo->up = 0;

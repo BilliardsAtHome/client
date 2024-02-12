@@ -2760,6 +2760,7 @@ sInstance__15RPBilCueManager=0x8043c9f0
 sInstance__16RPBilCtrlManager=0x8043c9c0
 TurnY__9RPBilCtrlFf=0x802bc000
 TurnX__9RPBilCtrlFf=0x802bc238
+isSceneChangeEnable__10RPSysSceneCFv=0x80184f04
 #
 sInstance__13RPSysSceneMgr=0x8043c468
 sInstance__11RPSysSystem=0x8043c440

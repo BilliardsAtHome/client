@@ -5,7 +5,7 @@
 namespace bah {
 namespace {
 
-void Scene_Calculate(RPSysScene* scene) {
+void bil_scene_calculate(RPSysScene* scene) {
     // Run one tick as usual
     Simulation::GetInstance().Tick();
     RPBilMain::GetInstance()->Calculate();
@@ -21,7 +21,7 @@ void Scene_Calculate(RPSysScene* scene) {
         RPBilMain::GetInstance()->Calculate();
     }
 }
-KM_BRANCH(0x802ba1e0, Scene_Calculate);
+KM_BRANCH(0x802ba1e0, bil_scene_calculate);
 
 } // namespace
 } // namespace bah

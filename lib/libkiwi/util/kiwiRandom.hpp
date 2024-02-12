@@ -26,6 +26,13 @@ public:
     }
 
     /**
+     * @brief Get random seed
+     */
+    u32 GetSeed() const {
+        return mSeed;
+    }
+
+    /**
      * @brief Get random u32 (unbounded)
      */
     u32 NextU32() {

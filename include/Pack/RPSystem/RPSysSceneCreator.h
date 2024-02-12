@@ -50,9 +50,9 @@ public:
         ESceneID_RPWlyScene,
         ESceneID_RPTnkScene,
         ESceneID_RPBomScene,
-        RP_SCENE_18H,
         ESceneID_RPPartyTitleScene,
-        RP_SCENE_1AH,
+        ESceneID_RPPartyMiiLoadScene,
+        ESceneID_RPPartyMenuScene,
 
 #ifdef PACK_PLAY
         RP_SCENE_MAX,
