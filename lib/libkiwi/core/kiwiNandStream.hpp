@@ -14,18 +14,16 @@ public:
     /**
      * @brief Constructor
      */
-    NandStream() {}
+    NandStream(EOpenMode mode) : FileStream(mode) {}
 
     /**
      * @brief Constructor
      *
      * @param path File path
      * @param mode Open mode
-     * @param create Create file if it doesn't exist
      */
-    NandStream(const char* path, EOpenMode mode, bool create = false)
-        : FileStream(mode) {
-        Open(path, create);
+    NandStream(const char* path, EOpenMode mode) : FileStream(mode) {
+        Open(path);
     }
 
     /**
@@ -37,7 +35,7 @@ public:
         }
     }
 
-    bool Open(const char* path, bool create = false);
+    bool Open(const char* path);
     virtual void Close();
 
     virtual u32 GetSize() const;

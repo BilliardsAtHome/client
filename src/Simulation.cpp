@@ -29,10 +29,7 @@ u32 GetNumPocket() {
             continue;
         }
 
-        // *Technically* OffTable is different,
-        // but for our purposes we do not care.
-        if (ball->IsState(RPBilBall::EState_Pocket) ||
-            ball->IsState(RPBilBall::EState_OffTable)) {
+        if (ball->IsState(RPBilBall::EState_Pocket)) {
             num++;
         }
     }
@@ -41,7 +38,28 @@ u32 GetNumPocket() {
 }
 
 /**
- * @brief Check whether the current shot fouled
+ * @brief Count number of balls shot off of the table
+ */
+u32 GetNumOffTable() {
+    RPBilBallManager* m = RPBilBallManager::GetInstance();
+    ASSERT(m != NULL);
+
+    u32 num = 0;
+
+    for (int i = 0; i < RPBilBallManager::BALL_MAX; i++) {
+        RPBilBall* ball = m->GetBall(i);
+        ASSERT(ball != NULL);
+
+        if (ball->IsState(RPBilBall::EState_OffTable)) {
+            num++;
+        }
+    }
+
+    return num;
+}
+
+/**
+ * @brief Check whether the break shot fouled
  */
 bool GetIsFoul() {
     RPBilBallManager* m = RPBilBallManager::GetInstance();
@@ -76,7 +94,8 @@ K_DYNAMIC_SINGLETON_IMPL(Simulation);
 Simulation::BreakInfo::BreakInfo()
     : seed(0),
       kseed(0),
-      num(0),
+      sunk(0),
+      off(0),
       frame(0),
       up(0),
       left(0),
@@ -91,7 +110,8 @@ Simulation::BreakInfo::BreakInfo()
 void Simulation::BreakInfo::Read(kiwi::IStream& strm) {
     seed = strm.Read_u32();
     kseed = strm.Read_u32();
-    num = strm.Read_u32();
+    sunk = strm.Read_u32();
+    off = strm.Read_u32();
     frame = strm.Read_u32();
     up = strm.Read_s32();
     left = strm.Read_s32();
@@ -114,14 +134,15 @@ void Simulation::BreakInfo::Read(kiwi::IStream& strm) {
 /**
  * @brief Serialize to stream
  */
-void Simulation::BreakInfo::Write(kiwi::IStream& strm) {
+void Simulation::BreakInfo::Write(kiwi::IStream& strm) const {
     // Checksum for integrity
     kiwi::Checksum crc;
     crc.Process(this, sizeof(BreakInfo));
 
     strm.Write_u32(seed);
     strm.Write_u32(kseed);
-    strm.Write_u32(num);
+    strm.Write_u32(sunk);
+    strm.Write_u32(off);
     strm.Write_u32(frame);
     strm.Write_s32(up);
     strm.Write_s32(left);
@@ -134,6 +155,78 @@ void Simulation::BreakInfo::Write(kiwi::IStream& strm) {
 }
 
 /**
+ * @brief Compare break results
+ *
+ * @param other Comparison target
+ */
+bool Simulation::BreakInfo::IsBetterThan(const BreakInfo& other) const {
+    // New best pocketed count
+    if (sunk > other.sunk) {
+        return;
+    }
+
+    // Same sunk, but more were shot off.
+    // (In a speedrun scenario, this is still good)
+    if (sunk == other.sunk && off > other.off) {
+        return true;
+    }
+
+    // Same ball count, but faster frame count
+    if (sunk == other.sunk && off == other.off && frame < other.frame) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * @brief Log break result to the console
+ */
+void Simulation::BreakInfo::Log() const {
+    // clang-format off
+    LOG("BREAK = {");
+    LOG_EX("    seed:\t%08X",        seed);
+    LOG_EX("    kseed:\t%08X",       kseed);
+    LOG_EX("    sunk:\t%d",          sunk);
+    LOG_EX("    off:\t%d",           off);
+    LOG_EX("    frame:\t%d",         frame);
+    LOG_EX("    up:\t%d",            up);
+    LOG_EX("    left:\t%d",          left);
+    LOG_EX("    right:\t%d",         right);
+    LOG_EX("    pos:\t{%08X, %08X}", *(u32*)&pos.x, *(u32*)&pos.y);
+    LOG_EX("    power:\t%.2f",       power);
+    LOG_EX("    foul:\t%s",          foul ? "true" : "false");
+    LOG("}");
+    // clang-format on
+}
+
+/**
+ * @brief Save break result to the NAND
+
+ * @param name File name
+ * @return Success
+ */
+void Simulation::BreakInfo::Save(const char* name) const {
+    kiwi::NandStream strm(kiwi::EOpenMode_Write);
+
+    while (true) {
+        // Attempt to open file
+        bool success = strm.Open(name);
+        if (success) {
+            break;
+        }
+
+        // Failed? Try again in one second
+        volatile s64 x = OSGetTime();
+        while (OSGetTime() - x < OS_SEC_TO_TICKS(1)) {
+            ;
+        }
+    }
+
+    Write(strm);
+}
+
+/**
  * @brief Constructor
  */
 Simulation::Simulation()
@@ -143,8 +236,8 @@ Simulation::Simulation()
  * @brief Destructor
  */
 Simulation::~Simulation() {
-    delete mpBreakInfo;
-    mpBreakInfo = NULL;
+    delete mpCurrBreak;
+    mpCurrBreak = NULL;
 }
 
 /**
@@ -152,20 +245,24 @@ Simulation::~Simulation() {
  */
 void Simulation::Configure(RPSysScene* scene) {
 #pragma unused(scene)
-    if (mpBreakInfo == NULL) {
-        mpBreakInfo = new (32) BreakInfo();
+    // 32-byte aligned because NAND is cool like that :D
+    if (mpCurrBreak == NULL) {
+        mpCurrBreak = new (32) BreakInfo();
+    }
+    if (mpBestBreak == NULL) {
+        mpBestBreak = new (32) BreakInfo();
     }
 
-    ASSERT(mpBreakInfo != NULL);
+    ASSERT(mpCurrBreak != NULL);
+    ASSERT(mpBestBreak != NULL);
+
+    // Default to max power.
+    // TODO: Maybe configurable later?
+    mpCurrBreak->power = 150.0f;
+    // Dummy record will instantly be broken
+    mpBestBreak->frame = INT_MAX;
 
     mIsReplay = false;
-
-    // TODO: Default to max power. Maybe configurable later?
-    mpBreakInfo->power = 150.0f;
-
-    // Dummy record will instantly be broken
-    mBestNum = 0;
-    mBestFrame = INT_MAX;
 }
 
 /**
@@ -176,12 +273,12 @@ void Simulation::BeforeReset(RPSysScene* scene) {
 
     // Reuse seed for replay
     if (mIsReplay) {
-        RPUtlRandom::setSeed(mpBreakInfo->seed);
+        RPUtlRandom::setSeed(mpBestBreak->seed);
         return;
     }
 
     // Record next seed
-    mpBreakInfo->seed = RPUtlRandom::getSeed();
+    mpCurrBreak->seed = RPUtlRandom::getSeed();
 }
 
 /**
@@ -192,52 +289,52 @@ void Simulation::AfterReset(RPSysScene* scene) {
 
     // Just reload what we need to replay the shot
     if (mIsReplay) {
-        mTimerUp = mpBreakInfo->up;
-        mTimerLeft = mpBreakInfo->left;
-        mTimerRight = mpBreakInfo->right;
+        mTimerUp = mpBestBreak->up;
+        mTimerLeft = mpBestBreak->left;
+        mTimerRight = mpBestBreak->right;
         return;
     }
 
     // Seeded by OS clock
     kiwi::Random random;
-    mpBreakInfo->kseed = random.GetSeed();
+    mpCurrBreak->kseed = random.GetSeed();
 
-    mpBreakInfo->frame = 0;
-    mTimerUp = mpBreakInfo->up = 0;
-    mTimerLeft = mpBreakInfo->left = 0;
-    mTimerRight = mpBreakInfo->right = 0;
+    mpCurrBreak->frame = 0;
+    mTimerUp = mpCurrBreak->up = 0;
+    mTimerLeft = mpCurrBreak->left = 0;
+    mTimerRight = mpCurrBreak->right = 0;
 
     // 50% chance to aim up, 50% chance to aim sideways
     if (random.Chance(0.5f)) {
         // Randomize aiming UP frames -> [0f, 35f]
-        mTimerUp = mpBreakInfo->up = random.NextU32(35);
+        mTimerUp = mpCurrBreak->up = random.NextU32(35);
     } else {
         // Randomize aiming SIDEWAYS frames -> [0f, 12f]
         // 50% chance to aim left vs. aim right
         if (random.Chance(0.5f)) {
-            mTimerLeft = mpBreakInfo->left = random.NextU32(12);
+            mTimerLeft = mpCurrBreak->left = random.NextU32(12);
         } else {
-            mTimerRight = mpBreakInfo->right = random.NextU32(12);
+            mTimerRight = mpCurrBreak->right = random.NextU32(12);
         }
     }
 
     // Base cue position
-    mpBreakInfo->pos = EGG::Vector2f(0.015f, 0.15f);
+    mpCurrBreak->pos = EGG::Vector2f(0.015f, 0.15f);
 
     // Randomize X pos -> [-0.015, +0.015]
-    mpBreakInfo->pos.x *= random.NextF32();
+    mpCurrBreak->pos.x *= random.NextF32();
     // 50% chance to flip
-    mpBreakInfo->pos.x *= random.Sign();
+    mpCurrBreak->pos.x *= random.Sign();
 
     // Randomize Y pos -> [+0.15, +0.30]
-    mpBreakInfo->pos.y += random.NextF32(0.15f);
+    mpCurrBreak->pos.y += random.NextF32(0.15f);
 }
 
 /**
  * @brief Run simulation tick
  */
 void Simulation::Tick() {
-    mpBreakInfo->frame++;
+    mpCurrBreak->frame++;
 
     RPBilCtrl* cueCtrl = RPBilCtrlManager::GetInstance()->GetCtrl();
     if (cueCtrl->CanCtrl()) {
@@ -263,23 +360,12 @@ void Simulation::Tick() {
 
     // Override IR position
     if (wiiCtrl.Connected()) {
-        wiiCtrl.Raw().pos.x = mpBreakInfo->pos.x;
-        wiiCtrl.Raw().pos.y = mpBreakInfo->pos.y;
+        wiiCtrl.Raw().pos.x =
+            mIsReplay ? mpBestBreak->pos.x : mpCurrBreak->pos.x;
+
+        wiiCtrl.Raw().pos.y =
+            mIsReplay ? mpBestBreak->pos.y : mpCurrBreak->pos.y;
     }
-}
-
-/**
- * @brief Save current break info to the NAND
- *
- * @param name File name
- */
-void Simulation::Save(const char* name) {
-    ASSERT(name != NULL);
-
-    kiwi::NandStream strm(name, kiwi::EOpenMode_Write, true);
-    ASSERT(strm.IsOpen());
-
-    mpBreakInfo->Write(strm);
 }
 
 /**
@@ -293,37 +379,21 @@ void Simulation::OnEndShot() {
     }
 
     // Record break results
-    mpBreakInfo->num = GetNumPocket();
-    mpBreakInfo->foul = GetIsFoul();
-    Save("last.brk");
+    mpCurrBreak->sunk = GetNumPocket();
+    mpCurrBreak->off = GetNumOffTable();
+    mpCurrBreak->foul = GetIsFoul();
 
-    // Best ball count (or 7+)
-    mIsReplay = (mpBreakInfo->num > mBestNum) || (mpBreakInfo->num >= 7);
-    // Tied ball count, best frame count
-    mIsReplay |=
-        (mpBreakInfo->num == mBestNum) && (mpBreakInfo->frame < mBestFrame);
+    // Write every break to file
+    mpCurrBreak->Save("last.brk");
 
-    // Record best shot
+    mIsReplay = mpCurrBreak->IsBetterThan(*mpBestBreak);
     if (mIsReplay) {
-        mBestNum = mpBreakInfo->num;
-        mBestFrame = mpBreakInfo->frame;
+        // Record best shot
+        std::memcpy(mpBestBreak, mpCurrBreak, sizeof(BreakInfo));
+        mpBestBreak->Log();
 
-        // clang-format off
-        LOG("BREAK = {");
-        LOG_EX("    seed:\t%08X",  mpBreakInfo->seed);
-        LOG_EX("    num:\t%d",     mpBreakInfo->num);
-        LOG_EX("    frame:\t%d",   mpBreakInfo->frame);
-        LOG_EX("    up:\t%d",      mpBreakInfo->up);
-        LOG_EX("    left:\t%d",    mpBreakInfo->left);
-        LOG_EX("    right:\t%d",   mpBreakInfo->right);
-        LOG_EX("    pos:\t{%08X, %08X}",
-                                   *(u32*)&mpBreakInfo->pos.x, *(u32*)&mpBreakInfo->pos.y);
-        LOG_EX("    power:\t%.2f", mpBreakInfo->power);
-        LOG_EX("    foul:\t%s",    mpBreakInfo->foul ? "true" : "false");
-        LOG("}");
-        // clang-format on
-
-        Save("best.brk");
+        // Write best break to file
+        mpBestBreak->Save("best.brk");
     }
 }
 

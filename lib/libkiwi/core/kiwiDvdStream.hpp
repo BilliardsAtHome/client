@@ -14,7 +14,7 @@ public:
     /**
      * @brief Constructor
      */
-    DvdStream() {}
+    DvdStream() : FileStream(EOpenMode_Read) {}
 
     /**
      * @brief Constructor

@@ -8,12 +8,7 @@ namespace kiwi {
 /**
  * @brief File access
  */
-enum EOpenMode {
-    EOpenMode_Invalid,
-    EOpenMode_Read,
-    EOpenMode_Write,
-    EOpenMode_RW
-};
+enum EOpenMode { EOpenMode_Read, EOpenMode_Write, EOpenMode_RW };
 
 /**
  * @brief Stream to a physical file
@@ -22,17 +17,10 @@ class FileStream : public IStream {
 public:
     /**
      * @brief Constructor
-     */
-    FileStream() : mOpenMode(EOpenMode_Invalid) {}
-
-    /**
-     * @brief Constructor
      *
      * @param mode Open mode
      */
-    FileStream(EOpenMode mode) : mOpenMode(mode) {
-        K_ASSERT(mode != EOpenMode_Invalid);
-    }
+    FileStream(EOpenMode mode) : mOpenMode(mode) {}
 
     /**
      * @brief Destructor
