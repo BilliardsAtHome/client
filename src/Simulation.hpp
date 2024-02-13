@@ -35,7 +35,7 @@ public:
 
         EGG::Vector2f pos;
         f32 power;
-        BOOL foul;
+        bool foul;
     };
 
 public:
