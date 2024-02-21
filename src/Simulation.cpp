@@ -162,7 +162,7 @@ void Simulation::BreakInfo::Write(kiwi::IStream& strm) const {
 bool Simulation::BreakInfo::IsBetterThan(const BreakInfo& other) const {
     // New best pocketed count
     if (sunk > other.sunk) {
-        return;
+        return true;
     }
 
     // Same sunk, but more were shot off.
