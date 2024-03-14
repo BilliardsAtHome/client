@@ -194,7 +194,7 @@ void Simulation::BreakInfo::Log() const {
     LOG_EX("    left:\t%d",          left);
     LOG_EX("    right:\t%d",         right);
     LOG_EX("    pos:\t{%08X, %08X}", *(u32*)&pos.x, *(u32*)&pos.y);
-    LOG_EX("    power:\t%.2f",       *(u32*)&power);
+    LOG_EX("    power:\t%08X",       *(u32*)&power);
     LOG_EX("    foul:\t%s",          foul ? "true" : "false");
     LOG("}");
     // clang-format on
