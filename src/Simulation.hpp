@@ -69,6 +69,7 @@ private:
     BreakInfo* mpCurrBreak;
     BreakInfo* mpBestBreak;
     bool mIsReplay;
+    bool mIsFirstTick;
 };
 
 } // namespace bah

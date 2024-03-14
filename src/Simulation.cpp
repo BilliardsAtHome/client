@@ -194,7 +194,7 @@ void Simulation::BreakInfo::Log() const {
     LOG_EX("    left:\t%d",          left);
     LOG_EX("    right:\t%d",         right);
     LOG_EX("    pos:\t{%08X, %08X}", *(u32*)&pos.x, *(u32*)&pos.y);
-    LOG_EX("    power:\t%.2f",       power);
+    LOG_EX("    power:\t%.2f",       *(u32*)&power);
     LOG_EX("    foul:\t%s",          foul ? "true" : "false");
     LOG("}");
     // clang-format on
@@ -270,6 +270,7 @@ void Simulation::Configure(RPSysScene* scene) {
  */
 void Simulation::BeforeReset(RPSysScene* scene) {
 #pragma unused(scene)
+    mIsFirstTick = true;
 
     // Reuse seed for replay
     if (mIsReplay) {
@@ -304,16 +305,20 @@ void Simulation::AfterReset(RPSysScene* scene) {
     mTimerLeft = mpCurrBreak->left = 0;
     mTimerRight = mpCurrBreak->right = 0;
 
-    // 50% chance to aim up, 50% chance to aim sideways
+    // 50% chance to aim up
     if (random.Chance(0.5f)) {
         // Randomize aiming UP frames -> [0f, 35f]
         mTimerUp = mpCurrBreak->up = random.NextU32(35);
-    } else {
-        // Randomize aiming SIDEWAYS frames -> [0f, 12f]
+    }
+
+    // 80% chance to aim sideways
+    if (random.Chance(0.80f)) {
         // 50% chance to aim left vs. aim right
         if (random.Chance(0.5f)) {
+            // Randomize aiming SIDEWAYS frames -> [0f, 12f]
             mTimerLeft = mpCurrBreak->left = random.NextU32(12);
         } else {
+            // Randomize aiming SIDEWAYS frames -> [0f, 12f]
             mTimerRight = mpCurrBreak->right = random.NextU32(12);
         }
     }
@@ -336,15 +341,17 @@ void Simulation::AfterReset(RPSysScene* scene) {
 void Simulation::Tick() {
     mpCurrBreak->frame++;
 
+    // For some reason, CanCtrl is wrong on the very first scene tick
     RPBilCtrl* cueCtrl = RPBilCtrlManager::GetInstance()->GetCtrl();
-    if (cueCtrl->CanCtrl()) {
+    if (cueCtrl->CanCtrl() && !mIsFirstTick) {
         // Aim up
         if (mTimerUp > 0) {
             cueCtrl->TurnY(-CUE_TURN_SPEED_Y);
             mTimerUp--;
         }
+
         // Aim left
-        else if (mTimerLeft > 0) {
+        if (mTimerLeft > 0) {
             cueCtrl->TurnX(CUE_TURN_SPEED_X);
             mTimerLeft--;
         }
@@ -366,6 +373,8 @@ void Simulation::Tick() {
         wiiCtrl.Raw().pos.y =
             mIsReplay ? mpBestBreak->pos.y : mpCurrBreak->pos.y;
     }
+
+    mIsFirstTick = false;
 }
 
 /**
