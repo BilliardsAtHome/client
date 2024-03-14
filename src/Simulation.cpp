@@ -260,7 +260,7 @@ void Simulation::Configure(RPSysScene* scene) {
     // TODO: Maybe configurable later?
     mpCurrBreak->power = 150.0f;
     // Dummy record will instantly be broken
-    mpBestBreak->frame = INT_MAX;
+    mpBestBreak->frame = ULONG_MAX;
 
     mIsReplay = false;
 }
