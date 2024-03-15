@@ -4,6 +4,7 @@
 #include <Pack/RPUtility.h>
 #include <kokeshi.hpp>
 #include <libkiwi.h>
+#include <revolution/SC.h>
 
 /**
  * Mod entrypoint
@@ -18,6 +19,10 @@ void KokeshiMain() {
 #endif
     // Register our billiards hook
     bah::Simulation::CreateInstance();
+
+    ASSERT_EX(SCGetAspectRatio() == SC_ASPECT_STD,
+              "16:9 aspect ratio is not supported.\nPlease change to 4:3 in "
+              "the console settings.");
 
     // Enter game loop
     RPSysSystem::getInstance()->mainLoop();

@@ -160,22 +160,30 @@ void Simulation::BreakInfo::Write(kiwi::IStream& strm) const {
  * @param other Comparison target
  */
 bool Simulation::BreakInfo::IsBetterThan(const BreakInfo& other) const {
-    // New best pocketed count
-    if (sunk > other.sunk) {
-        return true;
+    u32 myTotal = sunk + off;
+    u32 otherTotal = other.sunk + other.off;
+
+    // Compare total balls out of play
+    if (myTotal != otherTotal) {
+        return myTotal > otherTotal;
     }
 
-    // Same sunk, but more were shot off.
-    // (In a speedrun scenario, this is still good)
-    if (sunk == other.sunk && off > other.off) {
-        return true;
+    // Compare balls pocketed
+    if (sunk != other.sunk) {
+        return sunk > other.sunk;
     }
 
-    // Same ball count, but faster frame count
-    if (sunk == other.sunk && off == other.off && frame < other.frame) {
-        return true;
+    // Compare foul
+    if (foul != other.foul) {
+        return foul == false;
     }
 
+    // Compare frame count
+    if (frame != other.frame) {
+        return frame < other.frame;
+    }
+
+    // Tie, discard
     return false;
 }
 
