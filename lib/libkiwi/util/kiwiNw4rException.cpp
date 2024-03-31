@@ -412,9 +412,19 @@ void Nw4rException::DumpAssert() {
  */
 void Nw4rException::PrintHeapInfo() {
     Printf("---Heap Info---\n");
-    Printf("Module: %.2f KB free\n",
-           OS_MEM_B_TO_KB(
-               static_cast<f32>(MemoryMgr::GetInstance().GetFreeSize())));
+
+    Printf("libkiwi (MEM1): %.2f KB free\n",
+           OS_MEM_B_TO_KB(static_cast<f32>(
+               MemoryMgr::GetInstance().GetFreeSize(EMemory_MEM1))));
+
+    Printf("libkiwi (MEM2): %.2f KB free\n",
+           OS_MEM_B_TO_KB(static_cast<f32>(
+               MemoryMgr::GetInstance().GetFreeSize(EMemory_MEM2))));
+
+    Printf("RPSysSystem: %.2f KB free\n",
+           OS_MEM_B_TO_KB(static_cast<f32>(
+               RPSysSystem::getSystemHeap()->getAllocatableSize())));
+
     Printf("\n");
 }
 

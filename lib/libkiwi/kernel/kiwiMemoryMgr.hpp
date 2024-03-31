@@ -7,22 +7,33 @@
 namespace kiwi {
 
 /**
+ * @brief Memory region from which to allocate
+ */
+enum EMemory { EMemory_MEM1, EMemory_MEM2, EMemory_Max };
+
+/**
  * Module memory manager
  */
 class MemoryMgr : public StaticSingleton<MemoryMgr> {
     friend class StaticSingleton<MemoryMgr>;
 
 public:
-    void* Alloc(u32 size, s32 align);
+    void* Alloc(u32 size, s32 align, EMemory region);
     void Free(void* block);
-    u32 GetFreeSize();
+    u32 GetFreeSize(EMemory region);
 
     /**
-     * Access underlying heap for use with EGG functions
-     * TODO: Remove this and reimplement required EGG features
+     * @brief Access MEM1 heap
      */
-    EGG::Heap* GetEggHeap() {
-        return mpHeap;
+    EGG::Heap* GetHeapMEM1() const {
+        return mpHeapMEM1;
+    }
+
+    /**
+     * @brief Access MEM2 heap
+     */
+    EGG::Heap* GetHeapMEM2() const {
+        return mpHeapMEM2;
     }
 
 private:
@@ -30,13 +41,21 @@ private:
     ~MemoryMgr();
 
 private:
-    // Main heap
-    EGG::ExpHeap* mpHeap;
+    // Heap in MEM1 region
+    EGG::ExpHeap* mpHeapMEM1;
+    // Heap in MEM2 region
+    EGG::ExpHeap* mpHeapMEM2;
 
     // Main heap size
     static const u32 scHeapSize = OS_MEM_KB_TO_B(256);
 };
 
 } // namespace kiwi
+
+void* operator new(std::size_t size, kiwi::EMemory memory);
+void* operator new[](std::size_t size, kiwi::EMemory memory);
+
+void* operator new(std::size_t size, s32 align, kiwi::EMemory memory);
+void* operator new[](std::size_t size, s32 align, kiwi::EMemory memory);
 
 #endif

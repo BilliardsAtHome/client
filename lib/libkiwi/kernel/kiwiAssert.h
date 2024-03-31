@@ -7,6 +7,7 @@
 #define LOG_EX(msg, ...) K_LOG_EX(msg, __VA_ARGS__)
 #define ASSERT(msg) K_ASSERT(msg)
 #define ASSERT_EX(msg, ...) K_ASSERT_EX(msg, __VA_ARGS__)
+#define STATIC_ASSERT(expr) K_STATIC_ASSERT(expr)
 
 #ifndef NDEBUG
 // Log a message to the console
@@ -55,6 +56,10 @@
 #define K_ASSERT(exp, ...)
 #define K_ASSERT_EX(exp, ...)
 #endif
+
+// Compile-time assertion
+#define K_STATIC_ASSERT(expr)                                                  \
+    extern int K_PREDICATE##__COUNTER__[static_cast<int>(expr)];
 
 #ifdef __cplusplus
 extern "C" {

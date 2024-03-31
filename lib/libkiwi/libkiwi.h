@@ -1,5 +1,10 @@
 #ifndef LIBKIWI_H
 #define LIBKIWI_H
+
+#ifndef LIBKIWI_BIG_ENDIAN
+#define LIBKIWI_BIG_ENDIAN
+#endif
+
 #include <libkiwi/core/kiwiColor.hpp>
 #include <libkiwi/core/kiwiController.hpp>
 #include <libkiwi/core/kiwiDvdStream.hpp>

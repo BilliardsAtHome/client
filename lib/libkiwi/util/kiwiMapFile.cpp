@@ -34,7 +34,7 @@ void MapFile::Open(String path, ELinkType type) {
 
     // Load file from disc
     mpMapBuffer = static_cast<char*>(EGG::DvdRipper::loadToMainRAM(
-        path, NULL, MemoryMgr::GetInstance().GetEggHeap(),
+        path, NULL, MemoryMgr::GetInstance().GetHeapMEM1(),
         EGG::DvdRipper::ALLOC_HEAD, 0, NULL, NULL));
 
     if (mpMapBuffer == NULL) {

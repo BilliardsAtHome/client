@@ -103,10 +103,9 @@ s32 SyncSocket::RecvImpl(void* dst, u32 len, SOSockAddr* addr) {
  * @param addr Destination address
  * @return Bytes sent (< 0 if failure)
  */
-s32 SyncSocket::SendImpl(const void* src, u32 len,
-                         const SOSockAddr* addr) {
+s32 SyncSocket::SendImpl(const void* src, u32 len, const SOSockAddr* addr) {
     K_ASSERT(mHandle >= 0);
-    K_ASSERT(mSendPacket.IsEmpty());
+    K_ASSERT(mSendPacket.IsReadComplete());
 
     // Setup new packet
     Packet::Header header;
@@ -119,7 +118,7 @@ s32 SyncSocket::SendImpl(const void* src, u32 len,
 
     // Send packet over socket
     while (!mSendPacket.IsReadComplete()) {
-        return mRecvPacket.Send(mHandle);
+        return mSendPacket.Send(mHandle);
     }
 
     return len;

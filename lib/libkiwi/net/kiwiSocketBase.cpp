@@ -77,12 +77,7 @@ SocketBase::~SocketBase() {
 u32 SocketBase::GetHostAddr() {
     SOInAddr addr;
 
-    if (LibSO::GetHostID(addr) >= 0) {
-        return addr.raw;
-    }
-
-    // Fallback to loopback address
-    LibSO::INetPtoN("127.0.0.1", addr);
+    LibSO::GetHostID(addr);
     return addr.raw;
 }
 
