@@ -7,7 +7,7 @@
 namespace kiwi {
 
 /**
- * Synchronous (blocking) IOS socket wrapper
+ * Synchronous (blocking) socket
  */
 class SyncSocket : public SocketBase {
 public:
@@ -20,8 +20,8 @@ public:
 private:
     SyncSocket(SOSocket socket, SOProtoFamily family, SOSockType type);
 
-    virtual s32 RecvImpl(void* dst, u32 len, SOSockAddr* addr);
-    virtual s32 SendImpl(const void* src, u32 len, const SOSockAddr* addr);
+    virtual s32 RecvImpl(void* dst, s32 len, SOSockAddr* addr);
+    virtual s32 SendImpl(const void* src, s32 len, const SOSockAddr* addr);
 
 private:
     // Packet currently being received

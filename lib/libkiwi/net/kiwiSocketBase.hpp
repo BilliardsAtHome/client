@@ -20,21 +20,14 @@ public:
     virtual SocketBase* Accept() = 0;
 
     /**
-     * Conversion for use as socket descriptor
-     */
-    operator SOSocket() const {
-        return mHandle;
-    }
-
-    /**
      * Tests whether the socket has a valid descriptor
      */
     bool IsOpen() const {
         return mHandle >= 0;
     }
 
-    bool Bind(const SOSockAddr& addr) const;
-    bool Listen(s32 backlog = 5) const;
+    bool Bind(SOSockAddr& addr) const;
+    bool Listen(s32 backlog = SOMAXCONN) const;
     bool SetBlocking(bool enable) const;
     bool Shutdown(SOShutdownType how) const;
     bool Close();
@@ -45,11 +38,11 @@ public:
     bool CanRecv() const;
     bool CanSend() const;
 
-    bool RecvBytes(void* buf, u32 len, s32* nrecv = NULL);
-    bool RecvBytesFrom(void* buf, u32 len, SOSockAddr& addr, s32* nrecv = NULL);
+    bool RecvBytes(void* buf, s32 len, s32* nrecv = NULL);
+    bool RecvBytesFrom(void* buf, s32 len, SOSockAddr& addr, s32* nrecv = NULL);
 
-    bool SendBytes(const void* buf, u32 len, s32* nsend = NULL);
-    bool SendBytesTo(const void* buf, u32 len, const SOSockAddr& addr,
+    bool SendBytes(const void* buf, s32 len, s32* nsend = NULL);
+    bool SendBytesTo(const void* buf, s32 len, const SOSockAddr& addr,
                      s32* nsend = NULL);
 
     template <typename T> bool Recv(T& dst, s32* nrecv = NULL) {
@@ -73,8 +66,9 @@ protected:
 
     bool Poll(SOPollFD fds[], u32 numfds, s64 timeout) const;
 
-    virtual s32 RecvImpl(void* dst, u32 len, SOSockAddr* addr) = 0;
-    virtual s32 SendImpl(const void* src, u32 len, const SOSockAddr* addr) = 0;
+private:
+    virtual s32 RecvImpl(void* dst, s32 len, SOSockAddr* addr) = 0;
+    virtual s32 SendImpl(const void* src, s32 len, const SOSockAddr* addr) = 0;
 
 protected:
     // Socket file descriptor

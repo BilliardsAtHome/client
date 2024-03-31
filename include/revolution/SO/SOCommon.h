@@ -5,9 +5,6 @@
 extern "C" {
 #endif
 
-#define SO_F_GETFL 3
-#define SO_F_SETFL 4
-
 #define SO_O_NONBLOCK 0x4
 
 #define SO_INADDR_ANY 0
@@ -56,6 +53,8 @@ typedef enum {
     SO_IPPROTO_TCP = 6,
     SO_IPPROTO_UDP = 17,
 } SOIPProtocol;
+
+typedef enum { SO_F_GETFL = 3, SO_F_SETFL = 4 } SOFcntlCmd;
 
 typedef enum {
     SO_MSG_OOB = (1 << 0),

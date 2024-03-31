@@ -17,22 +17,22 @@ public:
     static s32 Close(SOSocket socket);
     static s32 Listen(SOSocket socket, s32 backlog = SOMAXCONN);
     static s32 Accept(SOSocket socket, SOSockAddr& addr);
-    static s32 Bind(SOSocket socket, const SOSockAddr& addr);
+    static s32 Bind(SOSocket socket, SOSockAddr& addr);
     static s32 Connect(SOSocket socket, const SOSockAddr& addr);
     static s32 GetSockName(SOSocket socket, SOSockAddr& addr);
     static s32 GetPeerName(SOSocket socket, SOSockAddr& addr);
 
-    static s32 Read(SOSocket socket, void* dst, u32 n);
-    static s32 Recv(SOSocket socket, void* dst, u32 n, u32 flags);
-    static s32 RecvFrom(SOSocket socket, void* dst, u32 n, u32 flags,
+    static s32 Read(SOSocket socket, void* dst, s32 n);
+    static s32 Recv(SOSocket socket, void* dst, s32 n, u32 flags);
+    static s32 RecvFrom(SOSocket socket, void* dst, s32 n, u32 flags,
                         SOSockAddr& addr);
 
-    static s32 Write(SOSocket socket, const void* src, u32 n);
-    static s32 Send(SOSocket socket, const void* src, u32 n, u32 flags);
-    static s32 SendTo(SOSocket socket, const void* src, u32 n, u32 flags,
+    static s32 Write(SOSocket socket, const void* src, s32 n);
+    static s32 Send(SOSocket socket, const void* src, s32 n, u32 flags);
+    static s32 SendTo(SOSocket socket, const void* src, s32 n, u32 flags,
                       const SOSockAddr& addr);
 
-    static s32 Fcntl(SOSocket socket, s32 cmd, ...);
+    static s32 Fcntl(SOSocket socket, SOFcntlCmd cmd, ...);
     static s32 Shutdown(SOSocket socket, SOShutdownType how);
     static s32 Poll(SOPollFD fds[], u32 numfds, s64 timeout);
 
@@ -49,9 +49,9 @@ public:
                           const void* val, u32 len);
 
 private:
-    static s32 RecvImpl(SOSocket socket, void* dst, u32 n, u32 flags,
+    static s32 RecvImpl(SOSocket socket, void* dst, s32 n, u32 flags,
                         SOSockAddr* addr);
-    static s32 SendImpl(SOSocket socket, const void* src, u32 n, u32 flags,
+    static s32 SendImpl(SOSocket socket, const void* src, s32 n, u32 flags,
                         const SOSockAddr* addr);
 
 private:
@@ -182,6 +182,7 @@ struct SockAddr6 : public SOSockAddrIn6 {
     }
 };
 
+// Should be SO types and nothing more
 K_STATIC_ASSERT(sizeof(SockAddr4) == sizeof(SOSockAddrIn));
 K_STATIC_ASSERT(sizeof(SockAddr6) == sizeof(SOSockAddrIn6));
 

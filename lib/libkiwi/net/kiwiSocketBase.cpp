@@ -16,7 +16,6 @@ bool ProcessResult(s32 err, s32* outsize) {
     if (err < 0) {
         // Cannot know message size
         if (outsize != NULL) {
-            // Max unsigned value
             *outsize = -1;
         }
 
@@ -43,7 +42,7 @@ bool ProcessResult(s32 err, s32* outsize) {
  */
 SocketBase::SocketBase(SOProtoFamily family, SOSockType type)
     : mHandle(-1), mFamily(family), mType(type) {
-    mHandle = LibSO::Socket(family, type);
+    mHandle = LibSO::Socket(mFamily, mType);
     K_ASSERT_EX(mHandle >= 0, "Failed to create socket");
 }
 
@@ -84,10 +83,11 @@ u32 SocketBase::GetHostAddr() {
 /**
  * Binds socket to local address
  *
- * @param addr Local address
+ * @note Bind to port zero for a random port (written out)
+ * @param addr[in,out] Local address
  * @return Success
  */
-bool SocketBase::Bind(const SOSockAddr& addr) const {
+bool SocketBase::Bind(SOSockAddr& addr) const {
     K_ASSERT(mHandle >= 0);
     K_ASSERT(mFamily == addr.in.family);
 
@@ -234,7 +234,7 @@ bool SocketBase::CanSend() const {
  * @param[out] nrecv Number of bytes received, or -1 if error/blocking
  * @return Success or would-be-blocking
  */
-bool SocketBase::RecvBytes(void* buf, u32 len, s32* nrecv) {
+bool SocketBase::RecvBytes(void* buf, s32 len, s32* nrecv) {
     K_ASSERT(mHandle >= 0);
     s32 result = RecvImpl(buf, len, NULL);
     return ProcessResult(result, nrecv);
@@ -249,7 +249,7 @@ bool SocketBase::RecvBytes(void* buf, u32 len, s32* nrecv) {
  * @param[out] nrecv Number of bytes received, or -1 if error/blocking
  * @return Success or would-be-blocking
  */
-bool SocketBase::RecvBytesFrom(void* buf, u32 len, SOSockAddr& addr,
+bool SocketBase::RecvBytesFrom(void* buf, s32 len, SOSockAddr& addr,
                                s32* nrecv) {
     K_ASSERT(mHandle >= 0);
     s32 result = RecvImpl(buf, len, &addr);
@@ -264,7 +264,7 @@ bool SocketBase::RecvBytesFrom(void* buf, u32 len, SOSockAddr& addr,
  * @param[out] nsend Number of bytes sent, or -1 if error/blocking
  * @return Success or would-be-blocking
  */
-bool SocketBase::SendBytes(const void* buf, u32 len, s32* nsend) {
+bool SocketBase::SendBytes(const void* buf, s32 len, s32* nsend) {
     K_ASSERT(mHandle >= 0);
     s32 result = SendImpl(buf, len, NULL);
     return ProcessResult(result, nsend);
@@ -279,7 +279,7 @@ bool SocketBase::SendBytes(const void* buf, u32 len, s32* nsend) {
  * @param[out] nsend Number of bytes sent, or -1 if error/blocking
  * @return Success or would-be-blocking
  */
-bool SocketBase::SendBytesTo(const void* buf, u32 len, const SOSockAddr& addr,
+bool SocketBase::SendBytesTo(const void* buf, s32 len, const SOSockAddr& addr,
                              s32* nsend) {
     K_ASSERT(mHandle >= 0);
     s32 result = SendImpl(buf, len, &addr);

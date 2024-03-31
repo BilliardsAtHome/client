@@ -63,14 +63,13 @@ SyncSocket* SyncSocket::Accept() {
  * @param[out] addr Sender address
  * @return Bytes received (< 0 if failure)
  */
-s32 SyncSocket::RecvImpl(void* dst, u32 len, SOSockAddr* addr) {
+s32 SyncSocket::RecvImpl(void* dst, s32 len, SOSockAddr* addr) {
     K_ASSERT(mHandle >= 0);
 
-    // No partial packet
+    s32 result = LibSO::Read(mHandle, &header, sizeof(Packet::Header));
     if (mRecvPacket.IsEmpty()) {
         // Try reading header for new packet
         Packet::Header header;
-        s32 result = LibSO::Read(mHandle, &header, sizeof(Packet::Header));
 
         // Something here, but not a packet
         if (result != sizeof(Packet::Header)) {
@@ -83,7 +82,7 @@ s32 SyncSocket::RecvImpl(void* dst, u32 len, SOSockAddr* addr) {
     }
 
     K_WARN_EX(mRecvPacket.WriteRemain() > len,
-              "Requested %d bytes which is smaller than the packet (%d)", len,
+              "Reqsuested %d bytes which is smaller than the packet (%d)", len,
               mRecvPacket.WriteRemain());
 
     // Read packet over socket
@@ -103,7 +102,7 @@ s32 SyncSocket::RecvImpl(void* dst, u32 len, SOSockAddr* addr) {
  * @param addr Destination address
  * @return Bytes sent (< 0 if failure)
  */
-s32 SyncSocket::SendImpl(const void* src, u32 len, const SOSockAddr* addr) {
+s32 SyncSocket::SendImpl(const void* src, s32 len, const SOSockAddr* addr) {
     K_ASSERT(mHandle >= 0);
     K_ASSERT(mSendPacket.IsReadComplete());
 
