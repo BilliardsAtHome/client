@@ -78,7 +78,7 @@ public:
      *
      * @param id Scene ID
      */
-    ISceneHook(RPSysSceneCreator::ESceneID id) : mSceneID(id) {
+    explicit ISceneHook(RPSysSceneCreator::ESceneID id) : mSceneID(id) {
         SceneHookMgr::GetInstance().AddHook(this, mSceneID);
     }
 

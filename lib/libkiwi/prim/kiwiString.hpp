@@ -67,7 +67,7 @@ public:
      *
      * @param n Number of characters to reserve
      */
-    BasicString(u32 n) : mpBuffer(NULL), mCapacity(0), mLength(0) {
+    explicit BasicString(u32 n) : mpBuffer(NULL), mCapacity(0), mLength(0) {
         Reserve(n);
     }
 

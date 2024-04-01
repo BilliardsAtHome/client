@@ -22,7 +22,7 @@ private:
      *
      * @param elem Node element
      */
-    TListNode(T* elem) : mpNext(NULL), mpPrev(NULL), mpElement(elem) {}
+    explicit TListNode(T* elem) : mpNext(NULL), mpPrev(NULL), mpElement(elem) {}
 
     // Next node in the linked-list
     TListNode<T>* mpNext;
@@ -50,7 +50,7 @@ public:
          *
          * @param node Iterator node
          */
-        Iterator(TListNode<T>* node) : mpNode(node) {
+        explicit Iterator(TListNode<T>* node) : mpNode(node) {
             K_ASSERT(mpNode);
         }
 
@@ -123,7 +123,7 @@ public:
          *
          * @param node Iterator node
          */
-        ConstIterator(TListNode<T>* node) : mpNode(node) {
+        explicit ConstIterator(TListNode<T>* node) : mpNode(node) {
             K_ASSERT(mpNode);
         }
 
@@ -197,7 +197,7 @@ public:
     /**
      * Constructor
      */
-    TList() : mSize(0), mEndNode(NULL) {
+    explicit TList() : mSize(0), mEndNode(NULL) {
         mEndNode.mpNext = &mEndNode;
         mEndNode.mpPrev = &mEndNode;
     }

@@ -23,7 +23,7 @@ public:
      * @param mode Open mode
      * @param create Create file if it doesn't exist
      */
-    DvdStream(const char* path) : FileStream(EOpenMode_Read) {
+    explicit DvdStream(const char* path) : FileStream(EOpenMode_Read) {
         Open(path);
     }
 

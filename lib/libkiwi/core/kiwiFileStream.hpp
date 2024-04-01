@@ -20,7 +20,7 @@ public:
      *
      * @param mode Open mode
      */
-    FileStream(EOpenMode mode) : mOpenMode(mode) {}
+    explicit FileStream(EOpenMode mode) : mOpenMode(mode) {}
 
     /**
      * @brief Destructor

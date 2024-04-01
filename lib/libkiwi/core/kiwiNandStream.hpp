@@ -14,7 +14,7 @@ public:
     /**
      * @brief Constructor
      */
-    NandStream(EOpenMode mode) : FileStream(mode) {}
+    explicit NandStream(EOpenMode mode) : FileStream(mode) {}
 
     /**
      * @brief Constructor
