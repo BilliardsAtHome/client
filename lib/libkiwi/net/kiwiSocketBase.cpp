@@ -2,38 +2,6 @@
 
 namespace kiwi {
 
-namespace {
-
-/**
- * Processes message (send/recv) result
- *
- * @param err LibSO result code
- * @param[out] outsize Message size, or -1 if error/blocking
- * @return Message success or would-be-blocking
- */
-bool ProcessResult(s32 err, s32* outsize) {
-    // Socket error
-    if (err < 0) {
-        // Cannot know message size
-        if (outsize != NULL) {
-            *outsize = -1;
-        }
-
-        // Only successful if error was from blocking
-        return err == SO_EWOULDBLOCK;
-    }
-
-    // "Error code" is actually message size (when >= 0)
-    if (outsize != NULL) {
-        *outsize = err;
-    }
-
-    // Message was successful
-    return true;
-}
-
-} // namespace
-
 /**
  * Constructor
  *
@@ -159,18 +127,6 @@ bool SocketBase::Close() {
 }
 
 /**
- * Monitors status of socket descriptors
- *
- * @param fds Poll information
- * @param numfds Descriptor array length
- * @param timeout Timeout (OS time)
- * @return Success
- */
-bool SocketBase::Poll(SOPollFD fds[], u32 numfds, s64 timeout) const {
-    return LibSO::Poll(fds, numfds, timeout) >= 0;
-}
-
-/**
  * Gets endpoint of socket
  *
  * @param[out] addr Socket address
@@ -207,7 +163,7 @@ bool SocketBase::CanRecv() const {
     fd[0].events = SO_POLLRDNORM;
     fd[0].revents = 0;
 
-    bool success = Poll(fd, LENGTHOF(fd), 0);
+    bool success = LibSO::Poll(fd, LENGTHOF(fd), 0);
     return success && fd[0].events == fd[0].revents;
 }
 
@@ -222,7 +178,7 @@ bool SocketBase::CanSend() const {
     fd[0].events = SO_POLLWRNORM;
     fd[0].revents = 0;
 
-    bool success = Poll(fd, LENGTHOF(fd), 0);
+    bool success = LibSO::Poll(fd, LENGTHOF(fd), 0);
     return success && fd[0].events == fd[0].revents;
 }
 
@@ -231,13 +187,16 @@ bool SocketBase::CanSend() const {
  *
  * @param buf Destination buffer
  * @param len Buffer size
- * @param[out] nrecv Number of bytes received, or -1 if error/blocking
+ * @param[out] nrecv Number of bytes received
  * @return Success or would-be-blocking
  */
-bool SocketBase::RecvBytes(void* buf, s32 len, s32* nrecv) {
+bool SocketBase::RecvBytes(void* buf, u32 len, u32& nrecv) {
     K_ASSERT(mHandle >= 0);
-    s32 result = RecvImpl(buf, len, NULL);
-    return ProcessResult(result, nrecv);
+    K_ASSERT(buf != NULL);
+    K_ASSERT(len > 0);
+
+    s32 result = RecvImpl(buf, len, NULL, nrecv);
+    return result >= 0 || result == SO_EWOULDBLOCK;
 }
 
 /**
@@ -246,14 +205,17 @@ bool SocketBase::RecvBytes(void* buf, s32 len, s32* nrecv) {
  * @param buf Destination buffer
  * @param len Buffer size
  * @param[out] addr Sender address
- * @param[out] nrecv Number of bytes received, or -1 if error/blocking
+ * @param[out] nrecv Number of bytes received
  * @return Success or would-be-blocking
  */
-bool SocketBase::RecvBytesFrom(void* buf, s32 len, SOSockAddr& addr,
-                               s32* nrecv) {
+bool SocketBase::RecvBytesFrom(void* buf, u32 len, SOSockAddr& addr,
+                               u32& nrecv) {
     K_ASSERT(mHandle >= 0);
-    s32 result = RecvImpl(buf, len, &addr);
-    return ProcessResult(result, nrecv);
+    K_ASSERT(buf != NULL);
+    K_ASSERT(len > 0);
+
+    s32 result = RecvImpl(buf, len, &addr, nrecv);
+    return result >= 0 || result == SO_EWOULDBLOCK;
 }
 
 /**
@@ -261,13 +223,16 @@ bool SocketBase::RecvBytesFrom(void* buf, s32 len, SOSockAddr& addr,
  *
  * @param buf Source buffer
  * @param len Buffer size
- * @param[out] nsend Number of bytes sent, or -1 if error/blocking
+ * @param[out] nsend Number of bytes sent
  * @return Success or would-be-blocking
  */
-bool SocketBase::SendBytes(const void* buf, s32 len, s32* nsend) {
+bool SocketBase::SendBytes(const void* buf, u32 len, u32& nsend) {
     K_ASSERT(mHandle >= 0);
-    s32 result = SendImpl(buf, len, NULL);
-    return ProcessResult(result, nsend);
+    K_ASSERT(buf != NULL);
+    K_ASSERT(len > 0);
+
+    s32 result = SendImpl(buf, len, NULL, nsend);
+    return result >= 0 || result == SO_EWOULDBLOCK;
 }
 
 /**
@@ -276,14 +241,17 @@ bool SocketBase::SendBytes(const void* buf, s32 len, s32* nsend) {
  * @param buf Source buffer
  * @param len Buffer size
  * @param addr Destination address
- * @param[out] nsend Number of bytes sent, or -1 if error/blocking
+ * @param[out] nsend Number of bytes sent
  * @return Success or would-be-blocking
  */
-bool SocketBase::SendBytesTo(const void* buf, s32 len, const SOSockAddr& addr,
-                             s32* nsend) {
+bool SocketBase::SendBytesTo(const void* buf, u32 len, const SOSockAddr& addr,
+                             u32& nsend) {
     K_ASSERT(mHandle >= 0);
-    s32 result = SendImpl(buf, len, &addr);
-    return ProcessResult(result, nsend);
+    K_ASSERT(buf != NULL);
+    K_ASSERT(len > 0);
+
+    s32 result = SendImpl(buf, len, &addr, nsend);
+    return result >= 0 || result == SO_EWOULDBLOCK;
 }
 
 } // namespace kiwi

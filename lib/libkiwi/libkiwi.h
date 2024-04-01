@@ -16,11 +16,12 @@
 #include <libkiwi/kernel/kiwiMemoryMgr.hpp>
 #include <libkiwi/kernel/kiwiRuntime.h>
 #include <libkiwi/math/kiwiAlgorithm.hpp>
-#include <libkiwi/net/kiwiAsyncClient.hpp>
 #include <libkiwi/net/kiwiAsyncSocket.hpp>
 #include <libkiwi/net/kiwiPacket.hpp>
+#include <libkiwi/net/kiwiReliableClient.hpp>
+#include <libkiwi/net/kiwiReliablePacket.hpp>
+#include <libkiwi/net/kiwiReliableSocket.hpp>
 #include <libkiwi/net/kiwiSocketBase.hpp>
-#include <libkiwi/net/kiwiSyncSocket.hpp>
 #include <libkiwi/prim/kiwiArray.hpp>
 #include <libkiwi/prim/kiwiLinkList.hpp>
 #include <libkiwi/prim/kiwiSTL.hpp>

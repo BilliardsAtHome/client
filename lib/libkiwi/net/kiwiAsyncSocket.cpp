@@ -4,7 +4,7 @@ namespace kiwi {
 
 OSThread AsyncSocket::sSocketThread;
 bool AsyncSocket::sSocketThreadCreated = false;
-u8 AsyncSocket::sSocketThreadStack[scSocketThreadStackSize];
+u8 AsyncSocket::sSocketThreadStack[THREAD_STACK_SIZE];
 TList<AsyncSocket> AsyncSocket::sSocketList;
 
 /**
@@ -21,44 +21,7 @@ void* AsyncSocket::ThreadFunc(void* arg) {
             K_ASSERT_EX(it->IsOpen(),
                         "Closed socket shouldn't be in the active list");
 
-            switch (it->mTask) {
-            case ETask_None:
-                it->CalcRecv();
-                it->CalcSend();
-                break;
-
-            case ETask_Connecting:
-                result = LibSO::Connect(it->mHandle, it->mPeer);
-
-                // Ignore async return codes
-                if (result != SO_EWOULDBLOCK || result != SO_EINPROGRESS) {
-                    // Done, report result to user
-                    it->mTask = ETask_None;
-                    it->mpConnectCallback(result, it->mpConnectCallbackArg);
-                }
-                break;
-
-            case ETask_Accepting:
-                result = LibSO::Accept(it->mHandle, it->mPeer);
-
-                // Ignore async return codes
-                if (result != SO_EWOULDBLOCK) {
-                    // Peer socket
-                    AsyncSocket* socket =
-                        result >= 0
-                            ? new AsyncSocket(result, it->mFamily, it->mType)
-                            : NULL;
-
-                    // If there was no error, confirm successful allocation
-                    K_ASSERT(socket != NULL || result < 0);
-
-                    // Done, report result to user
-                    it->mTask = ETask_None;
-                    it->mpAcceptCallback(socket, it->mPeer,
-                                         it->mpAcceptCallbackArg);
-                }
-                break;
-            }
+            it->Calc();
         }
     }
 
@@ -73,11 +36,13 @@ void* AsyncSocket::ThreadFunc(void* arg) {
  */
 AsyncSocket::AsyncSocket(SOProtoFamily family, SOSockType type)
     : SocketBase(family, type),
-      mTask(ETask_None),
+      mTask(ETask_Thinking),
       mpConnectCallback(NULL),
       mpConnectCallbackArg(NULL),
       mpAcceptCallback(NULL),
-      mpAcceptCallbackArg(NULL) {
+      mpAcceptCallbackArg(NULL),
+      mpReceiveCallback(NULL),
+      mpReceiveCallbackArg(NULL) {
     Initialize();
 }
 
@@ -90,11 +55,13 @@ AsyncSocket::AsyncSocket(SOProtoFamily family, SOSockType type)
  */
 AsyncSocket::AsyncSocket(SOSocket socket, SOProtoFamily family, SOSockType type)
     : SocketBase(socket, family, type),
-      mTask(ETask_None),
+      mTask(ETask_Thinking),
       mpConnectCallback(NULL),
       mpConnectCallbackArg(NULL),
       mpAcceptCallback(NULL),
-      mpAcceptCallbackArg(NULL) {
+      mpAcceptCallbackArg(NULL),
+      mpReceiveCallback(NULL),
+      mpReceiveCallbackArg(NULL) {
     Initialize();
 }
 
@@ -112,11 +79,11 @@ void AsyncSocket::Initialize() {
     // Thread must exist if there is an open socket
     if (!sSocketThreadCreated) {
         OSCreateThread(&sSocketThread, ThreadFunc, NULL,
-                       &sSocketThreadStack[LENGTHOF(sSocketThreadStack) - 1],
+                       sSocketThreadStack + sizeof(sSocketThreadStack),
                        sizeof(sSocketThreadStack), OS_PRIORITY_MAX, 0);
 
-        OSResumeThread(&sSocketThread);
         sSocketThreadCreated = true;
+        OSResumeThread(&sSocketThread);
     }
 }
 
@@ -124,7 +91,6 @@ void AsyncSocket::Initialize() {
  * Destructor
  */
 AsyncSocket::~AsyncSocket() {
-    // Socket list should only contain open sockets
     sSocketList.Remove(this);
 }
 
@@ -158,32 +124,31 @@ AsyncSocket* AsyncSocket::Accept() {
  * @param dst Destination buffer
  * @param len Buffer size
  * @param[out] addr Sender address
- * @return Bytes received (< 0 if failure)
+ * @param[out] nrecv Number of bytes received
+ * @return Success (or blocking)
  */
-s32 AsyncSocket::RecvImpl(void* dst, u32 len, SOSockAddr* addr) {
-    // No packets available
-    if (mRecvPackets.Empty()) {
-        return SO_EWOULDBLOCK;
+bool AsyncSocket::RecvImpl(void* dst, u32 len, SOSockAddr* addr, u32& nrecv) {
+    K_ASSERT(len > 0);
+    K_ASSERT_EX(mpReceiveCallback != NULL,
+                "Please register the async receive callback");
+
+    // Bad design, I know. But I can't think of a better way....
+    K_WARN(dst != NULL, "Async receive will not write to this parameter.\n"
+                        "Please use the receive callback instead.");
+
+    // Queue receive task
+    Packet* packet = new Packet(len);
+    K_ASSERT(packet != NULL);
+    mRecvPackets.PushBack(packet);
+
+    // Prevent UB
+    nrecv = 0;
+    if (addr != NULL) {
+        std::memset(addr, 0, sizeof(SOSockAddr));
     }
 
-    // Next packet
-    Packet& packet = mRecvPackets.Back();
-
-    // Packet not yet received
-    if (!packet.IsWriteComplete()) {
-        return SO_EWOULDBLOCK;
-    }
-
-    // Copy out packet data
-    u16 bytes = packet.Read(dst, len);
-
-    // Remove packet if completely read
-    if (packet.IsReadComplete()) {
-        mRecvPackets.PopBack();
-        delete &packet;
-    }
-
-    return bytes;
+    // Receive doesn't actually happen on this thread
+    return true;
 }
 
 /**
@@ -192,17 +157,66 @@ s32 AsyncSocket::RecvImpl(void* dst, u32 len, SOSockAddr* addr) {
  * @param src Source buffer
  * @param len Buffer size
  * @param addr Destination address
- * @return Bytes sent (< 0 if failure)
+ * @param[out] nsend Number of bytes sent
+ * @return Success (or blocking)
  */
-s32 AsyncSocket::SendImpl(const void* src, u32 len, const SOSockAddr* addr) {
-    // Create new packet
-    Packet::Header header;
-    header.capacity = len;
-    Packet* packet = new Packet(header);
-    mSendPackets.PushFront(packet);
+bool AsyncSocket::SendImpl(const void* src, u32 len, const SOSockAddr* addr,
+                           u32& nsend) {
+    K_ASSERT(src != NULL);
+    K_ASSERT(len > 0);
 
-    // Copy in data
-    return packet->Write(src, len);
+    Packet* packet = new Packet(len, addr);
+    K_ASSERT(packet != NULL);
+
+    // Store data inside packet
+    u32 written = packet->Write(src, len);
+
+    // Queue packet for sending
+    mSendPackets.PushFront(packet);
+    return written;
+}
+
+/**
+ * Attempt to complete the pending task
+ */
+void AsyncSocket::Calc() {
+    s32 result;
+
+    switch (mTask) {
+    case ETask_Thinking:
+        CalcRecv();
+        CalcSend();
+        break;
+
+    case ETask_Connecting:
+        result = LibSO::Connect(mHandle, mPeer);
+
+        // Report non-blocking results
+        if (result != SO_EWOULDBLOCK || result != SO_EINPROGRESS) {
+            mTask = ETask_Thinking;
+            mpConnectCallback(result, mpConnectCallbackArg);
+        }
+        break;
+
+    case ETask_Accepting:
+        result = LibSO::Accept(mHandle, mPeer);
+
+        // Report non-blocking results
+        if (result != SO_EWOULDBLOCK) {
+            // Peer connection
+            AsyncSocket* socket = NULL;
+
+            // Result code is the peer descriptor
+            if (result >= 0) {
+                AsyncSocket* socket = new AsyncSocket(result, mFamily, mType);
+                K_ASSERT(socket != NULL);
+            }
+
+            mTask = ETask_Thinking;
+            mpAcceptCallback(socket, mPeer, mpAcceptCallbackArg);
+        }
+        break;
+    }
 }
 
 /**
@@ -226,27 +240,32 @@ Packet* AsyncSocket::FindPacketForRecv() {
  */
 void AsyncSocket::CalcRecv() {
     while (true) {
-        // Receive data for the next packet
+        // Find next incomplete packet
         Packet* packet = FindPacketForRecv();
-        if (packet != NULL) {
-            packet->Recv(mHandle);
-            continue;
+        if (packet == NULL) {
+            return;
         }
 
-        // No existing packets, attempt to read new packet header
-        Packet::Header header;
-        s32 result = LibSO::Read(mHandle, &header, sizeof(Packet::Header));
+        // Attempt to complete packet
+        packet->Recv(mHandle);
 
-        // Packet header found, enqueue new packet
-        if (result == sizeof(Packet::Header)) {
-            mRecvPackets.PushFront(new Packet(header));
-            continue;
+        // If complete, dispatch message handler
+        if (packet->IsWriteComplete()) {
+            K_ASSERT_EX(mpReceiveCallback != NULL,
+                        "Please register the async receive callback");
+
+            if (packet->HasPeer()) {
+                SOSockAddr peer;
+                packet->GetPeer(peer);
+                mpReceiveCallback(this, &peer, packet->GetContent(),
+                                  packet->GetContentSize(),
+                                  mpReceiveCallbackArg);
+            } else {
+                mpReceiveCallback(this, NULL, packet->GetContent(),
+                                  packet->GetContentSize(),
+                                  mpReceiveCallbackArg);
+            }
         }
-
-        K_WARN_EX(result > 0, "Found extraneous data: %d bytes", result);
-
-        // No new packet found, stop receiving more packets
-        return;
     }
 }
 

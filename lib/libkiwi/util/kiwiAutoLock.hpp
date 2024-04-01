@@ -8,7 +8,7 @@ namespace kiwi {
 /**
  * Generic scoped lock
  */
-template <typename T> class AutoLock {
+template <typename T> class AutoLock : private NonCopyable {
 public:
     AutoLock(T& object) : mObject(object) {
         Lock();
@@ -17,6 +17,7 @@ public:
         Unlock();
     }
 
+    // Implement these for custom types
     void Lock();
     void Unlock();
 
@@ -26,7 +27,7 @@ private:
 };
 
 /**
- * OS mutex lock implementation
+ * OSMutex specializations
  */
 template <> inline void AutoLock<OSMutex>::Lock() {
     if (OSGetCurrentThread() != NULL) {
@@ -39,10 +40,12 @@ template <> inline void AutoLock<OSMutex>::Unlock() {
     }
 }
 
+typedef AutoLock<OSMutex> AutoMutexLock;
+
 /**
  * OS interrupt scoped lock
  */
-class AutoInterruptLock {
+class AutoInterruptLock : private NonCopyable {
 public:
     AutoInterruptLock(bool enable = false)
         : mEnabled(enable ? OSEnableInterrupts() : OSDisableInterrupts()) {}

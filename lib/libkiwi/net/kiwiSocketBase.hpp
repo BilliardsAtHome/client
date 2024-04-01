@@ -7,7 +7,7 @@
 namespace kiwi {
 
 /**
- * IOS socket wrapper, base class
+ * IOS Berkeley socket wrapper
  */
 class SocketBase : private NonCopyable {
 public:
@@ -15,7 +15,6 @@ public:
 
     SocketBase(SOProtoFamily family, SOSockType type);
     virtual ~SocketBase();
-
     virtual bool Connect(const SOSockAddr& addr) = 0;
     virtual SocketBase* Accept() = 0;
 
@@ -38,37 +37,39 @@ public:
     bool CanRecv() const;
     bool CanSend() const;
 
-    bool RecvBytes(void* buf, s32 len, s32* nrecv = NULL);
-    bool RecvBytesFrom(void* buf, s32 len, SOSockAddr& addr, s32* nrecv = NULL);
+    // Receive bytes
+    bool RecvBytes(void* buf, u32 len, u32& nrecv);
+    bool RecvBytesFrom(void* buf, u32 len, SOSockAddr& addr, u32& nrecv);
 
-    bool SendBytes(const void* buf, s32 len, s32* nsend = NULL);
-    bool SendBytesTo(const void* buf, s32 len, const SOSockAddr& addr,
-                     s32* nsend = NULL);
+    // Send bytes
+    bool SendBytes(const void* buf, u32 len, u32& nsend);
+    bool SendBytesTo(const void* buf, u32 len, const SOSockAddr& addr,
+                     u32& nsend);
 
-    template <typename T> bool Recv(T& dst, s32* nrecv = NULL) {
+    // Receive object
+    template <typename T> bool Recv(T& dst, u32& nrecv) {
         return RecvBytes(&dst, sizeof(T), nrecv);
     }
-    template <typename T>
-    bool RecvFrom(T& dst, SOSockAddr& addr, s32* nrecv = NULL) {
+    template <typename T> bool RecvFrom(T& dst, SOSockAddr& addr, u32& nrecv) {
         return RecvBytesFrom(&dst, sizeof(T), addr, nrecv);
     }
 
-    template <typename T> bool Send(const T& src, s32* nsend = NULL) {
+    // Send object
+    template <typename T> bool Send(const T& src, u32& nsend) {
         return SendBytes(&src, sizeof(T), nsend);
     }
     template <typename T>
-    bool SendTo(const T& src, const SOSockAddr& addr, s32* nsend = NULL) {
+    bool SendTo(const T& src, const SOSockAddr& addr, u32& nsend) {
         return SendBytesTo(&src, sizeof(T), addr, nsend);
     }
 
 protected:
     SocketBase(SOSocket socket, SOProtoFamily family, SOSockType type);
 
-    bool Poll(SOPollFD fds[], u32 numfds, s64 timeout) const;
-
 private:
-    virtual s32 RecvImpl(void* dst, s32 len, SOSockAddr* addr) = 0;
-    virtual s32 SendImpl(const void* src, s32 len, const SOSockAddr* addr) = 0;
+    virtual bool RecvImpl(void* dst, u32 len, SOSockAddr* addr, u32& nrecv) = 0;
+    virtual bool SendImpl(const void* src, u32 len, const SOSockAddr* addr,
+                          u32& nsend) = 0;
 
 protected:
     // Socket file descriptor

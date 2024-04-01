@@ -9,7 +9,7 @@
 namespace kiwi {
 
 /**
- * Asynchronous (non-blocking) IOS socket wrapper
+ * Asynchronous (non-blocking) socket
  */
 class AsyncSocket : public SocketBase {
 public:
@@ -31,11 +31,23 @@ public:
     typedef void (*AcceptCallback)(SocketBase* socket, const SOSockAddr& peer,
                                    void* arg);
 
+    /**
+     * Socket receive callback
+     *
+     * @param socket Socket which received data
+     * @param peer Peer address (NULL if Recv instead of RecvFrom)
+     * @param packet Packet data
+     * @param size Packet data size
+     * @param arg User callback argument
+     */
+    typedef void (*ReceiveCallback)(SocketBase* socket, const SOSockAddr* peer,
+                                    const void* packet, u32 size, void* arg);
+
 private:
     /**
      * Socket async task
      */
-    enum ETask { ETask_None, ETask_Connecting, ETask_Accepting };
+    enum ETask { ETask_Thinking, ETask_Connecting, ETask_Accepting };
 
 public:
     AsyncSocket(SOProtoFamily family, SOSockType type);
@@ -66,52 +78,64 @@ public:
         mpAcceptCallbackArg = arg;
     }
 
+    /**
+     * Set async receive callback
+     *
+     * @param callback Callback function
+     * @param arg Callback function argument
+     */
+    void SetReceiveCallback(ReceiveCallback callback, void* arg = NULL) {
+        mpReceiveCallback = callback;
+        mpReceiveCallbackArg = arg;
+    }
+
 private:
     static void* ThreadFunc(void* arg);
 
     AsyncSocket(SOSocket socket, SOProtoFamily family, SOSockType type);
 
     void Initialize();
-
-    virtual s32 RecvImpl(void* dst, u32 len, SOSockAddr* addr);
-    virtual s32 SendImpl(const void* src, u32 len, const SOSockAddr* addr);
-
+    void Calc();
     void CalcRecv();
     void CalcSend();
 
     Packet* FindPacketForRecv();
 
-private:
-    // Socket thread stack size
-    static const u32 scSocketThreadStackSize = 0x4000;
+    virtual bool RecvImpl(void* dst, u32 len, SOSockAddr* addr, u32& nrecv);
+    virtual bool SendImpl(const void* src, u32 len, const SOSockAddr* addr,
+                          u32& nsend);
 
-    // Socket async task
+private:
+    static const u32 THREAD_STACK_SIZE = 0x4000;
+
+    // Current async task
     ETask mTask;
-    // Socket peer address
+    // Peer address
     SOSockAddr mPeer;
 
-    // Packets for receive operations
+    // Active receive operations
     TList<Packet> mRecvPackets;
-    // Packets for receive operations
+    // Active send operations
     TList<Packet> mSendPackets;
 
-    // Socket connect callback
+    // Connect callback
     ConnectCallback mpConnectCallback;
-    // Socket connect callback argument
     void* mpConnectCallbackArg;
 
-    // Socket accept callback
+    // Accept callback
     AcceptCallback mpAcceptCallback;
-    // Socket accept callback argument
     void* mpAcceptCallbackArg;
+
+    // Receive callback
+    ReceiveCallback mpReceiveCallback;
+    void* mpReceiveCallbackArg;
 
     // Thread for async socket operation
     static OSThread sSocketThread;
-    // Socket thread has been created
     static bool sSocketThreadCreated;
-    // Async socket thread stack
-    static u8 sSocketThreadStack[scSocketThreadStackSize];
-    // List of all active async sockets
+    static u8 sSocketThreadStack[THREAD_STACK_SIZE];
+
+    // Active async sockets
     static TList<AsyncSocket> sSocketList;
 };
 
