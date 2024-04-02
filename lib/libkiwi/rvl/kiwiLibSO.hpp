@@ -13,6 +13,7 @@ namespace kiwi {
 class LibSO {
 public:
     static void Initialize();
+    static SOResult GetLastError();
 
     static s32 Socket(SOProtoFamily family, SOSockType type);
     static s32 Close(SOSocket socket);
@@ -58,6 +59,8 @@ private:
 private:
     // IOS IP device handle
     static s32 sDeviceHandle;
+    // Last IOS error code
+    static SOResult sLastError;
 };
 
 /**

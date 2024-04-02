@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_CORE_ARRAY_H
-#define LIBKIWI_CORE_ARRAY_H
+#ifndef LIBKIWI_PRIM_ARRAY_H
+#define LIBKIWI_PRIM_ARRAY_H
 #include <libkiwi/kernel/kiwiAssert.h>
 #include <types.h>
 

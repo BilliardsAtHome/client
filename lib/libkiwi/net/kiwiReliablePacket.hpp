@@ -49,6 +49,15 @@ public:
 
 public:
     /**
+     * Constructor
+     *
+     * @param size Packet buffer size
+     * @param dest Packet recipient
+     */
+    ReliablePacket(u32 size, const SOSockAddr* dest = NULL)
+        : Packet(size, dest) {}
+
+    /**
      * Access KUDP protocol header
      */
     KUDPHeader& GetHeader() {

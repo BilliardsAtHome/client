@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_CORE_STRING_H
-#define LIBKIWI_CORE_STRING_H
+#ifndef LIBKIWI_PRIM_STRING_H
+#define LIBKIWI_PRIM_STRING_H
 #include <types.h>
 
 namespace kiwi {

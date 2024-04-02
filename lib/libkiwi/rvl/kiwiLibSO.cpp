@@ -25,6 +25,7 @@ enum {
 };
 
 s32 LibSO::sDeviceHandle = -1;
+SOResult LibSO::sLastError = SO_SUCCESS;
 
 /**
  * Accesses IOS IP device for socket operation
@@ -38,6 +39,13 @@ void LibSO::Initialize() {
 
     sDeviceHandle = IOS_Open("/dev/net/ip/top", IPC_OPEN_NONE);
     K_ASSERT_EX(sDeviceHandle >= 0, "Could not access IOS IP device");
+}
+
+/**
+ * Determine the most recent error code
+ */
+SOResult LibSO::GetLastError() {
+    return sLastError;
 }
 
 /**
@@ -75,6 +83,11 @@ s32 LibSO::Socket(SOProtoFamily family, SOSockType type) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Create, args, sizeof(Args), NULL, 0);
 
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
+    }
+
     delete args;
     return result;
 }
@@ -100,6 +113,11 @@ s32 LibSO::Close(SOSocket socket) {
 
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Close, args, sizeof(Args), NULL, 0);
+
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
+    }
 
     delete args;
     return result;
@@ -129,6 +147,11 @@ s32 LibSO::Listen(SOSocket socket, s32 backlog) {
 
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Listen, args, sizeof(Args), NULL, 0);
+
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
+    }
 
     delete args;
     return result;
@@ -173,6 +196,11 @@ s32 LibSO::Accept(SOSocket socket, SOSockAddr& addr) {
         std::memcpy(&addr, out, out->len);
     }
 
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
+    }
+
     delete args;
     delete out;
     return result;
@@ -215,6 +243,11 @@ s32 LibSO::Bind(SOSocket socket, SOSockAddr& addr) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Bind, args, sizeof(Args), NULL, 0);
 
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
+    }
+
     delete args;
     return result;
 }
@@ -249,6 +282,11 @@ s32 LibSO::Connect(SOSocket socket, const SOSockAddr& addr) {
 
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Connect, args, sizeof(Args), NULL, 0);
+
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
+    }
 
     delete args;
     return result;
@@ -291,6 +329,11 @@ s32 LibSO::GetSockName(SOSocket socket, SOSockAddr& addr) {
         std::memcpy(&addr, self, self->len);
     }
 
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
+    }
+
     delete args;
     delete self;
     return result;
@@ -331,6 +374,11 @@ s32 LibSO::GetPeerName(SOSocket socket, SOSockAddr& addr) {
 
     if (result >= 0) {
         std::memcpy(&addr, peer, peer->len);
+    }
+
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
     }
 
     delete args;
@@ -515,6 +563,11 @@ s32 LibSO::RecvImpl(SOSocket socket, void* dst, s32 n, u32 flags,
     s32 result =
         IOS_Ioctlv(sDeviceHandle, Ioctl_RecvFrom, V_NUM_IN, V_NUM_OUT, vectors);
 
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
+    }
+
     delete[] vectors;
     delete args;
     delete from;
@@ -586,6 +639,11 @@ s32 LibSO::SendImpl(SOSocket socket, const void* src, s32 n, u32 flags,
     // Request send
     s32 result = IOS_Ioctlv(sDeviceHandle, Ioctl_SendTo, V_NUM_IN, 0, vectors);
 
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
+    }
+
     delete[] vectors;
     delete args;
     return result;
@@ -624,6 +682,11 @@ s32 LibSO::Fcntl(SOSocket socket, SOFcntlCmd cmd, ...) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Fcntl, args, sizeof(Args), NULL, 0);
 
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
+    }
+
     delete args;
     return result;
 }
@@ -652,6 +715,11 @@ s32 LibSO::Shutdown(SOSocket socket, SOShutdownType how) {
 
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Shutdown, args, sizeof(Args), NULL, 0);
+
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
+    }
 
     delete args;
     return result;
@@ -691,6 +759,11 @@ s32 LibSO::Poll(SOPollFD fds[], u32 numfds, s64 timeout) {
 
     if (result >= 0) {
         std::memcpy(fds, buffer, numfds * sizeof(SOPollFD));
+    }
+
+    // Update library error code
+    if (result < 0) {
+        sLastError = static_cast<SOResult>(result);
     }
 
     delete args;

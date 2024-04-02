@@ -24,6 +24,7 @@
 #include <libkiwi/net/kiwiSocketBase.hpp>
 #include <libkiwi/prim/kiwiArray.hpp>
 #include <libkiwi/prim/kiwiLinkList.hpp>
+#include <libkiwi/prim/kiwiOptional.hpp>
 #include <libkiwi/prim/kiwiSTL.hpp>
 #include <libkiwi/prim/kiwiString.hpp>
 #include <libkiwi/rvl/kiwiLibGX.hpp>

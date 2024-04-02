@@ -12,7 +12,6 @@
 #ifndef NDEBUG
 // Log a message to the console
 #define K_LOG(msg) kiwi_log(msg)
-
 // Log a variadic message to the console
 #define K_LOG_EX(msg, ...) kiwi_log(msg, __VA_ARGS__)
 
@@ -58,8 +57,15 @@
 #endif
 
 // Compile-time assertion
-#define K_STATIC_ASSERT(expr)                                                  \
-    extern int K_PREDICATE##__COUNTER__[static_cast<int>(expr)];
+#if defined(__MWERKS__) && __MWERKS__ >= 0x4199
+// >= GC 3.0 actually supports this!
+#define K_STATIC_ASSERT(expr) __static_assert((expr), "Static Assert")
+#define K_STATIC_ASSERT(expr, msg) __static_assert((expr), msg)
+#else
+// Otherwise we use our own version
+#define K_STATIC_ASSERT(expr) extern u8 K_ASSERT_DUMMY[(expr) ? 1 : -1]
+#define K_STATIC_ASSERT(expr, msg) extern u8 K_ASSERT_DUMMY[(expr) ? 1 : (msg)]
+#endif
 
 #ifdef __cplusplus
 extern "C" {

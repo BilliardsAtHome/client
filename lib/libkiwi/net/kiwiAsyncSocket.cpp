@@ -12,15 +12,12 @@ TList<AsyncSocket> AsyncSocket::sSocketList;
  */
 void* AsyncSocket::ThreadFunc(void* arg) {
 #pragma unused(arg)
-    s32 result;
 
     // Operate all open sockets
     while (true) {
         for (TList<AsyncSocket>::Iterator it = sSocketList.Begin();
              it != sSocketList.End(); it++) {
-            K_ASSERT_EX(it->IsOpen(),
-                        "Closed socket shouldn't be in the active list");
-
+            K_ASSERT(it->IsOpen());
             it->Calc();
         }
     }
@@ -127,7 +124,8 @@ AsyncSocket* AsyncSocket::Accept() {
  * @param[out] nrecv Number of bytes received
  * @return Success (or blocking)
  */
-bool AsyncSocket::RecvImpl(void* dst, u32 len, SOSockAddr* addr, u32& nrecv) {
+bool AsyncSocket::RecvImpl(void* dst, u32 len, Optional<SOSockAddr&> addr,
+                           u32& nrecv) {
     K_ASSERT(len > 0);
     K_ASSERT_EX(mpReceiveCallback != NULL,
                 "Please register the async receive callback");
@@ -143,8 +141,8 @@ bool AsyncSocket::RecvImpl(void* dst, u32 len, SOSockAddr* addr, u32& nrecv) {
 
     // Prevent UB
     nrecv = 0;
-    if (addr != NULL) {
-        std::memset(addr, 0, sizeof(SOSockAddr));
+    if (addr) {
+        std::memset(&addr.Value(), 0, sizeof(SOSockAddr));
     }
 
     // Receive doesn't actually happen on this thread
@@ -160,8 +158,8 @@ bool AsyncSocket::RecvImpl(void* dst, u32 len, SOSockAddr* addr, u32& nrecv) {
  * @param[out] nsend Number of bytes sent
  * @return Success (or blocking)
  */
-bool AsyncSocket::SendImpl(const void* src, u32 len, const SOSockAddr* addr,
-                           u32& nsend) {
+bool AsyncSocket::SendImpl(const void* src, u32 len,
+                           Optional<const SOSockAddr&> addr, u32& nsend) {
     K_ASSERT(src != NULL);
     K_ASSERT(len > 0);
 

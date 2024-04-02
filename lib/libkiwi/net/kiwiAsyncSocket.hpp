@@ -3,6 +3,7 @@
 #include <libkiwi/net/kiwiPacket.hpp>
 #include <libkiwi/net/kiwiSocketBase.hpp>
 #include <libkiwi/prim/kiwiLinkList.hpp>
+#include <libkiwi/prim/kiwiOptional.hpp>
 #include <revolution/OS.h>
 #include <types.h>
 
@@ -13,36 +14,6 @@ namespace kiwi {
  */
 class AsyncSocket : public SocketBase {
 public:
-    /**
-     * Socket connect callback
-     *
-     * @param s32 SOConnect result
-     * @param arg User callback argument
-     */
-    typedef void (*ConnectCallback)(s32 result, void* arg);
-
-    /**
-     * Socket accept callback
-     *
-     * @param socket Peer socket object
-     * @param peer Peer address
-     * @param arg User callback argument
-     */
-    typedef void (*AcceptCallback)(SocketBase* socket, const SOSockAddr& peer,
-                                   void* arg);
-
-    /**
-     * Socket receive callback
-     *
-     * @param socket Socket which received data
-     * @param peer Peer address (NULL if Recv instead of RecvFrom)
-     * @param packet Packet data
-     * @param size Packet data size
-     * @param arg User callback argument
-     */
-    typedef void (*ReceiveCallback)(SocketBase* socket, const SOSockAddr* peer,
-                                    const void* packet, u32 size, void* arg);
-
 private:
     /**
      * Socket async task
@@ -95,15 +66,17 @@ private:
     AsyncSocket(SOSocket socket, SOProtoFamily family, SOSockType type);
 
     void Initialize();
-    void Calc();
+    virtual void Calc();
+
     void CalcRecv();
     void CalcSend();
 
     Packet* FindPacketForRecv();
 
-    virtual bool RecvImpl(void* dst, u32 len, SOSockAddr* addr, u32& nrecv);
-    virtual bool SendImpl(const void* src, u32 len, const SOSockAddr* addr,
-                          u32& nsend);
+    virtual bool RecvImpl(void* dst, u32 len, Optional<SOSockAddr&> addr,
+                          u32& nrecv);
+    virtual bool SendImpl(const void* src, u32 len,
+                          Optional<const SOSockAddr&> addr, u32& nsend);
 
 private:
     static const u32 THREAD_STACK_SIZE = 0x4000;

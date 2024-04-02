@@ -2,6 +2,7 @@
 #define LIBKIWI_NET_PACKET_H
 #include <climits>
 #include <libkiwi/math/kiwiAlgorithm.hpp>
+#include <libkiwi/prim/kiwiOptional.hpp>
 #include <libkiwi/rvl/kiwiLibSO.hpp>
 #include <revolution/OS.h>
 #include <types.h>
@@ -19,16 +20,15 @@ public:
      * @param size Packet buffer size
      * @param dest Packet recipient
      */
-    explicit Packet(u32 size, const SOSockAddr* dest = NULL)
+    Packet(u32 size, const SOSockAddr* dest = NULL)
         : mpBuffer(NULL), mBufferSize(0), mReadOffset(0), mWriteOffset(0) {
         OSInitMutex(&mBufferMutex);
+        Alloc(size);
 
         if (dest != NULL) {
-            std::memcpy(&mAddress, &dest, dest->len);
-            mHasAddress = true;
+            mAddress = *dest;
         } else {
             std::memset(&mAddress, 0, sizeof(SOSockAddr));
-            mHasAddress = false;
         }
     }
 
@@ -78,8 +78,6 @@ public:
         return 0;
     }
 
-    void Alloc(u32 size);
-
     /**
      * Whether the packet contains no data
      */
@@ -114,21 +112,15 @@ public:
     }
 
     /**
-     * Whether this packet has a designated peer
-     */
-    bool HasPeer() const {
-        return mHasAddress;
-    }
-    /**
      * Get peer socket address
      *
      * @param addr Peer address
      */
     void GetPeer(SOSockAddr& addr) const {
-        if (HasPeer()) {
-            std::memcpy(&addr, &mAddress, mAddress.len);
-        }
+        addr = mAddress;
     }
+
+    void Alloc(u32 size);
 
     u32 Read(void* dst, u32 n);
     u32 Write(const void* src, u32 n);
@@ -152,7 +144,6 @@ protected:
 
     // Sender (recv) or recipient (send)
     SOSockAddr mAddress;
-    bool mHasAddress;
 };
 
 } // namespace kiwi
