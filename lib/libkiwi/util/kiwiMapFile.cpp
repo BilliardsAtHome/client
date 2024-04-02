@@ -10,7 +10,7 @@ K_DYNAMIC_SINGLETON_IMPL(MapFile);
  * Constructor
  */
 MapFile::MapFile()
-    : mELinkType(ELinkType_None), mpMapBuffer(NULL), mIsUnpacked(false) {}
+    : mLinkType(ELinkType_None), mpMapBuffer(NULL), mIsUnpacked(false) {}
 
 /**
  * Destructor
@@ -42,7 +42,7 @@ void MapFile::Open(String path, ELinkType type) {
         return;
     }
 
-    mELinkType = type;
+    mLinkType = type;
     Unpack();
 }
 
@@ -113,14 +113,14 @@ void MapFile::Unpack() {
         Symbol* sym = new Symbol();
 
         // Location
-        if (mELinkType == ELinkType_Static) {
+        if (mLinkType == ELinkType_Static) {
             sym->addr = reinterpret_cast<void*>(ksl::strtoul(map, &map, 16));
         } else {
             sym->offset = ksl::strtoul(map, &map, 16);
         }
 
         // Linkage
-        sym->type = mELinkType;
+        sym->type = mLinkType;
 
         // Size
         sym->size = ksl::strtoul(map, &map, 16);

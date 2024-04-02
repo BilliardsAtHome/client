@@ -60,7 +60,7 @@ private:
 
 private:
     // Map file type
-    ELinkType mELinkType;
+    ELinkType mLinkType;
     // Map file text buffer
     char* mpMapBuffer;
     // Whether the map has been unpacked
