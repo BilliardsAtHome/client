@@ -13,7 +13,7 @@ TList<AsyncSocket> AsyncSocket::sSocketList;
 void* AsyncSocket::ThreadFunc(void* arg) {
 #pragma unused(arg)
 
-    // Operate all open sockets
+    // Update all open sockets
     while (true) {
         for (TList<AsyncSocket>::Iterator it = sSocketList.Begin();
              it != sSocketList.End(); it++) {
@@ -33,13 +33,11 @@ void* AsyncSocket::ThreadFunc(void* arg) {
  */
 AsyncSocket::AsyncSocket(SOProtoFamily family, SOSockType type)
     : SocketBase(family, type),
-      mTask(ETask_Thinking),
+      mState(EState_Thinking),
       mpConnectCallback(NULL),
       mpConnectCallbackArg(NULL),
       mpAcceptCallback(NULL),
-      mpAcceptCallbackArg(NULL),
-      mpReceiveCallback(NULL),
-      mpReceiveCallbackArg(NULL) {
+      mpAcceptCallbackArg(NULL) {
     Initialize();
 }
 
@@ -52,13 +50,11 @@ AsyncSocket::AsyncSocket(SOProtoFamily family, SOSockType type)
  */
 AsyncSocket::AsyncSocket(SOSocket socket, SOProtoFamily family, SOSockType type)
     : SocketBase(socket, family, type),
-      mTask(ETask_Thinking),
+      mState(EState_Thinking),
       mpConnectCallback(NULL),
       mpConnectCallbackArg(NULL),
       mpAcceptCallback(NULL),
-      mpAcceptCallbackArg(NULL),
-      mpReceiveCallback(NULL),
-      mpReceiveCallbackArg(NULL) {
+      mpAcceptCallbackArg(NULL) {
     Initialize();
 }
 
@@ -95,108 +91,144 @@ AsyncSocket::~AsyncSocket() {
  * Connects to another socket
  *
  * @param addr Remote address
+ * @param callback Connection callback
+ * @param arg Callback user argument
  * @return Success
  */
-bool AsyncSocket::Connect(const SOSockAddr& addr) {
+bool AsyncSocket::Connect(const SOSockAddr& addr, ConnectCallback callback,
+                          void* arg) {
+    mState = EState_Connecting;
     mPeer = addr;
-    mTask = ETask_Connecting;
+
+    mpConnectCallback = callback;
+    mpConnectCallbackArg = arg;
+
     // Connect doesn't actually happen on this thread
-    return false;
+    return true;
 }
 
 /**
  * Accepts remote connection
  *
+ * @param callback Acceptance callback
+ * @param arg Callback user argument
  * @return New socket
  */
-AsyncSocket* AsyncSocket::Accept() {
-    mTask = ETask_Accepting;
+AsyncSocket* AsyncSocket::Accept(AcceptCallback callback, void* arg) {
+    mState = EState_Accepting;
+
+    mpAcceptCallback = callback;
+    mpAcceptCallbackArg = arg;
+
     // Accept doesn't actually happen on this thread
     return NULL;
 }
 
 /**
- * Receives data from specified connection
+ * Receives data and records sender address
  *
  * @param dst Destination buffer
  * @param len Buffer size
- * @param[out] addr Sender address
  * @param[out] nrecv Number of bytes received
- * @return Success (or blocking)
+ * @param[out] addr Sender address
+ * @param callback Completion callback
+ * @param arg Callback user argument
+ * @return Socket library result
  */
-bool AsyncSocket::RecvImpl(void* dst, u32 len, Optional<SOSockAddr&> addr,
-                           u32& nrecv) {
+SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SOSockAddr* addr,
+                               ReceiveCallback callback, void* arg) {
     K_ASSERT(len > 0);
-    K_ASSERT_EX(mpReceiveCallback != NULL,
-                "Please register the async receive callback");
+    K_ASSERT_EX(callback != NULL, "Please provide a receive callback");
 
     // Bad design, I know. But I can't think of a better way....
     K_WARN(dst != NULL, "Async receive will not write to this parameter.\n"
-                        "Please use the receive callback instead.");
+                        "Please use a receive callback instead.");
 
-    // Queue receive task
+    // Packet to hold incoming data
     Packet* packet = new Packet(len);
     K_ASSERT(packet != NULL);
-    mRecvPackets.PushBack(packet);
+
+    // Asynchronous job
+    Job* job = new Job(packet);
+    K_ASSERT(job != NULL);
+
+    // Queue up this receive
+    job->onrecv = callback;
+    job->arg = arg;
+    mRecvJobs.PushBack(job);
 
     // Prevent UB
-    nrecv = 0;
-    if (addr) {
-        std::memset(&addr.Value(), 0, sizeof(SOSockAddr));
+    if (addr != NULL) {
+        std::memset(addr, 0, sizeof(SOSockAddr));
     }
 
     // Receive doesn't actually happen on this thread
-    return true;
+    nrecv = 0;
+    return SO_EWOULDBLOCK;
 }
 
 /**
  * Sends data to specified connection
  *
- * @param src Source buffer
+ * @param dst Destination buffer
  * @param len Buffer size
- * @param addr Destination address
  * @param[out] nsend Number of bytes sent
- * @return Success (or blocking)
+ * @param[out] addr Sender address
+ * @param callback Completion callback
+ * @param arg Callback user argument
+ * @return Socket library result
  */
-bool AsyncSocket::SendImpl(const void* src, u32 len,
-                           Optional<const SOSockAddr&> addr, u32& nsend) {
+SOResult AsyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
+                               const SOSockAddr* addr, SendCallback callback,
+                               void* arg) {
     K_ASSERT(src != NULL);
     K_ASSERT(len > 0);
 
+    // Packet to hold incoming data
     Packet* packet = new Packet(len, addr);
     K_ASSERT(packet != NULL);
 
     // Store data inside packet
-    u32 written = packet->Write(src, len);
+    packet->Write(src, len);
 
-    // Queue packet for sending
-    mSendPackets.PushFront(packet);
-    return written;
+    // Asynchronous job
+    Job* job = new Job(packet);
+    K_ASSERT(job != NULL);
+
+    // Queue up this receive
+    job->onsend = callback;
+    job->arg = arg;
+    mSendJobs.PushBack(job);
+
+    // Send doesn't actually happen on this thread
+    nsend = 0;
+    return SO_EWOULDBLOCK;
 }
 
 /**
- * Attempt to complete the pending task
+ * Process pending tasks
  */
 void AsyncSocket::Calc() {
     s32 result;
 
-    switch (mTask) {
-    case ETask_Thinking:
+    switch (mState) {
+    case EState_Thinking:
         CalcRecv();
         CalcSend();
         break;
 
-    case ETask_Connecting:
+    case EState_Connecting:
         result = LibSO::Connect(mHandle, mPeer);
 
         // Report non-blocking results
         if (result != SO_EWOULDBLOCK || result != SO_EINPROGRESS) {
-            mTask = ETask_Thinking;
-            mpConnectCallback(result, mpConnectCallbackArg);
+            mState = EState_Thinking;
+            mpConnectCallback(static_cast<SOResult>(result),
+                              mpConnectCallbackArg);
         }
         break;
 
-    case ETask_Accepting:
+    case EState_Accepting:
         result = LibSO::Accept(mHandle, mPeer);
 
         // Report non-blocking results
@@ -210,7 +242,7 @@ void AsyncSocket::Calc() {
                 K_ASSERT(socket != NULL);
             }
 
-            mTask = ETask_Thinking;
+            mState = EState_Thinking;
             mpAcceptCallback(socket, mPeer, mpAcceptCallbackArg);
         }
         break;
@@ -218,51 +250,33 @@ void AsyncSocket::Calc() {
 }
 
 /**
- * Searches for the next packet which should be received from the socket
- */
-Packet* AsyncSocket::FindPacketForRecv() {
-    for (TList<Packet>::Iterator it = mRecvPackets.Begin();
-         it != mRecvPackets.End(); it++) {
-        // Incomplete packet means more data can be received
-        if (!it->IsWriteComplete()) {
-            return &*it;
-        }
-    }
-
-    // All packets are complete
-    return NULL;
-}
-
-/**
  * Receives packet data over socket
  */
 void AsyncSocket::CalcRecv() {
-    while (true) {
-        // Find next incomplete packet
-        Packet* packet = FindPacketForRecv();
-        if (packet == NULL) {
-            return;
-        }
+    while (!mRecvJobs.Empty()) {
+        // Find next incomplete job (FIFO)
+        Job& job = mRecvJobs.Front();
+        K_ASSERT_EX(job.packet != NULL, "Job has no packet?");
+        K_ASSERT_EX(!job.packet->IsWriteComplete(),
+                    "Completed job should be removed");
 
-        // Attempt to complete packet
-        packet->Recv(mHandle);
+        // Attempt to complete job
+        job.packet->Recv(mHandle);
 
-        // If complete, dispatch message handler
-        if (packet->IsWriteComplete()) {
-            K_ASSERT_EX(mpReceiveCallback != NULL,
-                        "Please register the async receive callback");
-
-            if (packet->HasPeer()) {
+        if (job.packet->IsWriteComplete()) {
+            // Notify user
+            if (job.onrecv != NULL) {
                 SOSockAddr peer;
-                packet->GetPeer(peer);
-                mpReceiveCallback(this, &peer, packet->GetContent(),
-                                  packet->GetContentSize(),
-                                  mpReceiveCallbackArg);
-            } else {
-                mpReceiveCallback(this, NULL, packet->GetContent(),
-                                  packet->GetContentSize(),
-                                  mpReceiveCallbackArg);
+                job.packet->GetPeer(peer);
+
+                // TODO: Maybe pass Packet instead, but that's not really useful
+                job.onrecv(peer, job.packet->GetContent(),
+                           job.packet->GetContentSize(), job.arg);
             }
+
+            // Remove from queue
+            mRecvJobs.PopFront();
+            delete &job;
         }
     }
 }
@@ -271,14 +285,25 @@ void AsyncSocket::CalcRecv() {
  * Sends packet data over socket
  */
 void AsyncSocket::CalcSend() {
-    while (!mSendPackets.Empty()) {
-        Packet& packet = mSendPackets.Back();
-        packet.Send(mHandle);
+    while (!mRecvJobs.Empty()) {
+        // Find next incomplete job (FIFO)
+        Job& job = mSendJobs.Front();
+        K_ASSERT_EX(job.packet != NULL, "Job has no packet?");
+        K_ASSERT_EX(!job.packet->IsReadComplete(),
+                    "Completed job should be removed");
 
-        // Remove packet if completely sent
-        if (packet.IsWriteComplete()) {
-            mSendPackets.PopBack();
-            delete &packet;
+        // Attempt to complete job
+        job.packet->Send(mHandle);
+
+        if (job.packet->IsReadComplete()) {
+            // Notify user
+            if (job.onsend != NULL) {
+                job.onsend(job.arg);
+            }
+
+            // Remove from queue
+            mSendJobs.PopFront();
+            delete &job;
         }
     }
 }

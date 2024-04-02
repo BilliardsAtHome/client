@@ -100,9 +100,9 @@ u32 Packet::Write(const void* src, u32 n) {
  *
  * @param socket Socket descriptor
  *
- * @returns Bytes received, or SO error
+ * @returns Number of bytes received
  */
-s32 Packet::Recv(SOSocket socket) {
+Optional<u32> Packet::Recv(SOSocket socket) {
     K_ASSERT(mpBuffer != NULL);
 
     AutoMutexLock lock(mBufferMutex);
@@ -114,9 +114,10 @@ s32 Packet::Recv(SOSocket socket) {
     // > 0 means bytes read from socket
     if (result >= 0) {
         mWriteOffset += result;
+        return result;
     }
 
-    return result;
+    return kiwi::nullopt;
 }
 
 /**
@@ -126,7 +127,7 @@ s32 Packet::Recv(SOSocket socket) {
  *
  * @returns Bytes written, or -1 if blocking
  */
-s32 Packet::Send(SOSocket socket) {
+Optional<u32> Packet::Send(SOSocket socket) {
     K_ASSERT(mpBuffer != NULL);
 
     AutoMutexLock lock(mBufferMutex);
@@ -138,9 +139,10 @@ s32 Packet::Send(SOSocket socket) {
     // > 0 means bytes written to socket
     if (result >= 0) {
         mReadOffset += result;
+        return result;
     }
 
-    return result;
+    return kiwi::nullopt;
 }
 
 } // namespace kiwi

@@ -12,7 +12,7 @@ namespace kiwi {
 class SocketBase : private NonCopyable {
 public:
     /**
-     * Socket connect callback
+     * Connection establish callback
      *
      * @param SOResult SOConnect result
      * @param arg User callback argument
@@ -20,7 +20,7 @@ public:
     typedef void (*ConnectCallback)(SOResult result, void* arg);
 
     /**
-     * Socket accept callback
+     * Connection accept callback
      *
      * @param peer Peer socket object
      * @param addr Peer address
@@ -30,7 +30,7 @@ public:
                                    void* arg);
 
     /**
-     * Socket receive callback
+     * Data receive callback
      *
      * @param addr Peer address
      * @param data Packet data
@@ -39,6 +39,13 @@ public:
      */
     typedef void (*ReceiveCallback)(const SOSockAddr& addr, const void* data,
                                     u32 size, void* arg);
+
+    /**
+     * Data send callback
+     *
+     * @param arg User callback argument
+     */
+    typedef void (*SendCallback)(void* arg);
 
 public:
     static u32 GetHostAddr();
@@ -78,27 +85,32 @@ public:
                                 void* arg = NULL);
 
     // Send bytes
-    Optional<u32> SendBytes(const void* buf, u32 len);
-    Optional<u32> SendBytesTo(const void* buf, u32 len, const SOSockAddr& addr);
+    Optional<u32> SendBytes(const void* buf, u32 len,
+                            SendCallback callback = NULL, void* arg = NULL);
+    Optional<u32> SendBytesTo(const void* buf, u32 len, const SOSockAddr& addr,
+                              SendCallback callback = NULL, void* arg = NULL);
 
     // Receive object
     template <typename T>
     Optional<u32> Recv(T& dst, ReceiveCallback callback = NULL,
                        void* arg = NULL) {
-        return RecvBytes(&dst, sizeof(T), nrecv);
+        return RecvBytes(&dst, sizeof(T), callback, arg);
     }
     template <typename T>
     Optional<u32> RecvFrom(T& dst, SOSockAddr& addr,
                            ReceiveCallback callback = NULL, void* arg = NULL) {
-        return RecvBytesFrom(&dst, sizeof(T), addr, nrecv);
+        return RecvBytesFrom(&dst, sizeof(T), addr, callback, arg);
     }
 
     // Send object
-    template <typename T> Optional<u32> Send(const T& src) {
+    template <typename T>
+    Optional<u32> Send(const T& src, SendCallback callback = NULL,
+                       void* arg = NULL) {
         return SendBytes(&src, sizeof(T));
     }
     template <typename T>
-    Optional<u32> SendTo(const T& src, const SOSockAddr& addr) {
+    Optional<u32> SendTo(const T& src, const SOSockAddr& addr,
+                         SendCallback callback = NULL, void* arg = NULL) {
         return SendBytesTo(&src, sizeof(T), addr);
     }
 
@@ -107,10 +119,10 @@ protected:
 
 private:
     virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SOSockAddr* addr,
-                              ReceiveCallback callback = NULL,
-                              void* arg = NULL) = 0;
+                              ReceiveCallback callback, void* arg) = 0;
     virtual SOResult SendImpl(const void* src, u32 len, u32& nsend,
-                              const SOSockAddr* addr) = 0;
+                              const SOSockAddr* addr, SendCallback callback,
+                              void* arg) = 0;
 
 protected:
     // Socket file descriptor

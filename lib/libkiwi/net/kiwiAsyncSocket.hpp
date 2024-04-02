@@ -14,51 +14,53 @@ namespace kiwi {
  */
 class AsyncSocket : public SocketBase {
 public:
-private:
-    /**
-     * Socket async task
-     */
-    enum ETask { ETask_Thinking, ETask_Connecting, ETask_Accepting };
-
-public:
     AsyncSocket(SOProtoFamily family, SOSockType type);
     virtual ~AsyncSocket();
 
-    virtual bool Connect(const SOSockAddr& addr);
-    virtual AsyncSocket* Accept();
+    virtual bool Connect(const SOSockAddr& addr,
+                         ConnectCallback callback = NULL, void* arg = NULL);
+    virtual AsyncSocket* Accept(AcceptCallback callback = NULL,
+                                void* arg = NULL);
+
+private:
+    /**
+     * Async state
+     */
+    enum EState { EState_Thinking, EState_Connecting, EState_Accepting };
 
     /**
-     * Set async connect callback
-     *
-     * @param callback Callback function
-     * @param arg Callback function argument
+     * Async operation
      */
-    void SetConnectCallback(ConnectCallback callback, void* arg = NULL) {
-        mpConnectCallback = callback;
-        mpConnectCallbackArg = arg;
-    }
+    struct Job {
+        /**
+         * Constructor
+         *
+         * @param _packet Packet for this job
+         */
+        Job(Packet* _packet) : packet(_packet) {
+            K_ASSERT(packet != NULL);
+        }
 
-    /**
-     * Set async accept callback
-     *
-     * @param callback Callback function
-     * @param arg Callback function argument
-     */
-    void SetAcceptCallback(AcceptCallback callback, void* arg = NULL) {
-        mpAcceptCallback = callback;
-        mpAcceptCallbackArg = arg;
-    }
+        /**
+         * Destructor
+         */
+        ~Job() {
+            delete packet;
+            packet = NULL;
+        }
 
-    /**
-     * Set async receive callback
-     *
-     * @param callback Callback function
-     * @param arg Callback function argument
-     */
-    void SetReceiveCallback(ReceiveCallback callback, void* arg = NULL) {
-        mpReceiveCallback = callback;
-        mpReceiveCallbackArg = arg;
-    }
+        // Packet associated with this job
+        Packet* packet;
+
+        // Job completion callback
+        union {
+            ReceiveCallback onrecv;
+            SendCallback onsend;
+        };
+
+        // Callback user argument
+        void* arg;
+    };
 
 private:
     static void* ThreadFunc(void* arg);
@@ -66,30 +68,27 @@ private:
     AsyncSocket(SOSocket socket, SOProtoFamily family, SOSockType type);
 
     void Initialize();
-    virtual void Calc();
-
+    void Calc();
     void CalcRecv();
     void CalcSend();
 
-    Packet* FindPacketForRecv();
-
-    virtual bool RecvImpl(void* dst, u32 len, Optional<SOSockAddr&> addr,
-                          u32& nrecv);
-    virtual bool SendImpl(const void* src, u32 len,
-                          Optional<const SOSockAddr&> addr, u32& nsend);
+    virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SOSockAddr* addr,
+                              ReceiveCallback callback, void* arg);
+    virtual SOResult SendImpl(const void* src, u32 len, u32& nsend,
+                              const SOSockAddr* addr, SendCallback callback,
+                              void* arg);
 
 private:
     static const u32 THREAD_STACK_SIZE = 0x4000;
 
     // Current async task
-    ETask mTask;
+    EState mState;
     // Peer address
     SOSockAddr mPeer;
 
-    // Active receive operations
-    TList<Packet> mRecvPackets;
-    // Active send operations
-    TList<Packet> mSendPackets;
+    // Active packet jobs
+    TList<Job> mRecvJobs;
+    TList<Job> mSendJobs;
 
     // Connect callback
     ConnectCallback mpConnectCallback;
@@ -98,10 +97,6 @@ private:
     // Accept callback
     AcceptCallback mpAcceptCallback;
     void* mpAcceptCallbackArg;
-
-    // Receive callback
-    ReceiveCallback mpReceiveCallback;
-    void* mpReceiveCallbackArg;
 
     // Thread for async socket operation
     static OSThread sSocketThread;

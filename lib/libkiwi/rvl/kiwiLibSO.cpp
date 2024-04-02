@@ -83,7 +83,6 @@ s32 LibSO::Socket(SOProtoFamily family, SOSockType type) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Create, args, sizeof(Args), NULL, 0);
 
-    // Update library error code
     if (result < 0) {
         sLastError = static_cast<SOResult>(result);
     }
@@ -98,7 +97,7 @@ s32 LibSO::Socket(SOProtoFamily family, SOSockType type) {
  * @param socket Socket descriptor
  * @return IOS error code
  */
-s32 LibSO::Close(SOSocket socket) {
+SOResult LibSO::Close(SOSocket socket) {
     K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
 
     struct Args {
@@ -114,13 +113,10 @@ s32 LibSO::Close(SOSocket socket) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Close, args, sizeof(Args), NULL, 0);
 
-    // Update library error code
-    if (result < 0) {
-        sLastError = static_cast<SOResult>(result);
-    }
-
     delete args;
-    return result;
+
+    sLastError = static_cast<SOResult>(result);
+    return sLastError;
 }
 
 /**
@@ -130,7 +126,7 @@ s32 LibSO::Close(SOSocket socket) {
  * @param backlog Maximum pending connections (default 5)
  * @return IOS error code
  */
-s32 LibSO::Listen(SOSocket socket, s32 backlog) {
+SOResult LibSO::Listen(SOSocket socket, s32 backlog) {
     K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
 
     struct Args {
@@ -148,13 +144,10 @@ s32 LibSO::Listen(SOSocket socket, s32 backlog) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Listen, args, sizeof(Args), NULL, 0);
 
-    // Update library error code
-    if (result < 0) {
-        sLastError = static_cast<SOResult>(result);
-    }
-
     delete args;
-    return result;
+
+    sLastError = static_cast<SOResult>(result);
+    return sLastError;
 }
 
 /**
@@ -194,10 +187,7 @@ s32 LibSO::Accept(SOSocket socket, SOSockAddr& addr) {
 
     if (result >= 0) {
         std::memcpy(&addr, out, out->len);
-    }
-
-    // Update library error code
-    if (result < 0) {
+    } else {
         sLastError = static_cast<SOResult>(result);
     }
 
@@ -213,7 +203,7 @@ s32 LibSO::Accept(SOSocket socket, SOSockAddr& addr) {
  * @param addr[in,out] Local address (zero for random port)
  * @return IOS error code
  */
-s32 LibSO::Bind(SOSocket socket, SOSockAddr& addr) {
+SOResult LibSO::Bind(SOSocket socket, SOSockAddr& addr) {
     K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
 
     K_ASSERT_EX(addr.len == sizeof(SOSockAddrIn) ||
@@ -243,13 +233,10 @@ s32 LibSO::Bind(SOSocket socket, SOSockAddr& addr) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Bind, args, sizeof(Args), NULL, 0);
 
-    // Update library error code
-    if (result < 0) {
-        sLastError = static_cast<SOResult>(result);
-    }
-
     delete args;
-    return result;
+
+    sLastError = static_cast<SOResult>(result);
+    return sLastError;
 }
 
 /**
@@ -259,7 +246,7 @@ s32 LibSO::Bind(SOSocket socket, SOSockAddr& addr) {
  * @param addr Remote address
  * @return IOS error code
  */
-s32 LibSO::Connect(SOSocket socket, const SOSockAddr& addr) {
+SOResult LibSO::Connect(SOSocket socket, const SOSockAddr& addr) {
     K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
 
     K_ASSERT_EX(addr.len == sizeof(SOSockAddrIn) ||
@@ -283,13 +270,10 @@ s32 LibSO::Connect(SOSocket socket, const SOSockAddr& addr) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Connect, args, sizeof(Args), NULL, 0);
 
-    // Update library error code
-    if (result < 0) {
-        sLastError = static_cast<SOResult>(result);
-    }
-
     delete args;
-    return result;
+
+    sLastError = static_cast<SOResult>(result);
+    return sLastError;
 }
 
 /**
@@ -299,7 +283,7 @@ s32 LibSO::Connect(SOSocket socket, const SOSockAddr& addr) {
  * @param[in,out] addr Local address
  * @return IOS error code
  */
-s32 LibSO::GetSockName(SOSocket socket, SOSockAddr& addr) {
+SOResult LibSO::GetSockName(SOSocket socket, SOSockAddr& addr) {
     K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
 
     K_ASSERT_EX(addr.len == sizeof(SOSockAddrIn) ||
@@ -329,14 +313,11 @@ s32 LibSO::GetSockName(SOSocket socket, SOSockAddr& addr) {
         std::memcpy(&addr, self, self->len);
     }
 
-    // Update library error code
-    if (result < 0) {
-        sLastError = static_cast<SOResult>(result);
-    }
-
     delete args;
     delete self;
-    return result;
+
+    sLastError = static_cast<SOResult>(result);
+    return sLastError;
 }
 
 /**
@@ -346,7 +327,7 @@ s32 LibSO::GetSockName(SOSocket socket, SOSockAddr& addr) {
  * @param[in,out] addr Remote address
  * @return IOS error code
  */
-s32 LibSO::GetPeerName(SOSocket socket, SOSockAddr& addr) {
+SOResult LibSO::GetPeerName(SOSocket socket, SOSockAddr& addr) {
     K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
 
     K_ASSERT_EX(addr.len == sizeof(SOSockAddrIn) ||
@@ -376,13 +357,10 @@ s32 LibSO::GetPeerName(SOSocket socket, SOSockAddr& addr) {
         std::memcpy(&addr, peer, peer->len);
     }
 
-    // Update library error code
-    if (result < 0) {
-        sLastError = static_cast<SOResult>(result);
-    }
-
     delete args;
-    return result;
+
+    sLastError = static_cast<SOResult>(result);
+    return sLastError;
 }
 
 /**
@@ -698,7 +676,7 @@ s32 LibSO::Fcntl(SOSocket socket, SOFcntlCmd cmd, ...) {
  * @param how How to shutdown connection
  * @return IOS error code
  */
-s32 LibSO::Shutdown(SOSocket socket, SOShutdownType how) {
+SOResult LibSO::Shutdown(SOSocket socket, SOShutdownType how) {
     K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
 
     struct Args {
@@ -716,13 +694,10 @@ s32 LibSO::Shutdown(SOSocket socket, SOShutdownType how) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Shutdown, args, sizeof(Args), NULL, 0);
 
-    // Update library error code
-    if (result < 0) {
-        sLastError = static_cast<SOResult>(result);
-    }
-
     delete args;
-    return result;
+
+    sLastError = static_cast<SOResult>(result);
+    return sLastError;
 }
 
 /**

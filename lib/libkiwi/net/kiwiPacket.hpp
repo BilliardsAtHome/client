@@ -125,8 +125,8 @@ public:
     u32 Read(void* dst, u32 n);
     u32 Write(const void* src, u32 n);
 
-    s32 Send(SOSocket socket);
-    s32 Recv(SOSocket socket);
+    Optional<u32> Send(SOSocket socket);
+    Optional<u32> Recv(SOSocket socket);
 
 protected:
     void Free();

@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_RVL_LIBSO_HPP
-#define LIBKIWI_RVL_LIBSO_HPP
+#ifndef LIBKIWI_RVL_LIBSO_H
+#define LIBKIWI_RVL_LIBSO_H
 #include <cstring>
 #include <libkiwi/prim/kiwiString.hpp>
 #include <revolution/SO.h>
@@ -16,13 +16,13 @@ public:
     static SOResult GetLastError();
 
     static s32 Socket(SOProtoFamily family, SOSockType type);
-    static s32 Close(SOSocket socket);
-    static s32 Listen(SOSocket socket, s32 backlog = SOMAXCONN);
+    static SOResult Close(SOSocket socket);
+    static SOResult Listen(SOSocket socket, s32 backlog = SOMAXCONN);
     static s32 Accept(SOSocket socket, SOSockAddr& addr);
-    static s32 Bind(SOSocket socket, SOSockAddr& addr);
-    static s32 Connect(SOSocket socket, const SOSockAddr& addr);
-    static s32 GetSockName(SOSocket socket, SOSockAddr& addr);
-    static s32 GetPeerName(SOSocket socket, SOSockAddr& addr);
+    static SOResult Bind(SOSocket socket, SOSockAddr& addr);
+    static SOResult Connect(SOSocket socket, const SOSockAddr& addr);
+    static SOResult GetSockName(SOSocket socket, SOSockAddr& addr);
+    static SOResult GetPeerName(SOSocket socket, SOSockAddr& addr);
 
     static s32 Read(SOSocket socket, void* dst, s32 n);
     static s32 Recv(SOSocket socket, void* dst, s32 n, u32 flags);
@@ -35,7 +35,7 @@ public:
                       const SOSockAddr& addr);
 
     static s32 Fcntl(SOSocket socket, SOFcntlCmd cmd, ...);
-    static s32 Shutdown(SOSocket socket, SOShutdownType how);
+    static SOResult Shutdown(SOSocket socket, SOShutdownType how);
     static s32 Poll(SOPollFD fds[], u32 numfds, s64 timeout);
 
     static bool INetPtoN(String str, SOInAddr& addr);

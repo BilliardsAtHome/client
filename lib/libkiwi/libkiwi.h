@@ -23,6 +23,7 @@
 #include <libkiwi/net/kiwiReliableSocket.hpp>
 #include <libkiwi/net/kiwiSocketBase.hpp>
 #include <libkiwi/prim/kiwiArray.hpp>
+#include <libkiwi/prim/kiwiBitCast.hpp>
 #include <libkiwi/prim/kiwiLinkList.hpp>
 #include <libkiwi/prim/kiwiOptional.hpp>
 #include <libkiwi/prim/kiwiSTL.hpp>

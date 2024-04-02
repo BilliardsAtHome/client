@@ -254,23 +254,29 @@ Optional<u32> SocketBase::RecvBytesFrom(void* buf, u32 len, SOSockAddr& addr,
  *
  * @param buf Source buffer
  * @param len Buffer size
+ * @param callback Completion callback
+ * @param arg Callback user argument
  * @return Number of bytes sent
  */
-Optional<u32> SocketBase::SendBytes(const void* buf, u32 len) {
+Optional<u32> SocketBase::SendBytes(const void* buf, u32 len,
+                                    SendCallback callback, void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(buf != NULL);
     K_ASSERT(len > 0);
 
+    // Implementation version is responsible for using the callback
     u32 nsend = 0;
-    SOResult result = SendImpl(buf, len, nsend, NULL);
+    SOResult result = SendImpl(buf, len, nsend, NULL, callback, arg);
 
     // Success, return bytes read
     if (result == SO_SUCCESS) {
         return nsend;
     }
 
-    // I don't think this is possible, but just to be sure...
-    K_ASSERT(result != SO_EWOULDBLOCK);
+    // Blocking is OK, just say zero bytes
+    if (result == SO_EWOULDBLOCK) {
+        return 0;
+    }
 
     // Something went wrong!
     return kiwi::nullopt;
@@ -282,24 +288,30 @@ Optional<u32> SocketBase::SendBytes(const void* buf, u32 len) {
  * @param buf Source buffer
  * @param len Buffer size
  * @param addr Destination address
+ * @param callback Completion callback
+ * @param arg Callback user argument
  * @return Number of bytes sent
  */
 Optional<u32> SocketBase::SendBytesTo(const void* buf, u32 len,
-                                      const SOSockAddr& addr) {
+                                      const SOSockAddr& addr,
+                                      SendCallback callback, void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(buf != NULL);
     K_ASSERT(len > 0);
 
+    // Implementation version is responsible for using the callback
     u32 nsend = 0;
-    SOResult result = SendImpl(buf, len, nsend, &addr);
+    SOResult result = SendImpl(buf, len, nsend, &addr, callback, arg);
 
     // Success, return bytes read
     if (result == SO_SUCCESS) {
         return nsend;
     }
 
-    // I don't think this is possible, but just to be sure...
-    K_ASSERT(result != SO_EWOULDBLOCK);
+    // Blocking is OK, just say zero bytes
+    if (result == SO_EWOULDBLOCK) {
+        return 0;
+    }
 
     // Something went wrong!
     return kiwi::nullopt;
