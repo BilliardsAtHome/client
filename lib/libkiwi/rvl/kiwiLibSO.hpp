@@ -49,10 +49,10 @@ public:
     static void GetHostID(SOInAddr& addr);
     static void WaitForDHCP();
 
-    static s32 GetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
-                          void* val, u32 len);
-    static s32 SetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
-                          const void* val, u32 len);
+    static SOResult GetSockOpt(SOSocket socket, SOSockOptLevel level,
+                               SOSockOpt opt, void* val, u32 len);
+    static SOResult SetSockOpt(SOSocket socket, SOSockOptLevel level,
+                               SOSockOpt opt, const void* val, u32 len);
 
 private:
     static s32 RecvImpl(SOSocket socket, void* dst, u32 len, u32 flags,
@@ -109,9 +109,9 @@ struct SockAddr : public SOSockAddr {
      */
     String ToString() const {
         switch (len) {
-        case sizeof(SockAddr4):
+        case sizeof(SOSockAddrIn):
             return Format("%s:%d", LibSO::INetNtoP(in.addr), port);
-        case sizeof(SockAddr6):
+        case sizeof(SOSockAddrIn6):
             return Format("%s:%d", LibSO::INetNtoP(in6.addr), port);
         default: K_ASSERT_EX(false, "Invalid SockAddr length"); return "";
         }

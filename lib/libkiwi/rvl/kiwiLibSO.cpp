@@ -796,4 +796,49 @@ void LibSO::GetHostID(SOInAddr& addr) {
     addr.raw = static_cast<u32>(result);
 }
 
+/**
+ * Wait until the local IP address has been assigned
+ */
+void LibSO::WaitForDHCP() {
+    SOInAddr addr;
+    GetHostID(addr);
+
+    while (addr.raw == 0) {
+        OSSleepTicks(OS_MSEC_TO_TICKS(10));
+        GetHostID(addr);
+    }
+}
+
+/**
+ * @brief Get socket option
+ *
+ * @param socket Socket descriptor
+ * @param level Option level
+ * @param opt Option name
+ * @param[out] val Option value
+ * @param len Buffer size
+ * @return IOS error code
+ */
+SOResult LibSO::GetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
+                           void* val, u32 len) {
+    K_ASSERT_EX(false, "Not implemented");
+    return SO_SUCCESS;
+}
+
+/**
+ * @brief Set socket option
+ *
+ * @param socket Socket descriptor
+ * @param level Option level
+ * @param opt Option name
+ * @param val Option value
+ * @param len Buffer size
+ * @return IOS error code
+ */
+SOResult LibSO::SetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
+                           const void* val, u32 len) {
+    K_ASSERT_EX(false, "Not implemented");
+    return SO_SUCCESS;
+}
+
 } // namespace kiwi
