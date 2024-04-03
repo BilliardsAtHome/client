@@ -52,7 +52,7 @@ void Packet::Clear() {
  * @param dst Data destination
  * @param n Data size
  *
- * @return Bytes read
+ * @return Number of bytes read
  */
 u32 Packet::Read(void* dst, u32 n) {
     K_ASSERT(mpBuffer != NULL);
@@ -76,7 +76,7 @@ u32 Packet::Read(void* dst, u32 n) {
  * @param src Data source
  * @param n Data size
  *
- * @return Bytes written
+ * @return Number of bytes written
  */
 
 u32 Packet::Write(const void* src, u32 n) {
@@ -111,6 +111,11 @@ Optional<u32> Packet::Recv(SOSocket socket) {
     s32 result = LibSO::RecvFrom(socket, mpBuffer + mWriteOffset, WriteRemain(),
                                  0, mAddress);
 
+    // Blocking, just say zero
+    if (result == SO_EWOULDBLOCK) {
+        return 0;
+    }
+
     // > 0 means bytes read from socket
     if (result >= 0) {
         mWriteOffset += result;
@@ -125,7 +130,7 @@ Optional<u32> Packet::Recv(SOSocket socket) {
  *
  * @param socket Socket descriptor
  *
- * @return Bytes written, or -1 if blocking
+ * @return Number of bytes sent
  */
 Optional<u32> Packet::Send(SOSocket socket) {
     K_ASSERT(mpBuffer != NULL);
@@ -135,6 +140,11 @@ Optional<u32> Packet::Send(SOSocket socket) {
     // Send through socket (try to complete packet)
     s32 result = LibSO::SendTo(socket, mpBuffer + mReadOffset, ReadRemain(), 0,
                                mAddress);
+
+    // Blocking, just say zero
+    if (result == SO_EWOULDBLOCK) {
+        return 0;
+    }
 
     // > 0 means bytes written to socket
     if (result >= 0) {

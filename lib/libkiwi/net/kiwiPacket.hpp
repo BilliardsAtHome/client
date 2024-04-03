@@ -28,7 +28,7 @@ public:
         if (dest != NULL) {
             mAddress = *dest;
         } else {
-            std::memset(&mAddress, 0, sizeof(SockAddr));
+            mAddress = SockAddr4();
         }
     }
 

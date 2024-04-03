@@ -12,13 +12,15 @@ public:
      * @brief Constructor
      *
      * @param _packet Packet for this job
+     * @param _dst Destination address
      * @param _callback Completion callback
      * @param _arg Callback user argument
      */
-    RecvJob(Packet* _packet, ReceiveCallback _callback = NULL,
+    RecvJob(Packet* _packet, void* _dst, ReceiveCallback _callback = NULL,
             void* _arg = NULL)
-        : packet(_packet), callback(_callback), arg(_arg) {
+        : packet(_packet), dst(_dst), callback(_callback), arg(_arg) {
         K_ASSERT(packet != NULL);
+        K_ASSERT(dst != NULL);
     }
 
     /**
@@ -44,7 +46,6 @@ public:
      * @return Whether the job is complete
      */
     bool Calc(SOSocket socket) {
-        K_ASSERT(socket != NULL);
         K_ASSERT(packet != NULL);
 
         // Nothing left to do
@@ -56,10 +57,15 @@ public:
         packet->Recv(socket);
         bool done = IsComplete();
 
-        // Fire callback
-        if (done && callback != NULL) {
-            callback(packet->GetPeer(), packet->GetContent(),
-                     packet->GetContentSize(), arg);
+        // Write out data
+        if (done) {
+            K_ASSERT(dst != NULL);
+            std::memcpy(dst, packet->GetContent(), packet->GetContentSize());
+
+            // Notify user
+            if (callback != NULL) {
+                callback(LibSO::GetLastError(), packet->GetPeer(), arg);
+            }
         }
 
         return done;
@@ -68,6 +74,8 @@ public:
 private:
     // Packet associated with this job
     Packet* packet;
+    // Original read address
+    void* dst;
 
     // Completion callback
     ReceiveCallback callback;
@@ -114,7 +122,6 @@ public:
      * @return Whether the job is complete
      */
     bool Calc(SOSocket socket) {
-        K_ASSERT(socket != NULL);
         K_ASSERT(packet != NULL);
 
         // Nothing left to do
@@ -128,7 +135,7 @@ public:
 
         // Fire callback
         if (done && callback != NULL) {
-            callback(arg);
+            callback(LibSO::GetLastError(), arg);
         }
 
         return done;
@@ -247,7 +254,7 @@ bool AsyncSocket::Connect(const SockAddr& addr, ConnectCallback callback,
     mpConnectCallbackArg = arg;
 
     // Connect doesn't actually happen on this thread
-    return true;
+    return false;
 }
 
 /**
@@ -283,19 +290,16 @@ AsyncSocket* AsyncSocket::Accept(AcceptCallback callback, void* arg) {
 SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
                                ReceiveCallback callback, void* arg) {
     K_ASSERT(IsOpen());
+    K_ASSERT(dst != NULL);
     K_ASSERT(len > 0 && len < ULONG_MAX);
     K_ASSERT_EX(callback != NULL, "Please provide a receive callback");
-
-    // Bad design, I know. But I can't think of a better way....
-    K_WARN(dst != NULL, "Async receive will not write to this parameter.\n"
-                        "Please use a receive callback instead.");
 
     // Packet to hold incoming data
     Packet* packet = new Packet(len);
     K_ASSERT(packet != NULL);
 
     // Asynchronous job
-    RecvJob* job = new RecvJob(packet, callback, arg);
+    RecvJob* job = new RecvJob(packet, dst, callback, arg);
     K_ASSERT(job != NULL);
     mRecvJobs.PushBack(job);
 
@@ -361,12 +365,17 @@ void AsyncSocket::Calc() {
     case EState_Connecting:
         result = LibSO::Connect(mHandle, mPeer);
 
-        // Report non-blocking results
-        if (result != SO_EWOULDBLOCK || result != SO_EINPROGRESS) {
-            mState = EState_Thinking;
-            mpConnectCallback(static_cast<SOResult>(result),
-                              mpConnectCallbackArg);
+        // Blocking, try again
+        if (result == SO_EINPROGRESS || result == SO_EALREADY) {
+            break;
         }
+
+        // Connection complete (looking for EISCONN here)
+        mState = EState_Thinking;
+        mpConnectCallback(result == SO_EISCONN ? SO_SUCCESS
+                                               : LibSO::GetLastError(),
+                          mpConnectCallbackArg);
+
         break;
 
     case EState_Accepting:
@@ -384,7 +393,8 @@ void AsyncSocket::Calc() {
             }
 
             mState = EState_Thinking;
-            mpAcceptCallback(socket, mPeer, mpAcceptCallbackArg);
+            mpAcceptCallback(LibSO::GetLastError(), socket, mPeer,
+                             mpAcceptCallbackArg);
         }
         break;
     }
@@ -396,17 +406,20 @@ void AsyncSocket::Calc() {
 void AsyncSocket::CalcRecv() {
     K_ASSERT(IsOpen());
 
-    while (!mRecvJobs.Empty()) {
-        // Find next incomplete job (FIFO)
-        RecvJob& job = mRecvJobs.Front();
-        K_ASSERT_EX(!job.IsComplete(), "Completed job should be removed");
+    // Nothing to do
+    if (mRecvJobs.Empty()) {
+        return;
+    }
 
-        // Attempt to complete job
-        if (job.Calc(mHandle)) {
-            // Remove from queue
-            mRecvJobs.PopFront();
-            delete &job;
-        }
+    // Find next incomplete job (FIFO)
+    RecvJob& job = mRecvJobs.Front();
+    K_ASSERT_EX(!job.IsComplete(), "Completed job should be removed");
+
+    // Attempt to complete job
+    if (job.Calc(mHandle)) {
+        // Remove from queue
+        mRecvJobs.PopFront();
+        delete &job;
     }
 }
 
@@ -416,17 +429,20 @@ void AsyncSocket::CalcRecv() {
 void AsyncSocket::CalcSend() {
     K_ASSERT(IsOpen());
 
-    while (!mRecvJobs.Empty()) {
-        // Find next incomplete job (FIFO)
-        SendJob& job = mSendJobs.Front();
-        K_ASSERT_EX(!job.IsComplete(), "Completed job should be removed");
+    // Nothing to do
+    if (mSendJobs.Empty()) {
+        return;
+    }
 
-        // Attempt to complete job
-        if (job.Calc(mHandle)) {
-            // Remove from queue
-            mSendJobs.PopFront();
-            delete &job;
-        }
+    // Find next incomplete job (FIFO)
+    SendJob& job = mSendJobs.Front();
+    K_ASSERT_EX(!job.IsComplete(), "Completed job should be removed");
+
+    // Attempt to complete job
+    if (job.Calc(mHandle)) {
+        // Remove from queue
+        mSendJobs.PopFront();
+        delete &job;
     }
 }
 

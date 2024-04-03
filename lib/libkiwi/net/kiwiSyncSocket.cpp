@@ -16,16 +16,13 @@ bool SyncSocket::Connect(const SockAddr& addr, ConnectCallback callback,
     K_ASSERT(IsOpen());
 
     // Blocking call
-    SOResult result = LibSO::Connect(mHandle, addr);
-    if (result != SO_SUCCESS) {
-        return false;
-    }
+    bool success = LibSO::Connect(mHandle, addr) == SO_SUCCESS;
 
     if (callback != NULL) {
-        callback(result, arg);
+        callback(LibSO::GetLastError(), arg);
     }
 
-    return true;
+    return success;
 }
 
 /**
@@ -38,24 +35,23 @@ bool SyncSocket::Connect(const SockAddr& addr, ConnectCallback callback,
 SyncSocket* SyncSocket::Accept(AcceptCallback callback, void* arg) {
     K_ASSERT(IsOpen());
 
-    // TODO: Will forcing ipv4 cause problems?
-    kiwi::SockAddr4 peer;
+    SyncSocket* peer = NULL;
+    kiwi::SockAddr4 addr; // TODO: Will forcing ipv4 cause problems?
 
     // Blocking call
-    s32 result = LibSO::Accept(mHandle, peer);
-    if (result < 0) {
-        return NULL;
-    }
+    s32 fd = LibSO::Accept(mHandle, addr);
 
     // Result code is the peer descriptor
-    SyncSocket* socket = new SyncSocket(mHandle, mFamily, mType);
-    K_ASSERT(socket != NULL);
-
-    if (callback != NULL) {
-        callback(socket, peer, arg);
+    if (fd > 0) {
+        peer = new SyncSocket(fd, mFamily, mType);
+        K_ASSERT(peer != NULL);
     }
 
-    return socket;
+    if (callback != NULL) {
+        callback(LibSO::GetLastError(), peer, addr, arg);
+    }
+
+    return peer;
 }
 
 /**
@@ -75,31 +71,33 @@ SOResult SyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
     K_ASSERT(dst != NULL);
     K_ASSERT(len > 0 && len < ULONG_MAX);
 
-    // TODO: Will forcing ipv4 cause problems?
-    kiwi::SockAddr4 peer;
+    s32 result;
+    kiwi::SockAddr4 peer; // TODO: Will forcing ipv4 cause problems?
 
     nrecv = 0;
     while (nrecv < len) {
         // Blocking call
-        s32 result = LibSO::RecvFrom(mHandle, dst, len - nrecv, 0, peer);
+        result = LibSO::RecvFrom(mHandle, dst, len - nrecv, 0, peer);
         if (result < 0) {
-            return static_cast<SOResult>(result);
+            goto _exit;
         }
 
-        nrecv += len;
+        nrecv += result;
     }
 
     K_ASSERT_EX(nrecv <= len, "Overflow???");
 
+_exit:
     if (addr != NULL) {
         std::memcpy(addr, &peer, peer.len);
     }
 
     if (callback != NULL) {
-        callback(peer, dst, nrecv, arg);
+        callback(LibSO::GetLastError(), peer, arg);
     }
 
-    return SO_SUCCESS;
+    // Successful if the last transaction resulted in some amount of bytes read
+    return result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
 }
 
 /**
@@ -120,10 +118,10 @@ SOResult SyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
     K_ASSERT(src != NULL);
     K_ASSERT(len > 0 && len < ULONG_MAX);
 
+    s32 result;
+
     nsend = 0;
     while (nsend < len) {
-        s32 result;
-
         // Blocking calls
         if (addr != NULL) {
             result = LibSO::SendTo(mHandle, src, len - nsend, 0, *addr);
@@ -132,17 +130,20 @@ SOResult SyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
         }
 
         if (result < 0) {
-            return static_cast<SOResult>(result);
+            goto _exit;
         }
 
         nsend += result;
     }
 
+    K_ASSERT_EX(nsend <= len, "Overflow???");
+
+_exit:
     if (callback != NULL) {
-        callback(arg);
+        callback(LibSO::GetLastError(), arg);
     }
 
-    return SO_SUCCESS;
+    return result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
 }
 
 } // namespace kiwi

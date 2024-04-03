@@ -482,9 +482,16 @@ void Nw4rException::PrintStack(u32 depth) {
     Printf("-----------------------------------\n");
     Printf("Address:   BackChain   LR save\n");
 
-    for (int i = 0;
-         i < depth && reinterpret_cast<std::uintptr_t>(frame) != 0xFFFFFFFF;
-         i++, frame = frame->next) {
+    for (int i = 0; i < depth; i++, frame = frame->next) {
+        // Main thread root frame
+        if (reinterpret_cast<u32>(frame) == 0xFFFFFFFF) {
+            break;
+        }
+
+        // Sub thread root frame
+        if (reinterpret_cast<u32>(frame) == 0) {
+            break;
+        }
 
         // Print stack frame info
         Printf("%08X:  %08X    ", frame, frame->next);

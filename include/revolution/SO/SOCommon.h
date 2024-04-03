@@ -26,6 +26,7 @@ typedef enum {
     SO_EHOSTUNREACH = -23,
     SO_EINPROGRESS = -26,
     SO_EINVAL = -28,
+    SO_EISCONN = -30,
     SO_EMSGSIZE = -35,
     SO_ENOBUFS = -42,
     SO_ENOMEM = -49,

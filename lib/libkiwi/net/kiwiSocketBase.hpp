@@ -14,7 +14,7 @@ public:
     /**
      * Connection establish callback
      *
-     * @param SOResult SOConnect result
+     * @param result Socket library result
      * @param arg User callback argument
      */
     typedef void (*ConnectCallback)(SOResult result, void* arg);
@@ -22,30 +22,31 @@ public:
     /**
      * Connection accept callback
      *
+     * @param result Socket library result
      * @param peer Peer socket object
      * @param addr Peer address
      * @param arg User callback argument
      */
-    typedef void (*AcceptCallback)(SocketBase* peer, const SockAddr& addr,
-                                   void* arg);
+    typedef void (*AcceptCallback)(SOResult result, SocketBase* peer,
+                                   const SockAddr& addr, void* arg);
 
     /**
      * Data receive callback
      *
+     * @param result Socket library result
      * @param addr Peer address
-     * @param data Packet data
-     * @param size Packet data size
      * @param arg User callback argument
      */
-    typedef void (*ReceiveCallback)(const SockAddr& addr, const void* data,
-                                    u32 size, void* arg);
+    typedef void (*ReceiveCallback)(SOResult result, const SockAddr& addr,
+                                    void* arg);
 
     /**
      * Data send callback
      *
+     * @param result Socket library result
      * @param arg User callback argument
      */
-    typedef void (*SendCallback)(void* arg);
+    typedef void (*SendCallback)(SOResult result, void* arg);
 
 public:
     static void GetHostAddr(SockAddr4& addr);
@@ -106,12 +107,12 @@ public:
     template <typename T>
     Optional<u32> Send(const T& src, SendCallback callback = NULL,
                        void* arg = NULL) {
-        return SendBytes(&src, sizeof(T));
+        return SendBytes(&src, sizeof(T), callback, arg);
     }
     template <typename T>
     Optional<u32> SendTo(const T& src, const SockAddr& addr,
                          SendCallback callback = NULL, void* arg = NULL) {
-        return SendBytesTo(&src, sizeof(T), addr);
+        return SendBytesTo(&src, sizeof(T), addr, callback, arg);
     }
 
 protected:

@@ -84,9 +84,7 @@ s32 LibSO::Socket(SOProtoFamily family, SOSockType type) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Create, args, sizeof(Args), NULL, 0);
 
-    if (result < 0) {
-        sLastError = static_cast<SOResult>(result);
-    }
+    sLastError = result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
 
     delete args;
     return result;
@@ -114,9 +112,9 @@ SOResult LibSO::Close(SOSocket socket) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Close, args, sizeof(Args), NULL, 0);
 
-    delete args;
-
     sLastError = static_cast<SOResult>(result);
+
+    delete args;
     return sLastError;
 }
 
@@ -145,9 +143,9 @@ SOResult LibSO::Listen(SOSocket socket, s32 backlog) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Listen, args, sizeof(Args), NULL, 0);
 
-    delete args;
-
     sLastError = static_cast<SOResult>(result);
+
+    delete args;
     return sLastError;
 }
 
@@ -185,10 +183,10 @@ s32 LibSO::Accept(SOSocket socket, SockAddr& addr) {
     s32 result = IOS_Ioctl(sDeviceHandle, Ioctl_Accept, args, sizeof(Args), out,
                            out->len);
 
+    sLastError = result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
+
     if (result >= 0) {
         std::memcpy(&addr, out, out->len);
-    } else {
-        sLastError = static_cast<SOResult>(result);
     }
 
     delete args;
@@ -232,9 +230,9 @@ SOResult LibSO::Bind(SOSocket socket, SockAddr& addr) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Bind, args, sizeof(Args), NULL, 0);
 
-    delete args;
-
     sLastError = static_cast<SOResult>(result);
+
+    delete args;
     return sLastError;
 }
 
@@ -268,9 +266,9 @@ SOResult LibSO::Connect(SOSocket socket, const SockAddr& addr) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Connect, args, sizeof(Args), NULL, 0);
 
-    delete args;
-
     sLastError = static_cast<SOResult>(result);
+
+    delete args;
     return sLastError;
 }
 
@@ -306,14 +304,14 @@ SOResult LibSO::GetSockName(SOSocket socket, SockAddr& addr) {
     s32 result = IOS_Ioctl(sDeviceHandle, Ioctl_GetSocketName, args,
                            sizeof(Args), self, self->len);
 
+    sLastError = static_cast<SOResult>(result);
+
     if (result >= 0) {
         std::memcpy(&addr, self, self->len);
     }
 
     delete args;
     delete self;
-
-    sLastError = static_cast<SOResult>(result);
     return sLastError;
 }
 
@@ -349,13 +347,13 @@ SOResult LibSO::GetPeerName(SOSocket socket, SockAddr& addr) {
     s32 result = IOS_Ioctl(sDeviceHandle, Ioctl_GetPeerName, args, sizeof(Args),
                            peer, peer->len);
 
+    sLastError = static_cast<SOResult>(result);
+
     if (result >= 0) {
         std::memcpy(&addr, peer, peer->len);
     }
 
     delete args;
-
-    sLastError = static_cast<SOResult>(result);
     return sLastError;
 }
 
@@ -535,9 +533,7 @@ s32 LibSO::RecvImpl(SOSocket socket, void* dst, u32 len, u32 flags,
     s32 result =
         IOS_Ioctlv(sDeviceHandle, Ioctl_RecvFrom, V_NUM_IN, V_NUM_OUT, vectors);
 
-    if (result < 0) {
-        sLastError = static_cast<SOResult>(result);
-    }
+    sLastError = result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
 
     delete[] vectors;
     delete args;
@@ -596,8 +592,8 @@ s32 LibSO::SendImpl(SOSocket socket, const void* src, u32 len, u32 flags,
     vectors[V_IBUFF].length = len;
 
     // Input vector 2: Ioctl args
-    vectors[V_IARGS].base = &args;
-    vectors[V_IARGS].length = sizeof(args);
+    vectors[V_IARGS].base = args;
+    vectors[V_IARGS].length = sizeof(Args);
 
     // Copy in destination address
     if (addr != NULL) {
@@ -610,9 +606,7 @@ s32 LibSO::SendImpl(SOSocket socket, const void* src, u32 len, u32 flags,
     // Request send
     s32 result = IOS_Ioctlv(sDeviceHandle, Ioctl_SendTo, V_NUM_IN, 0, vectors);
 
-    if (result < 0) {
-        sLastError = static_cast<SOResult>(result);
-    }
+    sLastError = result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
 
     delete[] vectors;
     delete args;
@@ -652,9 +646,7 @@ s32 LibSO::Fcntl(SOSocket socket, SOFcntlCmd cmd, ...) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Fcntl, args, sizeof(Args), NULL, 0);
 
-    if (result < 0) {
-        sLastError = static_cast<SOResult>(result);
-    }
+    sLastError = result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
 
     delete args;
     return result;
@@ -685,9 +677,9 @@ SOResult LibSO::Shutdown(SOSocket socket, SOShutdownType how) {
     s32 result =
         IOS_Ioctl(sDeviceHandle, Ioctl_Shutdown, args, sizeof(Args), NULL, 0);
 
-    delete args;
-
     sLastError = static_cast<SOResult>(result);
+
+    delete args;
     return sLastError;
 }
 
@@ -723,12 +715,10 @@ s32 LibSO::Poll(SOPollFD fds[], u32 numfds, s64 timeout) {
     s32 result = IOS_Ioctl(sDeviceHandle, Ioctl_Poll, args, sizeof(Args),
                            buffer, numfds * sizeof(SOPollFD));
 
+    sLastError = result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
+
     if (result >= 0) {
         std::memcpy(fds, buffer, numfds * sizeof(SOPollFD));
-    }
-
-    if (result < 0) {
-        sLastError = static_cast<SOResult>(result);
     }
 
     delete args;
@@ -762,6 +752,8 @@ bool LibSO::INetAtoN(String name, SockAddr4& addr) {
     s32 result = IOS_Ioctl(sDeviceHandle, Ioctl_INetAtoN, in, len, out,
                            sizeof(SOInAddr));
 
+    sLastError = result == 1 ? SO_SUCCESS : SO_EINVAL;
+
     if (result == 1) {
         addr.addr.raw = out->raw;
     }
@@ -779,26 +771,34 @@ bool LibSO::INetAtoN(String name, SockAddr4& addr) {
  * @return Success
  */
 bool LibSO::INetPtoN(String str, SockAddr& addr) {
+    bool success;
+
     switch (addr.len) {
     case sizeof(SockAddr4):
-        return std::sscanf(str, "%d.%d.%d.%d", &addr.in.addr.octets[0],
-                           &addr.in.addr.octets[1], &addr.in.addr.octets[2],
-                           &addr.in.addr.octets[3]) ==
-               LENGTHOF(addr.in.addr.octets);
+        success = std::sscanf(str, "%d.%d.%d.%d", &addr.in.addr.octets[0],
+                              &addr.in.addr.octets[1], &addr.in.addr.octets[2],
+                              &addr.in.addr.octets[3]) ==
+                  LENGTHOF(addr.in.addr.octets);
+        break;
 
     case sizeof(SockAddr6):
-        return std::sscanf(str, "%hx:%hx:%hx:%hx:%hx:%hx:%hx:%hx",
-                           &addr.in6.addr.groups[0], &addr.in6.addr.groups[1],
-                           &addr.in6.addr.groups[2], &addr.in6.addr.groups[3],
-                           &addr.in6.addr.groups[4], &addr.in6.addr.groups[5],
-                           &addr.in6.addr.groups[6],
-                           &addr.in6.addr.groups[7]) ==
-               LENGTHOF(addr.in6.addr.groups);
+        success =
+            std::sscanf(str, "%hx:%hx:%hx:%hx:%hx:%hx:%hx:%hx",
+                        &addr.in6.addr.groups[0], &addr.in6.addr.groups[1],
+                        &addr.in6.addr.groups[2], &addr.in6.addr.groups[3],
+                        &addr.in6.addr.groups[4], &addr.in6.addr.groups[5],
+                        &addr.in6.addr.groups[6], &addr.in6.addr.groups[7]) ==
+            LENGTHOF(addr.in6.addr.groups);
+        break;
 
     default:
+        success = false;
         K_ASSERT_EX(false, "Invalid SockAddr length (%d)", addr.len);
-        return false;
+        break;
     }
+
+    sLastError = success ? SO_SUCCESS : SO_EINVAL;
+    return success;
 }
 
 /**
@@ -810,11 +810,13 @@ bool LibSO::INetPtoN(String str, SockAddr& addr) {
 String LibSO::INetNtoP(const SockAddr& addr) {
     switch (addr.len) {
     case sizeof(SockAddr4):
+        sLastError = SO_SUCCESS;
         return Format("%d.%d.%d.%d", addr.in.addr.octets[0],
                       addr.in.addr.octets[1], addr.in.addr.octets[2],
                       addr.in.addr.octets[3]);
 
     case sizeof(SockAddr6):
+        sLastError = SO_SUCCESS;
         return Format("%hx:%hx:%hx:%hx:%hx:%hx:%hx:%hx",
                       addr.in6.addr.groups[0], addr.in6.addr.groups[1],
                       addr.in6.addr.groups[2], addr.in6.addr.groups[3],
@@ -822,6 +824,7 @@ String LibSO::INetNtoP(const SockAddr& addr) {
                       addr.in6.addr.groups[6], addr.in6.addr.groups[7]);
 
     default:
+        sLastError = SO_EINVAL;
         K_ASSERT_EX(false, "Invalid SockAddr length (%d)", addr.len);
         return "";
     }
@@ -838,6 +841,8 @@ void LibSO::GetHostID(SockAddr4& addr) {
     s32 result = IOS_Ioctl(sDeviceHandle, Ioctl_GetHostID, NULL, 0, NULL, 0);
     addr.addr.raw = static_cast<u32>(result);
     addr.port = 0;
+
+    sLastError = SO_SUCCESS;
 }
 
 /**
@@ -855,6 +860,7 @@ SOResult LibSO::GetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
     K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
 
     K_ASSERT_EX(false, "Not implemented");
+    sLastError = SO_SUCCESS;
     return SO_SUCCESS;
 }
 
@@ -873,6 +879,7 @@ SOResult LibSO::SetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
     K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
 
     K_ASSERT_EX(false, "Not implemented");
+    sLastError = SO_SUCCESS;
     return SO_SUCCESS;
 }
 
@@ -889,6 +896,8 @@ void LibSO::WaitForDHCP() {
         OSSleepTicks(OS_MSEC_TO_TICKS(10));
         GetHostID(addr);
     }
+
+    sLastError = SO_SUCCESS;
 }
 
 } // namespace kiwi
