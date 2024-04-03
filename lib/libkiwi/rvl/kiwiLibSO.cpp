@@ -743,7 +743,7 @@ s32 LibSO::Poll(SOPollFD fds[], u32 numfds, s64 timeout) {
  * @param[out] addr Socket address
  * @return IOS error code
  */
-SOResult LibSO::INetAtoN(String name, SockAddr4& addr) {
+bool LibSO::INetAtoN(String name, SockAddr4& addr) {
     K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
 
     u32 len = name.Length();
@@ -762,15 +762,13 @@ SOResult LibSO::INetAtoN(String name, SockAddr4& addr) {
     s32 result = IOS_Ioctl(sDeviceHandle, Ioctl_INetAtoN, in, len, out,
                            sizeof(SOInAddr));
 
-    if (result >= 0) {
+    if (result == 1) {
         addr.addr.raw = out->raw;
     }
 
     delete in;
     delete out;
-
-    sLastError = static_cast<SOResult>(result);
-    return sLastError;
+    return result == 1;
 }
 
 /**

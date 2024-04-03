@@ -43,7 +43,7 @@ public:
     static SOResult Shutdown(SOSocket socket, SOShutdownType how);
     static s32 Poll(SOPollFD fds[], u32 numfds, s64 timeout);
 
-    static SOResult INetAtoN(String str, SockAddr4& addr);
+    static bool INetAtoN(String str, SockAddr4& addr);
 
     static bool INetPtoN(String str, SockAddr& addr);
     static String INetNtoP(const SockAddr& addr);
@@ -139,16 +139,16 @@ struct SockAddr4 : public SOSockAddrIn {
     /**
      * @brief Constructor
      *
-     * @param _addr IPv4 address (string)
+     * @param host IPv4 address OR hostname
      * @param _port Port
      */
-    SockAddr4(String _addr, u16 _port) {
+    SockAddr4(String host, u16 _port = 0) {
         len = sizeof(SOSockAddrIn);
         family = SO_AF_INET;
         port = _port;
 
-        bool success = LibSO::INetPtoN(_addr, *this);
-        K_ASSERT(success);
+        bool success = LibSO::INetAtoN(host, *this);
+        K_ASSERT_EX(success, "Could not resolve hostname: %s", host.CStr());
     }
 
     /**
@@ -169,7 +169,7 @@ struct SockAddr4 : public SOSockAddrIn {
      *
      * @param _port Port
      */
-    SockAddr4(u16 _port) {
+    explicit SockAddr4(u16 _port) {
         len = sizeof(SOSockAddrIn);
         family = SO_AF_INET;
         port = _port;
@@ -229,7 +229,7 @@ struct SockAddr6 : public SOSockAddrIn6 {
      * @param _addr IPv6 address (string)
      * @param _port Port
      */
-    SockAddr6(String _addr, u16 _port) {
+    SockAddr6(String _addr, u16 _port = 0) {
         len = sizeof(SOSockAddrIn6);
         family = SO_AF_INET6;
         port = _port;
@@ -246,7 +246,7 @@ struct SockAddr6 : public SOSockAddrIn6 {
      *
      * @param _port Port
      */
-    SockAddr6(u16 _port) {
+    explicit SockAddr6(u16 _port) {
         len = sizeof(SOSockAddrIn6);
         family = SO_AF_INET6;
         port = _port;
