@@ -9,6 +9,8 @@ namespace kiwi {
 
 // Forward declarations
 class SockAddr;
+class SockAddr4;
+class SockAddr6;
 
 /**
  * SO library wrapper/extension
@@ -41,18 +43,19 @@ public:
     static SOResult Shutdown(SOSocket socket, SOShutdownType how);
     static s32 Poll(SOPollFD fds[], u32 numfds, s64 timeout);
 
-    static bool INetPtoN(String str, SOInAddr& addr);
-    static bool INetPtoN(String str, SOInAddr6& addr);
-    static String INetNtoP(const SOInAddr& addr);
-    static String INetNtoP(const SOInAddr6& addr);
+    static SOResult INetAtoN(String str, SockAddr4& addr);
 
-    static void GetHostID(SOInAddr& addr);
-    static void WaitForDHCP();
+    static bool INetPtoN(String str, SockAddr& addr);
+    static String INetNtoP(const SockAddr& addr);
+
+    static void GetHostID(SockAddr4& addr);
 
     static SOResult GetSockOpt(SOSocket socket, SOSockOptLevel level,
                                SOSockOpt opt, void* val, u32 len);
     static SOResult SetSockOpt(SOSocket socket, SOSockOptLevel level,
                                SOSockOpt opt, const void* val, u32 len);
+
+    static void WaitForDHCP();
 
 private:
     static s32 RecvImpl(SOSocket socket, void* dst, u32 len, u32 flags,
@@ -108,13 +111,7 @@ struct SockAddr : public SOSockAddr {
      * @brief Convert socket address to string
      */
     String ToString() const {
-        switch (len) {
-        case sizeof(SOSockAddrIn):
-            return Format("%s:%d", LibSO::INetNtoP(in.addr), port);
-        case sizeof(SOSockAddrIn6):
-            return Format("%s:%d", LibSO::INetNtoP(in6.addr), port);
-        default: K_ASSERT_EX(false, "Invalid SockAddr length"); return "";
-        }
+        return LibSO::INetNtoP(*this);
     }
 };
 
@@ -150,7 +147,7 @@ struct SockAddr4 : public SOSockAddrIn {
         family = SO_AF_INET;
         port = _port;
 
-        bool success = LibSO::INetPtoN(_addr, addr);
+        bool success = LibSO::INetPtoN(_addr, *this);
         K_ASSERT(success);
     }
 
@@ -199,7 +196,7 @@ struct SockAddr4 : public SOSockAddrIn {
      * @brief Convert IPv4 address to string
      */
     String ToString() const {
-        return Format("%s:%d", LibSO::INetNtoP(addr).CStr(), port);
+        return Format("%s:%d", LibSO::INetNtoP(*this).CStr(), port);
     }
 };
 
@@ -238,7 +235,7 @@ struct SockAddr6 : public SOSockAddrIn6 {
         port = _port;
         flowinfo = 0;
 
-        bool success = LibSO::INetPtoN(_addr, addr);
+        bool success = LibSO::INetPtoN(_addr, *this);
         K_ASSERT(success);
 
         scope = 0;
@@ -278,7 +275,7 @@ struct SockAddr6 : public SOSockAddrIn6 {
      * @brief Convert IPv6 address to string
      */
     String ToString() const {
-        return Format("%s:%d", LibSO::INetNtoP(addr).CStr(), port);
+        return Format("%s:%d", LibSO::INetNtoP(*this).CStr(), port);
     }
 };
 

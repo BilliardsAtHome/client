@@ -58,9 +58,8 @@ public:
 
         // Fire callback
         if (done && callback != NULL) {
-            SockAddr peer;
-            packet->GetPeer(peer);
-            callback(peer, packet->GetContent(), packet->GetContentSize(), arg);
+            callback(packet->GetPeer(), packet->GetContent(),
+                     packet->GetContentSize(), arg);
         }
 
         return done;

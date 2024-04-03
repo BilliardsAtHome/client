@@ -42,7 +42,7 @@ SocketBase::~SocketBase() {
  * @param addr[out] IPv4 address
  */
 void SocketBase::GetHostAddr(SockAddr4& addr) {
-    LibSO::GetHostID(addr.addr);
+    LibSO::GetHostID(addr);
 }
 
 /**

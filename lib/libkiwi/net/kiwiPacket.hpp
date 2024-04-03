@@ -113,11 +113,9 @@ public:
 
     /**
      * Get peer socket address
-     *
-     * @param addr Peer address
      */
-    void GetPeer(SockAddr& addr) const {
-        std::memcpy(&addr, &mAddress, mAddress.len);
+    const SockAddr& GetPeer() const {
+        return mAddress;
     }
 
     void Alloc(u32 size);

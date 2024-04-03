@@ -22,6 +22,7 @@ enum {
     Ioctl_Shutdown = 14,
     Ioctl_Create = 15,
     Ioctl_GetHostID = 16,
+    Ioctl_INetAtoN = 21,
 };
 
 s32 LibSO::sDeviceHandle = -1;
@@ -714,7 +715,7 @@ s32 LibSO::Poll(SOPollFD fds[], u32 numfds, s64 timeout) {
     args->msec = OS_TICKS_TO_MSEC(timeout);
 
     // Must be in MEM2, and must be 32-byte aligned
-    SOPollFD* buffer = new (32) SOPollFD[numfds];
+    SOPollFD* buffer = new (32, EMemory_MEM2) SOPollFD[numfds];
     K_ASSERT(buffer != NULL);
 
     std::memcpy(buffer, fds, numfds * sizeof(SOPollFD));
@@ -736,54 +737,96 @@ s32 LibSO::Poll(SOPollFD fds[], u32 numfds, s64 timeout) {
 }
 
 /**
- * Converts a string to an IPv4 address
+ * @brief Convert hostname to IPv4 address
+ *
+ * @param name Hostname
+ * @param[out] addr Socket address
+ * @return IOS error code
+ */
+SOResult LibSO::INetAtoN(String name, SockAddr4& addr) {
+    K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
+
+    u32 len = name.Length();
+
+    // Must be in MEM2, and must be 32-byte aligned
+    char* in = new (32, EMemory_MEM2) char[len + 1];
+    K_ASSERT(in != NULL);
+
+    std::strncpy(in, name, len);
+    in[len] = '\0';
+
+    // Must be in MEM2, and must be 32-byte aligned
+    SOInAddr* out = new (32, EMemory_MEM2) SOInAddr();
+    K_ASSERT(out != NULL);
+
+    s32 result = IOS_Ioctl(sDeviceHandle, Ioctl_INetAtoN, in, len, out,
+                           sizeof(SOInAddr));
+
+    if (result >= 0) {
+        addr.addr.raw = out->raw;
+    }
+
+    delete in;
+    delete out;
+
+    sLastError = static_cast<SOResult>(result);
+    return sLastError;
+}
+
+/**
+ * Converts a string to a socket address
  *
  * @param str Address string
- * @param[out] addr Address binary
+ * @param[out] addr Socket address
  * @return Success
  */
-bool LibSO::INetPtoN(String str, SOInAddr& addr) {
-    return std::sscanf(str, "%d.%d.%d.%d", &addr.octets[0], &addr.octets[1],
-                       &addr.octets[2],
-                       &addr.octets[3]) == LENGTHOF(addr.octets);
+bool LibSO::INetPtoN(String str, SockAddr& addr) {
+    switch (addr.len) {
+    case sizeof(SockAddr4):
+        return std::sscanf(str, "%d.%d.%d.%d", &addr.in.addr.octets[0],
+                           &addr.in.addr.octets[1], &addr.in.addr.octets[2],
+                           &addr.in.addr.octets[3]) ==
+               LENGTHOF(addr.in.addr.octets);
+
+    case sizeof(SockAddr6):
+        return std::sscanf(str, "%hx:%hx:%hx:%hx:%hx:%hx:%hx:%hx",
+                           &addr.in6.addr.groups[0], &addr.in6.addr.groups[1],
+                           &addr.in6.addr.groups[2], &addr.in6.addr.groups[3],
+                           &addr.in6.addr.groups[4], &addr.in6.addr.groups[5],
+                           &addr.in6.addr.groups[6],
+                           &addr.in6.addr.groups[7]) ==
+               LENGTHOF(addr.in6.addr.groups);
+
+    default:
+        K_ASSERT_EX(false, "Invalid SockAddr length (%d)", addr.len);
+        return false;
+    }
 }
 
 /**
- * Converts a string to an IPv6 address
+ * Converts a socket address to a string
  *
- * @param str Address string
- * @param[out] addr Address binary
- * @return Success
- */
-bool LibSO::INetPtoN(String str, SOInAddr6& addr) {
-    return std::sscanf(str, "%hx:%hx:%hx:%hx:%hx:%hx:%hx:%hx", &addr.groups[0],
-                       &addr.groups[1], &addr.groups[2], &addr.groups[3],
-                       &addr.groups[4], &addr.groups[5], &addr.groups[6],
-                       &addr.groups[7]) == LENGTHOF(addr.groups);
-}
-
-/**
- * Converts an IPv4 address to a string
- *
- * @param addr Address binary
+ * @param addr Socket address
  * @return Address string
  */
-String LibSO::INetNtoP(const SOInAddr& addr) {
-    return Format("%d.%d.%d.%d", addr.octets[0], addr.octets[1], addr.octets[2],
-                  addr.octets[3]);
-}
+String LibSO::INetNtoP(const SockAddr& addr) {
+    switch (addr.len) {
+    case sizeof(SockAddr4):
+        return Format("%d.%d.%d.%d", addr.in.addr.octets[0],
+                      addr.in.addr.octets[1], addr.in.addr.octets[2],
+                      addr.in.addr.octets[3]);
 
-/**
- * Converts an IPv6 address to a string
- *
- * @param addr Address binary
- * @return Address string
- */
-String LibSO::INetNtoP(const SOInAddr6& addr) {
-    return Format("%hx:%hx:%hx:%hx:%hx:%hx:%hx:%hx", addr.groups[0],
-                  addr.groups[1], addr.groups[2], addr.groups[3],
-                  addr.groups[4], addr.groups[5], addr.groups[6],
-                  addr.groups[7]);
+    case sizeof(SockAddr6):
+        return Format("%hx:%hx:%hx:%hx:%hx:%hx:%hx:%hx",
+                      addr.in6.addr.groups[0], addr.in6.addr.groups[1],
+                      addr.in6.addr.groups[2], addr.in6.addr.groups[3],
+                      addr.in6.addr.groups[4], addr.in6.addr.groups[5],
+                      addr.in6.addr.groups[6], addr.in6.addr.groups[7]);
+
+    default:
+        K_ASSERT_EX(false, "Invalid SockAddr length (%d)", addr.len);
+        return "";
+    }
 }
 
 /**
@@ -791,22 +834,12 @@ String LibSO::INetNtoP(const SOInAddr6& addr) {
  *
  * @param[out] addr Host address
  */
-void LibSO::GetHostID(SOInAddr& addr) {
+void LibSO::GetHostID(SockAddr4& addr) {
+    K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
+
     s32 result = IOS_Ioctl(sDeviceHandle, Ioctl_GetHostID, NULL, 0, NULL, 0);
-    addr.raw = static_cast<u32>(result);
-}
-
-/**
- * Wait until the local IP address has been assigned
- */
-void LibSO::WaitForDHCP() {
-    SOInAddr addr;
-    GetHostID(addr);
-
-    while (addr.raw == 0) {
-        OSSleepTicks(OS_MSEC_TO_TICKS(10));
-        GetHostID(addr);
-    }
+    addr.addr.raw = static_cast<u32>(result);
+    addr.port = 0;
 }
 
 /**
@@ -821,6 +854,8 @@ void LibSO::WaitForDHCP() {
  */
 SOResult LibSO::GetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
                            void* val, u32 len) {
+    K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
+
     K_ASSERT_EX(false, "Not implemented");
     return SO_SUCCESS;
 }
@@ -837,8 +872,25 @@ SOResult LibSO::GetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
  */
 SOResult LibSO::SetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
                            const void* val, u32 len) {
+    K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
+
     K_ASSERT_EX(false, "Not implemented");
     return SO_SUCCESS;
+}
+
+/**
+ * @brief Wait until the local IP address has been assigned
+ */
+void LibSO::WaitForDHCP() {
+    K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
+
+    SockAddr4 addr;
+    GetHostID(addr);
+
+    while (addr.addr.raw == 0) {
+        OSSleepTicks(OS_MSEC_TO_TICKS(10));
+        GetHostID(addr);
+    }
 }
 
 } // namespace kiwi
