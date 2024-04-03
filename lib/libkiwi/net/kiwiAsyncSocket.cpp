@@ -3,28 +3,151 @@
 
 namespace kiwi {
 
+/**
+ * Async receive operation
+ */
+class AsyncSocket::RecvJob {
+public:
+    /**
+     * @brief Constructor
+     *
+     * @param _packet Packet for this job
+     * @param _callback Completion callback
+     * @param _arg Callback user argument
+     */
+    RecvJob(Packet* _packet, ReceiveCallback _callback = NULL,
+            void* _arg = NULL)
+        : packet(_packet), callback(_callback), arg(_arg) {
+        K_ASSERT(packet != NULL);
+    }
+
+    /**
+     * @brief Destructor
+     */
+    ~RecvJob() {
+        delete packet;
+        packet = NULL;
+    }
+
+    /**
+     * @brief Check whether the receive is complete
+     */
+    bool IsComplete() const {
+        K_ASSERT(packet != NULL);
+        return packet->IsWriteComplete();
+    }
+
+    /**
+     * @brief Update job
+     *
+     * @param socket Socket descriptor
+     * @return Whether the job is complete
+     */
+    bool Calc(SOSocket socket) {
+        K_ASSERT(socket != NULL);
+        K_ASSERT(packet != NULL);
+
+        // Nothing left to do
+        if (IsComplete()) {
+            return true;
+        }
+
+        // Update
+        packet->Recv(socket);
+        bool done = IsComplete();
+
+        // Fire callback
+        if (done && callback != NULL) {
+            SockAddr peer;
+            packet->GetPeer(peer);
+            callback(peer, packet->GetContent(), packet->GetContentSize(), arg);
+        }
+
+        return done;
+    }
+
+private:
+    // Packet associated with this job
+    Packet* packet;
+
+    // Completion callback
+    ReceiveCallback callback;
+    void* arg;
+};
+
+/**
+ * Async send operation
+ */
+class AsyncSocket::SendJob {
+public:
+    /**
+     * @brief Constructor
+     *
+     * @param _packet Packet for this job
+     * @param _callback Completion callback
+     * @param _arg Callback user argument
+     */
+    SendJob(Packet* _packet, SendCallback _callback = NULL, void* _arg = NULL)
+        : packet(_packet), callback(_callback), arg(_arg) {
+        K_ASSERT(packet != NULL);
+    }
+
+    /**
+     * @brief Destructor
+     */
+    ~SendJob() {
+        delete packet;
+        packet = NULL;
+    }
+
+    /**
+     * @brief Check whether the send is complete
+     */
+    bool IsComplete() const {
+        K_ASSERT(packet != NULL);
+        return packet->IsReadComplete();
+    }
+
+    /**
+     * @brief Update job
+     *
+     * @param socket Socket descriptor
+     * @return Whether the job is complete
+     */
+    bool Calc(SOSocket socket) {
+        K_ASSERT(socket != NULL);
+        K_ASSERT(packet != NULL);
+
+        // Nothing left to do
+        if (IsComplete()) {
+            return true;
+        }
+
+        // Update
+        packet->Send(socket);
+        bool done = IsComplete();
+
+        // Fire callback
+        if (done && callback != NULL) {
+            callback(arg);
+        }
+
+        return done;
+    }
+
+private:
+    // Packet associated with this job
+    Packet* packet;
+
+    // Completion callback
+    SendCallback callback;
+    void* arg;
+};
+
 OSThread AsyncSocket::sSocketThread;
 bool AsyncSocket::sSocketThreadCreated = false;
 u8 AsyncSocket::sSocketThreadStack[THREAD_STACK_SIZE];
 TList<AsyncSocket> AsyncSocket::sSocketList;
-
-/**
- * Constructor
- *
- * @param _packet Packet for this job
- */
-AsyncSocket::Job::Job(Packet* _packet)
-    : packet(_packet), onrecv(NULL), arg(NULL) {
-    K_ASSERT(packet != NULL);
-}
-
-/**
- * Destructor
- */
-AsyncSocket::Job::~Job() {
-    delete packet;
-    packet = NULL;
-}
 
 /**
  * Socket thread function
@@ -173,12 +296,8 @@ SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
     K_ASSERT(packet != NULL);
 
     // Asynchronous job
-    Job* job = new Job(packet);
+    RecvJob* job = new RecvJob(packet, callback, arg);
     K_ASSERT(job != NULL);
-
-    // Queue up this receive
-    job->onrecv = callback;
-    job->arg = arg;
     mRecvJobs.PushBack(job);
 
     // Prevent UB
@@ -217,12 +336,8 @@ SOResult AsyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
     packet->Write(src, len);
 
     // Asynchronous job
-    Job* job = new Job(packet);
+    SendJob* job = new SendJob(packet, callback, arg);
     K_ASSERT(job != NULL);
-
-    // Queue up this receive
-    job->onsend = callback;
-    job->arg = arg;
     mSendJobs.PushBack(job);
 
     // Send doesn't actually happen on this thread
@@ -284,25 +399,11 @@ void AsyncSocket::CalcRecv() {
 
     while (!mRecvJobs.Empty()) {
         // Find next incomplete job (FIFO)
-        Job& job = mRecvJobs.Front();
-        K_ASSERT_EX(job.packet != NULL, "Job has no packet?");
-        K_ASSERT_EX(!job.packet->IsWriteComplete(),
-                    "Completed job should be removed");
+        RecvJob& job = mRecvJobs.Front();
+        K_ASSERT_EX(!job.IsComplete(), "Completed job should be removed");
 
         // Attempt to complete job
-        job.packet->Recv(mHandle);
-
-        if (job.packet->IsWriteComplete()) {
-            // Notify user
-            if (job.onrecv != NULL) {
-                SockAddr peer;
-                job.packet->GetPeer(peer);
-
-                // TODO: Maybe pass Packet instead, but that's not really useful
-                job.onrecv(peer, job.packet->GetContent(),
-                           job.packet->GetContentSize(), job.arg);
-            }
-
+        if (job.Calc(mHandle)) {
             // Remove from queue
             mRecvJobs.PopFront();
             delete &job;
@@ -318,20 +419,11 @@ void AsyncSocket::CalcSend() {
 
     while (!mRecvJobs.Empty()) {
         // Find next incomplete job (FIFO)
-        Job& job = mSendJobs.Front();
-        K_ASSERT_EX(job.packet != NULL, "Job has no packet?");
-        K_ASSERT_EX(!job.packet->IsReadComplete(),
-                    "Completed job should be removed");
+        SendJob& job = mSendJobs.Front();
+        K_ASSERT_EX(!job.IsComplete(), "Completed job should be removed");
 
         // Attempt to complete job
-        job.packet->Send(mHandle);
-
-        if (job.packet->IsReadComplete()) {
-            // Notify user
-            if (job.onsend != NULL) {
-                job.onsend(job.arg);
-            }
-
+        if (job.Calc(mHandle)) {
             // Remove from queue
             mSendJobs.PopFront();
             delete &job;

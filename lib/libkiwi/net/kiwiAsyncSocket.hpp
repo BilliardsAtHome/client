@@ -28,25 +28,8 @@ private:
      */
     enum EState { EState_Thinking, EState_Connecting, EState_Accepting };
 
-    /**
-     * Async operation
-     */
-    struct Job {
-        Job(Packet* _packet);
-        ~Job();
-
-        // Packet associated with this job
-        Packet* packet;
-
-        // Job completion callback
-        union {
-            ReceiveCallback onrecv;
-            SendCallback onsend;
-        };
-
-        // Callback user argument
-        void* arg;
-    };
+    class RecvJob;
+    class SendJob;
 
 private:
     static void* ThreadFunc(void* arg);
@@ -73,8 +56,8 @@ private:
     SockAddr mPeer;
 
     // Active packet jobs
-    TList<Job> mRecvJobs;
-    TList<Job> mSendJobs;
+    TList<RecvJob> mRecvJobs;
+    TList<SendJob> mSendJobs;
 
     // Connect callback
     ConnectCallback mpConnectCallback;

@@ -52,7 +52,7 @@ void Packet::Clear() {
  * @param dst Data destination
  * @param n Data size
  *
- * @returns Bytes read
+ * @return Bytes read
  */
 u32 Packet::Read(void* dst, u32 n) {
     K_ASSERT(mpBuffer != NULL);
@@ -76,7 +76,7 @@ u32 Packet::Read(void* dst, u32 n) {
  * @param src Data source
  * @param n Data size
  *
- * @returns Bytes written
+ * @return Bytes written
  */
 
 u32 Packet::Write(const void* src, u32 n) {
@@ -100,7 +100,7 @@ u32 Packet::Write(const void* src, u32 n) {
  *
  * @param socket Socket descriptor
  *
- * @returns Number of bytes received
+ * @return Number of bytes received
  */
 Optional<u32> Packet::Recv(SOSocket socket) {
     K_ASSERT(mpBuffer != NULL);
@@ -125,7 +125,7 @@ Optional<u32> Packet::Recv(SOSocket socket) {
  *
  * @param socket Socket descriptor
  *
- * @returns Bytes written, or -1 if blocking
+ * @return Bytes written, or -1 if blocking
  */
 Optional<u32> Packet::Send(SOSocket socket) {
     K_ASSERT(mpBuffer != NULL);
