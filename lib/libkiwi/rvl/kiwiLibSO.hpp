@@ -7,6 +7,9 @@
 
 namespace kiwi {
 
+// Forward declarations
+class SockAddr;
+
 /**
  * SO library wrapper/extension
  */
@@ -18,21 +21,21 @@ public:
     static s32 Socket(SOProtoFamily family, SOSockType type);
     static SOResult Close(SOSocket socket);
     static SOResult Listen(SOSocket socket, s32 backlog = SOMAXCONN);
-    static s32 Accept(SOSocket socket, SOSockAddr& addr);
-    static SOResult Bind(SOSocket socket, SOSockAddr& addr);
-    static SOResult Connect(SOSocket socket, const SOSockAddr& addr);
-    static SOResult GetSockName(SOSocket socket, SOSockAddr& addr);
-    static SOResult GetPeerName(SOSocket socket, SOSockAddr& addr);
+    static s32 Accept(SOSocket socket, SockAddr& addr);
+    static SOResult Bind(SOSocket socket, SockAddr& addr);
+    static SOResult Connect(SOSocket socket, const SockAddr& addr);
+    static SOResult GetSockName(SOSocket socket, SockAddr& addr);
+    static SOResult GetPeerName(SOSocket socket, SockAddr& addr);
 
-    static s32 Read(SOSocket socket, void* dst, s32 n);
-    static s32 Recv(SOSocket socket, void* dst, s32 n, u32 flags);
-    static s32 RecvFrom(SOSocket socket, void* dst, s32 n, u32 flags,
-                        SOSockAddr& addr);
+    static s32 Read(SOSocket socket, void* dst, u32 len);
+    static s32 Recv(SOSocket socket, void* dst, u32 len, u32 flags);
+    static s32 RecvFrom(SOSocket socket, void* dst, u32 len, u32 flags,
+                        SockAddr& addr);
 
-    static s32 Write(SOSocket socket, const void* src, s32 n);
-    static s32 Send(SOSocket socket, const void* src, s32 n, u32 flags);
-    static s32 SendTo(SOSocket socket, const void* src, s32 n, u32 flags,
-                      const SOSockAddr& addr);
+    static s32 Write(SOSocket socket, const void* src, u32 len);
+    static s32 Send(SOSocket socket, const void* src, u32 len, u32 flags);
+    static s32 SendTo(SOSocket socket, const void* src, u32 len, u32 flags,
+                      const SockAddr& addr);
 
     static s32 Fcntl(SOSocket socket, SOFcntlCmd cmd, ...);
     static SOResult Shutdown(SOSocket socket, SOShutdownType how);
@@ -44,6 +47,7 @@ public:
     static String INetNtoP(const SOInAddr6& addr);
 
     static void GetHostID(SOInAddr& addr);
+    static void WaitForDHCP();
 
     static s32 GetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
                           void* val, u32 len);
@@ -51,10 +55,10 @@ public:
                           const void* val, u32 len);
 
 private:
-    static s32 RecvImpl(SOSocket socket, void* dst, s32 n, u32 flags,
-                        SOSockAddr* addr);
-    static s32 SendImpl(SOSocket socket, const void* src, s32 n, u32 flags,
-                        const SOSockAddr* addr);
+    static s32 RecvImpl(SOSocket socket, void* dst, u32 len, u32 flags,
+                        SockAddr* addr);
+    static s32 SendImpl(SOSocket socket, const void* src, u32 len, u32 flags,
+                        const SockAddr* addr);
 
 private:
     // IOS IP device handle
@@ -64,14 +68,65 @@ private:
 };
 
 /**
- * SO IPv4 address wrapper to simplify upcasting
+ * @brief SO IP address wrapper
+ */
+struct SockAddr : public SOSockAddr {
+    /**
+     * @brief Constructor
+     */
+    SockAddr() {
+        std::memset(this, 0, sizeof(SockAddr));
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param addr Socket address
+     */
+    SockAddr(const SockAddr& addr) {
+        std::memcpy(this, &addr, addr.len);
+    }
+
+    SockAddr& operator=(const SockAddr& addr) {
+        std::memcpy(this, &addr, addr.len);
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param addr Socket address
+     */
+    SockAddr(const SOSockAddr& addr) {
+        std::memcpy(this, &addr, addr.len);
+    }
+
+    SockAddr& operator=(const SOSockAddr& addr) {
+        std::memcpy(this, &addr, addr.len);
+    }
+
+    /**
+     * @brief Convert socket address to string
+     */
+    String ToString() const {
+        switch (len) {
+        case sizeof(SockAddr4):
+            return Format("%s:%d", LibSO::INetNtoP(in.addr), port);
+        case sizeof(SockAddr6):
+            return Format("%s:%d", LibSO::INetNtoP(in6.addr), port);
+        default: K_ASSERT_EX(false, "Invalid SockAddr length"); return "";
+        }
+    }
+};
+
+/**
+ * @brief SO IPv4 address wrapper to simplify upcasting
  */
 struct SockAddr4 : public SOSockAddrIn {
-    operator SOSockAddr&() {
-        return reinterpret_cast<SOSockAddr&>(*this);
+    operator SockAddr&() {
+        return reinterpret_cast<SockAddr&>(*this);
     }
-    operator const SOSockAddr&() const {
-        return reinterpret_cast<const SOSockAddr&>(*this);
+    operator const SockAddr&() const {
+        return reinterpret_cast<const SockAddr&>(*this);
     }
 
     /**
@@ -125,10 +180,26 @@ struct SockAddr4 : public SOSockAddrIn {
     }
 
     /**
+     * @brief Constructor
+     *
+     * @param addr Socket address
+     */
+    SockAddr4(const SockAddr& addr) {
+        K_ASSERT_EX(addr.len == sizeof(SockAddr4), "Not for this class");
+        std::memcpy(this, &addr, addr.len);
+    }
+
+    SockAddr4& operator=(const SockAddr& addr) {
+        K_ASSERT_EX(addr.len == sizeof(SockAddr4), "Not for this class");
+        std::memcpy(this, &addr, addr.len);
+        return *this;
+    }
+
+    /**
      * @brief Convert IPv4 address to string
      */
     String ToString() const {
-        return LibSO::INetNtoP(addr);
+        return Format("%s:%d", LibSO::INetNtoP(addr).CStr(), port);
     }
 };
 
@@ -136,11 +207,11 @@ struct SockAddr4 : public SOSockAddrIn {
  * SO IPv6 address wrapper to simplify upcasting
  */
 struct SockAddr6 : public SOSockAddrIn6 {
-    operator SOSockAddr&() {
-        return reinterpret_cast<SOSockAddr&>(*this);
+    operator SockAddr&() {
+        return reinterpret_cast<SockAddr&>(*this);
     }
-    operator const SOSockAddr&() const {
-        return reinterpret_cast<const SOSockAddr&>(*this);
+    operator const SockAddr&() const {
+        return reinterpret_cast<const SockAddr&>(*this);
     }
 
     /**
@@ -150,7 +221,9 @@ struct SockAddr6 : public SOSockAddrIn6 {
         len = sizeof(SOSockAddrIn6);
         family = SO_AF_INET6;
         port = 0;
+        flowinfo = 0;
         std::memset(&addr, 0, sizeof(SOInAddr6));
+        scope = 0;
     }
 
     /**
@@ -163,7 +236,12 @@ struct SockAddr6 : public SOSockAddrIn6 {
         len = sizeof(SOSockAddrIn6);
         family = SO_AF_INET6;
         port = _port;
-        LibSO::INetPtoN(_addr, addr);
+        flowinfo = 0;
+
+        bool success = LibSO::INetPtoN(_addr, addr);
+        K_ASSERT(success);
+
+        scope = 0;
     }
 
     /**
@@ -175,18 +253,36 @@ struct SockAddr6 : public SOSockAddrIn6 {
         len = sizeof(SOSockAddrIn6);
         family = SO_AF_INET6;
         port = _port;
+        flowinfo = 0;
         std::memset(&addr, 0, sizeof(SOInAddr6));
+        scope = 0;
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param addr Socket address
+     */
+    SockAddr6(const SockAddr& addr) {
+        K_ASSERT_EX(addr.len == sizeof(SockAddr6), "Not for this class");
+        std::memcpy(this, &addr, addr.len);
+    }
+
+    SockAddr6& operator=(const SockAddr& addr) {
+        K_ASSERT_EX(addr.len == sizeof(SockAddr6), "Not for this class");
+        std::memcpy(this, &addr, addr.len);
+        return *this;
     }
 
     /**
      * @brief Convert IPv6 address to string
      */
     String ToString() const {
-        return LibSO::INetNtoP(addr);
+        return Format("%s:%d", LibSO::INetNtoP(addr).CStr(), port);
     }
 };
 
-// Should be SO types and nothing more
+K_STATIC_ASSERT(sizeof(SockAddr) == sizeof(SOSockAddr));
 K_STATIC_ASSERT(sizeof(SockAddr4) == sizeof(SOSockAddrIn));
 K_STATIC_ASSERT(sizeof(SockAddr6) == sizeof(SOSockAddrIn6));
 

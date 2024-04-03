@@ -96,22 +96,23 @@ typedef struct SOSockAddrIn {
 } SOSockAddrIn;
 
 typedef struct SOSockAddrIn6 {
-    u8 len;    // at 0x0
-    u8 family; // at 0x1
-    u16 port;  // at 0x2
-    u8 UNK_0x4[0x8];
-    SOInAddr6 addr; // at 0xC
+    u8 len;         // at 0x0
+    u8 family;      // at 0x1
+    u16 port;       // at 0x2
+    u32 flowinfo;   // at 0x4
+    SOInAddr6 addr; // at 0x8
+    u32 scope;      // at 0x18
 } SOSockAddrIn6;
 
 typedef struct SOSockAddr {
     union {
         struct {
-            u8 len;
-            u8 family;
-            u16 port;
+            u8 len;    // at 0x0
+            u8 family; // at 0x1
+            u16 port;  // at 0x2
         };
-        SOSockAddrIn in;
-        SOSockAddrIn6 in6;
+        SOSockAddrIn in;   // at 0x0
+        SOSockAddrIn6 in6; // at 0x0
     };
 } SOSockAddr;
 

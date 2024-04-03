@@ -26,7 +26,7 @@ public:
      * @param addr Peer address
      * @param arg User callback argument
      */
-    typedef void (*AcceptCallback)(SocketBase* peer, const SOSockAddr& addr,
+    typedef void (*AcceptCallback)(SocketBase* peer, const SockAddr& addr,
                                    void* arg);
 
     /**
@@ -37,7 +37,7 @@ public:
      * @param size Packet data size
      * @param arg User callback argument
      */
-    typedef void (*ReceiveCallback)(const SOSockAddr& addr, const void* data,
+    typedef void (*ReceiveCallback)(const SockAddr& addr, const void* data,
                                     u32 size, void* arg);
 
     /**
@@ -48,7 +48,7 @@ public:
     typedef void (*SendCallback)(void* arg);
 
 public:
-    static u32 GetHostAddr();
+    static void GetHostAddr(SockAddr4& addr);
 
     SocketBase(SOProtoFamily family, SOSockType type);
     virtual ~SocketBase();
@@ -60,19 +60,19 @@ public:
         return mHandle >= 0;
     }
 
-    virtual bool Connect(const SOSockAddr& addr,
-                         ConnectCallback callback = NULL, void* arg = NULL) = 0;
+    virtual bool Connect(const SockAddr& addr, ConnectCallback callback = NULL,
+                         void* arg = NULL) = 0;
     virtual SocketBase* Accept(AcceptCallback callback = NULL,
                                void* arg = NULL) = 0;
 
-    bool Bind(SOSockAddr& addr) const;
+    bool Bind(SockAddr& addr) const;
     bool Listen(s32 backlog = SOMAXCONN) const;
     bool SetBlocking(bool enable) const;
     bool Shutdown(SOShutdownType how) const;
     bool Close();
 
-    bool GetSocketAddr(SOSockAddr& addr) const;
-    bool GetPeerAddr(SOSockAddr& addr) const;
+    bool GetSocketAddr(SockAddr& addr) const;
+    bool GetPeerAddr(SockAddr& addr) const;
 
     bool CanRecv() const;
     bool CanSend() const;
@@ -80,14 +80,14 @@ public:
     // Receive bytes
     Optional<u32> RecvBytes(void* buf, u32 len, ReceiveCallback callback = NULL,
                             void* arg = NULL);
-    Optional<u32> RecvBytesFrom(void* buf, u32 len, SOSockAddr& addr,
+    Optional<u32> RecvBytesFrom(void* buf, u32 len, SockAddr& addr,
                                 ReceiveCallback callback = NULL,
                                 void* arg = NULL);
 
     // Send bytes
     Optional<u32> SendBytes(const void* buf, u32 len,
                             SendCallback callback = NULL, void* arg = NULL);
-    Optional<u32> SendBytesTo(const void* buf, u32 len, const SOSockAddr& addr,
+    Optional<u32> SendBytesTo(const void* buf, u32 len, const SockAddr& addr,
                               SendCallback callback = NULL, void* arg = NULL);
 
     // Receive object
@@ -97,7 +97,7 @@ public:
         return RecvBytes(&dst, sizeof(T), callback, arg);
     }
     template <typename T>
-    Optional<u32> RecvFrom(T& dst, SOSockAddr& addr,
+    Optional<u32> RecvFrom(T& dst, SockAddr& addr,
                            ReceiveCallback callback = NULL, void* arg = NULL) {
         return RecvBytesFrom(&dst, sizeof(T), addr, callback, arg);
     }
@@ -109,7 +109,7 @@ public:
         return SendBytes(&src, sizeof(T));
     }
     template <typename T>
-    Optional<u32> SendTo(const T& src, const SOSockAddr& addr,
+    Optional<u32> SendTo(const T& src, const SockAddr& addr,
                          SendCallback callback = NULL, void* arg = NULL) {
         return SendBytesTo(&src, sizeof(T), addr);
     }
@@ -118,10 +118,10 @@ protected:
     SocketBase(SOSocket socket, SOProtoFamily family, SOSockType type);
 
 private:
-    virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SOSockAddr* addr,
+    virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
                               ReceiveCallback callback, void* arg) = 0;
     virtual SOResult SendImpl(const void* src, u32 len, u32& nsend,
-                              const SOSockAddr* addr, SendCallback callback,
+                              const SockAddr* addr, SendCallback callback,
                               void* arg) = 0;
 
 protected:

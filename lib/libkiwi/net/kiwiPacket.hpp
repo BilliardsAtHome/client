@@ -20,7 +20,7 @@ public:
      * @param size Packet buffer size
      * @param dest Packet recipient
      */
-    Packet(u32 size, const SOSockAddr* dest = NULL)
+    Packet(u32 size, const SockAddr* dest = NULL)
         : mpBuffer(NULL), mBufferSize(0), mReadOffset(0), mWriteOffset(0) {
         OSInitMutex(&mBufferMutex);
         Alloc(size);
@@ -28,7 +28,7 @@ public:
         if (dest != NULL) {
             mAddress = *dest;
         } else {
-            std::memset(&mAddress, 0, sizeof(SOSockAddr));
+            std::memset(&mAddress, 0, sizeof(SockAddr));
         }
     }
 
@@ -116,8 +116,8 @@ public:
      *
      * @param addr Peer address
      */
-    void GetPeer(SOSockAddr& addr) const {
-        addr = mAddress;
+    void GetPeer(SockAddr& addr) const {
+        std::memcpy(&addr, &mAddress, mAddress.len);
     }
 
     void Alloc(u32 size);
@@ -143,7 +143,7 @@ protected:
     s32 mWriteOffset;
 
     // Sender (recv) or recipient (send)
-    SOSockAddr mAddress;
+    SockAddr mAddress;
 };
 
 } // namespace kiwi

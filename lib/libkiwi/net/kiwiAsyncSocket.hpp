@@ -17,8 +17,8 @@ public:
     AsyncSocket(SOProtoFamily family, SOSockType type);
     virtual ~AsyncSocket();
 
-    virtual bool Connect(const SOSockAddr& addr,
-                         ConnectCallback callback = NULL, void* arg = NULL);
+    virtual bool Connect(const SockAddr& addr, ConnectCallback callback = NULL,
+                         void* arg = NULL);
     virtual AsyncSocket* Accept(AcceptCallback callback = NULL,
                                 void* arg = NULL);
 
@@ -32,22 +32,8 @@ private:
      * Async operation
      */
     struct Job {
-        /**
-         * Constructor
-         *
-         * @param _packet Packet for this job
-         */
-        Job(Packet* _packet) : packet(_packet) {
-            K_ASSERT(packet != NULL);
-        }
-
-        /**
-         * Destructor
-         */
-        ~Job() {
-            delete packet;
-            packet = NULL;
-        }
+        Job(Packet* _packet);
+        ~Job();
 
         // Packet associated with this job
         Packet* packet;
@@ -72,10 +58,10 @@ private:
     void CalcRecv();
     void CalcSend();
 
-    virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SOSockAddr* addr,
+    virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
                               ReceiveCallback callback, void* arg);
     virtual SOResult SendImpl(const void* src, u32 len, u32& nsend,
-                              const SOSockAddr* addr, SendCallback callback,
+                              const SockAddr* addr, SendCallback callback,
                               void* arg);
 
 private:
@@ -84,7 +70,7 @@ private:
     // Current async task
     EState mState;
     // Peer address
-    SOSockAddr mPeer;
+    SockAddr mPeer;
 
     // Active packet jobs
     TList<Job> mRecvJobs;

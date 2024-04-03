@@ -39,13 +39,10 @@ SocketBase::~SocketBase() {
 /**
  * Gets the console's IP address
  *
- * @return Raw IPv4 address
+ * @param addr[out] IPv4 address
  */
-u32 SocketBase::GetHostAddr() {
-    SOInAddr addr;
-
-    LibSO::GetHostID(addr);
-    return addr.raw;
+void SocketBase::GetHostAddr(SockAddr4& addr) {
+    LibSO::GetHostID(addr.addr);
 }
 
 /**
@@ -55,7 +52,7 @@ u32 SocketBase::GetHostAddr() {
  * @param addr[in,out] Local address
  * @return Success
  */
-bool SocketBase::Bind(SOSockAddr& addr) const {
+bool SocketBase::Bind(SockAddr& addr) const {
     K_ASSERT(IsOpen());
     K_ASSERT(mFamily == addr.in.family);
 
@@ -132,7 +129,7 @@ bool SocketBase::Close() {
  * @param[out] addr Socket address
  * @return Success
  */
-bool SocketBase::GetSocketAddr(SOSockAddr& addr) const {
+bool SocketBase::GetSocketAddr(SockAddr& addr) const {
     K_ASSERT(IsOpen());
     K_ASSERT(mFamily == addr.in.family);
 
@@ -145,7 +142,7 @@ bool SocketBase::GetSocketAddr(SOSockAddr& addr) const {
  * @param[out] addr Peer address
  * @return Success
  */
-bool SocketBase::GetPeerAddr(SOSockAddr& addr) const {
+bool SocketBase::GetPeerAddr(SockAddr& addr) const {
     K_ASSERT(IsOpen());
     K_ASSERT(mFamily == addr.in.family);
 
@@ -225,7 +222,7 @@ Optional<u32> SocketBase::RecvBytes(void* buf, u32 len,
  * @param arg Callback user argument
  * @return Number of bytes received
  */
-Optional<u32> SocketBase::RecvBytesFrom(void* buf, u32 len, SOSockAddr& addr,
+Optional<u32> SocketBase::RecvBytesFrom(void* buf, u32 len, SockAddr& addr,
                                         ReceiveCallback callback, void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(buf != NULL);
@@ -293,7 +290,7 @@ Optional<u32> SocketBase::SendBytes(const void* buf, u32 len,
  * @return Number of bytes sent
  */
 Optional<u32> SocketBase::SendBytesTo(const void* buf, u32 len,
-                                      const SOSockAddr& addr,
+                                      const SockAddr& addr,
                                       SendCallback callback, void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(buf != NULL);

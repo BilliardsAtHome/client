@@ -1,3 +1,4 @@
+#include <climits>
 #include <libkiwi.h>
 
 namespace kiwi {
@@ -6,6 +7,24 @@ OSThread AsyncSocket::sSocketThread;
 bool AsyncSocket::sSocketThreadCreated = false;
 u8 AsyncSocket::sSocketThreadStack[THREAD_STACK_SIZE];
 TList<AsyncSocket> AsyncSocket::sSocketList;
+
+/**
+ * Constructor
+ *
+ * @param _packet Packet for this job
+ */
+AsyncSocket::Job::Job(Packet* _packet)
+    : packet(_packet), onrecv(NULL), arg(NULL) {
+    K_ASSERT(packet != NULL);
+}
+
+/**
+ * Destructor
+ */
+AsyncSocket::Job::~Job() {
+    delete packet;
+    packet = NULL;
+}
 
 /**
  * Socket thread function
@@ -95,8 +114,10 @@ AsyncSocket::~AsyncSocket() {
  * @param arg Callback user argument
  * @return Success
  */
-bool AsyncSocket::Connect(const SOSockAddr& addr, ConnectCallback callback,
+bool AsyncSocket::Connect(const SockAddr& addr, ConnectCallback callback,
                           void* arg) {
+    K_ASSERT(IsOpen());
+
     mState = EState_Connecting;
     mPeer = addr;
 
@@ -115,6 +136,8 @@ bool AsyncSocket::Connect(const SOSockAddr& addr, ConnectCallback callback,
  * @return New socket
  */
 AsyncSocket* AsyncSocket::Accept(AcceptCallback callback, void* arg) {
+    K_ASSERT(IsOpen());
+
     mState = EState_Accepting;
 
     mpAcceptCallback = callback;
@@ -135,9 +158,10 @@ AsyncSocket* AsyncSocket::Accept(AcceptCallback callback, void* arg) {
  * @param arg Callback user argument
  * @return Socket library result
  */
-SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SOSockAddr* addr,
+SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
                                ReceiveCallback callback, void* arg) {
-    K_ASSERT(len > 0);
+    K_ASSERT(IsOpen());
+    K_ASSERT(len > 0 && len < ULONG_MAX);
     K_ASSERT_EX(callback != NULL, "Please provide a receive callback");
 
     // Bad design, I know. But I can't think of a better way....
@@ -159,7 +183,7 @@ SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SOSockAddr* addr,
 
     // Prevent UB
     if (addr != NULL) {
-        std::memset(addr, 0, sizeof(SOSockAddr));
+        std::memset(addr, 0, sizeof(SockAddr));
     }
 
     // Receive doesn't actually happen on this thread
@@ -179,10 +203,11 @@ SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SOSockAddr* addr,
  * @return Socket library result
  */
 SOResult AsyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
-                               const SOSockAddr* addr, SendCallback callback,
+                               const SockAddr* addr, SendCallback callback,
                                void* arg) {
+    K_ASSERT(IsOpen());
     K_ASSERT(src != NULL);
-    K_ASSERT(len > 0);
+    K_ASSERT(len > 0 && len < ULONG_MAX);
 
     // Packet to hold incoming data
     Packet* packet = new Packet(len, addr);
@@ -210,6 +235,8 @@ SOResult AsyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
  */
 void AsyncSocket::Calc() {
     s32 result;
+
+    K_ASSERT(IsOpen());
 
     switch (mState) {
     case EState_Thinking:
@@ -253,6 +280,8 @@ void AsyncSocket::Calc() {
  * Receives packet data over socket
  */
 void AsyncSocket::CalcRecv() {
+    K_ASSERT(IsOpen());
+
     while (!mRecvJobs.Empty()) {
         // Find next incomplete job (FIFO)
         Job& job = mRecvJobs.Front();
@@ -266,7 +295,7 @@ void AsyncSocket::CalcRecv() {
         if (job.packet->IsWriteComplete()) {
             // Notify user
             if (job.onrecv != NULL) {
-                SOSockAddr peer;
+                SockAddr peer;
                 job.packet->GetPeer(peer);
 
                 // TODO: Maybe pass Packet instead, but that's not really useful
@@ -285,6 +314,8 @@ void AsyncSocket::CalcRecv() {
  * Sends packet data over socket
  */
 void AsyncSocket::CalcSend() {
+    K_ASSERT(IsOpen());
+
     while (!mRecvJobs.Empty()) {
         // Find next incomplete job (FIFO)
         Job& job = mSendJobs.Front();

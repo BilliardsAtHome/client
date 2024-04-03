@@ -7,12 +7,12 @@ namespace kiwi {
 /**
  * String wrapper
  */
-template <typename T> class BasicString {
+template <typename T> class StringImpl {
 public:
     /**
      * Constructor
      */
-    BasicString() : mpBuffer(NULL), mCapacity(0), mLength(0) {
+    StringImpl() : mpBuffer(NULL), mCapacity(0), mLength(0) {
         Clear();
     }
 
@@ -22,7 +22,7 @@ public:
      *
      * @param str String to copy
      */
-    BasicString(const BasicString& str)
+    StringImpl(const StringImpl& str)
         : mpBuffer(NULL), mCapacity(0), mLength(0) {
         Assign(str);
     }
@@ -35,7 +35,7 @@ public:
      * @param pos Substring start index
      * @param len Substring length
      */
-    BasicString(const BasicString& str, u32 pos, u32 len = npos)
+    StringImpl(const StringImpl& str, u32 pos, u32 len = npos)
         : mpBuffer(NULL), mCapacity(0), mLength(0) {
         Assign(str.Substr(pos, len));
     }
@@ -46,7 +46,7 @@ public:
      *
      * @param s C-style string
      */
-    BasicString(const T* s) : mpBuffer(NULL), mCapacity(0), mLength(0) {
+    StringImpl(const T* s) : mpBuffer(NULL), mCapacity(0), mLength(0) {
         Assign(s);
     }
 
@@ -57,7 +57,7 @@ public:
      * @param s Buffer/sequence
      * @param n Number of characters to copy
      */
-    BasicString(const T* s, u32 n) : mpBuffer(NULL), mCapacity(0), mLength(0) {
+    StringImpl(const T* s, u32 n) : mpBuffer(NULL), mCapacity(0), mLength(0) {
         Assign(s, n);
     }
 
@@ -67,14 +67,14 @@ public:
      *
      * @param n Number of characters to reserve
      */
-    explicit BasicString(u32 n) : mpBuffer(NULL), mCapacity(0), mLength(0) {
+    explicit StringImpl(u32 n) : mpBuffer(NULL), mCapacity(0), mLength(0) {
         Reserve(n);
     }
 
     /**
      * Destructor
      */
-    ~BasicString() {
+    ~StringImpl() {
         // Don't delete static memory
         if (mpBuffer == scEmptyCStr) {
             return;
@@ -135,46 +135,46 @@ public:
     }
 
     void Clear();
-    BasicString Substr(u32 pos = 0, u32 len = npos) const;
+    StringImpl Substr(u32 pos = 0, u32 len = npos) const;
 
-    u32 Find(const BasicString& str, u32 pos = 0) const;
+    u32 Find(const StringImpl& str, u32 pos = 0) const;
     u32 Find(const T* s, u32 pos = 0) const;
     u32 Find(T c, u32 pos = 0) const;
 
-    BasicString& operator+=(const BasicString& str) {
+    StringImpl& operator+=(const StringImpl& str) {
         Append(str);
         return *this;
     }
-    BasicString& operator+=(const T* s) {
+    StringImpl& operator+=(const T* s) {
         K_ASSERT(s != -NULL);
         Append(s);
         return *this;
     }
-    BasicString& operator+=(T c) {
+    StringImpl& operator+=(T c) {
         Append(c);
         return *this;
     }
 
-    BasicString& operator=(const BasicString& str) {
+    StringImpl& operator=(const StringImpl& str) {
         Assign(str);
         return *this;
     }
-    BasicString& operator=(const T* s) {
+    StringImpl& operator=(const T* s) {
         Assign(s);
         return *this;
     }
-    BasicString& operator=(T c) {
+    StringImpl& operator=(T c) {
         Assign(c);
         return *this;
     }
 
-    bool operator==(const BasicString& str) const;
+    bool operator==(const StringImpl& str) const;
     bool operator==(const T* s) const;
     bool operator==(const T c) const {
         return mLength == 1 && mpBuffer[0] == c;
     }
 
-    bool operator!=(const BasicString& str) const {
+    bool operator!=(const StringImpl& str) const {
         return (*this == str) == false;
     }
     bool operator!=(const T* s) const {
@@ -188,11 +188,11 @@ private:
     void Reserve(u32 n);
     void Shrink();
 
-    void Assign(const BasicString& str);
+    void Assign(const StringImpl& str);
     void Assign(const T* s, u32 n = npos);
     void Assign(T c);
 
-    void Append(const BasicString& str);
+    void Append(const StringImpl& str);
     void Append(const T* s);
     void Append(T c);
 
@@ -204,34 +204,34 @@ private:
     // String length
     u32 mLength;
 
-    // Static string for empty BasicStrings
+    // Static string for empty StringImpls
     static const T* scEmptyCStr;
 
 public:
     static const u32 npos = -1;
 };
 
-typedef BasicString<char> String;
-typedef BasicString<wchar_t> WString;
+typedef StringImpl<char> String;
+typedef StringImpl<wchar_t> WString;
 
 template <typename T>
-inline BasicString<T> operator+(const BasicString<T>& lhs,
-                                const BasicString<T>& rhs) {
-    BasicString<T> str = lhs;
+inline StringImpl<T> operator+(const StringImpl<T>& lhs,
+                               const StringImpl<T>& rhs) {
+    StringImpl<T> str = lhs;
     str += rhs;
     return str;
 }
 
 template <typename T>
-inline BasicString<T> operator+(const BasicString<T>& lhs, const T* rhs) {
-    BasicString<T> str = lhs;
+inline StringImpl<T> operator+(const StringImpl<T>& lhs, const T* rhs) {
+    StringImpl<T> str = lhs;
     str += rhs;
     return str;
 }
 
 template <typename T>
-inline BasicString<T> operator+(const BasicString<T>& lhs, T rhs) {
-    BasicString<T> str = lhs;
+inline StringImpl<T> operator+(const StringImpl<T>& lhs, T rhs) {
+    StringImpl<T> str = lhs;
     str += rhs;
     return str;
 }
@@ -243,10 +243,10 @@ inline BasicString<T> operator+(const BasicString<T>& lhs, T rhs) {
  * @param args Format arguments
  */
 template <typename T>
-inline BasicString<T> VFormat(const BasicString<T>& fmt, std::va_list args) {
+inline StringImpl<T> VFormat(const StringImpl<T>& fmt, std::va_list args) {
     char buffer[1024];
     std::vsnprintf(buffer, sizeof(buffer), fmt, args);
-    return BasicString<T>(buffer);
+    return StringImpl<T>(buffer);
 }
 
 /**
@@ -256,10 +256,10 @@ inline BasicString<T> VFormat(const BasicString<T>& fmt, std::va_list args) {
  * @param args Format arguments
  */
 template <typename T>
-inline BasicString<T> VFormat(const T* fmt, std::va_list args) {
+inline StringImpl<T> VFormat(const T* fmt, std::va_list args) {
     char buffer[1024];
     std::vsnprintf(buffer, sizeof(buffer), fmt, args);
-    return BasicString<T>(buffer);
+    return StringImpl<T>(buffer);
 }
 
 /**
@@ -269,10 +269,10 @@ inline BasicString<T> VFormat(const T* fmt, std::va_list args) {
  * @param ... Format arguments
  */
 template <typename T>
-inline BasicString<T> Format(const BasicString<T>& fmt, ...) {
+inline StringImpl<T> Format(const StringImpl<T>& fmt, ...) {
     std::va_list list;
     va_start(list, fmt);
-    BasicString<T> str = VFormat(fmt, list);
+    StringImpl<T> str = VFormat(fmt, list);
     va_end(list);
 
     return str;
@@ -284,10 +284,10 @@ inline BasicString<T> Format(const BasicString<T>& fmt, ...) {
  * @param fmt Format C-style string
  * @param ... Format arguments
  */
-template <typename T> inline BasicString<T> Format(const T* fmt, ...) {
+template <typename T> inline StringImpl<T> Format(const T* fmt, ...) {
     std::va_list list;
     va_start(list, fmt);
-    BasicString<T> str = VFormat(fmt, list);
+    StringImpl<T> str = VFormat(fmt, list);
     va_end(list);
 
     return str;
