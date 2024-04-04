@@ -1,6 +1,6 @@
 #ifndef LIBKIWI_CORE_COLOR_H
 #define LIBKIWI_CORE_COLOR_H
-#include <libkiwi/math/kiwiAlgorithm.hpp>
+#include <libkiwi/math/kiwiAlgorithm.h>
 #include <nw4r/ut.h>
 #include <types.h>
 

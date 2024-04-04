@@ -1,6 +1,6 @@
 #ifndef LIBKIWI_KERNEL_RUNTIME_H
 #define LIBKIWI_KERNEL_RUNTIME_H
-#include <libkiwi/math/kiwiAlgorithm.hpp>
+#include <libkiwi/math/kiwiAlgorithm.h>
 #include <revolution/OS.h>
 #include <types.h>
 

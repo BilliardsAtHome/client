@@ -1,7 +1,7 @@
 #ifndef LIBKIWI_NET_RELIABLE_PACKET_H
 #define LIBKIWI_NET_RELIABLE_PACKET_H
 #include <libkiwi/kernel/kiwiAssert.h>
-#include <libkiwi/net/kiwiPacket.hpp>
+#include <libkiwi/net/kiwiPacket.h>
 #include <types.h>
 
 namespace kiwi {

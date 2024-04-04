@@ -1,9 +1,9 @@
 #ifndef LIBKIWI_NET_PACKET_H
 #define LIBKIWI_NET_PACKET_H
 #include <climits>
-#include <libkiwi/math/kiwiAlgorithm.hpp>
-#include <libkiwi/prim/kiwiOptional.hpp>
-#include <libkiwi/rvl/kiwiLibSO.hpp>
+#include <libkiwi/math/kiwiAlgorithm.h>
+#include <libkiwi/prim/kiwiOptional.h>
+#include <libkiwi/rvl/kiwiLibSO.h>
 #include <revolution/OS.h>
 #include <types.h>
 

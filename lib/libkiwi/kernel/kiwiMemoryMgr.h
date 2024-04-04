@@ -1,7 +1,7 @@
 #ifndef LIBKIWI_KERNEL_MEMORY_MGR_H
 #define LIBKIWI_KERNEL_MEMORY_MGR_H
 #include <egg/core.h>
-#include <libkiwi/util/kiwiStaticSingleton.hpp>
+#include <libkiwi/util/kiwiStaticSingleton.h>
 #include <types.h>
 
 namespace kiwi {

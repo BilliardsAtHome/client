@@ -1,7 +1,7 @@
 #ifndef LIBKIWI_CORE_I_STREAM_H
 #define LIBKIWI_CORE_I_STREAM_H
 #include <libkiwi/kernel/kiwiAssert.h>
-#include <libkiwi/prim/kiwiString.hpp>
+#include <libkiwi/prim/kiwiString.h>
 #include <types.h>
 
 /**

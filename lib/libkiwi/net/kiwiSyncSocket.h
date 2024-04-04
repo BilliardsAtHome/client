@@ -1,6 +1,6 @@
 #ifndef LIBKIWI_NET_SYNC_SOCKET_H
 #define LIBKIWI_NET_SYNC_SOCKET_H
-#include <libkiwi/net/kiwiSocketBase.hpp>
+#include <libkiwi/net/kiwiSocketBase.h>
 #include <types.h>
 
 namespace kiwi {

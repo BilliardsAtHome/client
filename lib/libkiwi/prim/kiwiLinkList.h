@@ -1,7 +1,7 @@
 #ifndef LIBKIWI_PRIM_LINKLIST_H
 #define LIBKIWI_PRIM_LINKLIST_H
 #include <libkiwi/kernel/kiwiAssert.h>
-#include <libkiwi/util/kiwiNonCopyable.hpp>
+#include <libkiwi/util/kiwiNonCopyable.h>
 #include <types.h>
 
 namespace kiwi {

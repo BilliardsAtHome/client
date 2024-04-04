@@ -1,9 +1,9 @@
 #ifndef LIBKIWI_NET_ASYNC_SOCKET_H
 #define LIBKIWI_NET_ASYNC_SOCKET_H
-#include <libkiwi/net/kiwiPacket.hpp>
-#include <libkiwi/net/kiwiSocketBase.hpp>
-#include <libkiwi/prim/kiwiLinkList.hpp>
-#include <libkiwi/prim/kiwiOptional.hpp>
+#include <libkiwi/net/kiwiPacket.h>
+#include <libkiwi/net/kiwiSocketBase.h>
+#include <libkiwi/prim/kiwiLinkList.h>
+#include <libkiwi/prim/kiwiOptional.h>
 #include <revolution/OS.h>
 #include <types.h>
 

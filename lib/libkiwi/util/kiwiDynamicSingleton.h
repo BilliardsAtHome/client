@@ -1,7 +1,7 @@
 #ifndef LIBKIWI_UTIL_DYNAMIC_SINGLETON_H
 #define LIBKIWI_UTIL_DYNAMIC_SINGLETON_H
-#include <libkiwi/util/kiwiAutoLock.hpp>
-#include <libkiwi/util/kiwiNonCopyable.hpp>
+#include <libkiwi/util/kiwiAutoLock.h>
+#include <libkiwi/util/kiwiNonCopyable.h>
 #include <revolution/OS.h>
 #include <types.h>
 

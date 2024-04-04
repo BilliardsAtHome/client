@@ -81,7 +81,8 @@ void SceneHookMgr::OnSceneLoadResource() {
         return;
     }
 
-    for (TList<ISceneHook>::Iterator it = active->Begin(); it != active->End();) {
+    for (TList<ISceneHook>::Iterator it = active->Begin();
+         it != active->End();) {
         it++->LoadResource(GetCurrentScene());
     }
 }
@@ -132,7 +133,8 @@ void SceneHookMgr::OnSceneExit() {
         return;
     }
 
-    for (TList<ISceneHook>::Iterator it = active->Begin(); it != active->End();) {
+    for (TList<ISceneHook>::Iterator it = active->Begin();
+         it != active->End();) {
         it++->Exit(GetCurrentScene());
     }
 }
@@ -151,7 +153,8 @@ void SceneHookMgr::OnScenePause() {
         return;
     }
 
-    for (TList<ISceneHook>::Iterator it = active->Begin(); it != active->End();) {
+    for (TList<ISceneHook>::Iterator it = active->Begin();
+         it != active->End();) {
         it++->Pause(GetCurrentScene(), true);
     }
 }
@@ -170,7 +173,8 @@ void SceneHookMgr::OnSceneUnPause() {
         return;
     }
 
-    for (TList<ISceneHook>::Iterator it = active->Begin(); it != active->End();) {
+    for (TList<ISceneHook>::Iterator it = active->Begin();
+         it != active->End();) {
         it++->Pause(GetCurrentScene(), false);
     }
 }

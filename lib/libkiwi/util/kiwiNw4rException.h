@@ -1,6 +1,6 @@
 #ifndef LIBKIWI_UTIL_NW4R_EXCEPTION_H
 #define LIBKIWI_UTIL_NW4R_EXCEPTION_H
-#include <libkiwi/util/kiwiDynamicSingleton.hpp>
+#include <libkiwi/util/kiwiDynamicSingleton.h>
 #include <revolution/OS.h>
 #include <types.h>
 

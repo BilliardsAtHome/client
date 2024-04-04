@@ -1,6 +1,6 @@
 #ifndef LIBKIWI_CORE_MEM_STREAM_H
 #define LIBKIWI_CORE_MEM_STREAM_H
-#include <libkiwi/core/kiwiFileStream.hpp>
+#include <libkiwi/core/kiwiFileStream.h>
 #include <types.h>
 
 namespace kiwi {

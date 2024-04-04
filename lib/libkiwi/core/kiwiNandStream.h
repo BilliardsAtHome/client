@@ -1,36 +1,35 @@
-#ifndef LIBKIWI_CORE_DVD_STREAM_H
-#define LIBKIWI_CORE_DVD_STREAM_H
-#include <libkiwi/core/kiwiFileStream.hpp>
-#include <revolution/DVD.h>
+#ifndef LIBKIWI_CORE_NAND_STREAM_H
+#define LIBKIWI_CORE_NAND_STREAM_H
+#include <libkiwi/core/kiwiFileStream.h>
+#include <revolution/NAND.h>
 #include <types.h>
 
 namespace kiwi {
 
 /**
- * @brief DVD file stream
+ * @brief NAND file stream
  */
-class DvdStream : public FileStream {
+class NandStream : public FileStream {
 public:
     /**
      * @brief Constructor
      */
-    DvdStream() : FileStream(EOpenMode_Read) {}
+    explicit NandStream(EOpenMode mode) : FileStream(mode) {}
 
     /**
      * @brief Constructor
      *
      * @param path File path
      * @param mode Open mode
-     * @param create Create file if it doesn't exist
      */
-    explicit DvdStream(const char* path) : FileStream(EOpenMode_Read) {
+    NandStream(const char* path, EOpenMode mode) : FileStream(mode) {
         Open(path);
     }
 
     /**
      * @brief Destructor
      */
-    virtual ~DvdStream() {
+    virtual ~NandStream() {
         if (mIsOpen) {
             Close();
         }
@@ -48,7 +47,7 @@ public:
         return true;
     }
     virtual bool CanWrite() const {
-        return false;
+        return true;
     }
     virtual bool CanPeek() const {
         return true;
@@ -59,14 +58,14 @@ public:
     }
 
 private:
-    virtual void SeekImpl(ESeekDir dir, s32 offset);
     virtual s32 ReadImpl(void* dst, u32 size);
     virtual s32 WriteImpl(const void* src, u32 size);
     virtual s32 PeekImpl(void* dst, u32 size);
+    virtual void SeekImpl(ESeekDir dir, s32 offset);
 
 private:
-    // DVD handle
-    DVDFileInfo mFileInfo;
+    // NAND handle
+    NANDFileInfo mFileInfo;
 };
 
 } // namespace kiwi

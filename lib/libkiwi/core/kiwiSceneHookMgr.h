@@ -1,9 +1,9 @@
 #ifndef LIBKIWI_CORE_SCENE_HOOK_MGR_H
 #define LIBKIWI_CORE_SCENE_HOOK_MGR_H
 #include <Pack/RPSystem.h>
-#include <libkiwi/prim/kiwiArray.hpp>
-#include <libkiwi/prim/kiwiLinkList.hpp>
-#include <libkiwi/util/kiwiStaticSingleton.hpp>
+#include <libkiwi/prim/kiwiArray.h>
+#include <libkiwi/prim/kiwiLinkList.h>
+#include <libkiwi/util/kiwiStaticSingleton.h>
 #include <types.h>
 
 namespace kiwi {
