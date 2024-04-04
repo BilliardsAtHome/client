@@ -66,7 +66,7 @@ public:
     virtual SocketBase* Accept(AcceptCallback callback = NULL,
                                void* arg = NULL) = 0;
 
-    bool Bind(SockAddr& addr) const;
+    bool Bind(SockAddr& addr = SockAddr4()) const;
     bool Listen(s32 backlog = SOMAXCONN) const;
     bool SetBlocking(bool enable) const;
     bool Shutdown(SOShutdownType how) const;

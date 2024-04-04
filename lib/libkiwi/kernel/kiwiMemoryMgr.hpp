@@ -52,6 +52,15 @@ private:
 
 } // namespace kiwi
 
+void* operator new(std::size_t size);
+void* operator new[](std::size_t size);
+
+void* operator new(std::size_t size, s32 align);
+void* operator new[](std::size_t size, s32 align);
+
+void operator delete(void* block);
+void operator delete[](void* block);
+
 void* operator new(std::size_t size, kiwi::EMemory memory);
 void* operator new[](std::size_t size, kiwi::EMemory memory);
 

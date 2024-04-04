@@ -17,6 +17,7 @@
 #include <libkiwi/kernel/kiwiRuntime.h>
 #include <libkiwi/math/kiwiAlgorithm.hpp>
 #include <libkiwi/net/kiwiAsyncSocket.hpp>
+#include <libkiwi/net/kiwiHttpRequest.hpp>
 #include <libkiwi/net/kiwiPacket.hpp>
 #include <libkiwi/net/kiwiReliableClient.hpp>
 #include <libkiwi/net/kiwiReliablePacket.hpp>
@@ -25,8 +26,10 @@
 #include <libkiwi/net/kiwiSyncSocket.hpp>
 #include <libkiwi/prim/kiwiArray.hpp>
 #include <libkiwi/prim/kiwiBitCast.hpp>
+#include <libkiwi/prim/kiwiHashMap.hpp>
 #include <libkiwi/prim/kiwiLinkList.hpp>
 #include <libkiwi/prim/kiwiOptional.hpp>
+#include <libkiwi/prim/kiwiPair.hpp>
 #include <libkiwi/prim/kiwiSTL.hpp>
 #include <libkiwi/prim/kiwiString.hpp>
 #include <libkiwi/rvl/kiwiLibGX.hpp>
@@ -44,13 +47,4 @@
 #include <libkiwi/util/kiwiRandom.hpp>
 #include <libkiwi/util/kiwiStaticSingleton.hpp>
 #include <types.h>
-
-void* operator new(std::size_t size);
-void* operator new[](std::size_t size);
-
-void* operator new(std::size_t size, s32 align);
-void* operator new[](std::size_t size, s32 align);
-
-void operator delete(void* block);
-void operator delete[](void* block);
 #endif

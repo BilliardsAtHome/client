@@ -92,6 +92,7 @@ struct SockAddr : public SOSockAddr {
 
     SockAddr& operator=(const SockAddr& addr) {
         std::memcpy(this, &addr, addr.len);
+        return *this;
     }
 
     /**
@@ -105,6 +106,7 @@ struct SockAddr : public SOSockAddr {
 
     SockAddr& operator=(const SOSockAddr& addr) {
         std::memcpy(this, &addr, addr.len);
+        return *this;
     }
 
     /**
