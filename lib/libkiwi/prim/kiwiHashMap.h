@@ -29,9 +29,108 @@ template <typename TKey> struct Hasher {
  * TODO: Track load factor, expand + re-hash when high
  */
 template <typename TKey, typename TValue> class TMap {
+    friend class ConstIterator; // Access 'Bucket' structure
+
 public:
     // Default bucket count
     static const u32 DEFAULT_CAPACITY = 32;
+
+private:
+    struct Bucket {
+        /**
+         * @brief Destructor
+         */
+        ~Bucket() {
+            // Recurse
+            delete chained;
+        }
+
+        // Key/value pair
+        TKey key;
+        TValue value;
+
+        // Bucket is in use
+        bool used;
+
+        // Chains
+        Bucket* chained;
+    };
+
+public:
+    class ConstIterator {
+        template <typename, typename> friend class TMap;
+
+    private:
+        /**
+         * @brief Constructor
+         *
+         * @param capacity Map capacity
+         * @param buckets Array of buckets
+         */
+        ConstIterator(u32 capacity, const Bucket* buckets)
+            : mIndex(0),
+              mCapacity(capacity),
+              mpBuckets(buckets),
+              mpChained(mpBuckets) {
+            K_ASSERT(mCapacity > 0);
+        }
+
+    public:
+        /**
+         * Pre-increment operator
+         */
+        ConstIterator& operator++() {
+            if (mpChained != NULL) {
+                mpChained = mpChained->next;
+            }
+
+            // End of chain, advance to next bucket
+            if (mpChained == NULL) {
+                if (++mIndex < mCapacity) {
+                    mpChained = mpBuckets[mIndex];
+                } else {
+                    mpChained = NULL;
+                }
+            }
+
+            return *this;
+        }
+        /**
+         * Post-increment operator
+         */
+        ConstIterator operator++(int) {
+            ConstIterator clone(*this);
+            ++*this;
+            return clone;
+        }
+
+        /**
+         * Gets pointer to element
+         */
+        TValue* operator->() const {
+            return &mpChained->value;
+        }
+        /**
+         * Gets reference to element
+         */
+        TValue& operator*() const {
+            return mpChained->value;
+        }
+
+        bool operator==(ConstIterator rhs) const {
+            return mpChained == rhs.mpChained;
+        }
+        bool operator!=(ConstIterator rhs) const {
+            return mpChained != rhs.mpChained;
+        }
+
+    private:
+        u32 mIndex;    // Current bucket index
+        u32 mCapacity; // Maximum bucket index
+
+        Bucket* mpBuckets; // Current bucket root
+        Bucket* mpChained; // Current bucket chain
+    };
 
 public:
     /**
@@ -127,26 +226,19 @@ public:
         return Find(key) != NULL;
     }
 
-private:
-    struct Bucket {
-        /**
-         * @brief Destructor
-         */
-        ~Bucket() {
-            // Recurse
-            delete chained;
-        }
+    /**
+     * Gets iterator to beginning of map (const view)
+     */
+    ConstIterator Begin() const {
+        return ConstIterator(mCapacity, mpBuckets);
+    }
 
-        // Key/value pair
-        TKey key;
-        TValue value;
-
-        // Bucket is in use
-        bool used;
-
-        // Chains
-        Bucket* chained;
-    };
+    /**
+     * Gets iterator to end of map (const-view)
+     */
+    ConstIterator End() const {
+        return ConstIterator(mCapacity, NULL);
+    }
 
 private:
     /**

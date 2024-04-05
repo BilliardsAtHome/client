@@ -97,6 +97,7 @@ public:
          * Gets reference to element
          */
         T& operator*() const {
+            K_ASSERT(mpNode->mpElement != NULL);
             return *mpNode->mpElement;
         }
 

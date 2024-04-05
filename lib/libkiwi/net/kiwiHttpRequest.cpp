@@ -1,6 +1,11 @@
 #include <libkiwi.h>
 
 namespace kiwi {
+namespace {
+
+const String sMethodNames[EMethod_Max] = {"GET", "POST"};
+
+}
 
 /**
  * @brief Send request synchronously
@@ -15,6 +20,10 @@ HttpRequest::Response HttpRequest::Send(EMethod method) {
     SockAddr4 addr(mHostName, 80);
     bool success = mpSocket->Connect(addr);
     K_ASSERT(success);
+
+    TMap<String, String>::ConstIterator it = mHeader.Begin();
+    for (; it != mHeader.End(); ++it) {
+    }
 }
 
 /**
