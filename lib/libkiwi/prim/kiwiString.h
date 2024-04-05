@@ -293,6 +293,27 @@ template <typename T> inline StringImpl<T> Format(const T* fmt, ...) {
     return str;
 }
 
+template <typename T> inline String ToString(const T& t);
+
+/**
+ * @brief Convert integer to string
+ */
+template <> inline String ToString<int>(const int& t) {
+    return Format("%d", t);
+}
+/**
+ * @brief Convert float to string
+ */
+template <> inline String ToString<f32>(const f32& t) {
+    return Format("%f", t);
+}
+/**
+ * @brief Convert double to string
+ */
+template <> inline String ToString<f64>(const f64& t) {
+    return Format("%f", t);
+}
+
 } // namespace kiwi
 
 #endif

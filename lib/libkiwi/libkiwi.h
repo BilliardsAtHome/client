@@ -12,6 +12,7 @@
 #include <libkiwi/core/kiwiMemStream.h>
 #include <libkiwi/core/kiwiNandStream.h>
 #include <libkiwi/core/kiwiSceneHookMgr.h>
+#include <libkiwi/core/kiwiThread.h>
 #include <libkiwi/kernel/kiwiAssert.h>
 #include <libkiwi/kernel/kiwiMemoryMgr.h>
 #include <libkiwi/kernel/kiwiRuntime.h>

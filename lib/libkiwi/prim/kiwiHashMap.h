@@ -71,7 +71,7 @@ public:
             : mIndex(0),
               mCapacity(capacity),
               mpBuckets(buckets),
-              mpChained(mpBuckets) {
+              mpIter(mpBuckets) {
             K_ASSERT(mCapacity > 0);
         }
 
@@ -80,16 +80,16 @@ public:
          * Pre-increment operator
          */
         ConstIterator& operator++() {
-            if (mpChained != NULL) {
-                mpChained = mpChained->next;
+            if (mpIter != NULL) {
+                mpIter = mpIter->chained;
             }
 
             // End of chain, advance to next bucket
-            if (mpChained == NULL) {
+            if (mpIter == NULL) {
                 if (++mIndex < mCapacity) {
-                    mpChained = mpBuckets[mIndex];
+                    mpIter = &mpBuckets[mIndex];
                 } else {
-                    mpChained = NULL;
+                    mpIter = NULL;
                 }
             }
 
@@ -108,28 +108,29 @@ public:
          * Gets pointer to element
          */
         TValue* operator->() const {
-            return &mpChained->value;
+            return mpIter != NULL ? &mpIter->value : NULL;
         }
         /**
          * Gets reference to element
          */
         TValue& operator*() const {
-            return mpChained->value;
+            K_ASSERT(mpIter != NULL);
+            return mpIter->value;
         }
 
         bool operator==(ConstIterator rhs) const {
-            return mpChained == rhs.mpChained;
+            return mpIter == rhs.mpIter;
         }
         bool operator!=(ConstIterator rhs) const {
-            return mpChained != rhs.mpChained;
+            return mpIter != rhs.mpIter;
         }
 
     private:
         u32 mIndex;    // Current bucket index
         u32 mCapacity; // Maximum bucket index
 
-        Bucket* mpBuckets; // Current bucket root
-        Bucket* mpChained; // Current bucket chain
+        const Bucket* mpBuckets; // Current bucket root
+        const Bucket* mpIter;    // Current bucket chain
     };
 
 public:

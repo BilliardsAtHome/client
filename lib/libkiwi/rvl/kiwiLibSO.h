@@ -108,13 +108,6 @@ struct SockAddr : public SOSockAddr {
         std::memcpy(this, &addr, addr.len);
         return *this;
     }
-
-    /**
-     * @brief Convert socket address to string
-     */
-    String ToString() const {
-        return LibSO::INetNtoP(*this);
-    }
 };
 
 /**
@@ -193,13 +186,6 @@ struct SockAddr4 : public SOSockAddrIn {
         std::memcpy(this, &addr, addr.len);
         return *this;
     }
-
-    /**
-     * @brief Convert IPv4 address to string
-     */
-    String ToString() const {
-        return Format("%s:%d", LibSO::INetNtoP(*this).CStr(), port);
-    }
 };
 
 /**
@@ -272,14 +258,14 @@ struct SockAddr6 : public SOSockAddrIn6 {
         std::memcpy(this, &addr, addr.len);
         return *this;
     }
-
-    /**
-     * @brief Convert IPv6 address to string
-     */
-    String ToString() const {
-        return Format("%s:%d", LibSO::INetNtoP(*this).CStr(), port);
-    }
 };
+
+/**
+ * @brief Convert socket address to string
+ */
+template <> inline String ToString(const SockAddr& t) {
+    return Format("%s:%d", LibSO::INetNtoP(t).CStr(), t.port);
+}
 
 K_STATIC_ASSERT(sizeof(SockAddr) == sizeof(SOSockAddr));
 K_STATIC_ASSERT(sizeof(SockAddr4) == sizeof(SOSockAddrIn));

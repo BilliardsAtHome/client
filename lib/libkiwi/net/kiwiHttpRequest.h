@@ -1,5 +1,6 @@
 #ifndef LIBKIWI_NET_HTTP_REQUEST_H
 #define LIBKIWI_NET_HTTP_REQUEST_H
+#include <libkiwi/kernel/kiwiAssert.h>
 #include <libkiwi/net/kiwiSyncSocket.h>
 #include <libkiwi/prim/kiwiHashMap.h>
 #include <libkiwi/prim/kiwiString.h>
@@ -132,8 +133,10 @@ private:
     };
 
 private:
-    String mHostName;             // Server host name
-    SyncSocket* mpSocket;         // Connection to server
+    String mHostName;     // Server host name
+    SyncSocket* mpSocket; // Connection to server
+
+    TMap<String, String> mParams; // URL parameters
     TMap<String, String> mHeader; // Header fields
 
     ResponseCallback mpResponseCallback; // Response callback

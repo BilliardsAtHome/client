@@ -3,7 +3,7 @@
 namespace kiwi {
 namespace {
 
-const String sMethodNames[EMethod_Max] = {"GET", "POST"};
+const String sMethodNames[HttpRequest::EMethod_Max] = {"GET", "POST"};
 
 }
 
