@@ -27,14 +27,7 @@ ThreadImpl::~ThreadImpl() {
     K_ASSERT_EX(*mpOSThread->stackEnd == OS_THREAD_STACK_MAGIC,
                 "Thread stack overflow!!!");
 
-    // Wait for task to finish
-    Join();
-
-    // Destroy thread
-    if (!OSIsThreadTerminated(mpOSThread)) {
-        OSDetachThread(mpOSThread);
-        OSCancelThread(mpOSThread);
-    }
+    OSDetachThread(mpOSThread);
 
     delete mpOSThread;
     delete mpThreadStack;
@@ -58,7 +51,9 @@ void ThreadImpl::Start() {
  */
 void ThreadImpl::Join() {
     K_ASSERT(mpOSThread != NULL);
-    OSJoinThread(mpOSThread, NULL);
+
+    BOOL success = OSJoinThread(mpOSThread, NULL);
+    K_ASSERT(success);
 }
 
 /**

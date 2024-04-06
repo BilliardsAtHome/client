@@ -25,11 +25,10 @@ protected:
     template <typename TFunc, typename TClass>
     void SetMemberFunction(TFunc fn, const TClass& obj);
 
-protected:
+private:
     OSThread* mpOSThread; // RVL thread
     u8* mpThreadStack;    // RVL thread stack
 
-private:
     // OS thread parameters
     static const u32 cStackSize = 0x4000;
     static const s32 cPriority = OS_PRIORITY_MAX / 2;
@@ -37,6 +36,9 @@ private:
 
 } // namespace detail
 
+/**
+ * @brief Similar to std::thread
+ */
 class Thread : public detail::ThreadImpl {
 public:
     // Thread function parameter
@@ -142,7 +144,7 @@ public:
     }
 
     /**
-     * @brief Wait for this thread to finish executing
+     * @brief Block the main thread until this thread finishes executing
      */
     void Join() {
         ThreadImpl::Join();
