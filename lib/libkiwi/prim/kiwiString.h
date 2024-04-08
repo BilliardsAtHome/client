@@ -1,5 +1,6 @@
 #ifndef LIBKIWI_PRIM_STRING_H
 #define LIBKIWI_PRIM_STRING_H
+#include <libkiwi/prim/kiwiHashMap.h>
 #include <types.h>
 
 namespace kiwi {
@@ -146,7 +147,7 @@ public:
         return *this;
     }
     StringImpl& operator+=(const T* s) {
-        K_ASSERT(s != -NULL);
+        K_ASSERT(s != NULL);
         Append(s);
         return *this;
     }
@@ -293,6 +294,14 @@ template <typename T> inline StringImpl<T> Format(const T* fmt, ...) {
     return str;
 }
 
+/**
+ * @brief String hash support
+ */
+template <typename T> inline hash_t Hash(const StringImpl<T>& key) {
+    return HashImpl(key.CStr(), key.Length() * sizeof(T));
+}
+
+// String conversion. Specialize this for custom types
 template <typename T> inline String ToString(const T& t);
 
 /**
@@ -312,6 +321,12 @@ template <> inline String ToString<f32>(const f32& t) {
  */
 template <> inline String ToString<f64>(const f64& t) {
     return Format("%f", t);
+}
+/**
+ * @brief Convert string to string :D
+ */
+template <> inline String ToString<String>(const String& t) {
+    return t;
 }
 
 } // namespace kiwi

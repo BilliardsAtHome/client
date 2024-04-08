@@ -188,8 +188,8 @@ bool SocketBase::CanSend() const {
  * @param arg Callback user argument
  * @return Number of bytes received
  */
-Optional<u32> SocketBase::RecvBytes(void* buf, u32 len,
-                                    ReceiveCallback callback, void* arg) {
+Optional<u32> SocketBase::RecvBytes(void* buf, u32 len, Callback callback,
+                                    void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(buf != NULL);
     K_ASSERT(len > 0);
@@ -223,7 +223,7 @@ Optional<u32> SocketBase::RecvBytes(void* buf, u32 len,
  * @return Number of bytes received
  */
 Optional<u32> SocketBase::RecvBytesFrom(void* buf, u32 len, SockAddr& addr,
-                                        ReceiveCallback callback, void* arg) {
+                                        Callback callback, void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(buf != NULL);
     K_ASSERT(len > 0);
@@ -255,8 +255,8 @@ Optional<u32> SocketBase::RecvBytesFrom(void* buf, u32 len, SockAddr& addr,
  * @param arg Callback user argument
  * @return Number of bytes sent
  */
-Optional<u32> SocketBase::SendBytes(const void* buf, u32 len,
-                                    SendCallback callback, void* arg) {
+Optional<u32> SocketBase::SendBytes(const void* buf, u32 len, Callback callback,
+                                    void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(buf != NULL);
     K_ASSERT(len > 0);
@@ -290,8 +290,8 @@ Optional<u32> SocketBase::SendBytes(const void* buf, u32 len,
  * @return Number of bytes sent
  */
 Optional<u32> SocketBase::SendBytesTo(const void* buf, u32 len,
-                                      const SockAddr& addr,
-                                      SendCallback callback, void* arg) {
+                                      const SockAddr& addr, Callback callback,
+                                      void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(buf != NULL);
     K_ASSERT(len > 0);

@@ -11,8 +11,7 @@ namespace kiwi {
  * @param arg Callback user argument
  * @return Success
  */
-bool SyncSocket::Connect(const SockAddr& addr, ConnectCallback callback,
-                         void* arg) {
+bool SyncSocket::Connect(const SockAddr& addr, Callback callback, void* arg) {
     K_ASSERT(IsOpen());
 
     // Blocking call
@@ -66,7 +65,7 @@ SyncSocket* SyncSocket::Accept(AcceptCallback callback, void* arg) {
  * @return Socket library result
  */
 SOResult SyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
-                              ReceiveCallback callback, void* arg) {
+                              Callback callback, void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(dst != NULL);
     K_ASSERT(len > 0 && len < ULONG_MAX);
@@ -89,11 +88,11 @@ SOResult SyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
 
 _exit:
     if (addr != NULL) {
-        std::memcpy(addr, &peer, peer.len);
+        *addr = peer;
     }
 
     if (callback != NULL) {
-        callback(LibSO::GetLastError(), peer, arg);
+        callback(LibSO::GetLastError(), arg);
     }
 
     // Successful if the last transaction resulted in some amount of bytes read
@@ -112,7 +111,7 @@ _exit:
  * @return Socket library result
  */
 SOResult SyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
-                              const SockAddr* addr, SendCallback callback,
+                              const SockAddr* addr, Callback callback,
                               void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(src != NULL);

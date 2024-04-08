@@ -17,7 +17,7 @@ public:
     AsyncSocket(SOProtoFamily family, SOSockType type);
     virtual ~AsyncSocket();
 
-    virtual bool Connect(const SockAddr& addr, ConnectCallback callback = NULL,
+    virtual bool Connect(const SockAddr& addr, Callback callback = NULL,
                          void* arg = NULL);
     virtual AsyncSocket* Accept(AcceptCallback callback = NULL,
                                 void* arg = NULL);
@@ -42,9 +42,9 @@ private:
     void CalcSend();
 
     virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
-                              ReceiveCallback callback, void* arg);
+                              Callback callback, void* arg);
     virtual SOResult SendImpl(const void* src, u32 len, u32& nsend,
-                              const SockAddr* addr, SendCallback callback,
+                              const SockAddr* addr, Callback callback,
                               void* arg);
 
 private:
@@ -60,7 +60,7 @@ private:
     TList<SendJob> mSendJobs;
 
     // Connect callback
-    ConnectCallback mpConnectCallback;
+    Callback mpConnectCallback;
     void* mpConnectCallbackArg;
 
     // Accept callback

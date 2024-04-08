@@ -1,7 +1,7 @@
 #ifndef LIBKIWI_NET_HTTP_REQUEST_H
 #define LIBKIWI_NET_HTTP_REQUEST_H
 #include <libkiwi/kernel/kiwiAssert.h>
-#include <libkiwi/net/kiwiSyncSocket.h>
+#include <libkiwi/net/kiwiAsyncSocket.h>
 #include <libkiwi/prim/kiwiHashMap.h>
 #include <libkiwi/prim/kiwiString.h>
 #include <types.h>
@@ -29,6 +29,9 @@ public:
      * @brief Status code
      */
     enum EStatus {
+        EStatus_LibkiwiErr = -1, // Internal library error
+        EStatus_Dummy = 0,       // Uninitialized
+
         // TODO: Determine which additional codes are useful here
 
         // Successful
@@ -90,8 +93,8 @@ public:
           mpSocket(NULL),
           mpResponseCallback(NULL),
           mpResponseCallbackArg(NULL),
-          mAsyncState(EState_None) {
-        mpSocket = new SyncSocket(SO_PF_INET, SO_SOCK_STREAM);
+          mAsyncState(EState_Idle) {
+        mpSocket = new AsyncSocket(SO_PF_INET, SO_SOCK_STREAM);
         K_ASSERT(mpSocket != NULL);
 
         bool success = mpSocket->Bind();
@@ -106,18 +109,26 @@ public:
     }
 
     /**
-     * @brief Access a header field by name
-     * @note Creates field if it does not already exist
+     * @brief Add/update a request header field
      *
-     * @param key Key
-     * @return Existing field, or new field
+     * @param name Field name
+     * @param value Field value
      */
-    String& operator[](const String& key) {
-        return mHeader[key];
+    void SetHeaderField(const String& name, const String& value) {
+        mHeader.Insert(name, value);
     }
 
-    Response Send(EMethod method = EMethod_GET);
+    /**
+     * @brief Add/update a URL parameter
+     *
+     * @param name Parameter name
+     * @param value Parameter value
+     */
+    void SetParameter(const String& name, const String& value) {
+        mParams.Insert(name, value);
+    }
 
+    const Response& Send(EMethod method = EMethod_GET);
     void SendAsync(ResponseCallback callback, void* arg = NULL,
                    EMethod method = EMethod_GET);
 
@@ -126,23 +137,33 @@ private:
      * @brief Asynchronous state
      */
     enum EState {
-        EState_None,
+        EState_Idle,
         EState_Connecting,
         EState_Sending,
-        EState_Receiving
+        EState_Receiving,
+        EState_Finish
     };
 
 private:
-    String mHostName;     // Server host name
-    SyncSocket* mpSocket; // Connection to server
+    static void SocketCallback(SOResult result, void* arg);
+
+    void StateConnecting();
+    void StateSending();
+    void StateReceiving();
+
+private:
+    EMethod mMethod;       // Request type
+    String mHostName;      // Server host name
+    AsyncSocket* mpSocket; // Connection to server
 
     TMap<String, String> mParams; // URL parameters
     TMap<String, String> mHeader; // Header fields
 
+    Response mResponse;                  // Server response
     ResponseCallback mpResponseCallback; // Response callback
     void* mpResponseCallbackArg;         // Callback user argument
 
-    EState mAsyncState; // Current state (for async only)
+    volatile EState mAsyncState; // Current state (for async only)
 };
 
 } // namespace kiwi

@@ -13,11 +13,12 @@ public:
      *
      * @param _packet Packet for this job
      * @param _dst Destination address
+     * @param[out] _peer Peer address
      * @param _callback Completion callback
      * @param _arg Callback user argument
      */
-    RecvJob(Packet* _packet, void* _dst, ReceiveCallback _callback = NULL,
-            void* _arg = NULL)
+    RecvJob(Packet* _packet, void* _dst, SockAddr* _peer,
+            Callback _callback = NULL, void* _arg = NULL)
         : packet(_packet), dst(_dst), callback(_callback), arg(_arg) {
         K_ASSERT(packet != NULL);
         K_ASSERT(dst != NULL);
@@ -62,9 +63,14 @@ public:
             K_ASSERT(dst != NULL);
             std::memcpy(dst, packet->GetContent(), packet->GetContentSize());
 
+            // Write peer information
+            if (peer != NULL) {
+                *peer = packet->GetPeer();
+            }
+
             // Notify user
             if (callback != NULL) {
-                callback(LibSO::GetLastError(), packet->GetPeer(), arg);
+                callback(LibSO::GetLastError(), arg);
             }
         }
 
@@ -76,9 +82,11 @@ private:
     Packet* packet;
     // Original read address
     void* dst;
+    // Peer address
+    SOSockAddr* peer;
 
     // Completion callback
-    ReceiveCallback callback;
+    Callback callback;
     void* arg;
 };
 
@@ -94,7 +102,7 @@ public:
      * @param _callback Completion callback
      * @param _arg Callback user argument
      */
-    SendJob(Packet* _packet, SendCallback _callback = NULL, void* _arg = NULL)
+    SendJob(Packet* _packet, Callback _callback = NULL, void* _arg = NULL)
         : packet(_packet), callback(_callback), arg(_arg) {
         K_ASSERT(packet != NULL);
     }
@@ -146,7 +154,7 @@ private:
     Packet* packet;
 
     // Completion callback
-    SendCallback callback;
+    Callback callback;
     void* arg;
 };
 
@@ -243,8 +251,7 @@ AsyncSocket::~AsyncSocket() {
  * @param arg Callback user argument
  * @return Success
  */
-bool AsyncSocket::Connect(const SockAddr& addr, ConnectCallback callback,
-                          void* arg) {
+bool AsyncSocket::Connect(const SockAddr& addr, Callback callback, void* arg) {
     K_ASSERT(IsOpen());
 
     mState = EState_Connecting;
@@ -288,7 +295,7 @@ AsyncSocket* AsyncSocket::Accept(AcceptCallback callback, void* arg) {
  * @return Socket library result
  */
 SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
-                               ReceiveCallback callback, void* arg) {
+                               Callback callback, void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(dst != NULL);
     K_ASSERT(len > 0 && len < ULONG_MAX);
@@ -299,14 +306,9 @@ SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
     K_ASSERT(packet != NULL);
 
     // Asynchronous job
-    RecvJob* job = new RecvJob(packet, dst, callback, arg);
+    RecvJob* job = new RecvJob(packet, dst, addr, callback, arg);
     K_ASSERT(job != NULL);
     mRecvJobs.PushBack(job);
-
-    // Prevent UB
-    if (addr != NULL) {
-        std::memset(addr, 0, sizeof(SockAddr));
-    }
 
     // Receive doesn't actually happen on this thread
     nrecv = 0;
@@ -325,7 +327,7 @@ SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
  * @return Socket library result
  */
 SOResult AsyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
-                               const SockAddr* addr, SendCallback callback,
+                               const SockAddr* addr, Callback callback,
                                void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(src != NULL);

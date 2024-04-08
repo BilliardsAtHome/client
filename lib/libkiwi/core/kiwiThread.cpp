@@ -10,12 +10,12 @@ ThreadImpl::ThreadImpl() : mpOSThread(NULL), mpThreadStack(NULL) {
     // Thread & stack aligned to 32
     mpOSThread = new (32) OSThread();
     K_ASSERT(mpOSThread != NULL);
-    mpThreadStack = new (32) u8[cStackSize];
+    mpThreadStack = new (32) u8[scStackSize];
     K_ASSERT(mpThreadStack != NULL);
 
     BOOL success =
-        OSCreateThread(mpOSThread, NULL, NULL, mpThreadStack + cStackSize,
-                       cStackSize, cPriority, 0);
+        OSCreateThread(mpOSThread, NULL, NULL, mpThreadStack + scStackSize,
+                       scStackSize, scPriority, 0);
     K_ASSERT(success);
 }
 

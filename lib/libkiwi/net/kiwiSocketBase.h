@@ -12,12 +12,12 @@ namespace kiwi {
 class SocketBase : private NonCopyable {
 public:
     /**
-     * Connection establish callback
+     * Generic socket operation callback
      *
      * @param result Socket library result
      * @param arg User callback argument
      */
-    typedef void (*ConnectCallback)(SOResult result, void* arg);
+    typedef void (*Callback)(SOResult result, void* arg);
 
     /**
      * Connection accept callback
@@ -29,24 +29,6 @@ public:
      */
     typedef void (*AcceptCallback)(SOResult result, SocketBase* peer,
                                    const SockAddr& addr, void* arg);
-
-    /**
-     * Data receive callback
-     *
-     * @param result Socket library result
-     * @param addr Peer address
-     * @param arg User callback argument
-     */
-    typedef void (*ReceiveCallback)(SOResult result, const SockAddr& addr,
-                                    void* arg);
-
-    /**
-     * Data send callback
-     *
-     * @param result Socket library result
-     * @param arg User callback argument
-     */
-    typedef void (*SendCallback)(SOResult result, void* arg);
 
 public:
     static void GetHostAddr(SockAddr4& addr);
@@ -61,7 +43,7 @@ public:
         return mHandle >= 0;
     }
 
-    virtual bool Connect(const SockAddr& addr, ConnectCallback callback = NULL,
+    virtual bool Connect(const SockAddr& addr, Callback callback = NULL,
                          void* arg = NULL) = 0;
     virtual SocketBase* Accept(AcceptCallback callback = NULL,
                                void* arg = NULL) = 0;
@@ -79,40 +61,51 @@ public:
     bool CanSend() const;
 
     // Receive bytes
-    Optional<u32> RecvBytes(void* buf, u32 len, ReceiveCallback callback = NULL,
+    Optional<u32> RecvBytes(void* buf, u32 len, Callback callback = NULL,
                             void* arg = NULL);
     Optional<u32> RecvBytesFrom(void* buf, u32 len, SockAddr& addr,
-                                ReceiveCallback callback = NULL,
-                                void* arg = NULL);
+                                Callback callback = NULL, void* arg = NULL);
 
     // Send bytes
-    Optional<u32> SendBytes(const void* buf, u32 len,
-                            SendCallback callback = NULL, void* arg = NULL);
+    Optional<u32> SendBytes(const void* buf, u32 len, Callback callback = NULL,
+                            void* arg = NULL);
     Optional<u32> SendBytesTo(const void* buf, u32 len, const SockAddr& addr,
-                              SendCallback callback = NULL, void* arg = NULL);
+                              Callback callback = NULL, void* arg = NULL);
 
     // Receive object
     template <typename T>
-    Optional<u32> Recv(T& dst, ReceiveCallback callback = NULL,
-                       void* arg = NULL) {
+    Optional<u32> Recv(T& dst, Callback callback = NULL, void* arg = NULL) {
         return RecvBytes(&dst, sizeof(T), callback, arg);
     }
     template <typename T>
-    Optional<u32> RecvFrom(T& dst, SockAddr& addr,
-                           ReceiveCallback callback = NULL, void* arg = NULL) {
+    Optional<u32> RecvFrom(T& dst, SockAddr& addr, Callback callback = NULL,
+                           void* arg = NULL) {
         return RecvBytesFrom(&dst, sizeof(T), addr, callback, arg);
     }
 
     // Send object
     template <typename T>
-    Optional<u32> Send(const T& src, SendCallback callback = NULL,
+    Optional<u32> Send(const T& src, Callback callback = NULL,
                        void* arg = NULL) {
         return SendBytes(&src, sizeof(T), callback, arg);
     }
     template <typename T>
     Optional<u32> SendTo(const T& src, const SockAddr& addr,
-                         SendCallback callback = NULL, void* arg = NULL) {
+                         Callback callback = NULL, void* arg = NULL) {
         return SendBytesTo(&src, sizeof(T), addr, callback, arg);
+    }
+
+    // Send specializations for strings
+    template <typename T>
+    Optional<u32> Send(const StringImpl<T>& src, Callback callback = NULL,
+                       void* arg = NULL) {
+        return SendBytes(src.CStr(), src.Length() * sizeof(T), callback, arg);
+    }
+    template <typename T>
+    Optional<u32> SendTo(const StringImpl<T>& src, const SockAddr& addr,
+                         Callback callback = NULL, void* arg = NULL) {
+        return SendBytesTo(src.CStr(), src.Length() * sizeof(T), addr, callback,
+                           arg);
     }
 
 protected:
@@ -120,9 +113,9 @@ protected:
 
 private:
     virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
-                              ReceiveCallback callback, void* arg) = 0;
+                              Callback callback, void* arg) = 0;
     virtual SOResult SendImpl(const void* src, u32 len, u32& nsend,
-                              const SockAddr* addr, SendCallback callback,
+                              const SockAddr* addr, Callback callback,
                               void* arg) = 0;
 
 protected:

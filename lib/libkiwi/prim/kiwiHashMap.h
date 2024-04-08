@@ -1,5 +1,6 @@
 #ifndef LIBKIWI_PRIM_HASHMAP_H
 #define LIBKIWI_PRIM_HASHMAP_H
+#include <libkiwi/prim/kiwiLinkList.h>
 #include <types.h>
 
 namespace kiwi {
@@ -9,19 +10,15 @@ typedef u32 hash_t;
 // Largest representable hash
 static const hash_t HASH_MAX = (1 << (sizeof(hash_t) * 8)) - 1;
 
-// Raw data hash function (call this from Hasher)
 hash_t HashImpl(const void* key, s32 len);
 
 /**
  * @brief Key hasher
- * @note Specialize the call operator for your custom types
+ * @note Specialize for your custom types
  */
-template <typename TKey> struct Hasher {
-    // Default hash function
-    hash_t operator()(const TKey& key) const {
-        return HashImpl(&key, sizeof(TKey));
-    }
-};
+template <typename TKey> inline hash_t Hash(const TKey& key) {
+    return HashImpl(&key, sizeof(TKey));
+}
 
 /**
  * @brief Key/value map
@@ -37,6 +34,11 @@ public:
 
 private:
     struct Bucket {
+        /**
+         * @brief Constructor
+         */
+        Bucket() : key(TKey()), value(TValue()), used(false), chained(NULL) {}
+
         /**
          * @brief Destructor
          */
@@ -72,7 +74,10 @@ public:
               mCapacity(capacity),
               mpBuckets(buckets),
               mpIter(mpBuckets) {
-            K_ASSERT(mCapacity > 0);
+            // Find first non-empty value
+            if (mpIter != NULL && !mpIter->used) {
+                ++*this;
+            }
         }
 
     public:
@@ -80,17 +85,33 @@ public:
          * Pre-increment operator
          */
         ConstIterator& operator++() {
-            if (mpIter != NULL) {
-                mpIter = mpIter->chained;
+            // Can't iterate
+            if (mpIter == NULL) {
+                return *this;
             }
 
-            // End of chain, advance to next bucket
-            if (mpIter == NULL) {
-                if (++mIndex < mCapacity) {
+            // Increment
+            mpIter = mpIter->chained;
+
+            // Find next non-empty chain
+            while (true) {
+                // End of chain, advance to next bucket
+                if (mpIter == NULL) {
+                    if (++mIndex >= mCapacity) {
+                        break;
+                    }
+
                     mpIter = &mpBuckets[mIndex];
-                } else {
-                    mpIter = NULL;
                 }
+
+                // Did we find an item?
+                K_ASSERT(mpIter != NULL);
+                if (mpIter->used) {
+                    break;
+                }
+
+                // Keep searching
+                mpIter = mpIter->chained;
             }
 
             return *this;
@@ -105,17 +126,31 @@ public:
         }
 
         /**
-         * Gets pointer to element
+         * Get key from this element
          */
-        TValue* operator->() const {
-            return mpIter != NULL ? &mpIter->value : NULL;
+        const TKey& Key() const {
+            K_ASSERT(mpIter != NULL);
+            return mpIter->key;
         }
         /**
-         * Gets reference to element
+         * Get value from this element
          */
-        TValue& operator*() const {
+        const TValue& Value() const {
             K_ASSERT(mpIter != NULL);
             return mpIter->value;
+        }
+
+        /**
+         * Gets pointer to this value
+         */
+        const TValue* operator->() const {
+            return &Value();
+        }
+        /**
+         * Gets reference to this value
+         */
+        const TValue& operator*() const {
+            return Value();
         }
 
         bool operator==(ConstIterator rhs) const {
@@ -140,7 +175,7 @@ public:
      * @param capacity Starting number of buckets
      */
     TMap(u32 capacity = DEFAULT_CAPACITY)
-        : mCapacity(capacity), mpBuckets(NULL) {
+        : mSize(0), mCapacity(capacity), mpBuckets(NULL) {
         K_ASSERT(mCapacity > 0);
         K_ASSERT(mCapacity < HASH_MAX);
 
@@ -163,7 +198,7 @@ public:
      * @return Existing value, or new entry
      */
     TValue& operator[](const TKey& key) {
-        return FindImpl(key, true)->value;
+        return Create(key).value;
     }
 
     /**
@@ -173,7 +208,7 @@ public:
      * @param value Value
      */
     void Insert(const TKey& key, const TValue& value) {
-        FindImpl(key, true)->value = value;
+        Create(key).value = value;
     }
 
     /**
@@ -184,7 +219,7 @@ public:
      * @return Success
      */
     bool Remove(const TKey& key, TValue* removed = NULL) {
-        Bucket* bucket = Find(key);
+        Bucket* bucket = Search(key);
 
         // Can't remove, doesn't exist
         if (bucket == NULL) {
@@ -198,6 +233,7 @@ public:
 
         // Just mark as unused
         bucket->used = false;
+        mSize--;
         return true;
     }
 
@@ -208,23 +244,57 @@ public:
      * @return Value if it exists
      */
     TValue* Find(const TKey& key) const {
-        Bucket* bucket = FindImpl(key, false);
-        if (bucket == NULL) {
-            return NULL;
-        }
-
-        return &bucket->value;
+        Bucket* bucket = Search(key);
+        return bucket != NULL ? &bucket->value : NULL;
     }
 
     /**
      * @brief Check whether a key exists
      *
-     * @param key
-     * @return true
-     * @return false
+     * @param key Key
      */
     bool Contains(const TKey& key) const {
         return Find(key) != NULL;
+    }
+
+    /**
+     * @brief Get number of elements in the map
+     */
+    u32 Size() const {
+        return mSize;
+    }
+
+    /**
+     * @brief Check whether the map contains no elements
+     */
+    bool Empty() const {
+        return Size() == 0;
+    }
+
+    /**
+     * @brief Gets list of keys in the map
+     */
+    TList<TKey> Keys() const {
+        TList<TKey> keys;
+
+        for (ConstIterator it = Begin(); it != End(); ++it) {
+            keys.PushBack(it.Key());
+        }
+
+        return keys;
+    }
+
+    /**
+     * @brief Gets list of values in the map
+     */
+    TList<TValue> Values() const {
+        TList<TValue> values;
+
+        for (ConstIterator it = Begin(); it != End(); ++it) {
+            values.PushBack(it.Value());
+        }
+
+        return values;
     }
 
     /**
@@ -238,7 +308,7 @@ public:
      * Gets iterator to end of map (const-view)
      */
     ConstIterator End() const {
-        return ConstIterator(mCapacity, NULL);
+        return ConstIterator(0, NULL);
     }
 
 private:
@@ -246,14 +316,12 @@ private:
      * @brief Find key in hashmap
      *
      * @param key Key
-     * @param insert Insert key if it doesn't exist
      */
-    Bucket* FindImpl(const TKey& key, bool insert) {
+    Bucket* Search(const TKey& key) const {
         // Calculate bucket index
-        u32 i = Hasher<TKey>()(key) % mCapacity;
+        u32 i = Hash(key) % mCapacity;
 
         // Iterate through chains
-        Bucket* last = NULL;
         for (Bucket* it = &mpBuckets[i]; it != NULL; it = it->chained) {
             // Unused entry
             if (!it->used) {
@@ -264,24 +332,53 @@ private:
             if (it->key == key) {
                 return it;
             }
-
-            last = it;
-        }
-
-        K_ASSERT(last != NULL && last->used);
-
-        // Chain new bucket
-        if (insert) {
-            last->chained = new Bucket();
-            K_ASSERT(last->chained != NULL);
-
-            return last->chained;
         }
 
         return NULL;
     }
 
+    /**
+     * @brief Create key in hashmap
+     *
+     * @param key Key
+     */
+    Bucket& Create(const TKey& key) {
+        // Calculate bucket index
+        u32 i = Hash(key) % mCapacity;
+
+        // Iterate through chains
+        Bucket* last = NULL;
+        for (Bucket* it = &mpBuckets[i]; it != NULL; it = it->chained) {
+            // Unused entry
+            if (!it->used) {
+                // Override this entry
+                it->key = key;
+                it->used = true;
+                mSize++;
+                return *it;
+            }
+
+            // Matches key
+            if (it->key == key) {
+                return *it;
+            }
+
+            last = it;
+        }
+
+        // Chain new bucket
+        K_ASSERT(last != NULL);
+        last->chained = new Bucket();
+        K_ASSERT(last->chained != NULL);
+
+        last->chained->key = key;
+        last->chained->used = true;
+        mSize++;
+        return *last->chained;
+    }
+
 private:
+    u32 mSize;
     u32 mCapacity;
     Bucket* mpBuckets;
 };

@@ -30,8 +30,8 @@ private:
     u8* mpThreadStack;    // RVL thread stack
 
     // OS thread parameters
-    static const u32 cStackSize = 0x4000;
-    static const s32 cPriority = OS_PRIORITY_MAX / 2;
+    static const u32 scStackSize = 0x4000;
+    static const s32 scPriority = OS_PRIORITY_MAX / 2;
 };
 
 } // namespace detail
