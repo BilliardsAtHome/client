@@ -51,7 +51,7 @@ private:
     static const u32 THREAD_STACK_SIZE = 0x4000;
 
     // Current async task
-    EState mState;
+    volatile EState mState;
     // Peer address
     SockAddr mPeer;
 
