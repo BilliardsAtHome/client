@@ -10,19 +10,21 @@
  * Mod entrypoint
  */
 void KokeshiMain() {
-    // Setup libkiwi debugging utilities
 #ifndef NDEBUG
+    // Setup libkiwi debugging utilities
     kiwi::Nw4rException::CreateInstance();
     kiwi::MapFile::CreateInstance();
     kiwi::MapFile::GetInstance().Open(kokeshi::scMapfilePath,
                                       kiwi::MapFile::ELinkType_Relocatable);
 #endif
-    // Register our billiards hook
-    bah::Simulation::CreateInstance();
+
+    kiwi::LibSO::Initialize();
 
     ASSERT_EX(SCGetAspectRatio() == SC_ASPECT_STD,
               "16:9 aspect ratio is not supported.\nPlease change to 4:3 in "
               "the console settings.");
+
+    bah::Simulation::CreateInstance();
 
     // Enter game loop
     RPSysSystem::getInstance()->mainLoop();
