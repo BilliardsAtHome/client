@@ -186,8 +186,10 @@ template <typename T> void StringImpl<T>::Reserve(u32 n) {
 
     // Reallocate buffer
     T* buffer = new T[n + 1];
+
     // Copy existing data
     StrNCpy(buffer, mpBuffer, mLength);
+    buffer[mLength] = '\0';
 
     // Delete old data
     if (mpBuffer != scEmptyCStr) {

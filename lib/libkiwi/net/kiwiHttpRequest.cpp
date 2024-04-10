@@ -17,13 +17,13 @@ const String sProtocolVer = "1.1";
 const HttpRequest::Response& HttpRequest::Send(EMethod method) {
     K_ASSERT(method < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
-    K_ASSERT(mAsyncState == EState_Idle);
 
-    // Wait on async version
-    SendAsync(NULL, NULL, method);
-    while (mAsyncState != EState_Finish) {
-        ;
-    }
+    mMethod = method;
+    mpResponseCallback = NULL;
+    mpResponseCallbackArg = NULL;
+
+    // Call on this thread
+    SendImpl();
 
     K_ASSERT(mResponse.status != EStatus_Dummy);
     return mResponse;
@@ -38,100 +38,66 @@ const HttpRequest::Response& HttpRequest::Send(EMethod method) {
  */
 void HttpRequest::SendAsync(ResponseCallback callback, void* arg,
                             EMethod method) {
+    K_ASSERT(callback != NULL);
     K_ASSERT(method < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
-    K_ASSERT_EX(mAsyncState == EState_Idle,
-                "Please wait before calling this function");
 
     mMethod = method;
     mpResponseCallback = callback;
     mpResponseCallbackArg = arg;
 
-    // Begin state machine
-    mAsyncState = EState_Connecting;
-    SocketCallback(SO_SUCCESS, this);
+    // Call on new thread
+    kiwi::Thread t(SendImpl, *this);
 }
 
 /**
- * @brief Async socket state machine
+ * @brief Common send implementation
  *
- * @param result Socket library result
- * @param arg Callback user argument (this request)
+ * @return Success
  */
-void HttpRequest::SocketCallback(SOResult result, void* arg) {
-    K_ASSERT(arg != NULL);
-
-    // Callback argument is the request object
-    HttpRequest* self = static_cast<HttpRequest*>(arg);
-
-    K_LOG_EX("Socket callback! State %d", self->mAsyncState);
-
-    // Socket library failure
-    if (result != SO_SUCCESS) {
-        self->mResponse.status = EStatus_LibkiwiErr;
-    }
-
-    // Async operation is finished
-    if (self->mAsyncState == EState_Finish) {
-        K_ASSERT(self->mResponse.status != EStatus_Dummy);
-
-        if (self->mpResponseCallback) {
-            self->mpResponseCallback(self->mResponse,
-                                     self->mpResponseCallbackArg);
-        }
-
-        return;
-    }
-
-    // State machine
-    switch (self->mAsyncState) {
-    case EState_Connecting:
-        self->StateConnecting();
-        self->mAsyncState = EState_Sending;
-        break;
-    case EState_Sending:
-        self->StateSending();
-        self->mAsyncState = EState_Receiving;
-        break;
-    case EState_Receiving:
-        self->StateReceiving();
-        self->mAsyncState = EState_Finish;
-        break;
-    default:
-        K_ASSERT_EX(false, "Invalid state");
-        self->mAsyncState = EState_Idle;
-        break;
-    }
-}
-
-/**
- * @brief Connect to server
- */
-void HttpRequest::StateConnecting() {
+void HttpRequest::SendImpl() {
+    K_ASSERT(mMethod < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
-    K_ASSERT(mAsyncState == EState_Connecting);
+
+    bool success = true;
 
     // Establish connection with server
     SockAddr4 addr(mHostName, 80);
-    mpSocket->Connect(addr, SocketCallback, this);
+    success = mpSocket->Connect(addr);
+    K_ASSERT(success);
+
+    // Send request, receive server's response
+    success = success && Request();
+    success = success && Receive();
+    K_ASSERT(mResponse.status != EStatus_Dummy);
+
+    // Internal error
+    if (!success) {
+        mResponse.status = EStatus_LibkiwiErr;
+        K_ASSERT(false);
+    }
+
+    // User callback
+    if (mpResponseCallback != NULL) {
+        mpResponseCallback(mResponse, mpResponseCallbackArg);
+    }
 }
 
 /**
  * @brief Send request data
+ *
+ * @return Success
  */
-void HttpRequest::StateSending() {
-    K_ASSERT(mpSocket != NULL);
-    K_ASSERT(mAsyncState == EState_Sending);
+bool HttpRequest::Request() {
     K_ASSERT(mMethod < EMethod_Max);
+    K_ASSERT(mpSocket != NULL);
 
-    Optional<u32> sent;
-    String request;
-
-    // Build URL parameter string
-    request += mParams.Empty() ? "/" : "/?";
-    for (TMap<String, String>::ConstIterator it = mParams.Begin();
-         it != mParams.End(); ++it) {
-        request += Format("&%s=%s", it.Key().CStr(), it.Value().CStr());
+    // Build URI & URL parameter string
+    String request = mURI;
+    for (ParamIterator it = mParams.Begin(); it != mParams.End(); ++it) {
+        // Parameters delimited by ampersand
+        String fmt = it == mParams.Begin() ? "?%s=%s" : "&%s=%s";
+        request += Format(fmt, it.Key().CStr(), it.Value().CStr());
     }
 
     // Build request line
@@ -139,29 +105,30 @@ void HttpRequest::StateSending() {
                      request.CStr(), sProtocolVer.CStr());
 
     // Build header fields
-    for (TMap<String, String>::ConstIterator it = mHeader.Begin();
-         it != mHeader.End(); ++it) {
+    for (HeaderIterator it = mHeader.Begin(); it != mHeader.End(); ++it) {
         request += Format("%s: %s\n", it.Key().CStr(), it.Value().CStr());
     }
 
-    // :D
-    request += "User-Agent: libkiwi\n";
     // Request ends with double-line
-    request += "\n\n";
+    request += "\n";
 
     // Send request data
-    mpSocket->Send(request, SocketCallback, this);
+    Optional<u32> sent = mpSocket->Send(request);
+    return sent && sent.Value() == request.Length();
 }
 
 /**
  * @brief Receive response data
+ *
+ * @return Successs
  */
-void HttpRequest::StateReceiving() {
+bool HttpRequest::Receive() {
+    K_ASSERT(mMethod < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
-    K_ASSERT(mAsyncState == EState_Receiving);
 
     // TODO: Implement
-    SocketCallback(SO_SUCCESS, this);
+    mResponse.status = EStatus_OK;
+    return true;
 }
 
 } // namespace kiwi

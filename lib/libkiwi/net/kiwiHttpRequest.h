@@ -1,7 +1,7 @@
 #ifndef LIBKIWI_NET_HTTP_REQUEST_H
 #define LIBKIWI_NET_HTTP_REQUEST_H
 #include <libkiwi/kernel/kiwiAssert.h>
-#include <libkiwi/net/kiwiAsyncSocket.h>
+#include <libkiwi/net/kiwiSyncSocket.h>
 #include <libkiwi/prim/kiwiHashMap.h>
 #include <libkiwi/prim/kiwiString.h>
 #include <types.h>
@@ -18,7 +18,6 @@ public:
      */
     enum EMethod {
         // TODO: Should we support more?
-
         EMethod_GET,
         EMethod_POST,
 
@@ -45,6 +44,7 @@ public:
         EStatus_Payment,      // Payment Required
         EStatus_Forbidden,    // Forbidden
         EStatus_NotFound,     // Not Found
+        EStatus_Method,       // Method Not Allowed
 
         // Server error
         EStatus_ServErr = 500, // Internal Server Error
@@ -90,15 +90,20 @@ public:
      */
     HttpRequest(const String& host)
         : mHostName(host),
+          mURI("/"),
           mpSocket(NULL),
           mpResponseCallback(NULL),
-          mpResponseCallbackArg(NULL),
-          mAsyncState(EState_Idle) {
-        mpSocket = new AsyncSocket(SO_PF_INET, SO_SOCK_STREAM);
+          mpResponseCallbackArg(NULL) {
+        mpSocket = new SyncSocket(SO_PF_INET, SO_SOCK_STREAM);
         K_ASSERT(mpSocket != NULL);
 
         bool success = mpSocket->Bind();
         K_ASSERT(success);
+
+        // Hostname required by HTTP 1.1
+        mHeader["Host"] = host;
+        // Identify libkiwi requests by user agent
+        mHeader["User-Agent"] = "libkiwi";
     }
 
     /**
@@ -128,33 +133,34 @@ public:
         mParams.Insert(name, value);
     }
 
+    /**
+     * @brief Change the requested resource
+     *
+     * @param uri URI value
+     */
+    void SetURI(const String& uri) {
+        mURI = uri;
+    }
+
     const Response& Send(EMethod method = EMethod_GET);
     void SendAsync(ResponseCallback callback, void* arg = NULL,
                    EMethod method = EMethod_GET);
 
 private:
-    /**
-     * @brief Asynchronous state
-     */
-    enum EState {
-        EState_Idle,
-        EState_Connecting,
-        EState_Sending,
-        EState_Receiving,
-        EState_Finish
-    };
+    typedef TMap<String, String>::ConstIterator ParamIterator;
+    typedef TMap<String, String>::ConstIterator HeaderIterator;
 
 private:
-    static void SocketCallback(SOResult result, void* arg);
+    void SendImpl();
 
-    void StateConnecting();
-    void StateSending();
-    void StateReceiving();
+    bool Request();
+    bool Receive();
 
 private:
-    EMethod mMethod;       // Request type
-    String mHostName;      // Server host name
-    AsyncSocket* mpSocket; // Connection to server
+    EMethod mMethod;      // Request method
+    String mHostName;     // Server host name
+    String mURI;          // Requested resource
+    SyncSocket* mpSocket; // Connection to server
 
     TMap<String, String> mParams; // URL parameters
     TMap<String, String> mHeader; // Header fields
@@ -162,8 +168,6 @@ private:
     Response mResponse;                  // Server response
     ResponseCallback mpResponseCallback; // Response callback
     void* mpResponseCallbackArg;         // Callback user argument
-
-    volatile EState mAsyncState; // Current state (for async only)
 };
 
 } // namespace kiwi
