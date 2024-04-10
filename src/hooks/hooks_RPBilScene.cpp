@@ -1,8 +1,8 @@
-#include "Simulation.hpp"
+#include "Simulation.h"
 
 #include <Pack/RPParty.h>
 
-namespace bah {
+namespace BAH {
 namespace {
 
 void bil_scene_calculate(RPSysScene* scene) {
@@ -24,4 +24,4 @@ void bil_scene_calculate(RPSysScene* scene) {
 KM_BRANCH(0x802ba1e0, bil_scene_calculate);
 
 } // namespace
-} // namespace bah
+} // namespace BAH

@@ -9,6 +9,56 @@
 namespace kiwi {
 
 /**
+ * @brief HTTP Status code
+ */
+enum EHttpStatus {
+    EHttpStatus_LibkiwiErr = -1, // Internal library error
+    EHttpStatus_Dummy = 0,       // Uninitialized
+
+    // TODO: Determine which additional codes are useful here
+
+    // Successful
+    EHttpStatus_OK = 200, // OK
+    EHttpStatus_Created,  // Created
+    EHttpStatus_Accepted, // Accepted
+
+    // Client error
+    EHttpStatus_BadReq = 400, // Bad Request
+    EHttpStatus_NotAuth,      // Unauthorized
+    EHttpStatus_Payment,      // Payment Required
+    EHttpStatus_Forbidden,    // Forbidden
+    EHttpStatus_NotFound,     // Not Found
+    EHttpStatus_Method,       // Method Not Allowed
+
+    // Server error
+    EHttpStatus_ServErr = 500, // Internal Server Error
+    EHttpStatus_NotImpl,       // Not Implemented
+    EHttpStatus_BadGateway,    // Bad Gateway
+    EHttpStatus_ServDown,      // Service Unavailable
+};
+
+/**
+ * @brief HTTP request response
+ */
+struct HttpResponse {
+    /**
+     * @brief Constructor
+     */
+    HttpResponse() : status(EHttpStatus_OK) {}
+
+    /**
+     * @brief Destructor
+     */
+    ~HttpResponse() {
+        delete body;
+    }
+
+    EHttpStatus status;          // Status code
+    TMap<String, String> header; // Response header
+    const char* body;            // Response body/payload
+};
+
+/**
  * @brief HTTP 1.1 request wrapper
  */
 class HttpRequest {
@@ -25,62 +75,12 @@ public:
     };
 
     /**
-     * @brief Status code
-     */
-    enum EStatus {
-        EStatus_LibkiwiErr = -1, // Internal library error
-        EStatus_Dummy = 0,       // Uninitialized
-
-        // TODO: Determine which additional codes are useful here
-
-        // Successful
-        EStatus_OK = 200, // OK
-        EStatus_Created,  // Created
-        EStatus_Accepted, // Accepted
-
-        // Client error
-        EStatus_BadReq = 400, // Bad Request
-        EStatus_NotAuth,      // Unauthorized
-        EStatus_Payment,      // Payment Required
-        EStatus_Forbidden,    // Forbidden
-        EStatus_NotFound,     // Not Found
-        EStatus_Method,       // Method Not Allowed
-
-        // Server error
-        EStatus_ServErr = 500, // Internal Server Error
-        EStatus_NotImpl,       // Not Implemented
-        EStatus_BadGateway,    // Bad Gateway
-        EStatus_ServDown,      // Service Unavailable
-    };
-
-    /**
-     * @brief Request response
-     */
-    struct Response {
-        /**
-         * @brief Constructor
-         */
-        Response() : status(EStatus_OK) {}
-
-        /**
-         * @brief Destructor
-         */
-        ~Response() {
-            delete body;
-        }
-
-        EStatus status;              // Status code
-        TMap<String, String> header; // Response header
-        const char* body;            // Response body/payload
-    };
-
-    /**
      * @brief Request response callback
      *
      * @param response Request response
      * @param arg Callback user argument
      */
-    typedef void (*ResponseCallback)(const Response& response, void* arg);
+    typedef void (*ResponseCallback)(const HttpResponse& response, void* arg);
 
 public:
     /**
@@ -142,7 +142,7 @@ public:
         mURI = uri;
     }
 
-    const Response& Send(EMethod method = EMethod_GET);
+    const HttpResponse& Send(EMethod method = EMethod_GET);
     void SendAsync(ResponseCallback callback, void* arg = NULL,
                    EMethod method = EMethod_GET);
 
@@ -165,7 +165,7 @@ private:
     TMap<String, String> mParams; // URL parameters
     TMap<String, String> mHeader; // Header fields
 
-    Response mResponse;                  // Server response
+    HttpResponse mResponse;              // Server response
     ResponseCallback mpResponseCallback; // Response callback
     void* mpResponseCallbackArg;         // Callback user argument
 };

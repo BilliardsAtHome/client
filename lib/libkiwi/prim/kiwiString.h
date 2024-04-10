@@ -1,5 +1,6 @@
 #ifndef LIBKIWI_PRIM_STRING_H
 #define LIBKIWI_PRIM_STRING_H
+#include <libkiwi/prim/kiwiBitCast.h>
 #include <libkiwi/prim/kiwiHashMap.h>
 #include <types.h>
 
@@ -301,33 +302,67 @@ template <typename T> inline hash_t Hash(const StringImpl<T>& key) {
     return HashImpl(key.CStr(), key.Length() * sizeof(T));
 }
 
-// String conversion. Specialize this for custom types
+// String conversion. Specialize these for custom types
 template <typename T> inline String ToString(const T& t);
+template <typename T> inline String ToHexString(const T& t);
+
+#define K_TO_STRING_FMT_DEF(T, fmt, val)                                       \
+    template <> inline String ToString<T>(const T& t) {                        \
+        return Format(fmt, val);                                               \
+    }
+#define K_TO_HEX_STRING_FMT_DEF(T, fmt, val)                                   \
+    template <> inline String ToHexString<T>(const T& t) {                     \
+        return Format(fmt, val);                                               \
+    }
 
 /**
  * @brief Convert integer to string
  */
-template <> inline String ToString<int>(const int& t) {
-    return Format("%d", t);
-}
+K_TO_STRING_FMT_DEF(int, "%d", t);
+K_TO_STRING_FMT_DEF(s32, "%ld", t);
+K_TO_STRING_FMT_DEF(s64, "%lld", t);
+K_TO_HEX_STRING_FMT_DEF(int, "0x%08X", t);
+K_TO_HEX_STRING_FMT_DEF(s32, "0x%08X", t);
+K_TO_HEX_STRING_FMT_DEF(s64, "0x%016X", t);
+
+K_TO_STRING_FMT_DEF(unsigned int, "%u", t);
+K_TO_STRING_FMT_DEF(u32, "%lu", t);
+K_TO_STRING_FMT_DEF(u64, "%llu", t);
+K_TO_HEX_STRING_FMT_DEF(unsigned int, "0x%08X", t);
+K_TO_HEX_STRING_FMT_DEF(u32, "0x%08X", t);
+K_TO_HEX_STRING_FMT_DEF(u64, "0x%016X", t);
+
 /**
- * @brief Convert float to string
+ * @brief Convert decimal to string
  */
-template <> inline String ToString<f32>(const f32& t) {
-    return Format("%f", t);
-}
+K_TO_STRING_FMT_DEF(f32, "%f", t);
+K_TO_STRING_FMT_DEF(f64, "%f", t);
+K_TO_HEX_STRING_FMT_DEF(f32, "0x%08X", BitCast<u32>(t));
+K_TO_HEX_STRING_FMT_DEF(f64, "0x%016X", BitCast<u64>(t));
+
 /**
- * @brief Convert double to string
+ * @brief Convert boolean to string
  */
-template <> inline String ToString<f64>(const f64& t) {
-    return Format("%f", t);
+template <> inline String ToString<bool>(const bool& t) {
+    return t ? "true" : "false";
 }
+template <> inline String ToHexString<bool>(const bool& t) {
+    return t ? "0x01" : "0x00";
+}
+
 /**
  * @brief Convert string to string :D
  */
 template <> inline String ToString<String>(const String& t) {
     return t;
 }
+template <> inline String ToHexString<String>(const String& t) {
+    K_ASSERT_EX(false, "Please reconsider...");
+    return t;
+}
+
+#undef K_TO_STRING_FMT_DEF
+#undef K_TO_HEX_STRING_FMT_DEF
 
 } // namespace kiwi
 

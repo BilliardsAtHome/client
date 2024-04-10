@@ -1,6 +1,6 @@
 #include <types.h>
 
-namespace bah {
+namespace BAH {
 namespace {
 
 /**
@@ -31,4 +31,4 @@ _epilogue:
 } KM_BRANCH(0x801e4074, title_scene_skip_ab);
 
 } // namespace
-} // namespace bah
+} // namespace BAH

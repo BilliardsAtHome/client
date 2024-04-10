@@ -1,10 +1,10 @@
-#include "BilMain.hpp"
+#include "BilMain.h"
 
-#include "Simulation.hpp"
+#include "Simulation.h"
 
 #include <Pack/RPSystem.h>
 
-namespace bah {
+namespace BAH {
 
 /**
  * @brief Shorten intro camera (OPENINGDEMO state)
@@ -39,4 +39,4 @@ void BilMain::State_FOUL_enter() {
 }
 KM_BRANCH_MF(0x802c563c, BilMain, State_FOUL_enter);
 
-} // namespace bah
+} // namespace BAH

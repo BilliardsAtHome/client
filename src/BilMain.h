@@ -5,7 +5,7 @@
 #include <libkiwi.h>
 #include <types.h>
 
-namespace bah {
+namespace BAH {
 
 /**
  * @brief Billiards game manager ("main" class)
@@ -18,6 +18,6 @@ public:
     void OnEndShot();
 };
 
-} // namespace bah
+} // namespace BAH
 
 #endif

@@ -1,4 +1,4 @@
-#include "Simulation.hpp"
+#include "Simulation.h"
 
 #include <Pack/RPKernel.h>
 #include <Pack/RPUtility.h>
@@ -24,7 +24,7 @@ void KokeshiMain() {
               "16:9 aspect ratio is not supported.\nPlease change to 4:3 in "
               "the console settings.");
 
-    bah::Simulation::CreateInstance();
+    BAH::Simulation::CreateInstance();
 
     // Enter game loop
     RPSysSystem::getInstance()->mainLoop();

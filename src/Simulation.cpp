@@ -1,4 +1,4 @@
-#include "Simulation.hpp"
+#include "Simulation.h"
 
 #include <Pack/RPParty.h>
 #include <Pack/RPUtility.h>
@@ -8,7 +8,7 @@
 #define CUE_TURN_SPEED_X 0.0015707965f // pi/2000
 #define CUE_TURN_SPEED_Y 0.0062831859f // pi/500
 
-namespace bah {
+namespace BAH {
 namespace {
 
 /**
@@ -91,154 +91,9 @@ K_DYNAMIC_SINGLETON_IMPL(Simulation);
 /**
  * @brief Constructor
  */
-Simulation::BreakInfo::BreakInfo()
-    : seed(0),
-      kseed(0),
-      sunk(0),
-      off(0),
-      frame(0),
-      up(0),
-      left(0),
-      right(0),
-      pos(),
-      power(0.0f),
-      foul(false) {}
-
-/**
- * @brief Deserialize from stream
- */
-void Simulation::BreakInfo::Read(kiwi::IStream& strm) {
-    seed = strm.Read_u32();
-    kseed = strm.Read_u32();
-    sunk = strm.Read_u32();
-    off = strm.Read_u32();
-    frame = strm.Read_u32();
-    up = strm.Read_s32();
-    left = strm.Read_s32();
-    right = strm.Read_s32();
-    pos.x = strm.Read_f32();
-    pos.y = strm.Read_f32();
-    power = strm.Read_f32();
-    foul = strm.Read_bool();
-
-    // Checksum for integrity
-    kiwi::Checksum crc;
-    crc.Process(this, sizeof(BreakInfo));
-
-    u32 expected = crc.Result();
-    u32 got = strm.Read_u32();
-    K_WARN_EX(expected != got, "Checksum mismatch (expected %08X, got %08X)",
-              expected, got);
-}
-
-/**
- * @brief Serialize to stream
- */
-void Simulation::BreakInfo::Write(kiwi::IStream& strm) const {
-    // Checksum for integrity
-    kiwi::Checksum crc;
-    crc.Process(this, sizeof(BreakInfo));
-
-    strm.Write_u32(seed);
-    strm.Write_u32(kseed);
-    strm.Write_u32(sunk);
-    strm.Write_u32(off);
-    strm.Write_u32(frame);
-    strm.Write_s32(up);
-    strm.Write_s32(left);
-    strm.Write_s32(right);
-    strm.Write_f32(pos.x);
-    strm.Write_f32(pos.y);
-    strm.Write_f32(power);
-    strm.Write_bool(foul);
-    strm.Write_u32(crc.Result());
-}
-
-/**
- * @brief Compare break results
- *
- * @param other Comparison target
- */
-bool Simulation::BreakInfo::IsBetterThan(const BreakInfo& other) const {
-    u32 myTotal = sunk + off;
-    u32 otherTotal = other.sunk + other.off;
-
-    // Compare total balls out of play
-    if (myTotal != otherTotal) {
-        return myTotal > otherTotal;
-    }
-
-    // Compare balls pocketed
-    if (sunk != other.sunk) {
-        return sunk > other.sunk;
-    }
-
-    // Compare foul
-    if (foul != other.foul) {
-        return foul == false;
-    }
-
-    // Compare frame count
-    if (frame != other.frame) {
-        return frame < other.frame;
-    }
-
-    // Tie, discard
-    return false;
-}
-
-/**
- * @brief Log break result to the console
- */
-void Simulation::BreakInfo::Log() const {
-    // clang-format off
-    LOG("BREAK = {");
-    LOG_EX("    seed:\t%08X",        seed);
-    LOG_EX("    kseed:\t%08X",       kseed);
-    LOG_EX("    sunk:\t%d",          sunk);
-    LOG_EX("    off:\t%d",           off);
-    LOG_EX("    frame:\t%d",         frame);
-    LOG_EX("    up:\t%d",            up);
-    LOG_EX("    left:\t%d",          left);
-    LOG_EX("    right:\t%d",         right);
-    LOG_EX("    pos:\t{%08X, %08X}", *(u32*)&pos.x, *(u32*)&pos.y);
-    LOG_EX("    power:\t%08X",       *(u32*)&power);
-    LOG_EX("    foul:\t%s",          foul ? "true" : "false");
-    LOG("}");
-    // clang-format on
-}
-
-/**
- * @brief Save break result to the NAND
-
- * @param name File name
- * @return Success
- */
-void Simulation::BreakInfo::Save(const char* name) const {
-    kiwi::NandStream strm(kiwi::EOpenMode_Write);
-
-    while (true) {
-        // Attempt to open file
-        bool success = strm.Open(name);
-        if (success) {
-            break;
-        }
-
-        // Failed? Try again in one second
-        volatile s64 x = OSGetTime();
-        while (OSGetTime() - x < OS_SEC_TO_TICKS(1)) {
-            ;
-        }
-    }
-
-    Write(strm);
-}
-
-/**
- * @brief Constructor
- */
 Simulation::Simulation()
-    : kiwi::ISceneHook(RPSysSceneCreator::ESceneID_RPBilScene) {}
+    : kiwi::ISceneHook(RPSysSceneCreator::ESceneID_RPBilScene),
+      mUserId("000000000000000000") {}
 
 /**
  * @brief Destructor
@@ -400,8 +255,8 @@ void Simulation::OnEndShot() {
     mpCurrBreak->off = GetNumOffTable();
     mpCurrBreak->foul = GetIsFoul();
 
-    // Write every break to file
-    mpCurrBreak->Save("last.brk");
+    // Upload to submission server
+    mpCurrBreak->Upload();
 
     mIsReplay = mpCurrBreak->IsBetterThan(*mpBestBreak);
     if (mIsReplay) {
@@ -414,4 +269,4 @@ void Simulation::OnEndShot() {
     }
 }
 
-} // namespace bah
+} // namespace BAH

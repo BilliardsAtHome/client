@@ -1,6 +1,6 @@
-#include "Simulation.hpp"
+#include "Simulation.h"
 
-namespace bah {
+namespace BAH {
 namespace {
 
 /**
@@ -45,4 +45,4 @@ KM_CALL(0x802bf070, bil_cue_get_power);
 KM_CALL(0x802bf080, bil_cue_get_power);
 
 } // namespace
-} // namespace bah
+} // namespace BAH

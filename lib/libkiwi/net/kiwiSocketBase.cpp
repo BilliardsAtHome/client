@@ -56,7 +56,20 @@ bool SocketBase::Bind(SockAddr& addr) const {
     K_ASSERT(IsOpen());
     K_ASSERT(mFamily == addr.in.family);
 
-    return LibSO::Bind(mHandle, addr) >= 0;
+    // Auto-detect may fail so we retry up to 10 times
+    if (addr.port == 0) {
+        for (int i = 0; i < 10; i++) {
+            if (LibSO::Bind(mHandle, addr) == SO_SUCCESS) {
+                return true;
+            }
+        }
+
+        K_ASSERT_EX(false, "Auto-detect port failed");
+        return false;
+    }
+
+    // Just try once if we've chosen a port
+    return LibSO::Bind(mHandle, addr) == SO_SUCCESS;
 }
 
 /**
@@ -69,7 +82,7 @@ bool SocketBase::Listen(s32 backlog) const {
     K_ASSERT(IsOpen());
     K_WARN(mType == SO_SOCK_DGRAM, "Listen won't do anything for dgram.");
 
-    return LibSO::Listen(mHandle, backlog) >= 0;
+    return LibSO::Listen(mHandle, backlog) == SO_SUCCESS;
 }
 
 /**
@@ -102,7 +115,7 @@ bool SocketBase::Shutdown(SOShutdownType how) const {
     K_ASSERT(IsOpen());
     K_ASSERT(how == SO_SHUT_RD || how == SO_SHUT_WR || how == SO_SHUT_RDWR);
 
-    return LibSO::Shutdown(mHandle, how) >= 0;
+    return LibSO::Shutdown(mHandle, how) == SO_SUCCESS;
 }
 
 /**
@@ -133,7 +146,7 @@ bool SocketBase::GetSocketAddr(SockAddr& addr) const {
     K_ASSERT(IsOpen());
     K_ASSERT(mFamily == addr.in.family);
 
-    return LibSO::GetSockName(mHandle, addr) >= 0;
+    return LibSO::GetSockName(mHandle, addr) == SO_SUCCESS;
 }
 
 /**
@@ -146,7 +159,7 @@ bool SocketBase::GetPeerAddr(SockAddr& addr) const {
     K_ASSERT(IsOpen());
     K_ASSERT(mFamily == addr.in.family);
 
-    return LibSO::GetPeerName(mHandle, addr) >= 0;
+    return LibSO::GetPeerName(mHandle, addr) == SO_SUCCESS;
 }
 
 /**
