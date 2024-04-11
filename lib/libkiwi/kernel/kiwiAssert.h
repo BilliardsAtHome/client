@@ -5,9 +5,15 @@
 // General macros for external usage
 #define LOG(msg) K_LOG(msg)
 #define LOG_EX(msg, ...) K_LOG_EX(msg, __VA_ARGS__)
+
 #define ASSERT(msg) K_ASSERT(msg)
 #define ASSERT_EX(msg, ...) K_ASSERT_EX(msg, __VA_ARGS__)
+
 #define STATIC_ASSERT(expr) K_STATIC_ASSERT(expr)
+#define STATIC_ASSERT_EX(expr, msg) K_STATIC_ASSERT_EX(expr, msg)
+
+// For compiling modern libraries
+#define static_assert(expr, msg) K_STATIC_ASSERT_EX(expr, msg)
 
 #ifndef NDEBUG
 // Log a message to the console

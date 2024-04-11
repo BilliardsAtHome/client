@@ -2606,8 +2606,11 @@ void ImGuiTextFilter::Build()
     input_range.split(',', &Filters);
 
     CountGrep = 0;
-    for (ImGuiTextRange& f : Filters)
+
+    for (int i = 0; i < Filters.size(); i++)
     {
+        ImGuiTextRange& f = Filters[i];
+
         while (f.b < f.e && ImCharIsBlankA(f.b[0]))
             f.b++;
         while (f.e > f.b && ImCharIsBlankA(f.e[-1]))
@@ -2627,8 +2630,10 @@ bool ImGuiTextFilter::PassFilter(const char* text, const char* text_end) const
     if (text == NULL)
         text = "";
 
-    for (const ImGuiTextRange& f : Filters)
+    for (int i = 0; i < Filters.size(); i++)
     {
+        const ImGuiTextRange& f = Filters[i];
+
         if (f.empty())
             continue;
         if (f.b[0] == '-')
@@ -2697,13 +2702,9 @@ void ImGuiTextBuffer::appendf(const char* fmt, ...)
 // Helper: Text buffer for logging/accumulating text
 void ImGuiTextBuffer::appendfv(const char* fmt, va_list args)
 {
-    va_list args_copy;
-    va_copy(args_copy, args);
-
     int len = ImFormatStringV(NULL, 0, fmt, args);         // FIXME-OPT: could do a first pass write attempt, likely successful on first pass.
     if (len <= 0)
     {
-        va_end(args_copy);
         return;
     }
 
@@ -2717,8 +2718,7 @@ void ImGuiTextBuffer::appendfv(const char* fmt, va_list args)
     }
 
     Buf.resize(needed_sz);
-    ImFormatStringV(&Buf[write_off - 1], (size_t)len + 1, fmt, args_copy);
-    va_end(args_copy);
+    ImFormatStringV(&Buf[write_off - 1], (size_t)len + 1, fmt, args);
 }
 
 void ImGuiTextIndex::append(const char* base, int old_size, int new_size)
@@ -2967,7 +2967,9 @@ static bool ImGuiListClipper_StepInternal(ImGuiListClipper* clipper)
         // - Very important: when a starting position is after our maximum item, we set Min to (ItemsCount - 1). This allows us to handle most forms of wrapping.
         // - Due to how Selectable extra padding they tend to be "unaligned" with exact unit in the item list,
         //   which with the flooring/ceiling tend to lead to 2 items instead of one being submitted.
-        for (ImGuiListClipperRange& range : data->Ranges)
+        for (int i = 0; i < data->Ranges.size(); i++)
+            ImGuiListClipperRange& range = data->Ranges[i];
+            
             if (range.PosToIndexConvert)
             {
                 int m1 = (int)(((double)range.Min - window->DC.CursorPos.y - data->LossynessOffset) / clipper->ItemsHeight);
@@ -3729,9 +3731,13 @@ void ImGui::RemoveContextHook(ImGuiContext* ctx, ImGuiID hook_id)
 {
     ImGuiContext& g = *ctx;
     IM_ASSERT(hook_id != 0);
-    for (ImGuiContextHook& hook : g.Hooks)
+    for (int i = 0; i < g.Hooks.size(); i++)
+    {
+        ImGuiContextHook& hook = g.Hooks[i];
+
         if (hook.HookId == hook_id)
             hook.Type = ImGuiContextHookType_PendingRemoval_;
+    }
 }
 
 // Call context hooks (used by e.g. test engine)
@@ -3739,9 +3745,13 @@ void ImGui::RemoveContextHook(ImGuiContext* ctx, ImGuiID hook_id)
 void ImGui::CallContextHooks(ImGuiContext* ctx, ImGuiContextHookType hook_type)
 {
     ImGuiContext& g = *ctx;
-    for (ImGuiContextHook& hook : g.Hooks)
+    for (int i = 0; i < g.Hooks.size(); i++)
+    {
+        ImGuiContextHook& hook = g.Hooks[i];
+
         if (hook.Type == hook_type)
             hook.Callback(&g, &hook);
+    }
 }
 
 
@@ -4749,9 +4759,15 @@ void ImGui::NewFrame()
     for (int i = 0; i < g.TablesLastTimeActive.Size; i++)
         if (g.TablesLastTimeActive[i] >= 0.0f && g.TablesLastTimeActive[i] < memory_compact_start_time)
             TableGcCompactTransientBuffers(g.Tables.GetByIndex(i));
-    for (ImGuiTableTempData& table_temp_data : g.TablesTempData)
+
+    for (int i = 0; i < g.TablesTempData.size(); i++)
+    {
+        ImGuiTableTempData& table_temp_data = g.TablesTempData[i];
+
         if (table_temp_data.LastTimeActive >= 0.0f && table_temp_data.LastTimeActive < memory_compact_start_time)
             TableGcCompactTransientBuffers(&table_temp_data);
+    }
+
     if (g.GcCompactAll)
         GcCompactTransientMiscBuffers();
     g.GcCompactAll = false;
@@ -6323,8 +6339,10 @@ ImGuiWindow* ImGui::FindBlockingModal(ImGuiWindow* window)
         return NULL;
 
     // Find a modal that has common parent with specified window. Specified window should be positioned behind that modal.
-    for (ImGuiPopupData& popup_data : g.OpenPopupStack)
+    for (int i = 0; i < g.OpenPopupStack.size(); i++)
     {
+        ImGuiPopupData& popup_data = g.OpenPopupStack[i];
+
         ImGuiWindow* popup_window = popup_data.Window;
         if (popup_window == NULL || !(popup_window->Flags & ImGuiWindowFlags_Modal))
             continue;

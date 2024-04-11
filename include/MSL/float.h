@@ -5,9 +5,8 @@
 extern "C" {
 #endif
 
-extern unsigned long __float_nan[];
-extern unsigned long __float_huge[];
-extern unsigned long __double_huge[];
+#define FLT_MIN 1.175494e-38
+#define FLT_MAX 3.402823e+38
 
 #ifdef __cplusplus
 }

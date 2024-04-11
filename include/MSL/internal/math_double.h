@@ -15,6 +15,12 @@ inline float ceilf(float x) {
 inline float cosf(float x) {
     return cos(x);
 }
+inline float logf(float x) {
+    return log(x);
+}
+inline float powf(float x, float y) {
+    return pow(x, y);
+}
 inline float sinf(float x) {
     return sin(x);
 }
