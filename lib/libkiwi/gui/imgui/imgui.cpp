@@ -4785,8 +4785,9 @@ void ImGui::NewFrame()
         g.DrawListSharedData.InitialFlags |= ImDrawListFlags_AllowVtxOffset;
 
     // Mark rendering data as invalid to prevent user who may have a handle on it to use it.
-    for (ImGuiViewportP* viewport : g.Viewports)
+    for (int i = 0; i < g.Viewports.size(); i++)
     {
+        ImGuiViewportP* viewport = g.Viewports[i];
         viewport->DrawData = NULL;
         viewport->DrawDataP.Valid = false;
     }
@@ -4939,8 +4940,9 @@ void ImGui::NewFrame()
     // Mark all windows as not visible and compact unused memory.
     IM_ASSERT(g.WindowsFocusOrder.Size <= g.Windows.Size);
     const float memory_compact_start_time = (g.GcCompactAll || g.IO.ConfigMemoryCompactTimer < 0.0f) ? FLT_MAX : (float)g.Time - g.IO.ConfigMemoryCompactTimer;
-    for (ImGuiWindow* window : g.Windows)
+    for (int i = 0; i < g.Windows.size(); i++)
     {
+        ImGuiWindow* window = g.Windows[i];
         window->WasActive = window->Active;
         window->Active = false;
         window->WriteAccessed = false;
@@ -5245,8 +5247,9 @@ static void ImGui::RenderDimmedBackgrounds()
     }
 
     // Draw dimming background on _other_ viewports than the ones our windows are in
-    for (ImGuiViewportP* viewport : g.Viewports)
+    for (int i = 0; i < g.Viewports.size(); i++)
     {
+        ImGuiViewportP* viewport = g.Viewports[i];
         if (viewport == viewports_already_dimmed[0] || viewport == viewports_already_dimmed[1])
             continue;
         if (modal_window && viewport->Window && IsWindowAbove(viewport->Window, modal_window))
@@ -5328,8 +5331,9 @@ void ImGui::EndFrame()
     // We cannot do that on FocusWindow() because children may not exist yet
     g.WindowsTempSortBuffer.resize(0);
     g.WindowsTempSortBuffer.reserve(g.Windows.Size);
-    for (ImGuiWindow* window : g.Windows)
+    for (int i = 0; i < g.Windows.size(); i++)
     {
+        ImGuiWindow* window = g.Windows[i];
         if (window->Active && (window->Flags & ImGuiWindowFlags_ChildWindow))       // if a child is active its parent will add it
             continue;
         AddWindowToSortBuffer(&g.WindowsTempSortBuffer, window);
@@ -5370,8 +5374,9 @@ void ImGui::Render()
     CallContextHooks(&g, ImGuiContextHookType_RenderPre);
 
     // Add background ImDrawList (for each active viewport)
-    for (ImGuiViewportP* viewport : g.Viewports)
+    for (int i = 0; i < g.Viewports.size(); i++)
     {
+        ImGuiViewportP* viewport = g.Viewports[i];
         InitViewportDrawData(viewport);
         if (viewport->BgFgDrawLists[0] != NULL)
             AddDrawListToDrawDataEx(&viewport->DrawDataP, viewport->DrawDataBuilder.Layers[0], GetBackgroundDrawList(viewport));
@@ -5384,8 +5389,9 @@ void ImGui::Render()
     ImGuiWindow* windows_to_render_top_most[2];
     windows_to_render_top_most[0] = (g.NavWindowingTarget && !(g.NavWindowingTarget->Flags & ImGuiWindowFlags_NoBringToFrontOnFocus)) ? g.NavWindowingTarget->RootWindowDockTree : NULL;
     windows_to_render_top_most[1] = (g.NavWindowingTarget ? g.NavWindowingListWindow : NULL);
-    for (ImGuiWindow* window : g.Windows)
+    for (int i = 0; i < g.Windows.size(); i++)
     {
+        ImGuiWindow* window = g.Windows[i];
         IM_MSVC_WARNING_SUPPRESS(6011); // Static Analysis false positive "warning C6011: Dereferencing NULL pointer 'window'"
         if (IsWindowActiveAndVisible(window) && (window->Flags & ImGuiWindowFlags_ChildWindow) == 0 && window != windows_to_render_top_most[0] && window != windows_to_render_top_most[1])
             AddRootWindowToDrawData(window);
@@ -5400,8 +5406,9 @@ void ImGui::Render()
 
     // Setup ImDrawData structures for end-user
     g.IO.MetricsRenderVertices = g.IO.MetricsRenderIndices = 0;
-    for (ImGuiViewportP* viewport : g.Viewports)
+    for (int i = 0; i < g.Viewports.size(); i++)
     {
+        ImGuiViewportP* viewport = g.Viewports[i];
         FlattenDrawDataIntoSingleLayer(&viewport->DrawDataBuilder);
 
         // Add foreground ImDrawList (for each active viewport)
@@ -6708,8 +6715,9 @@ ImGuiWindow* ImGui::FindBlockingModal(ImGuiWindow* window)
         return NULL;
 
     // Find a modal that has common parent with specified window. Specified window should be positioned behind that modal.
-    for (ImGuiPopupData& popup_data : g.OpenPopupStack)
+    for (int i = 0; i < g.OpenPopupStack.size(); i++)
     {
+        ImGuiPopupData& popup_data = g.OpenPopupStack[i];
         ImGuiWindow* popup_window = popup_data.Window;
         if (popup_window == NULL || !(popup_window->Flags & ImGuiWindowFlags_Modal))
             continue;
@@ -10322,8 +10330,9 @@ static void ImGui::ErrorCheckNewFrameSanityChecks()
         }
 
         // Perform simple checks on platform monitor data + compute a total bounding box for quick early outs
-        for (ImGuiPlatformMonitor& mon : g.PlatformIO.Monitors)
+        for (int i = 0; i < g.PlatformIO.Monitors.size(); i++)
         {
+            ImGuiPlatformMonitor& mon = g.PlatformIO.Monitors[i];
             IM_UNUSED(mon);
             IM_ASSERT(mon.MainSize.x > 0.0f && mon.MainSize.y > 0.0f && "Monitor main bounds not setup properly.");
             IM_ASSERT(ImRect(mon.MainPos, mon.MainPos + mon.MainSize).Contains(ImRect(mon.WorkPos, mon.WorkPos + mon.WorkSize)) && "Monitor work bounds not setup properly. If you don't have work area information, just copy MainPos/MainSize into them.");
@@ -14476,8 +14485,9 @@ static void WindowSettingsHandler_WriteAll(ImGuiContext* ctx, ImGuiSettingsHandl
     // Gather data from windows that were active during this session
     // (if a window wasn't opened in this session we preserve its settings)
     ImGuiContext& g = *ctx;
-    for (ImGuiWindow* window : g.Windows)
+    for (int i = 0; i < g.Windows.size(); i++)
     {
+        ImGuiWindow* window = g.Windows[i];
         if (window->Flags & ImGuiWindowFlags_NoSavedSettings)
             continue;
 
@@ -14665,8 +14675,9 @@ static bool ImGui::UpdateTryMergeWindowIntoHostViewport(ImGuiWindow* window, ImG
         return false;
 
     // FIXME: Can't use g.WindowsFocusOrder[] for root windows only as we care about Z order. If we maintained a DisplayOrder along with FocusOrder we could..
-    for (ImGuiWindow* window_behind : g.Windows)
+    for (int i = 0; i < g.Windows.size(); i++)
     {
+        ImGuiWindow* window_behind = g.Windows[i];
         if (window_behind == window)
             break;
         if (window_behind->WasActive && window_behind->ViewportOwned && !(window_behind->Flags & ImGuiWindowFlags_ChildWindow))
@@ -14756,8 +14767,9 @@ static void ImGui::UpdateViewportsNewFrame()
     if (viewports_enabled)
     {
         ImGuiViewportP* focused_viewport = NULL;
-        for (ImGuiViewportP* viewport : g.Viewports)
+        for (int i = 0; i < g.Viewports.size(); i++)
         {
+            ImGuiViewportP* viewport = g.Viewports[i];
             const bool platform_funcs_available = viewport->PlatformWindowCreated;
             if (g.PlatformIO.Platform_GetWindowMinimized && platform_funcs_available)
             {
@@ -14918,8 +14930,9 @@ static void ImGui::UpdateViewportsNewFrame()
         g.PlatformMonitorsFullWorkRect.Add(monitor->WorkPos);
         g.PlatformMonitorsFullWorkRect.Add(monitor->WorkPos + monitor->WorkSize);
     }
-    for (ImGuiPlatformMonitor& monitor : g.PlatformIO.Monitors)
+    for (int i = 0; i < g.PlatformIO.Monitors.size(); i++)
     {
+        ImGuiPlatformMonitor& monitor = g.PlatformIO.Monitors[i];
         g.PlatformMonitorsFullWorkRect.Add(monitor.WorkPos);
         g.PlatformMonitorsFullWorkRect.Add(monitor.WorkPos + monitor.WorkSize);
     }
@@ -15065,8 +15078,9 @@ static void ImGui::DestroyViewport(ImGuiViewportP* viewport)
 {
     // Clear references to this viewport in windows (window->ViewportId becomes the master data)
     ImGuiContext& g = *GImGui;
-    for (ImGuiWindow* window : g.Windows)
+    for (int i = 0; i < g.Windows.size(); i++)
     {
+        ImGuiWindow* window = g.Windows[i];
         if (window->Viewport != viewport)
             continue;
         window->Viewport = NULL;
@@ -15856,8 +15870,9 @@ void ImGui::DockContextNewFrameUpdateUndocking(ImGuiContext* ctx)
     }
 
     // Process Undocking requests (we need to process them _before_ the UpdateMouseMovingWindowNewFrame call in NewFrame)
-    for (ImGuiDockRequest& req : dc->Requests)
+    for (int i = 0; i < dc->Requests.size(); i++)
     {
+        ImGuiDockRequest& req = dc->Requests[i];
         if (req.Type == ImGuiDockRequestType_Undock && req.UndockTargetWindow)
             DockContextProcessUndockWindow(ctx, req.UndockTargetWindow);
         else if (req.Type == ImGuiDockRequestType_Undock && req.UndockTargetNode)
@@ -16092,8 +16107,9 @@ void ImGui::DockContextBuildAddWindowsToNodes(ImGuiContext* ctx, ImGuiID root_id
 {
     // Rebind all windows to nodes (they can also lazily rebind but we'll have a visible glitch during the first frame)
     ImGuiContext& g = *ctx;
-    for (ImGuiWindow* window : g.Windows)
+    for (int i = 0; i < g.Windows.size(); i++)
     {
+        ImGuiWindow* window = g.Windows[i];
         if (window->DockId == 0 || window->LastFrameActive < g.FrameCount - 1)
             continue;
         if (window->DockNode != NULL)
@@ -16362,8 +16378,9 @@ void ImGui::DockContextProcessUndockNode(ImGuiContext* ctx, ImGuiDockNode* node)
         node->ParentNode->AuthorityForViewport = ImGuiDataAuthority_Window; // The node that stays in place keeps the viewport, so our newly dragged out node will create a new viewport
         node->ParentNode = NULL;
     }
-    for (ImGuiWindow* window : node->Windows)
+    for (int i = 0; i < node->Windows.size(); i++)
     {
+        ImGuiWindow* window = node->Windows[i];
         window->Flags &= ~ImGuiWindowFlags_ChildWindow;
         if (window->ParentWindow)
             window->ParentWindow->DC.ChildWindows.find_erase(window);
@@ -16633,8 +16650,9 @@ static void ImGui::DockNodeMoveWindows(ImGuiDockNode* dst_node, ImGuiDockNode* s
     }
 
     // Tab order is not important here, it is preserved by sorting in DockNodeUpdateTabBar().
-    for (ImGuiWindow* window : src_node->Windows)
+    for (int i = 0; i < src_node->Windows.size(); i++)
     {
+        ImGuiWindow* window = src_node->Windows[i];
         window->DockNode = NULL;
         window->DockIsActive = false;
         DockNodeAddWindow(dst_node, window, !move_tab_bar);
@@ -16651,8 +16669,9 @@ static void ImGui::DockNodeMoveWindows(ImGuiDockNode* dst_node, ImGuiDockNode* s
 
 static void ImGui::DockNodeApplyPosSizeToWindows(ImGuiDockNode* node)
 {
-    for (ImGuiWindow* window : node->Windows)
+    for (int i = 0; i < node->Windows.size(); i++)
     {
+        ImGuiWindow* window = node->Windows[i];
         SetWindowPos(window, node->Pos, ImGuiCond_Always); // We don't assign directly to Pos because it can break the calculation of SizeContents on next frame
         SetWindowSize(window, node->Size, ImGuiCond_Always);
     }
@@ -16980,8 +16999,9 @@ static void ImGui::DockNodeUpdate(ImGuiDockNode* node)
     // Decide if the node will have a close button and a window menu button
     node->HasWindowMenuButton = (node->Windows.Size > 0) && (node_flags & ImGuiDockNodeFlags_NoWindowMenuButton) == 0;
     node->HasCloseButton = false;
-    for (ImGuiWindow* window : node->Windows)
+    for (int i = 0; i < node->Windows.size(); i++)
     {
+        ImGuiWindow* window = node->Windows[i];
         // FIXME-DOCK: Setting DockIsActive here means that for single active window in a leaf node, DockIsActive will be cleared until the next Begin() call.
         node->HasCloseButton |= window->HasCloseButton;
         window->DockIsActive = (node->Windows.Size > 1);
@@ -19689,8 +19709,9 @@ void ImGui::DebugRenderViewportThumbnail(ImDrawList* draw_list, ImGuiViewportP* 
     ImVec2 off = bb.Min - viewport->Pos * scale;
     float alpha_mul = (viewport->Flags & ImGuiViewportFlags_IsMinimized) ? 0.30f : 1.00f;
     window->DrawList->AddRectFilled(bb.Min, bb.Max, GetColorU32(ImGuiCol_Border, alpha_mul * 0.40f));
-    for (ImGuiWindow* thumb_window : g.Windows)
+    for (int i = 0; i < g.Windows.size(); i++)
     {
+        ImGuiWindow* thumb_window = g.Windows[i];
         if (!thumb_window->WasActive || (thumb_window->Flags & ImGuiWindowFlags_ChildWindow))
             continue;
         if (thumb_window->Viewport != viewport)
@@ -19725,16 +19746,18 @@ static void RenderViewportsThumbnails()
         bb_full.Add(ImRect(monitor.MainPos, monitor.MainPos + monitor.MainSize));
     ImVec2 p = window->DC.CursorPos;
     ImVec2 off = p - bb_full.Min * SCALE;
-    for (ImGuiPlatformMonitor& monitor : g.PlatformIO.Monitors)
+    for (int i = 0; i < g.PlatformIO.Monitors.size(); i++)
     {
+        ImGuiPlatformMonitor& monitor = g.PlatformIO.Monitors[i];
         ImRect monitor_draw_bb(off + (monitor.MainPos) * SCALE, off + (monitor.MainPos + monitor.MainSize) * SCALE);
         window->DrawList->AddRect(monitor_draw_bb.Min, monitor_draw_bb.Max, (g.DebugMetricsConfig.HighlightMonitorIdx == g.PlatformIO.Monitors.index_from_ptr(&monitor)) ? IM_COL32(255, 255, 0, 255) : ImGui::GetColorU32(ImGuiCol_Border), 4.0f);
         window->DrawList->AddRectFilled(monitor_draw_bb.Min, monitor_draw_bb.Max, ImGui::GetColorU32(ImGuiCol_Border, 0.10f), 4.0f);
     }
 
     // Draw viewports
-    for (ImGuiViewportP* viewport : g.Viewports)
+    for (int i = 0; i < g.Viewports.size(); i++)
     {
+        ImGuiViewportP* viewport = g.Viewports[i];
         ImRect viewport_draw_bb(off + (viewport->Pos) * SCALE, off + (viewport->Pos + viewport->Size) * SCALE);
         ImGui::DebugRenderViewportThumbnail(window->DrawList, viewport, viewport_draw_bb);
     }
@@ -19879,8 +19902,9 @@ static void MetricsHelpMarker(const char* desc)
 // [DEBUG] List fonts in a font atlas and display its texture
 void ImGui::ShowFontAtlas(ImFontAtlas* atlas)
 {
-    for (ImFont* font : atlas->Fonts)
+    for (int i = 0; i < atlas->Fonts.size(); i++)
     {
+        ImFont* font = atlas->Fonts[i];
         PushID(font);
         DebugNodeFont(font);
         PopID();
@@ -20109,11 +20133,13 @@ void ImGui::ShowMetricsWindow(bool* p_open)
     {
         Checkbox("Show ImDrawCmd mesh when hovering", &cfg->ShowDrawCmdMesh);
         Checkbox("Show ImDrawCmd bounding boxes when hovering", &cfg->ShowDrawCmdBoundingBoxes);
-        for (ImGuiViewportP* viewport : g.Viewports)
+        for (int i = 0; i < g.Viewports.size(); i++)
         {
+            ImGuiViewportP* viewport = g.Viewports[i];
             bool viewport_has_drawlist = false;
-            for (ImDrawList* draw_list : viewport->DrawDataP.CmdLists)
+            for (int i = 0; i < viewport->DrawDataP.CmdLists.size(); i++)
             {
+                ImDrawList* draw_list = viewport->DrawDataP.CmdLists[i];
                 if (!viewport_has_drawlist)
                     Text("Active DrawLists in Viewport #%d, ID: 0x%08X", viewport->Idx, viewport->ID);
                 viewport_has_drawlist = true;
@@ -20161,8 +20187,9 @@ void ImGui::ShowMetricsWindow(bool* p_open)
             memcpy(viewports.Data, g.Viewports.Data, g.Viewports.size_in_bytes());
             if (viewports.Size > 1)
                 ImQsort(viewports.Data, viewports.Size, sizeof(ImGuiViewport*), ViewportComparerByLastFocusedStampCount);
-            for (ImGuiViewportP* viewport : viewports)
+            for (int i = 0; i < viewports.size(); i++)
             {
+                ImGuiViewportP* viewport = viewports[i];
                 BulletText("Viewport #%d, ID: 0x%08X, LastFocused = %08d, PlatformFocused = %s, Window: \"%s\"",
                     viewport->Idx, viewport->ID, viewport->LastFocusedStampCount,
                     (g.PlatformIO.Platform_GetWindowFocus && viewport->PlatformWindowCreated) ? (g.PlatformIO.Platform_GetWindowFocus(viewport) ? "1" : "0") : "N/A",
@@ -20181,8 +20208,9 @@ void ImGui::ShowMetricsWindow(bool* p_open)
     // Details for Popups
     if (TreeNode("Popups", "Popups (%d)", g.OpenPopupStack.Size))
     {
-        for (const ImGuiPopupData& popup_data : g.OpenPopupStack)
+        for (int i = 0; i < g.OpenPopupStack.size(); i++)
         {
+            const ImGuiPopupData& popup_data = g.OpenPopupStack[i];
             // As it's difficult to interact with tree nodes while popups are open, we display everything inline.
             ImGuiWindow* window = popup_data.Window;
             BulletText("PopupID: %08x, Window: '%s' (%s%s), RestoreNavWindow '%s', ParentWindow '%s'",
@@ -20493,8 +20521,9 @@ void ImGui::ShowMetricsWindow(bool* p_open)
     // Overlay: Display windows Rectangles and Begin Order
     if (cfg->ShowWindowsRects || cfg->ShowWindowsBeginOrder)
     {
-        for (ImGuiWindow* window : g.Windows)
+        for (int i = 0; i < g.Windows.size(); i++)
         {
+            ImGuiWindow* window = g.Windows[i];
             if (!window->WasActive)
                 continue;
             ImDrawList* draw_list = GetForegroundDrawList(window);
