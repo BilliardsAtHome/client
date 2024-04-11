@@ -51,6 +51,7 @@ public:
     bool Bind(SockAddr& addr = SockAddr4()) const;
     bool Listen(s32 backlog = SOMAXCONN) const;
     bool SetBlocking(bool enable) const;
+    bool SetReuseAddr(bool enable) const;
     bool Shutdown(SOShutdownType how) const;
     bool Close();
 

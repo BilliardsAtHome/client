@@ -10,8 +10,13 @@ namespace kiwi {
  */
 SocketBase::SocketBase(SOProtoFamily family, SOSockType type)
     : mHandle(-1), mFamily(family), mType(type) {
+    // Create IOS socket
     mHandle = LibSO::Socket(mFamily, mType);
     K_ASSERT_EX(IsOpen(), "Failed to create socket");
+
+    // By default, enable port reuse
+    bool success = SetReuseAddr(true);
+    K_ASSERT(success);
 }
 
 /**
@@ -103,6 +108,18 @@ bool SocketBase::SetBlocking(bool enable) const {
     }
 
     return LibSO::Fcntl(mHandle, SO_F_SETFL, flags) >= 0;
+}
+
+/**
+ * Toggle port reuse
+ *
+ * @param enable Whether to enable port reuse
+ * @return Success
+ */
+bool SocketBase::SetReuseAddr(bool enable) const {
+    BOOL value = TRUE;
+    return LibSO::SetSockOpt(mHandle, SO_SOL_SOCKET, SO_SO_REUSEADDR, &value,
+                             sizeof(value)) == SO_SUCCESS;
 }
 
 /**
