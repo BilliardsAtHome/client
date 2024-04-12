@@ -8501,13 +8501,23 @@ void ImGui::SetNavFocusScope(ImGuiID focus_scope_id)
             g.NavFocusRoute.push_back(g.FocusScopeStack.Data[n]);
     }
     else if (focus_scope_id == g.NavWindow->NavRootFocusScopeId)
-        g.NavFocusRoute.push_back({ focus_scope_id, g.NavWindow->ID });
+    {
+        ImGuiFocusScopeData data;
+        data.ID = focus_scope_id;
+        data.WindowID = g.NavWindow->ID;
+        g.NavFocusRoute.push_back(data);
+    }
     else
         return;
 
     // Then follow on manually set ParentWindowForFocusRoute field (#6798)
     for (ImGuiWindow* window = g.NavWindow->ParentWindowForFocusRoute; window != NULL; window = window->ParentWindowForFocusRoute)
-        g.NavFocusRoute.push_back({ window->NavRootFocusScopeId, window->ID });
+    {
+        ImGuiFocusScopeData data;
+        data.ID = window->NavRootFocusScopeId;
+        data.WindowID = window->ID;
+        g.NavFocusRoute.push_back(data);
+    }
     IM_ASSERT(g.NavFocusRoute.Size < 100); // Maximum depth is technically 251 as per CalcRoutingScore(): 254 - 3
 }
 
@@ -12636,7 +12646,7 @@ static void ImGui::NavUpdate()
     const bool nav_gamepad_active = (io.ConfigFlags & ImGuiConfigFlags_NavEnableGamepad) != 0 && (io.BackendFlags & ImGuiBackendFlags_HasGamepad) != 0;
     const ImGuiKey nav_gamepad_keys_to_change_source[] = { ImGuiKey_GamepadFaceRight, ImGuiKey_GamepadFaceLeft, ImGuiKey_GamepadFaceUp, ImGuiKey_GamepadFaceDown, ImGuiKey_GamepadDpadRight, ImGuiKey_GamepadDpadLeft, ImGuiKey_GamepadDpadUp, ImGuiKey_GamepadDpadDown };
     if (nav_gamepad_active)
-        for (int i = 0; i < nav_gamepad_keys_to_change_source.size(); i++)
+        for (int i = 0; i < sizeof(nav_gamepad_keys_to_change_source) / sizeof(nav_gamepad_keys_to_change_source[0]); i++)
         {
             ImGuiKey key = nav_gamepad_keys_to_change_source[i];
             if (IsKeyDown(key))
@@ -12645,7 +12655,7 @@ static void ImGui::NavUpdate()
     const bool nav_keyboard_active = (io.ConfigFlags & ImGuiConfigFlags_NavEnableKeyboard) != 0;
     const ImGuiKey nav_keyboard_keys_to_change_source[] = { ImGuiKey_Space, ImGuiKey_Enter, ImGuiKey_Escape, ImGuiKey_RightArrow, ImGuiKey_LeftArrow, ImGuiKey_UpArrow, ImGuiKey_DownArrow };
     if (nav_keyboard_active)
-        for (int i = 0; i < nav_keyboard_keys_to_change_source.size(); i++)
+        for (int i = 0; i < sizeof(nav_keyboard_keys_to_change_source) / sizeof(nav_keyboard_keys_to_change_source[0]); i++)
         {
             ImGuiKey key = nav_keyboard_keys_to_change_source[i];
             if (IsKeyDown(key))
@@ -13426,7 +13436,7 @@ static void ImGui::NavUpdateWindowing()
 
     // Keyboard: Press and Release ALT to toggle menu layer
     const ImGuiKey windowing_toggle_keys[] = { ImGuiKey_LeftAlt, ImGuiKey_RightAlt };
-    for (int i = 0; i < windowing_toggle_keys.size(); i++)
+    for (int i = 0; i < LENGTHOF(windowing_toggle_keys); i++)
     {
         ImGuiKey windowing_toggle_key = windowing_toggle_keys[i];
         if (nav_keyboard_active && IsKeyPressed(windowing_toggle_key, ImGuiKeyOwner_None))
@@ -18957,6 +18967,19 @@ void ImGui::DockBuilderCopyWindowSettings(const char* src_name, const char* dst_
     }
 }
 
+struct DockRemainingWindowTask
+{
+    ImGuiWindow* Window;
+    ImGuiID DockId;
+    
+    DockRemainingWindowTask(ImGuiWindow* window, ImGuiID dock_id)
+    {
+        Window = window;
+        DockId = dock_id;
+    } 
+};
+
+
 // FIXME: Will probably want to change this signature, in particular how the window remapping pairs are passed.
 void ImGui::DockBuilderCopyDockSpace(ImGuiID src_dockspace_id, ImGuiID dst_dockspace_id, ImVector<const char*>* in_window_remap_pairs)
 {
@@ -19015,7 +19038,6 @@ void ImGui::DockBuilderCopyDockSpace(ImGuiID src_dockspace_id, ImGuiID dst_docks
     // Anything else in the source nodes of 'node_remap_pairs' are windows that are not included in the remapping list.
     // Find those windows and move to them to the cloned dock node. This may be optional?
     // Dock those are a second step as undocking would invalidate source dock nodes.
-    struct DockRemainingWindowTask { ImGuiWindow* Window; ImGuiID DockId; DockRemainingWindowTask(ImGuiWindow* window, ImGuiID dock_id) { Window = window; DockId = dock_id; } };
     ImVector<DockRemainingWindowTask> dock_remaining_windows;
     for (int dock_remap_n = 0; dock_remap_n < node_remap_pairs.Size; dock_remap_n += 2)
         if (ImGuiID src_dock_id = node_remap_pairs[dock_remap_n])
