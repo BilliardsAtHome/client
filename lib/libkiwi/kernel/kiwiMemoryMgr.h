@@ -47,7 +47,7 @@ private:
     EGG::ExpHeap* mpHeapMEM2;
 
     // Main heap size
-    static const u32 scHeapSize = OS_MEM_KB_TO_B(256);
+    static const u32 scHeapSize = OS_MEM_KB_TO_B(1024);
 };
 
 } // namespace kiwi

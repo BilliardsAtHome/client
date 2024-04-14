@@ -63,16 +63,8 @@
 #endif
 
 // Compile-time assertion
-#if defined(__MWERKS__) && __MWERKS__ >= 0x4199
-// >= GC 3.0 actually supports this!
-#define K_STATIC_ASSERT(expr) __static_assert((expr), "Static Assert")
-#define K_STATIC_ASSERT_EX(expr, msg) __static_assert((expr), msg)
-#else
-// Otherwise we use our own version
 #define K_STATIC_ASSERT(expr) extern u8 __K_PREDICATE[(expr) ? 1 : -1]
-#define K_STATIC_ASSERT_EX(expr, msg)                                          \
-    extern u8 __K_PREDICATE[(expr) ? 1 : (msg)]
-#endif
+#define K_STATIC_ASSERT_EX(expr, msg) K_STATIC_ASSERT(expr)
 
 #ifdef __cplusplus
 extern "C" {

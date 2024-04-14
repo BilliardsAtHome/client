@@ -2294,7 +2294,7 @@ bool ImGui::DragBehaviorT(ImGuiDataType data_type, TYPE* v, float v_speed, const
         const bool tweak_fast = IsKeyDown((g.NavInputSource == ImGuiInputSource_Gamepad) ? ImGuiKey_NavGamepadTweakFast : ImGuiKey_NavKeyboardTweakFast);
         const float tweak_factor = tweak_slow ? 1.0f / 1.0f : tweak_fast ? 10.0f : 1.0f;
         adjust_delta = GetNavTweakPressedAmount(axis) * tweak_factor;
-        v_speed = ImMax(v_speed, GetMinimumStepAtDecimalPrecision(decimal_precision));
+        v_speed = ImMax(v_speed, GetMinimumStepAtDecimalPrecision((float)decimal_precision));
     }
     adjust_delta *= v_speed;
 

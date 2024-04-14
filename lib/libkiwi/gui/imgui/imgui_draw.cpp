@@ -1738,9 +1738,13 @@ struct ImTriangulatorNode
 
 struct ImTriangulatorNodeSpan
 {
-    ImTriangulatorNode**    Data = NULL;
-    int                     Size = 0;
+    ImTriangulatorNode**    Data;
+    int                     Size;
 
+    ImTriangulatorNodeSpan() :
+        Data(NULL),
+        Size(0) {}
+        
     void    push_back(ImTriangulatorNode* node) { Data[Size++] = node; }
     void    find_erase_unsorted(int idx)        { for (int i = Size - 1; i >= 0; i--) if (Data[i]->Index == idx) { Data[i] = Data[Size - 1]; Size--; return; } }
 };
@@ -1749,6 +1753,10 @@ struct ImTriangulator
 {
     static int EstimateTriangleCount(int points_count)      { return (points_count < 3) ? 0 : points_count - 2; }
     static int EstimateScratchBufferSize(int points_count)  { return sizeof(ImTriangulatorNode) * points_count + sizeof(ImTriangulatorNode*) * points_count * 2; }
+
+    ImTriangulator() :
+        _TrianglesLeft(0),
+        _Nodes(NULL) {}
 
     void    Init(const ImVec2* points, int points_count, void* scratch_buffer);
     void    GetNextTriangle(unsigned int out_triangle[3]);     // Return relative indexes for next triangle
@@ -1762,8 +1770,8 @@ struct ImTriangulator
     void    ReclassifyNode(ImTriangulatorNode* node);
 
     // Internal members
-    int                     _TrianglesLeft = 0;
-    ImTriangulatorNode*     _Nodes = NULL;
+    int                     _TrianglesLeft;
+    ImTriangulatorNode*     _Nodes;
     ImTriangulatorNodeSpan  _Ears;
     ImTriangulatorNodeSpan  _Reflexes;
 };

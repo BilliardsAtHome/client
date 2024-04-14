@@ -2760,9 +2760,15 @@ void ImGuiTextBuffer::appendf(const char* fmt, ...)
 // Helper: Text buffer for logging/accumulating text
 void ImGuiTextBuffer::appendfv(const char* fmt, va_list args)
 {
+    va_list args_copy;
+
+    // va_copy(args_copy, args);
+    std::memcpy(args_copy, args, sizeof(va_list));
+
     int len = ImFormatStringV(NULL, 0, fmt, args);         // FIXME-OPT: could do a first pass write attempt, likely successful on first pass.
     if (len <= 0)
     {
+        va_end(args_copy);
         return;
     }
 
@@ -2776,7 +2782,8 @@ void ImGuiTextBuffer::appendfv(const char* fmt, va_list args)
     }
 
     Buf.resize(needed_sz);
-    ImFormatStringV(&Buf[write_off - 1], (size_t)len + 1, fmt, args);
+    ImFormatStringV(&Buf[write_off - 1], (size_t)len + 1, fmt, args_copy);
+    va_end(args_copy);
 }
 
 void ImGuiTextIndex::append(const char* base, int old_size, int new_size)
@@ -12646,7 +12653,7 @@ static void ImGui::NavUpdate()
     const bool nav_gamepad_active = (io.ConfigFlags & ImGuiConfigFlags_NavEnableGamepad) != 0 && (io.BackendFlags & ImGuiBackendFlags_HasGamepad) != 0;
     const ImGuiKey nav_gamepad_keys_to_change_source[] = { ImGuiKey_GamepadFaceRight, ImGuiKey_GamepadFaceLeft, ImGuiKey_GamepadFaceUp, ImGuiKey_GamepadFaceDown, ImGuiKey_GamepadDpadRight, ImGuiKey_GamepadDpadLeft, ImGuiKey_GamepadDpadUp, ImGuiKey_GamepadDpadDown };
     if (nav_gamepad_active)
-        for (int i = 0; i < sizeof(nav_gamepad_keys_to_change_source) / sizeof(nav_gamepad_keys_to_change_source[0]); i++)
+        for (int i = 0; i < IM_ARRAYSIZE(nav_gamepad_keys_to_change_source); i++)
         {
             ImGuiKey key = nav_gamepad_keys_to_change_source[i];
             if (IsKeyDown(key))
@@ -12655,7 +12662,7 @@ static void ImGui::NavUpdate()
     const bool nav_keyboard_active = (io.ConfigFlags & ImGuiConfigFlags_NavEnableKeyboard) != 0;
     const ImGuiKey nav_keyboard_keys_to_change_source[] = { ImGuiKey_Space, ImGuiKey_Enter, ImGuiKey_Escape, ImGuiKey_RightArrow, ImGuiKey_LeftArrow, ImGuiKey_UpArrow, ImGuiKey_DownArrow };
     if (nav_keyboard_active)
-        for (int i = 0; i < sizeof(nav_keyboard_keys_to_change_source) / sizeof(nav_keyboard_keys_to_change_source[0]); i++)
+        for (int i = 0; i < IM_ARRAYSIZE(nav_keyboard_keys_to_change_source); i++)
         {
             ImGuiKey key = nav_keyboard_keys_to_change_source[i];
             if (IsKeyDown(key))
@@ -21103,8 +21110,11 @@ void ImGui::DebugNodeStorage(ImGuiStorage* storage, const char* label)
 {
     if (!TreeNode(label, "%s: %d entries, %d bytes", label, storage->Data.Size, storage->Data.size_in_bytes()))
         return;
-    for (const ImGuiStorage::ImGuiStoragePair& p : storage->Data)
+    for (int i = 0; i < storage->Data.size(); i++)
+    {
+        const ImGuiStorage::ImGuiStoragePair& p = storage->Data[i];
         BulletText("Key 0x%08X Value { i: %d }", p.key, p.val_i); // Important: we currently don't store a type, real value may not be integer.
+    }
     TreePop();
 }
 

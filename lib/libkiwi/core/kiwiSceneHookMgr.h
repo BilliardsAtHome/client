@@ -22,22 +22,30 @@ public:
      * @brief Register new hook
      *
      * @param hook Scene hook
-     * @param id Scene ID
+     * @param id Scene ID (-1 for all scenes)
      */
-    void AddHook(ISceneHook* hook, RPSysSceneCreator::ESceneID id) {
-        K_ASSERT(hook != NULL);
-        mHookLists[id].PushBack(hook);
+    void AddHook(ISceneHook& hook, s32 id) {
+        if (id == -1) {
+            mGlobalHooks.PushBack(&hook);
+        } else {
+            K_ASSERT(id < RPSysSceneCreator::RP_SCENE_MAX);
+            mHookLists[id].PushBack(&hook);
+        }
     }
 
     /**
      * @brief Unregister existing hook
      *
      * @param hook Scene hook
-     * @param id Scene ID
+     * @param id Scene ID (-1 for all scenes)
      */
-    void RemoveHook(ISceneHook* hook, RPSysSceneCreator::ESceneID id) {
-        K_ASSERT(hook != NULL);
-        mHookLists[id].Remove(hook);
+    void RemoveHook(ISceneHook& hook, s32 id) {
+        if (id == -1) {
+            mGlobalHooks.Remove(&hook);
+        } else {
+            K_ASSERT(id < RPSysSceneCreator::RP_SCENE_MAX);
+            mHookLists[id].Remove(&hook);
+        }
     }
 
     static void OnSceneEnter();
@@ -66,6 +74,8 @@ private:
 private:
     // Lists of scene hooks
     TArray<TList<ISceneHook>, RPSysSceneCreator::RP_SCENE_MAX> mHookLists;
+    // Global hooks (always active)
+    TList<ISceneHook> mGlobalHooks;
 };
 
 /**
@@ -76,17 +86,18 @@ public:
     /**
      * @brief Constructor
      *
-     * @param id Scene ID
+     * @param id Scene ID (-1 for all scenes)
      */
-    explicit ISceneHook(RPSysSceneCreator::ESceneID id) : mSceneID(id) {
-        SceneHookMgr::GetInstance().AddHook(this, mSceneID);
+    explicit ISceneHook(s32 id) : mSceneID(id) {
+        K_ASSERT(id == -1 || id < RPSysSceneCreator::RP_SCENE_MAX);
+        SceneHookMgr::GetInstance().AddHook(*this, mSceneID);
     }
 
     /**
      * @brief Destructor
      */
     virtual ~ISceneHook() {
-        SceneHookMgr::GetInstance().RemoveHook(this, mSceneID);
+        SceneHookMgr::GetInstance().RemoveHook(*this, mSceneID);
     }
 
     /**
@@ -133,7 +144,7 @@ public:
 
 private:
     // Scene ID to which this hook belongs
-    RPSysSceneCreator::ESceneID mSceneID;
+    s32 mSceneID;
 };
 
 } // namespace kiwi

@@ -19,6 +19,7 @@ void KokeshiMain() {
 #endif
 
     kiwi::LibSO::Initialize();
+    kiwi::ImGuiImplRvl::CreateInstance();
 
     ASSERT_EX(SCGetAspectRatio() == SC_ASPECT_STD,
               "16:9 aspect ratio is not supported.\nPlease change to 4:3 in "

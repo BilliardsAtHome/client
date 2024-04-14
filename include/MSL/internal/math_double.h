@@ -9,6 +9,9 @@ extern "C" {
 inline float acosf(float x) {
     return acos(x);
 }
+inline float atan2f(float y, float x) {
+    return atan2(y, x);
+}
 inline float ceilf(float x) {
     return ceil(x);
 }

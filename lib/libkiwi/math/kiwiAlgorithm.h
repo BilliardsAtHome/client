@@ -1,6 +1,7 @@
 #ifndef LIBKIWI_MATH_ALGORITHM_H
 #define LIBKIWI_MATH_ALGORITHM_H
 #include <types.h>
+#include <nw4r/math.h>
 
 namespace kiwi {
 namespace {
@@ -28,6 +29,13 @@ template <typename T> inline T Abs(const T& x) {
 #else
     return x < 0 ? -x : x;
 #endif
+}
+
+/**
+ * @brief Logarithm
+ */
+template <typename T> inline T Log(const T& x) {
+    return nw4r::math::FLog(static_cast<f32>(x));
 }
 
 /**
