@@ -57,9 +57,6 @@ void ImGuiImplRvl::BeforeCalculate(RPSysScene* scene) {
 
     // Prepare for this frame
     imgui::NewFrame();
-
-    // Testing: show imgui demo window
-    kiwi::imgui::ShowDemoWindow();
 }
 
 /**
