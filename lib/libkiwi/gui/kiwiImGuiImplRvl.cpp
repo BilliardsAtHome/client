@@ -3,7 +3,6 @@
  */
 
 #include <Pack/RPGraphics.h>
-#include <egg/gfx/eggDrawGX.h>
 #include <libkiwi.h>
 #include <revolution/GX.h>
 
@@ -61,7 +60,6 @@ void ImGuiImplRvl::BeforeCalculate(RPSysScene* scene) {
 
     // Testing: show imgui demo window
     kiwi::imgui::ShowDemoWindow();
-    K_LOG("[ImGuiImplRvl::BeforeCalculate]");
 }
 
 /**
@@ -72,7 +70,6 @@ void ImGuiImplRvl::AfterCalculate(RPSysScene* scene) {
 
     // Create draw data for this frame
     imgui::Render();
-    K_LOG("[ImGuiImplRvl::AfterCalculate]");
 }
 
 /**
@@ -130,9 +127,7 @@ void ImGuiImplRvl::CreateFontTexture() {
     u8* image;
     int w, h;
     io.Fonts->GetTexDataAsRGBA32(&image, &w, &h);
-
-    K_ASSERT_EX(w <= 1024, "Texture is too large for GX");
-    K_ASSERT_EX(h <= 1024, "Texture is too large for GX");
+    K_ASSERT_EX(w <= 1024 && h <= 1024, "Texture is too large for GX");
 
     // Build GX texture
     GXInitTexObj(&mFontTexObj, image, w, h, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP,
@@ -151,13 +146,9 @@ void ImGuiImplRvl::SetupGX() const {
     K_ASSERT(data->Valid);
 
     // Alpha-blending enabled, no face culling, no depth testing
-
-    // GXSetBlendMode(GX_BM_BLEND, GX_BL_INVDSTALPHA, GX_BL_DSTALPHA,
-    // GX_LO_SET);
-
-    // GXSetCullMode(GX_CULL_NONE);
-
-    // GXSetZMode(FALSE, GX_NEVER, FALSE);
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_INVDSTALPHA, GX_BL_DSTALPHA, GX_LO_SET);
+    GXSetCullMode(GX_CULL_NONE);
+    GXSetZMode(FALSE, GX_NEVER, FALSE);
 
     // Setup viewport
     GXSetViewport(0.0f, 0.0f, data->DisplaySize.x * data->FramebufferScale.x,
