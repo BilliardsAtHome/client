@@ -8,6 +8,7 @@ namespace BAH {
 /**
  * @brief Break shot configuration
  */
+#pragma pack(push, 1)
 struct BreakInfo {
     BreakInfo();
     void Read(kiwi::IStream& strm);
@@ -25,14 +26,15 @@ struct BreakInfo {
     u32 off;
     u32 frame;
 
-    int up;
-    int left;
-    int right;
+    s32 up;
+    s32 left;
+    s32 right;
 
     EGG::Vector2f pos;
     f32 power;
     bool foul;
 };
+#pragma pack(pop)
 
 } // namespace BAH
 
