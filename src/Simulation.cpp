@@ -122,12 +122,17 @@ void Simulation::Configure(RPSysScene* scene) {
     ASSERT(mpCurrBreak != NULL);
     ASSERT(mpBestBreak != NULL);
 
-    // Default to max power.
-    // TODO: Maybe configurable later?
-    mpCurrBreak->power = 150.0f;
-    // Dummy record will instantly be broken
-    mpBestBreak->frame = ULONG_MAX;
+    // Previous best may still be on the NAND
+    kiwi::NandStream strm("best.brk", kiwi::EOpenMode_Read);
+    if (strm.IsOpen()) {
+        mpBestBreak->Read(strm);
+    } else {
+        // Dummy record will instantly be broken
+        mpBestBreak->frame = ULONG_MAX;
+    }
 
+    // Default to max power.
+    mpCurrBreak->power = 150.0f;
     mIsReplay = false;
 }
 
