@@ -13,8 +13,9 @@ enum {
     Ioctl_Close = 3,
     Ioctl_Connect = 4,
     Ioctl_Fcntl = 5,
-    Ioctl_GetPeerName = 7,
+    Ioctl_GetPeerName = 6,
     Ioctl_GetSocketName = 7,
+    Ioctl_SetSockOpt = 9,
     Ioctl_Listen = 10,
     Ioctl_Poll = 11,
     Ioctl_RecvFrom = 12,
@@ -877,10 +878,35 @@ SOResult LibSO::GetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
 SOResult LibSO::SetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
                            const void* val, u32 len) {
     K_ASSERT_EX(sDeviceHandle >= 0, "Please call LibSO::Initialize");
+    K_ASSERT(socket >= 0);
+    K_ASSERT(val != NULL);
+    K_ASSERT(len > 0);
 
-    K_ASSERT_EX(false, "Not implemented");
-    sLastError = SO_SUCCESS;
-    return SO_SUCCESS;
+    struct Args {
+        s32 fd;          // at 0x0
+        s32 level;       // at 0x4
+        s32 opt;         // at 0x8
+        const void* val; // at 0xC
+        u32 len;         // at 0x10
+    };
+
+    // Must be in MEM2, and must be 32-byte aligned
+    Args* args = new (32, EMemory_MEM2) Args();
+    K_ASSERT(args != NULL);
+
+    args->fd = socket;
+    args->level = level;
+    args->opt = opt;
+    args->val = val;
+    args->len = len;
+
+    s32 result =
+        IOS_Ioctl(sDeviceHandle, Ioctl_SetSockOpt, args, sizeof(Args), NULL, 0);
+
+    sLastError = static_cast<SOResult>(result);
+
+    delete args;
+    return sLastError;
 }
 
 /**

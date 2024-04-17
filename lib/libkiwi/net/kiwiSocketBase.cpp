@@ -61,19 +61,11 @@ bool SocketBase::Bind(SockAddr& addr) const {
     K_ASSERT(IsOpen());
     K_ASSERT(mFamily == addr.in.family);
 
-    // Auto-detect may fail so we retry up to 10 times
+    // Pick a random port in the private port range
     if (addr.port == 0) {
-        for (int i = 0; i < 10; i++) {
-            if (LibSO::Bind(mHandle, addr) == SO_SUCCESS) {
-                return true;
-            }
-        }
-
-        K_ASSERT_EX(false, "Auto-detect port failed");
-        return false;
+        addr.port = Random().NextU32(49152, 65535);
     }
 
-    // Just try once if we've chosen a port
     return LibSO::Bind(mHandle, addr) == SO_SUCCESS;
 }
 
@@ -117,7 +109,7 @@ bool SocketBase::SetBlocking(bool enable) const {
  * @return Success
  */
 bool SocketBase::SetReuseAddr(bool enable) const {
-    BOOL value = TRUE;
+    s32 value = enable;
     return LibSO::SetSockOpt(mHandle, SO_SOL_SOCKET, SO_SO_REUSEADDR, &value,
                              sizeof(value)) == SO_SUCCESS;
 }

@@ -87,11 +87,6 @@ void ImGuiImplRvl::UserDraw() {
     RenderDrawData();
 }
 
-void ImGuiImplRvl::UserDrawHook() {
-    GetInstance().UserDraw();
-}
-KM_CALL(0x80184a70, ImGuiImplRvl::UserDrawHook);
-
 /**
  * @brief Initialize ImGui library
  */

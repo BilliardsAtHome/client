@@ -25,8 +25,7 @@ public:
     ImGuiImplRvl();
     ~ImGuiImplRvl();
 
-    /* virtual */ void UserDraw();
-    static void UserDrawHook();
+    virtual void UserDraw();
 
 private:
     virtual void BeforeCalculate(RPSysScene* scene);
