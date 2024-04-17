@@ -31,6 +31,7 @@ KM_WRITE_32(0x802bead0, 0x60000000);
  * @brief Fixes for controller disconnect
  */
 KM_WRITE_32(0x802bfbc4, 0x60000000);
+KM_WRITE_32(0x802bfbd0, 0x60000000);
 KM_WRITE_32(0x802bfbf4, 0x60000000);
 KM_WRITE_32(0x802bfc3c, 0x60000000);
 
