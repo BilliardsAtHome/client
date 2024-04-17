@@ -50,7 +50,7 @@ u32 GetNumOffTable() {
         RPBilBall* ball = m->GetBall(i);
         ASSERT(ball != NULL);
 
-        if (ball->IsState(RPBilBall::EState_OffTable)) {
+        if (!ball->IsCueBall() && ball->IsState(RPBilBall::EState_OffTable)) {
             num++;
         }
     }
@@ -131,7 +131,7 @@ void Simulation::Configure(RPSysScene* scene) {
         mpBestBreak->frame = ULONG_MAX;
     }
 
-    // Default to max power.
+    // Default to max power
     mpCurrBreak->power = 150.0f;
     mIsReplay = false;
 }
