@@ -208,11 +208,7 @@ SOResult LibSO::Bind(SOSocket socket, SockAddr& addr) {
     K_ASSERT_EX(addr.len == sizeof(SockAddr4) || addr.len == sizeof(SockAddr6),
                 "Invalid address length (%d)", addr.len);
 
-    // IOS doesn't allow specifying zero for a random port.
-    // We must emulate this behavior at the user level
-    if (addr.port == 0) {
-        addr.port = Random().NextU32(49152, 65535);
-    }
+    K_ASSERT(addr.port != 0);
 
     struct Args {
         s32 fd;        // at 0x0

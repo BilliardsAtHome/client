@@ -61,9 +61,16 @@ bool SocketBase::Bind(SockAddr& addr) const {
     K_ASSERT(IsOpen());
     K_ASSERT(mFamily == addr.in.family);
 
-    // Pick a random port in the private port range
+    // Choose a random port in the private range
     if (addr.port == 0) {
-        addr.port = Random().NextU32(49152, 65535);
+        // Retry up to 10 times in case the random port is in use
+        for (int i = 0; i < 10; i++) {
+            addr.port = Random().NextU32(49152, 65535);
+
+            if (LibSO::Bind(mHandle, addr) == SO_SUCCESS) {
+                return true;
+            }
+        }
     }
 
     return LibSO::Bind(mHandle, addr) == SO_SUCCESS;
