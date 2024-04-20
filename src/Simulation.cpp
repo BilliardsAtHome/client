@@ -14,7 +14,7 @@ namespace {
 /**
  * @brief Count number of pocketed balls
  */
-u32 GetNumPocket() {
+u32 GetNumSunk() {
     RPBilBallManager* m = RPBilBallManager::GetInstance();
     ASSERT(m != NULL);
 
@@ -40,7 +40,7 @@ u32 GetNumPocket() {
 /**
  * @brief Count number of balls shot off of the table
  */
-u32 GetNumOffTable() {
+u32 GetNumOff() {
     RPBilBallManager* m = RPBilBallManager::GetInstance();
     ASSERT(m != NULL);
 
@@ -50,7 +50,12 @@ u32 GetNumOffTable() {
         RPBilBall* ball = m->GetBall(i);
         ASSERT(ball != NULL);
 
-        if (!ball->IsCueBall() && ball->IsState(RPBilBall::EState_OffTable)) {
+        // Ignore cue ball
+        if (ball->IsCueBall()) {
+            continue;
+        }
+
+        if (ball->IsState(RPBilBall::EState_OffTable)) {
             num++;
         }
     }
@@ -70,8 +75,8 @@ bool GetIsFoul() {
         ASSERT(ball != NULL);
 
         // Cue ball pocketed?
-        if (i == 0 && ball->IsState(RPBilBall::EState_Pocket)) {
-            ASSERT(ball->IsCueBall());
+        if (ball->IsCueBall() && ball->IsState(RPBilBall::EState_Pocket)) {
+            ASSERT(i == 0);
             return true;
         }
 
@@ -111,14 +116,8 @@ Simulation::~Simulation() {
  */
 void Simulation::Configure(RPSysScene* scene) {
 #pragma unused(scene)
-    // 32-byte aligned because NAND is cool like that :D
-    if (mpCurrBreak == NULL) {
-        mpCurrBreak = new (32) BreakInfo();
-    }
-    if (mpBestBreak == NULL) {
-        mpBestBreak = new (32) BreakInfo();
-    }
-
+    mpCurrBreak = new BreakInfo();
+    mpBestBreak = new BreakInfo();
     ASSERT(mpCurrBreak != NULL);
     ASSERT(mpBestBreak != NULL);
 
@@ -259,8 +258,8 @@ void Simulation::OnEndShot() {
     }
 
     // Record break results
-    mpCurrBreak->sunk = GetNumPocket();
-    mpCurrBreak->off = GetNumOffTable();
+    mpCurrBreak->sunk = GetNumSunk();
+    mpCurrBreak->off = GetNumOff();
     mpCurrBreak->foul = GetIsFoul();
 
     // Upload 6+ breaks to submission server
