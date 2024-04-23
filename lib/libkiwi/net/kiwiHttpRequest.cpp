@@ -14,7 +14,7 @@ const String sProtocolVer = "1.1";
  * @param method Request method
  * @return Server response
  */
-const HttpResponse& HttpRequest::Send(EMethod method) {
+const Optional<HttpResponse>& HttpRequest::Send(EMethod method) {
     K_ASSERT(method < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
 
@@ -25,7 +25,6 @@ const HttpResponse& HttpRequest::Send(EMethod method) {
     // Call on this thread
     SendImpl();
 
-    K_ASSERT(mResponse.status != EHttpStatus_Dummy);
     return mResponse;
 }
 
@@ -60,6 +59,7 @@ void HttpRequest::SendImpl() {
     K_ASSERT(mpSocket != NULL);
 
     bool success = true;
+    mResponse = HttpResponse();
 
     // Establish connection with server
     SockAddr4 addr(mHostName, 80);
@@ -69,12 +69,10 @@ void HttpRequest::SendImpl() {
     // Send request, receive server's response
     success = success && Request();
     success = success && Receive();
-    K_ASSERT(mResponse.status != EHttpStatus_Dummy);
 
     // Internal error
     if (!success) {
-        mResponse.status = EHttpStatus_LibkiwiErr;
-        K_ASSERT(false);
+        mResponse.Reset();
     }
 
     // User callback
@@ -127,7 +125,7 @@ bool HttpRequest::Receive() {
     K_ASSERT(mpSocket != NULL);
 
     // TODO: Implement
-    mResponse.status = EHttpStatus_OK;
+    mResponse->status = EHttpStatus_OK;
     return true;
 }
 

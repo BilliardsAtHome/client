@@ -186,8 +186,8 @@ void BreakInfo::Upload() const {
     crc.Process(this, sizeof(BreakInfo));
     request.SetParameter("checksum", kiwi::ToHexString(crc.Result()));
 
-    const kiwi::HttpResponse& resp = request.Send();
-    K_ASSERT(resp.status != kiwi::EHttpStatus_LibkiwiErr);
+    const kiwi::Optional<kiwi::HttpResponse>& resp = request.Send();
+    K_ASSERT(resp);
 }
 
 } // namespace BAH

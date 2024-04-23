@@ -3,6 +3,7 @@
 #include <libkiwi/kernel/kiwiAssert.h>
 #include <libkiwi/net/kiwiSyncSocket.h>
 #include <libkiwi/prim/kiwiHashMap.h>
+#include <libkiwi/prim/kiwiOptional.h>
 #include <libkiwi/prim/kiwiString.h>
 #include <types.h>
 
@@ -12,9 +13,6 @@ namespace kiwi {
  * @brief HTTP Status code
  */
 enum EHttpStatus {
-    EHttpStatus_LibkiwiErr = -1, // Internal library error
-    EHttpStatus_Dummy = 0,       // Uninitialized
-
     // TODO: Determine which additional codes are useful here
 
     // Successful
@@ -44,7 +42,7 @@ struct HttpResponse {
     /**
      * @brief Constructor
      */
-    HttpResponse() : status(EHttpStatus_OK) {}
+    HttpResponse() : status(EHttpStatus_OK), body(NULL) {}
 
     /**
      * @brief Destructor
@@ -80,7 +78,8 @@ public:
      * @param response Request response
      * @param arg Callback user argument
      */
-    typedef void (*ResponseCallback)(const HttpResponse& response, void* arg);
+    typedef void (*ResponseCallback)(const Optional<HttpResponse>& response,
+                                     void* arg);
 
 public:
     /**
@@ -142,7 +141,7 @@ public:
         mURI = uri;
     }
 
-    const HttpResponse& Send(EMethod method = EMethod_GET);
+    const Optional<HttpResponse>& Send(EMethod method = EMethod_GET);
     void SendAsync(ResponseCallback callback, void* arg = NULL,
                    EMethod method = EMethod_GET);
 
@@ -165,7 +164,7 @@ private:
     TMap<String, String> mParams; // URL parameters
     TMap<String, String> mHeader; // Header fields
 
-    HttpResponse mResponse;              // Server response
+    Optional<HttpResponse> mResponse;    // Server response
     ResponseCallback mpResponseCallback; // Response callback
     void* mpResponseCallbackArg;         // Callback user argument
 };

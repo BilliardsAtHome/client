@@ -76,6 +76,23 @@ public:
         return reinterpret_cast<const T&>(mBuffer);
     }
 
+    // Access optional value (or 'val' if none)
+    T& ValueOr(const T& val) {
+        return HasValue() ? Value() : val;
+    }
+    const T& ValueOr(const T& val) const {
+        return HasValue() ? Value() : val;
+    }
+
+    // Destroy value
+    void Reset() {
+        if (HasValue()) {
+            Value().~T();
+        }
+
+        mHasValue = false;
+    }
+
     // Dereference access
     T& operator*() {
         return Value();
