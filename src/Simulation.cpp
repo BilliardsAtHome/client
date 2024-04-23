@@ -263,7 +263,7 @@ void Simulation::OnEndShot() {
     mpCurrBreak->foul = GetIsFoul();
 
     // Upload 6+ breaks to submission server
-    if (mpCurrBreak->sunk + mpCurrBreak->off > 6) {
+    if (mpCurrBreak->sunk + mpCurrBreak->off >= 6) {
         mpCurrBreak->Upload();
     }
 
