@@ -9,6 +9,35 @@ const String sProtocolVer = "1.1";
 } // namespace
 
 /**
+ * @brief Constructor
+ *
+ * @param host Server hostname
+ */
+HttpRequest::HttpRequest(const String& host)
+    : mHostName(host),
+      mURI("/"),
+      mpSocket(NULL),
+      mpWorkMemory(NULL),
+      mWorkMemorySize(1024),
+      mWorkMemoryPos(0),
+      mpResponseCallback(NULL),
+      mpResponseCallbackArg(NULL) {
+    // Bind to any local port
+    mpSocket = new SyncSocket(SO_PF_INET, SO_SOCK_STREAM);
+    K_ASSERT(mpSocket != NULL);
+    bool success = mpSocket->Bind();
+    K_ASSERT(success);
+
+    mpWorkMemory = new char[mWorkMemorySize];
+    K_ASSERT(mpWorkMemory != NULL);
+
+    // Hostname required by HTTP 1.1
+    mHeader["Host"] = host;
+    // Identify libkiwi requests by user agent
+    mHeader["User-Agent"] = "libkiwi";
+}
+
+/**
  * @brief Send request synchronously
  *
  * @param method Request method

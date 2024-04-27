@@ -82,28 +82,7 @@ public:
                                      void* arg);
 
 public:
-    /**
-     * @brief Constructor
-     *
-     * @param host Server hostname
-     */
-    HttpRequest(const String& host)
-        : mHostName(host),
-          mURI("/"),
-          mpSocket(NULL),
-          mpResponseCallback(NULL),
-          mpResponseCallbackArg(NULL) {
-        mpSocket = new SyncSocket(SO_PF_INET, SO_SOCK_STREAM);
-        K_ASSERT(mpSocket != NULL);
-
-        bool success = mpSocket->Bind();
-        K_ASSERT(success);
-
-        // Hostname required by HTTP 1.1
-        mHeader["Host"] = host;
-        // Identify libkiwi requests by user agent
-        mHeader["User-Agent"] = "libkiwi";
-    }
+    HttpRequest(const String& host);
 
     /**
      * @brief Destructor
@@ -160,6 +139,10 @@ private:
     String mHostName;     // Server host name
     String mURI;          // Requested resource
     SyncSocket* mpSocket; // Connection to server
+
+    char* mpWorkMemory;  // Work memory for receive
+    u32 mWorkMemorySize; // Work memory buffer size
+    u32 mWorkMemoryPos;  // Work memory buffer position
 
     TMap<String, String> mParams; // URL parameters
     TMap<String, String> mHeader; // Header fields
