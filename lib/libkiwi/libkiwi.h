@@ -6,10 +6,13 @@
 #endif
 
 #include <libkiwi/core/kiwiColor.h>
+#include <libkiwi/core/kiwiConsoleOut.h>
 #include <libkiwi/core/kiwiController.h>
 #include <libkiwi/core/kiwiDvdStream.h>
+#include <libkiwi/core/kiwiIBinary.h>
 #include <libkiwi/core/kiwiIStream.h>
 #include <libkiwi/core/kiwiMemStream.h>
+#include <libkiwi/core/kiwiMessage.h>
 #include <libkiwi/core/kiwiNandStream.h>
 #include <libkiwi/core/kiwiSceneHookMgr.h>
 #include <libkiwi/core/kiwiThread.h>
@@ -20,11 +23,14 @@
 #include <libkiwi/kernel/kiwiRuntime.h>
 #include <libkiwi/math/kiwiAlgorithm.h>
 #include <libkiwi/net/kiwiAsyncSocket.h>
+#include <libkiwi/net/kiwiEmuRichPresence.h>
 #include <libkiwi/net/kiwiHttpRequest.h>
+#include <libkiwi/net/kiwiIRichPresence.h>
 #include <libkiwi/net/kiwiPacket.h>
 #include <libkiwi/net/kiwiReliableClient.h>
 #include <libkiwi/net/kiwiReliablePacket.h>
 #include <libkiwi/net/kiwiReliableSocket.h>
+#include <libkiwi/net/kiwiRvlRichPresence.h>
 #include <libkiwi/net/kiwiSocketBase.h>
 #include <libkiwi/net/kiwiSyncSocket.h>
 #include <libkiwi/prim/kiwiArray.h>

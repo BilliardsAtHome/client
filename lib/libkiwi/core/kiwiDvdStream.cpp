@@ -8,9 +8,7 @@ namespace kiwi {
  * @param path File path
  * @return Success
  */
-bool DvdStream::Open(const char* path) {
-    K_ASSERT(path != NULL);
-
+bool DvdStream::Open(const String& path) {
     // Close existing file
     if (mIsOpen) {
         Close();
@@ -19,7 +17,7 @@ bool DvdStream::Open(const char* path) {
     // Try to locate file on disc
     s32 entrynum = DVDConvertPathToEntrynum(path);
     if (entrynum < 0) {
-        K_LOG_EX("Can't find DVD file: %s", path);
+        K_LOG_EX("Can't find DVD file: %s\n", path);
         return false;
     }
 
