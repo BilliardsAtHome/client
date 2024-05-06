@@ -11,19 +11,6 @@
 
 namespace kiwi {
 
-template <typename T> void DumpVector(const TVector<T>& v) {
-    K_LOG("{");
-
-    for (int i = 0; i < v.Size(); i++) {
-        K_LOG_EX("%s, ", v[i].CStr());
-    }
-
-    K_LOG("}\n");
-}
-
-// Allocate 20% extra space
-static const f32 scAllocBonus = 0.20f;
-
 /**
  * @brief Clear vector contents
  */
@@ -31,7 +18,7 @@ template <typename T> void TVector<T>::Clear() {
     K_ASSERT(mSize == 0 || mpData != NULL);
 
     for (u32 i = 0; i < mSize; i++) {
-        mpData[i].~T();
+        Buffer()[i].~T();
     }
 
     mSize = 0;
@@ -46,34 +33,22 @@ template <typename T> void TVector<T>::Clear() {
 template <typename T> void TVector<T>::Insert(const T& t, u32 pos) {
     K_ASSERT(pos <= mSize);
 
-    K_LOG_EX("Before insert %s -> %d: \n", t.CStr(), pos);
-    DumpVector(*this);
-
     // Need to reallocate
     if (mSize >= mCapacity) {
-        // Allocate 20% extra space
-        u32 newSize = mSize + 1;
-        newSize += static_cast<u32>(scAllocBonus * newSize);
-        Reserve(newSize);
+        Reserve(mSize + 1);
     }
 
     K_ASSERT(mpData != NULL);
 
     // Inserted in the middle, copy forward
     if (pos < mSize) {
-        std::memcpy(mpData + pos + 1, //
-                    mpData + pos,     //
+        std::memcpy(Buffer() + pos + 1, Buffer() + pos,
                     (mSize - pos) * sizeof(T));
     }
 
-    K_LOG_EX("Set mpData[%d]=%s, previously %s\n", pos, t.CStr(),
-             mpData[pos].CStr());
-
-    mpData[pos] = t;
+    // Copy construct in-place
+    new (&Buffer()[pos]) T(t);
     mSize++;
-
-    K_LOG_EX("After insert %s -> %d: \n", t.CStr(), pos);
-    DumpVector(*this);
 }
 
 /**
@@ -87,7 +62,7 @@ template <typename T> bool TVector<T>::Remove(const T& t) {
 
     // Linear search for the target
     for (u32 i = 0; i < mSize; i++) {
-        if (mpData[i] == t) {
+        if (Buffer()[i] == t) {
             RemoveAt(i);
             return true;
         }
@@ -107,12 +82,11 @@ template <typename T> void TVector<T>::RemoveAt(u32 pos) {
     K_ASSERT(mpData != NULL);
 
     // Destroy element
-    mpData[pos].~T();
+    Buffer()[pos].~T();
 
     // Removed from the middle, copy backward
     if (pos < mSize) {
-        std::memcpy(mpData + pos,     //
-                    mpData + pos + 1, //
+        std::memcpy(Buffer() + pos, Buffer() + pos + 1,
                     (mSize - pos) * sizeof(T));
     }
 
@@ -142,35 +116,24 @@ template <typename T> void TVector<T>::PopBack() {
  * @param capacity New capacity
  */
 template <typename T> void TVector<T>::Reserve(u32 capacity) {
-    K_ASSERT_EX(false, "Don't use this class. Still broken");
-
     // All good!
     if (mCapacity >= capacity) {
         return;
     }
 
-    K_LOG_EX("Before reallocate for %d: \n", capacity);
-    DumpVector(*this);
-
     // Need to reallocate
-    T* buffer = new T[capacity];
+    u8* buffer = new u8[capacity * sizeof(T)];
     K_ASSERT(buffer != NULL);
 
     // Copy in old data
     if (mpData != NULL) {
         std::memcpy(buffer, mpData, mSize * sizeof(T));
-
-        // TODO: WHY?????
-        // delete[] mpData;
-        K_LOG_EX("    LEAKING %d BYTES YEAAAAAAA\n", mCapacity * sizeof(T));
+        delete mpData;
     }
 
     // Swap buffer
     mpData = buffer;
     mCapacity = capacity;
-
-    K_LOG_EX("After reallocate for %d: \n", capacity);
-    DumpVector(*this);
 }
 
 /**
@@ -184,7 +147,7 @@ template <typename T> void TVector<T>::CopyFrom(const TVector& other) {
 
     // Make sure we can fit the contents
     Reserve(other.mSize);
-    std::memcpy(mpData, other.mpData, other.mSize);
+    std::memcpy(mpData, other.mpData, other.mSize * sizeof(T));
 }
 
 } // namespace kiwi

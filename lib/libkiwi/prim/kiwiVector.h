@@ -37,7 +37,11 @@ public:
      * @brief Destructor
      */
     ~TVector() {
-        delete[] mpData;
+        // Destroy objects
+        Clear();
+
+        // Free array buffer
+        delete mpData;
         mpData = NULL;
     }
 
@@ -64,7 +68,7 @@ public:
     T& operator[](u32 i) {
         K_ASSERT(i < mSize);
         K_ASSERT(mpData != NULL);
-        return mpData[i];
+        return Buffer()[i];
     }
 
     /**
@@ -76,7 +80,7 @@ public:
     const T& operator[](u32 i) const {
         K_ASSERT(i < mSize);
         K_ASSERT(mpData != NULL);
-        return mpData[i];
+        return Buffer()[i];
     }
 
     void Clear();
@@ -89,12 +93,19 @@ public:
     void PopBack();
 
 private:
+    /**
+     * @brief Access underlying array buffer
+     */
+    T* Buffer() const {
+        return reinterpret_cast<T*>(mpData);
+    }
+
     void Reserve(u32 capacity);
     void CopyFrom(const TVector& other);
 
 private:
     // Allocated buffer
-    T* mpData;
+    u8* mpData;
     // Buffer size
     u32 mCapacity;
     // Number of elements
