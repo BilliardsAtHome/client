@@ -12,9 +12,6 @@ namespace detail {
  */
 class ConsoleOut : private NonCopyable {
 public:
-    ConsoleOut() {}
-    ~ConsoleOut() {}
-
     /**
      * @brief Output pipe operator
      *

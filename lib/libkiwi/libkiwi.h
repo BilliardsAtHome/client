@@ -16,8 +16,6 @@
 #include <libkiwi/core/kiwiNandStream.h>
 #include <libkiwi/core/kiwiSceneHookMgr.h>
 #include <libkiwi/core/kiwiThread.h>
-#include <libkiwi/gui/kiwiImGui.h>
-#include <libkiwi/gui/kiwiImGuiImplRvl.h>
 #include <libkiwi/kernel/kiwiAssert.h>
 #include <libkiwi/kernel/kiwiMemoryMgr.h>
 #include <libkiwi/kernel/kiwiRuntime.h>
@@ -41,6 +39,7 @@
 #include <libkiwi/prim/kiwiPair.h>
 #include <libkiwi/prim/kiwiSTL.h>
 #include <libkiwi/prim/kiwiString.h>
+#include <libkiwi/prim/kiwiVector.h>
 #include <libkiwi/rvl/kiwiLibGX.h>
 #include <libkiwi/rvl/kiwiLibSO.h>
 #include <libkiwi/util/kiwiAutoLock.h>

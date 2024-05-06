@@ -10,7 +10,7 @@ namespace kiwi {
  */
 class EmuRichPresence : public IRichPresence {
 public:
-    EmuRichPresence(const String& client);
+    explicit EmuRichPresence(const String& client);
     virtual ~EmuRichPresence();
 
     virtual bool IsConnected() const;

@@ -34,7 +34,7 @@ private:
     };
 
 public:
-    Message(const void* bin);
+    explicit Message(const void* bin);
     virtual ~Message();
 
     /**

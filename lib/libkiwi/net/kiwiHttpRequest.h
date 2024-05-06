@@ -42,18 +42,16 @@ struct HttpResponse {
     /**
      * @brief Constructor
      */
-    HttpResponse() : status(EHttpStatus_OK), body(NULL) {}
+    HttpResponse() : status(EHttpStatus_OK) {}
 
     /**
      * @brief Destructor
      */
-    ~HttpResponse() {
-        delete body;
-    }
+    ~HttpResponse() {}
 
     EHttpStatus status;          // Status code
     TMap<String, String> header; // Response header
-    const char* body;            // Response body/payload
+    String body;                 // Response body/payload
 };
 
 /**
@@ -82,7 +80,7 @@ public:
                                      void* arg);
 
 public:
-    HttpRequest(const String& host);
+    explicit HttpRequest(const String& host);
 
     /**
      * @brief Destructor
@@ -139,10 +137,6 @@ private:
     String mHostName;     // Server host name
     String mURI;          // Requested resource
     SyncSocket* mpSocket; // Connection to server
-
-    char* mpWorkMemory;  // Work memory for receive
-    u32 mWorkMemorySize; // Work memory buffer size
-    u32 mWorkMemoryPos;  // Work memory buffer position
 
     TMap<String, String> mParams; // URL parameters
     TMap<String, String> mHeader; // Header fields

@@ -10,7 +10,7 @@ namespace kiwi {
  */
 class RvlRichPresence : public IRichPresence {
 public:
-    RvlRichPresence(const String& client);
+    explicit RvlRichPresence(const String& client);
     virtual ~RvlRichPresence();
 
     virtual bool IsConnected() const;

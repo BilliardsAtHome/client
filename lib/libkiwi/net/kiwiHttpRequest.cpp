@@ -17,9 +17,6 @@ HttpRequest::HttpRequest(const String& host)
     : mHostName(host),
       mURI("/"),
       mpSocket(NULL),
-      mpWorkMemory(NULL),
-      mWorkMemorySize(1024),
-      mWorkMemoryPos(0),
       mpResponseCallback(NULL),
       mpResponseCallbackArg(NULL) {
     // Bind to any local port
@@ -27,9 +24,6 @@ HttpRequest::HttpRequest(const String& host)
     K_ASSERT(mpSocket != NULL);
     bool success = mpSocket->Bind();
     K_ASSERT(success);
-
-    mpWorkMemory = new char[mWorkMemorySize];
-    K_ASSERT(mpWorkMemory != NULL);
 
     // Hostname required by HTTP 1.1
     mHeader["Host"] = host;
@@ -153,8 +147,103 @@ bool HttpRequest::Receive() {
     K_ASSERT(mMethod < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
 
-    // TODO: Implement
-    mResponse->status = EHttpStatus_OK;
+    /**
+     * Receive response headers
+     */
+
+    K_LOG("RECV HEADERS\n");
+
+    // Need non-blocking because we greedily receive data
+    mpSocket->SetBlocking(false);
+
+    // Read header string (ends in double newline)
+    size_t end;
+    String work = "";
+    while ((end = work.Find("\r\n\r\n")) == String::npos) {
+        char buffer[512] = "";
+        Optional<u32> nrecv = mpSocket->Recv(buffer);
+
+        // Don't append buffer if it's empty
+        if (nrecv) {
+            work += buffer;
+        }
+    }
+
+    // Point index at end of sequence instead of start
+    end += sizeof("\r\n\r\n") - 1;
+    String headers = work.SubStr(0, work.Length() - end);
+
+    K_LOG_EX("HEADERS =\n%s\n", headers.CStr());
+
+    /**
+     * Build header dictionary
+     */
+
+    K_LOG("BUILD DICT\n");
+
+    TVector<String> lines = headers.Split("\n");
+
+    // Must at least have one line (status code)
+    if (lines.Size() < 1) {
+        return false;
+    }
+    K_ASSERT(lines[0].StartsWith("HTTP/1.1"));
+    std::sscanf("HTTP/1.1 %d", lines[0], &mResponse->status);
+
+    // Other lines contain key/value pairs
+    for (int i = 1; i < lines.Size(); i++) {
+        // Use Find over Split in case the value also contains a colon
+        u32 pos = lines[i].Find(": ");
+        u32 after = pos + sizeof(": ") - 1;
+
+        // Malformed line (or part of \r\n\r\n)
+        if (pos == String::npos) {
+            K_ASSERT_EX(lines[i] == "\r", "Malformed response header");
+        }
+
+        // Create key/value pair
+        String key = lines[i].SubStr(0, pos);
+        String value = lines[i].SubStr(after);
+        mResponse->header.Insert(key, value);
+
+        K_LOG_EX("INSERT HEADER {%s, %s}\n", key.CStr(), value.CStr());
+    }
+
+    /**
+     * Receive response body
+     */
+
+    K_LOG("RECV BODY\n");
+
+    // We may have read *some* of it earlier
+    if (end != headers.Length()) {
+        mResponse->body = work.SubStr(end);
+    }
+
+    // Try to complete what we read earlier
+    while (true) {
+        char buffer[512] = "";
+        Optional<u32> nrecv = mpSocket->Recv(buffer);
+
+        // This is likely the end of the body (rather than server stall)
+        if (nrecv.ValueOr(0)) {
+            // If we were given the length, we can be 100% sure
+            if (mResponse->header.Contains("Content-Length")) {
+                u32 length =
+                    ksl::strtoul(*mResponse->header.Find("Content-Length"));
+
+                // Yep, we really did read all of it
+                if (mResponse->body.Length() >= length) {
+                    break;
+                }
+            }
+        }
+
+        mResponse->body += buffer;
+    }
+
+    K_LOG_EX("BODY = %s\n", mResponse->body);
+
     return true;
 }
 

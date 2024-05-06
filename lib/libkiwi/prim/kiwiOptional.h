@@ -77,7 +77,7 @@ public:
     }
 
     // Access optional value (or 'val' if none)
-    T& ValueOr(const T& val) {
+    const T& ValueOr(const T& val) {
         return HasValue() ? Value() : val;
     }
     const T& ValueOr(const T& val) const {

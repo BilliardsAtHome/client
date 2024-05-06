@@ -16,7 +16,7 @@ public:
      *
      * @param client Client app ID
      */
-    IRichPresence(const String& client)
+    explicit IRichPresence(const String& client)
         : mClient(client),
           mStartTime(0),
           mEndTime(0),
