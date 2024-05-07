@@ -20,9 +20,10 @@ HttpRequest::HttpRequest(const String& host)
       mpResponse(NULL),
       mpResponseCallback(NULL),
       mpResponseCallbackArg(NULL) {
-    // Bind to any local port
     mpSocket = new SyncSocket(SO_PF_INET, SO_SOCK_STREAM);
     K_ASSERT(mpSocket != NULL);
+
+    // Bind to any local port
     bool success = mpSocket->Bind();
     K_ASSERT(success);
 
@@ -83,19 +84,18 @@ void HttpRequest::SendImpl() {
     K_ASSERT(mMethod < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
 
-    bool success = true;
-
     mpResponse = new HttpResponse();
     K_ASSERT(mpResponse != NULL);
 
     // Establish connection with server
     SockAddr4 addr(mHostName, 80);
-    success = mpSocket->Connect(addr);
-    K_ASSERT(success);
+    bool success = mpSocket->Connect(addr);
 
     // Send request, receive server's response
-    success = success && Request();
-    success = success && Receive();
+    if (success) {
+        success = success && Request();
+        success = success && Receive();
+    }
 
     // User callback
     if (mpResponseCallback != NULL) {
@@ -146,13 +146,17 @@ bool HttpRequest::Request() {
 bool HttpRequest::Receive() {
     K_ASSERT(mMethod < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
+    K_ASSERT(mpResponse != NULL);
 
     /**
      * Receive response headers
      */
 
     // Need non-blocking because we greedily receive data
-    mpSocket->SetBlocking(false);
+    bool success = mpSocket->SetBlocking(false);
+    K_ASSERT(success);
+
+    return true;
 
     // Read header string (ends in double newline)
     size_t end;
@@ -192,9 +196,10 @@ bool HttpRequest::Receive() {
         u32 pos = lines[i].Find(": ");
         u32 after = pos + sizeof(": ") - 1;
 
-        // Malformed line (or part of \r\n\r\n)
+        // Malformed line (or part of \r\n\r\n ending)
         if (pos == String::npos) {
             K_ASSERT_EX(lines[i] == "", "Malformed response header");
+            continue;
         }
 
         // Create key/value pair
@@ -203,41 +208,41 @@ bool HttpRequest::Receive() {
         mpResponse->header.Insert(key, value);
     }
 
-    // /**
-    //  * Receive response body
-    //  */
+    return true;
 
-    // K_LOG("RECV BODY\n");
+    /**
+     * Receive response body
+     */
 
-    // // We may have read *some* of it earlier
-    // if (end != headers.Length()) {
-    //     mResponse->body = work.SubStr(end);
-    // }
+    // We may have read *some* of it earlier
+    if (end != headers.Length()) {
+        mpResponse->body = work.SubStr(end);
 
-    // // Try to complete what we read earlier
-    // while (true) {
-    //     char buffer[512] = "";
-    //     Optional<u32> nrecv = mpSocket->Recv(buffer);
+        // Try to complete what we read earlier
+        while (true) {
+            char buffer[512 + 1] = "";
+            Optional<u32> nrecv =
+                mpSocket->RecvBytes(buffer, sizeof(buffer) - 1);
 
-    //     // This is likely the end of the body (rather than server stall)
-    //     if (nrecv.ValueOr(0)) {
-    //         // If we were given the length, we can be 100% sure
-    //         if (mResponse->header.Contains("Content-Length")) {
-    //             u32 length =
-    //                 ksl::strtoul(*mResponse->header.Find("Content-Length"));
+            // This is likely the end of the body (rather than server stall)
+            if (nrecv.ValueOr(0)) {
+                // If we were given the length, we can be 100% sure
+                if (mpResponse->header.Contains("Content-Length")) {
+                    u32 length = ksl::strtoul(
+                        *mpResponse->header.Find("Content-Length"));
 
-    //             // Yep, we really did read all of it
-    //             if (mResponse->body.Length() >= length) {
-    //                 break;
-    //             }
-    //         }
-    //     }
+                    // Yep, we really did read all of it
+                    if (mpResponse->body.Length() >= length) {
+                        break;
+                    }
+                }
+            }
 
-    //     mResponse->body += buffer;
-    // }
+            mpResponse->body += buffer;
+        }
+    }
 
-    // K_LOG_EX("BODY = %s\n", mResponse->body);
-
+    K_LOG_EX("BODY = %s\n", mpResponse->body.CStr());
     return true;
 }
 

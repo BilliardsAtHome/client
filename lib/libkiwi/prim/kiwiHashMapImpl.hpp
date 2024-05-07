@@ -87,7 +87,7 @@ bool TMap<TKey, TValue>::Remove(const TKey& key, TValue* removed) {
 
     // Write out value about to be removed
     if (removed != NULL) {
-        *removed = bucket->value;
+        *removed = *bucket->value;
     }
 
     // Just mark as unused
@@ -114,7 +114,7 @@ TMap<TKey, TValue>::Bucket* TMap<TKey, TValue>::Search(const TKey& key) const {
         }
 
         // Matches key
-        if (it->key == key) {
+        if (*it->key == key) {
             return it;
         }
     }
@@ -137,18 +137,16 @@ TMap<TKey, TValue>::Bucket& TMap<TKey, TValue>::Create(const TKey& key) {
     for (Bucket* it = &mpBuckets[i]; it != NULL; it = it->chained) {
         // Unused entry
         if (!it->used) {
-            K_LOG_EX("Insert key=%s (to unused)\n", key.CStr());
-
             // Override this entry
             it->key = key;
-            it->value = TValue();
+            it->value.Emplace();
             it->used = true;
             mSize++;
             return *it;
         }
 
         // Matches key
-        if (it->key == key) {
+        if (*it->key == key) {
             return *it;
         }
 
@@ -160,9 +158,8 @@ TMap<TKey, TValue>::Bucket& TMap<TKey, TValue>::Create(const TKey& key) {
     last->chained = new Bucket();
     K_ASSERT(last->chained != NULL);
 
-    K_LOG_EX("Insert key=%s (to new chain)\n", key.CStr());
     last->chained->key = key;
-    last->chained->value = TValue();
+    last->chained->value.Emplace();
     last->chained->used = true;
     mSize++;
     return *last->chained;

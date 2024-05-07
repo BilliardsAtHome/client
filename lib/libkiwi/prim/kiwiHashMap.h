@@ -49,8 +49,8 @@ private:
         }
 
         // Key/value pair
-        TKey key;
-        TValue value;
+        StorageFor<TKey> key;
+        StorageFor<TValue> value;
 
         // Bucket is in use
         bool used;
@@ -99,14 +99,14 @@ public:
          */
         const TKey& Key() const {
             K_ASSERT(mpIter != NULL);
-            return mpIter->key;
+            return *mpIter->key;
         }
         /**
          * Get value from this element
          */
         const TValue& Value() const {
             K_ASSERT(mpIter != NULL);
-            return mpIter->value;
+            return *mpIter->value;
         }
 
         /**
@@ -174,7 +174,7 @@ public:
      * @return Existing value, or new entry
      */
     TValue& operator[](const TKey& key) {
-        return Create(key).value;
+        return *Create(key).value;
     }
 
     /**
@@ -204,7 +204,7 @@ public:
      */
     TValue* Find(const TKey& key) const {
         Bucket* bucket = Search(key);
-        return bucket != NULL ? &bucket->value : NULL;
+        return bucket != NULL ? &*bucket->value : NULL;
     }
 
     /**

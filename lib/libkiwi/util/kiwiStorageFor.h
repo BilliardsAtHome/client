@@ -40,18 +40,6 @@ public:
     }
 
     /**
-     * @brief Set value
-     *
-     * @param x New value
-     */
-    void Set(const T& x) {
-        // Construct in-place
-        K_ASSERT(mpStorage != NULL);
-        new (mpStorage) T(x);
-        mInitialized = true;
-    }
-
-    /**
      * @brief Get value
      *
      * @return Value reference
@@ -61,7 +49,6 @@ public:
         K_ASSERT_EX(mInitialized, "Uninitialized storage");
         return *reinterpret_cast<T*>(mpStorage);
     }
-
     /**
      * @brief Get value (read-only)
      *
@@ -74,12 +61,27 @@ public:
     }
 
     /**
+     * @brief Set value
+     *
+     * @param t New value
+     */
+    void Set(const T& t) {
+        Assign(&t);
+    }
+    /**
+     * @brief Construct value
+     */
+    void Emplace() {
+        Assign(NULL);
+    }
+
+    /**
      * @brief Assign a new value
      *
-     * @param x New value
+     * @param t New value
      */
-    StorageFor& operator=(const T& x) {
-        Set(x);
+    StorageFor& operator=(const T& t) {
+        Set(t);
     }
 
     // Dereference access
@@ -96,6 +98,25 @@ public:
     }
     const T* operator->() const {
         return &Get();
+    }
+
+private:
+    /**
+     * @brief Assign value through copy
+     *
+     * @param t New value
+     */
+    void Assign(const T* t) {
+        K_ASSERT(mpStorage != NULL);
+
+        // Construct in-place
+        if (t != NULL) {
+            new (mpStorage) T(*t);
+        } else {
+            new (mpStorage) T();
+        }
+
+        mInitialized = true;
     }
 
 private:
