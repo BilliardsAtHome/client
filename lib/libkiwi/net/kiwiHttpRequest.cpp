@@ -17,6 +17,7 @@ HttpRequest::HttpRequest(const String& host)
     : mHostName(host),
       mURI("/"),
       mpSocket(NULL),
+      mpResponse(NULL),
       mpResponseCallback(NULL),
       mpResponseCallbackArg(NULL) {
     // Bind to any local port
@@ -48,7 +49,8 @@ const Optional<HttpResponse>& HttpRequest::Send(EMethod method) {
     // Call on this thread
     SendImpl();
 
-    return mResponse;
+    K_ASSERT(mpResponse != NULL);
+    return *mpResponse;
 }
 
 /**
@@ -82,7 +84,9 @@ void HttpRequest::SendImpl() {
     K_ASSERT(mpSocket != NULL);
 
     bool success = true;
-    mResponse = HttpResponse();
+
+    mpResponse = new HttpResponse();
+    K_ASSERT(mpResponse != NULL);
 
     // Establish connection with server
     SockAddr4 addr(mHostName, 80);
@@ -93,14 +97,10 @@ void HttpRequest::SendImpl() {
     success = success && Request();
     success = success && Receive();
 
-    // Internal error
-    if (!success) {
-        mResponse.Reset();
-    }
-
     // User callback
     if (mpResponseCallback != NULL) {
-        mpResponseCallback(mResponse, mpResponseCallbackArg);
+        mpResponseCallback(success ? MakeOptional(*mpResponse) : kiwi::nullopt,
+                           mpResponseCallbackArg);
     }
 }
 
@@ -151,8 +151,6 @@ bool HttpRequest::Receive() {
      * Receive response headers
      */
 
-    K_LOG("RECV HEADERS\n");
-
     // Need non-blocking because we greedily receive data
     mpSocket->SetBlocking(false);
 
@@ -160,8 +158,8 @@ bool HttpRequest::Receive() {
     size_t end;
     String work = "";
     while ((end = work.Find("\r\n\r\n")) == String::npos) {
-        char buffer[512] = "";
-        Optional<u32> nrecv = mpSocket->Recv(buffer);
+        char buffer[512 + 1] = "";
+        Optional<u32> nrecv = mpSocket->RecvBytes(buffer, sizeof(buffer) - 1);
 
         // Don't append buffer if it's empty
         if (nrecv) {
@@ -171,24 +169,22 @@ bool HttpRequest::Receive() {
 
     // Point index at end of sequence instead of start
     end += sizeof("\r\n\r\n") - 1;
-    String headers = work.SubStr(0, work.Length() - end);
-
-    K_LOG_EX("HEADERS =\n%s\n", headers.CStr());
+    String headers = work.SubStr(0, end);
 
     /**
      * Build header dictionary
      */
 
-    K_LOG("BUILD DICT\n");
-
-    TVector<String> lines = headers.Split("\n");
-
     // Must at least have one line (status code)
+    TVector<String> lines = headers.Split("\r\n");
     if (lines.Size() < 1) {
         return false;
     }
+
+    // Extract status code
     K_ASSERT(lines[0].StartsWith("HTTP/1.1"));
-    std::sscanf("HTTP/1.1 %d", lines[0], &mResponse->status);
+    int num = std::sscanf(lines[0], "HTTP/1.1 %d", &mpResponse->status);
+    K_ASSERT(num == 1);
 
     // Other lines contain key/value pairs
     for (int i = 1; i < lines.Size(); i++) {
@@ -198,51 +194,49 @@ bool HttpRequest::Receive() {
 
         // Malformed line (or part of \r\n\r\n)
         if (pos == String::npos) {
-            K_ASSERT_EX(lines[i] == "\r", "Malformed response header");
+            K_ASSERT_EX(lines[i] == "", "Malformed response header");
         }
 
         // Create key/value pair
         String key = lines[i].SubStr(0, pos);
         String value = lines[i].SubStr(after);
-        mResponse->header.Insert(key, value);
-
-        K_LOG_EX("INSERT HEADER {%s, %s}\n", key.CStr(), value.CStr());
+        mpResponse->header.Insert(key, value);
     }
 
-    /**
-     * Receive response body
-     */
+    // /**
+    //  * Receive response body
+    //  */
 
-    K_LOG("RECV BODY\n");
+    // K_LOG("RECV BODY\n");
 
-    // We may have read *some* of it earlier
-    if (end != headers.Length()) {
-        mResponse->body = work.SubStr(end);
-    }
+    // // We may have read *some* of it earlier
+    // if (end != headers.Length()) {
+    //     mResponse->body = work.SubStr(end);
+    // }
 
-    // Try to complete what we read earlier
-    while (true) {
-        char buffer[512] = "";
-        Optional<u32> nrecv = mpSocket->Recv(buffer);
+    // // Try to complete what we read earlier
+    // while (true) {
+    //     char buffer[512] = "";
+    //     Optional<u32> nrecv = mpSocket->Recv(buffer);
 
-        // This is likely the end of the body (rather than server stall)
-        if (nrecv.ValueOr(0)) {
-            // If we were given the length, we can be 100% sure
-            if (mResponse->header.Contains("Content-Length")) {
-                u32 length =
-                    ksl::strtoul(*mResponse->header.Find("Content-Length"));
+    //     // This is likely the end of the body (rather than server stall)
+    //     if (nrecv.ValueOr(0)) {
+    //         // If we were given the length, we can be 100% sure
+    //         if (mResponse->header.Contains("Content-Length")) {
+    //             u32 length =
+    //                 ksl::strtoul(*mResponse->header.Find("Content-Length"));
 
-                // Yep, we really did read all of it
-                if (mResponse->body.Length() >= length) {
-                    break;
-                }
-            }
-        }
+    //             // Yep, we really did read all of it
+    //             if (mResponse->body.Length() >= length) {
+    //                 break;
+    //             }
+    //         }
+    //     }
 
-        mResponse->body += buffer;
-    }
+    //     mResponse->body += buffer;
+    // }
 
-    K_LOG_EX("BODY = %s\n", mResponse->body);
+    // K_LOG_EX("BODY = %s\n", mResponse->body);
 
     return true;
 }

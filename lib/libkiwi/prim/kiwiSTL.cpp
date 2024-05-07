@@ -220,7 +220,7 @@ f64 atof(const char* str) {
 
     // Convert value
     f64 value;
-    int num = std::sscanf("%lf", str, &value);
+    int num = std::sscanf(str, "%lf", &value);
 
     // Failure -> zero
     if (num != 1) {

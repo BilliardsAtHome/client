@@ -63,6 +63,7 @@ StringImpl<T> StringImpl<T>::SubStr(u32 pos, u32 len) const {
     // Create C-style substring
     T* buffer = new T[len + 1];
     StrNCpy(buffer, mpBuffer + pos, len);
+    buffer[len] = '\0';
 
     // Construct string wrapper
     StringImpl<T> str = StringImpl(buffer);

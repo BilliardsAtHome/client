@@ -20,6 +20,31 @@ void LogHeap(const char* name, EGG::Heap* heap) {
              OS_MEM_B_TO_KB(static_cast<f32>(heap->getAllocatableSize())));
 }
 
+/**
+ * @brief Catch erroneous double-frees
+ *
+ * @param block Target of delete operation
+ */
+void CheckDoubleFree(const void* block) {
+    // NULL delete is OK
+    if (block == NULL) {
+        return;
+    }
+
+    // Catch invalid pointers while we're here
+    K_ASSERT(OSIsMEM1Region(block) || OSIsMEM2Region(block));
+
+    // Sanity check, should always be ExpHeap
+    MEMiHeapHead* handle = MEMFindContainHeap(block);
+    K_ASSERT(handle != NULL);
+    K_ASSERT(handle->magic == 'EXPH');
+
+    // Check that the block is still marked as used
+    MEMiExpHeapMBlock* memBlock = static_cast<MEMiExpHeapMBlock*>(
+        AddToPtr(memBlock, -sizeof(MEMiExpHeapMBlock)));
+    K_ASSERT_EX(memBlock->state == 'UD', "Double free!");
+}
+
 } // namespace
 
 /**
@@ -83,6 +108,7 @@ void* MemoryMgr::Alloc(u32 size, s32 align, EMemory memory) {
  */
 void MemoryMgr::Free(void* block) {
     K_ASSERT(mpHeapMEM1 != NULL && mpHeapMEM2 != NULL);
+    CheckDoubleFree(block);
     EGG::Heap::free(block, NULL);
 }
 

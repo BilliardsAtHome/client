@@ -19,6 +19,7 @@
 #include <libkiwi/kernel/kiwiAssert.h>
 #include <libkiwi/kernel/kiwiMemoryMgr.h>
 #include <libkiwi/kernel/kiwiRuntime.h>
+#include <libkiwi/kernel/kiwiStackChecker.h>
 #include <libkiwi/math/kiwiAlgorithm.h>
 #include <libkiwi/net/kiwiAsyncSocket.h>
 #include <libkiwi/net/kiwiEmuRichPresence.h>
@@ -54,5 +55,6 @@
 #include <libkiwi/util/kiwiOverride.h>
 #include <libkiwi/util/kiwiRandom.h>
 #include <libkiwi/util/kiwiStaticSingleton.h>
+#include <libkiwi/util/kiwiStorageFor.h>
 #include <types.h>
 #endif

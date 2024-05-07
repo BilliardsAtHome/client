@@ -84,7 +84,20 @@ public:
         return HasValue() ? Value() : val;
     }
 
-    // Destroy value
+    /**
+     * @brief Construct value
+     */
+    T& Emplace() {
+        K_ASSERT(!mHasValue);
+
+        new (mBuffer) T();
+        mHasValue = true;
+        return Value();
+    }
+
+    /**
+     * @brief Destroy value
+     */
     void Reset() {
         if (HasValue()) {
             Value().~T();
@@ -103,10 +116,10 @@ public:
 
     // Pointer access
     T* operator->() {
-        return &this->Value();
+        return &Value();
     }
     const T* operator->() const {
-        return &this->Value();
+        return &Value();
     }
 
 private:
@@ -116,6 +129,27 @@ private:
     bool mHasValue;
 };
 
+namespace {
+
+/**
+ * @brief Optional construction helper
+ *
+ * @param t Value
+ */
+template <typename T> Optional<T> MakeOptional(const T& t) {
+    return Optional<T>(t);
+}
+
+/**
+ * @brief Optional construction helper
+ *
+ * @param t Value (may be NULL)
+ */
+template <typename T> Optional<T> MakeOptional(const T* t) {
+    return t ? Optional<T>(*t) : kiwi::nullopt;
+}
+
+} // namespace
 } // namespace kiwi
 
 #endif

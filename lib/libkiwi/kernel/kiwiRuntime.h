@@ -104,7 +104,7 @@ u32 GetDataSize() {
     {                                                                          \
         BOOL __enabled__ = OSDisableInterrupts();                              \
         K_LOG("************ BREAKPOINT! ************\n");                      \
-        K_LOG_EX("Source: " __FILE__ "(%d)", __LINE__ "\n");                   \
+        K_LOG_EX("Source: " __FILE__ "(%d)\n", __LINE__);                      \
         volatile int __x__ = 1;                                                \
         do {                                                                   \
             ;                                                                  \

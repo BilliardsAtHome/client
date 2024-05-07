@@ -42,9 +42,9 @@ private:
 
 private:
     // Heap in MEM1 region
-    EGG::ExpHeap* mpHeapMEM1;
+    EGG::Heap* mpHeapMEM1;
     // Heap in MEM2 region
-    EGG::ExpHeap* mpHeapMEM2;
+    EGG::Heap* mpHeapMEM2;
 
     // Main heap size
     static const u32 scHeapSize = OS_MEM_KB_TO_B(1024);

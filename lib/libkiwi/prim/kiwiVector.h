@@ -83,13 +83,44 @@ public:
         return Buffer()[i];
     }
 
+    /**
+     * @brief Clear vector contents
+     */
     void Clear();
 
+    /**
+     * @brief Insert a new element at the specified position
+     *
+     * @param t New element
+     * @param pos Element position
+     */
     void Insert(const T& t, u32 pos);
+
+    /**
+     * @brief Remove an element if it exists in the vector
+     *
+     * @param t Element to remove
+     * @return Success
+     */
     bool Remove(const T& t);
+
+    /**
+     * @brief Remove an element at the specified position
+     *
+     * @param pos Element position
+     */
     void RemoveAt(u32 pos);
 
+    /**
+     * @brief Insert a new element at the back of the vector
+     *
+     * @param t New element
+     */
     void PushBack(const T& t);
+
+    /**
+     * @brief Remove the last element from the vector
+     */
     void PopBack();
 
 private:
@@ -104,12 +135,9 @@ private:
     void CopyFrom(const TVector& other);
 
 private:
-    // Allocated buffer
-    u8* mpData;
-    // Buffer size
-    u32 mCapacity;
-    // Number of elements
-    u32 mSize;
+    u8* mpData;    // Allocated buffer
+    u32 mCapacity; // Buffer size
+    u32 mSize;     // Number of elements
 };
 
 } // namespace kiwi

@@ -44,11 +44,6 @@ struct HttpResponse {
      */
     HttpResponse() : status(EHttpStatus_OK) {}
 
-    /**
-     * @brief Destructor
-     */
-    ~HttpResponse() {}
-
     EHttpStatus status;          // Status code
     TMap<String, String> header; // Response header
     String body;                 // Response body/payload
@@ -86,7 +81,15 @@ public:
      * @brief Destructor
      */
     ~HttpRequest() {
+        K_ASSERT_EX(
+            mpResponseCallback == NULL,
+            "Don't destroy this object while async request is pending.");
+
         delete mpSocket;
+        mpSocket = NULL;
+
+        delete mpResponse;
+        mpResponse = NULL;
     }
 
     /**
@@ -141,7 +144,7 @@ private:
     TMap<String, String> mParams; // URL parameters
     TMap<String, String> mHeader; // Header fields
 
-    Optional<HttpResponse> mResponse;    // Server response
+    HttpResponse* mpResponse;            // Server response
     ResponseCallback mpResponseCallback; // Response callback
     void* mpResponseCallbackArg;         // Callback user argument
 };
