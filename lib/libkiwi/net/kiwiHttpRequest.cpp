@@ -94,7 +94,9 @@ void HttpRequest::SendImpl() {
     if (success) {
         success = success && Request();
         success = success && Receive();
-    } else {
+    }
+
+    if (!success) {
         mResponse.Reset();
     }
 
