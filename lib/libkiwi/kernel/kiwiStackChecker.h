@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_KERNEL_STACK_CHECK_H
-#define LIBKIWI_KERNEL_STACK_CHECK_H
+#ifndef LIBKIWI_KERNEL_STACK_CHECKER_H
+#define LIBKIWI_KERNEL_STACK_CHECKER_H
 #include <revolution/OS.h>
 #include <types.h>
 

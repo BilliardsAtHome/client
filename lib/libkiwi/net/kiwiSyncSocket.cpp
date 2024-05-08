@@ -77,10 +77,11 @@ SOResult SyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
     while (nrecv < len) {
         // Blocking call
         result = LibSO::RecvFrom(mHandle, dst, len - nrecv, 0, peer);
-        if (result < 0) {
+        if (result <= 0) {
             goto _exit;
         }
 
+        dst = AddToPtr(dst, result);
         nrecv += result;
     }
 

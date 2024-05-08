@@ -48,6 +48,13 @@ public:
     }
 
     /**
+     * @brief Destructor
+     */
+    ~Optional() {
+        Reset();
+    }
+
+    /**
      * @brief Value assignment
      *
      * @param t New value

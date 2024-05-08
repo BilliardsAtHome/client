@@ -90,6 +90,16 @@ bool SocketBase::Listen(s32 backlog) const {
 }
 
 /**
+ * Tests whether socket is blocking
+ */
+bool SocketBase::IsBlocking() const {
+    K_ASSERT(IsOpen());
+
+    s32 flags = LibSO::Fcntl(mHandle, SO_F_GETFL, 0);
+    return (flags & SO_O_NONBLOCK) == 0;
+}
+
+/**
  * Toggles socket blocking
  *
  * @param enable Whether to enable blocking

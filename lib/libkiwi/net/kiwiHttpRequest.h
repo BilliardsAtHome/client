@@ -87,9 +87,6 @@ public:
 
         delete mpSocket;
         mpSocket = NULL;
-
-        delete mpResponse;
-        mpResponse = NULL;
     }
 
     /**
@@ -144,7 +141,7 @@ private:
     TMap<String, String> mParams; // URL parameters
     TMap<String, String> mHeader; // Header fields
 
-    HttpResponse* mpResponse;            // Server response
+    Optional<HttpResponse> mResponse;    // Server response
     ResponseCallback mpResponseCallback; // Response callback
     void* mpResponseCallbackArg;         // Callback user argument
 };
