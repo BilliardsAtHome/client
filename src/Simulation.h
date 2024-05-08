@@ -22,8 +22,8 @@ public:
     void Tick();
     void OnEndShot();
 
-    kiwi::String GetUserId() const {
-        return mUserId;
+    kiwi::String GetUniqueId() const {
+        return mUniqueId;
     }
 
     f32 GetCuePower() const {
@@ -43,7 +43,7 @@ private:
     virtual ~Simulation();
 
 private:
-    kiwi::String mUserId;
+    kiwi::String mUniqueId;
     int mTimerUp;
     int mTimerLeft;
     int mTimerRight;

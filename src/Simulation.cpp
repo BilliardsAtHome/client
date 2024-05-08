@@ -98,7 +98,7 @@ K_DYNAMIC_SINGLETON_IMPL(Simulation);
  */
 Simulation::Simulation()
     : kiwi::ISceneHook(RPSysSceneCreator::ESceneID_RPBilScene),
-      mUserId("000000000000000000") {}
+      mUniqueId("0") {}
 
 /**
  * @brief Destructor

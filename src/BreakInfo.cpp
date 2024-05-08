@@ -163,7 +163,7 @@ void BreakInfo::Upload() const {
     kiwi::HttpRequest request("127.0.0.1");
     request.SetURI("/billiards/api");
 
-    request.SetParameter("user", Simulation::GetInstance().GetUserId());
+    request.SetParameter("user", Simulation::GetInstance().GetUniqueId());
 
     request.SetParameter("seed", kiwi::ToHexString(seed));
     request.SetParameter("kseed", kiwi::ToHexString(kseed));
