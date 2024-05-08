@@ -17,6 +17,7 @@ HttpRequest::HttpRequest(const String& host)
     : mHostName(host),
       mURI("/"),
       mpSocket(NULL),
+      mTimeOut(OS_MSEC_TO_TICKS(DEFAULT_TIMEOUT_MS)),
       mpResponseCallback(NULL),
       mpResponseCallbackArg(NULL) {
     mpSocket = new SyncSocket(SO_PF_INET, SO_SOCK_STREAM);
@@ -30,6 +31,8 @@ HttpRequest::HttpRequest(const String& host)
     mHeader["Host"] = host;
     // Identify libkiwi requests by user agent
     mHeader["User-Agent"] = "libkiwi";
+    // Ask for the server to close the connection
+    mHeader["Connnection"] = "close";
 }
 
 /**
@@ -144,6 +147,9 @@ bool HttpRequest::Receive() {
     K_ASSERT(mMethod < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
 
+    // Beginning timestamp
+    s32 start = OSGetTick();
+
     /**
      * Receive response headers
      */
@@ -173,6 +179,11 @@ bool HttpRequest::Receive() {
             if (nrecv.Value() == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
                 break;
             }
+        }
+
+        // Timeout check
+        if (OSGetTick() - start >= mTimeOut) {
+            return false;
         }
     }
 
@@ -257,7 +268,12 @@ bool HttpRequest::Receive() {
                 }
             }
         }
-    }
+
+        // Timeout check
+        if (OSGetTick() - start >= mTimeOut) {
+            return false;
+        }
+    };
 
     return true;
 }

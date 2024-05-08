@@ -90,6 +90,15 @@ public:
     }
 
     /**
+     * @brief Set the maximum connection duration before timeout
+     *
+     * @param timeOut Time-out period, in milliseconds
+     */
+    void SetTimeOut(u32 timeOut) {
+        mTimeOut = OS_MSEC_TO_TICKS(timeOut);
+    }
+
+    /**
      * @brief Add/update a request header field
      *
      * @param name Field name
@@ -126,6 +135,11 @@ private:
     typedef TMap<String, String>::ConstIterator ParamIterator;
     typedef TMap<String, String>::ConstIterator HeaderIterator;
 
+    /**
+     * @brief Default connection timeout, in milliseconds
+     */
+    static const u32 DEFAULT_TIMEOUT_MS = 5000;
+
 private:
     void SendImpl();
 
@@ -133,10 +147,12 @@ private:
     bool Receive();
 
 private:
-    EMethod mMethod;      // Request method
-    String mHostName;     // Server host name
-    String mURI;          // Requested resource
+    EMethod mMethod;  // Request method
+    String mHostName; // Server host name
+    String mURI;      // Requested resource
+
     SyncSocket* mpSocket; // Connection to server
+    u32 mTimeOut;         // Connection timeout
 
     TMap<String, String> mParams; // URL parameters
     TMap<String, String> mHeader; // Header fields
