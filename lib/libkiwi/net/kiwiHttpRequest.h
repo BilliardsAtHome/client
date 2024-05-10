@@ -9,6 +9,10 @@
 
 namespace kiwi {
 
+enum EHttpErr {
+    EHttpErr_Libkiwi,
+};
+
 /**
  * @brief HTTP Status code
  */
@@ -138,7 +142,7 @@ private:
     /**
      * @brief Default connection timeout, in milliseconds
      */
-    static const u32 DEFAULT_TIMEOUT_MS = 5000;
+    static const u32 DEFAULT_TIMEOUT_MS = 2000;
 
 private:
     void SendImpl();

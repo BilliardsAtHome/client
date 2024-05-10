@@ -5,7 +5,7 @@
 
 /**
  * @brief Pack Project boot scene
- * @note Stub class for SceneCreatorEx
+ * @note Stub class for SceneCreator
  */
 class RPSysBootScene : public RPSysScene {
 public:

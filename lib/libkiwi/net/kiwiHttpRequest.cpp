@@ -31,8 +31,6 @@ HttpRequest::HttpRequest(const String& host)
     mHeader["Host"] = host;
     // Identify libkiwi requests by user agent
     mHeader["User-Agent"] = "libkiwi";
-    // Ask for the server to close the connection
-    mHeader["Connnection"] = "close";
 }
 
 /**
@@ -273,7 +271,8 @@ bool HttpRequest::Receive() {
 
         // Timeout check
         if (OSGetTick() - start >= mTimeOut) {
-            return false;
+            // May be the only way to end the body, so not a failure
+            return true;
         }
     };
 

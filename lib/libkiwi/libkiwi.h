@@ -10,10 +10,12 @@
 #include <libkiwi/core/kiwiController.h>
 #include <libkiwi/core/kiwiDvdStream.h>
 #include <libkiwi/core/kiwiIBinary.h>
+#include <libkiwi/core/kiwiIScene.h>
 #include <libkiwi/core/kiwiIStream.h>
 #include <libkiwi/core/kiwiMemStream.h>
 #include <libkiwi/core/kiwiMessage.h>
 #include <libkiwi/core/kiwiNandStream.h>
+#include <libkiwi/core/kiwiSceneCreator.h>
 #include <libkiwi/core/kiwiSceneHookMgr.h>
 #include <libkiwi/core/kiwiThread.h>
 #include <libkiwi/kernel/kiwiAssert.h>
