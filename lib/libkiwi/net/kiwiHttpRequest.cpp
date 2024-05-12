@@ -39,7 +39,7 @@ HttpRequest::HttpRequest(const String& host)
  * @param method Request method
  * @return Server response
  */
-const Optional<HttpResponse>& HttpRequest::Send(EMethod method) {
+const HttpResponse& HttpRequest::Send(EMethod method) {
     K_ASSERT(method < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
 
@@ -82,20 +82,14 @@ void HttpRequest::SendImpl() {
     K_ASSERT(mMethod < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
 
-    mResponse.Emplace();
-
     // Establish connection with server
     SockAddr4 addr(mHostName, 80);
-    bool success = mpSocket->Connect(addr);
-
-    // Send request, receive server's response
-    if (success) {
-        success = success && Request();
-        success = success && Receive();
-    }
-
-    if (!success) {
-        mResponse.Reset();
+    if (mpSocket->Connect(addr)) {
+        // Send request, receive server's response
+        (void)Request();
+        (void)Receive();
+    } else {
+        mResponse.error = EHttpErr_CantConnect;
     }
 
     // User callback
@@ -167,6 +161,7 @@ bool HttpRequest::Receive() {
 
         // Check for error
         if (!nrecv) {
+            mResponse.error = EHttpErr_Socket;
             return false;
         }
 
@@ -175,20 +170,22 @@ bool HttpRequest::Receive() {
             work += buffer;
             end = work.Find("\r\n\r\n");
 
-            // Server is likely done and has terminated the connection
+            // Server has terminated the connection
             if (nrecv.Value() == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
-                break;
+                mResponse.error = EHttpErr_Closed;
+                return false;
             }
         }
 
         // Timeout check
         if (OSGetTick() - start >= mTimeOut) {
+            mResponse.error = EHttpErr_TimedOut;
             return false;
         }
     }
 
     if (end == String::npos) {
-        K_ASSERT_EX(false, "Malformed response headers");
+        mResponse.error = EHttpErr_BadResponse;
         return false;
     }
 
@@ -203,14 +200,15 @@ bool HttpRequest::Receive() {
     // Must at least have one line (status code)
     TVector<String> lines = headers.Split("\r\n");
     if (lines.Size() < 1) {
+        mResponse.error = EHttpErr_BadResponse;
         return false;
     }
 
     // Extract status code
     K_ASSERT(lines[0].StartsWith("HTTP/1.1"));
-    int num = std::sscanf(lines[0], "HTTP/1.1 %d", &mResponse->status);
+    int num = std::sscanf(lines[0], "HTTP/1.1 %d", &mResponse.status);
     if (num != 1) {
-        K_ASSERT_EX(false, "Malformed response headers");
+        mResponse.error = EHttpErr_BadResponse;
         return false;
     }
 
@@ -222,14 +220,19 @@ bool HttpRequest::Receive() {
 
         // Malformed line (or part of \r\n\r\n ending)
         if (pos == String::npos) {
-            K_ASSERT_EX(lines[i] == "", "Malformed response headers");
+            // If this isn't one of the trailing newlines, we have a problem
+            if (lines[i] != "") {
+                mResponse.error = EHttpErr_BadResponse;
+                return false;
+            }
+
             continue;
         }
 
         // Create key/value pair
         String key = lines[i].SubStr(0, pos);
         String value = lines[i].SubStr(after);
-        mResponse->header.Insert(key, value);
+        mResponse.header.Insert(key, value);
     }
 
     /**
@@ -238,13 +241,13 @@ bool HttpRequest::Receive() {
 
     // If we were given the length, we can be 100% sure
     Optional<u32> len;
-    if (mResponse->header.Contains("Content-Length")) {
-        len = ksl::strtoul(*mResponse->header.Find("Content-Length"));
+    if (mResponse.header.Contains("Content-Length")) {
+        len = ksl::strtoul(*mResponse.header.Find("Content-Length"));
     }
 
     // We may have read *some* of it earlier
     if (end != work.Length()) {
-        mResponse->body = work.SubStr(end);
+        mResponse.body = work.SubStr(end);
     }
 
     // Receive the rest of the body
@@ -254,28 +257,34 @@ bool HttpRequest::Receive() {
 
         // Check for error
         if (!nrecv) {
+            mResponse.error = EHttpErr_Socket;
             return false;
         }
 
         // Continue appending data
         if (nrecv) {
-            mResponse->body += buffer;
+            mResponse.body += buffer;
 
             // Server is likely done and has terminated the connection
             if (nrecv.Value() == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
-                if (!len || mResponse->body.Length() >= len.Value()) {
+                // This is only okay if we've read enough of the body
+                if (!len || mResponse.body.Length() >= len.Value()) {
                     break;
                 }
+
+                mResponse.error = EHttpErr_Closed;
+                return false;
             }
         }
 
         // Timeout check
         if (OSGetTick() - start >= mTimeOut) {
             // May be the only way to end the body, so not a failure
-            return true;
+            break;
         }
     };
 
+    mResponse.error = EHttpErr_Success;
     return true;
 }
 

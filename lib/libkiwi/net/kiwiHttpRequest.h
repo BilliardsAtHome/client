@@ -9,12 +9,21 @@
 
 namespace kiwi {
 
+/**
+ * @brief HTTP error
+ */
 enum EHttpErr {
-    EHttpErr_Libkiwi,
+    EHttpErr_Success, // OK
+
+    EHttpErr_CantConnect, // Can't connect to the server
+    EHttpErr_BadResponse, // Malformed server response
+    EHttpErr_TimedOut,    // Connection timed out
+    EHttpErr_Closed,      // Connection closed
+    EHttpErr_Socket,      // Misc. socket error
 };
 
 /**
- * @brief HTTP Status code
+ * @brief HTTP status code
  */
 enum EHttpStatus {
     // TODO: Determine which additional codes are useful here
@@ -48,6 +57,7 @@ struct HttpResponse {
      */
     HttpResponse() : status(EHttpStatus_OK) {}
 
+    EHttpErr error;              // Error code
     EHttpStatus status;          // Status code
     TMap<String, String> header; // Response header
     String body;                 // Response body/payload
@@ -72,11 +82,10 @@ public:
     /**
      * @brief Request response callback
      *
-     * @param response Request response
+     * @param resp Request response
      * @param arg Callback user argument
      */
-    typedef void (*ResponseCallback)(const Optional<HttpResponse>& response,
-                                     void* arg);
+    typedef void (*ResponseCallback)(const HttpResponse& resp, void* arg);
 
 public:
     explicit HttpRequest(const String& host);
@@ -131,7 +140,7 @@ public:
         mURI = uri;
     }
 
-    const Optional<HttpResponse>& Send(EMethod method = EMethod_GET);
+    const HttpResponse& Send(EMethod method = EMethod_GET);
     void SendAsync(ResponseCallback callback, void* arg = NULL,
                    EMethod method = EMethod_GET);
 
@@ -161,7 +170,7 @@ private:
     TMap<String, String> mParams; // URL parameters
     TMap<String, String> mHeader; // Header fields
 
-    Optional<HttpResponse> mResponse;    // Server response
+    HttpResponse mResponse;              // Server response
     ResponseCallback mpResponseCallback; // Response callback
     void* mpResponseCallbackArg;         // Callback user argument
 };
