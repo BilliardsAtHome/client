@@ -26,14 +26,14 @@ struct KUDPHeader {
 
     // Identifier string
     static const u32 KUDP_MAGIC = 'KUv0';
-};
 
-/**
- * Packet flags
- */
-enum EFlags {
-    // This packet is only a fragment of the message, and there are more
-    EFlags_MoreFragments = (1 << 0),
+    /**
+     * Packet flags
+     */
+    enum EFlags {
+        // This packet is only a fragment of the message, and there are more
+        EFlags_MoreFragments = (1 << 0),
+    };
 };
 
 /**
