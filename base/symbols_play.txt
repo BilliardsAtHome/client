@@ -1,4 +1,3 @@
-# ghidra export C linkage
 memcpy=0x80004000
 __fill_mem=0x80004050
 memset=0x80004104
@@ -2758,9 +2757,7 @@ PPCMfmsr=0x8010a400
 PPCMtmsr=0x8010a408
 VISetPreRetraceCallback=0x800fa3f0
 _current_locale=0x8032e650
-#
 FLog__Q34nw4r4math6detailFf=0x8002f920
-#
 alloc__Q23EGG4HeapFUliPQ23EGG4Heap=0x800a35ec
 free__Q23EGG4HeapFPvPQ23EGG4Heap=0x800a3854
 __dt__Q23EGG5SceneFv=0x800ab4f8
@@ -2807,6 +2804,14 @@ __vt__17RPSysNunchukScene=0x80357d30
 __vt__22RPSysPlayerSelectScene=0x803579d0
 __vt__14RPSysBootScene=0x80357970
 __ct__18IRPSysHostIOSocketFv=0x8018ed90
+getDebugHeap__10RPSysSceneFv=0x80184f14
+outgoing_childCreate__10RPSysSceneFv=0x80184a00
+incoming_childDestroy__10RPSysSceneFv=0x80184b60
+reinit__10RPSysSceneFv=0x80184c24
+exit__10RPSysSceneFv=0x80184988
+enter__10RPSysSceneFv=0x80184cfc
+draw__10RPSysSceneFv=0x80184a40
+calc__10RPSysSceneFv=0x80184a8c
 __pl__3EGGFRCQ23EGG8Vector3fRCQ23EGG8Vector3f=0x800a1628
 __mi__3EGGFRCQ23EGG8Vector3fRCQ23EGG8Vector3f=0x800a1680
 __ml__3EGGFRCQ23EGG8Vector3ff=0x800a1980
@@ -2822,7 +2827,6 @@ rotateVector__Q23EGG5QuatfFRCQ23EGG8Vector3f=0x800a2840
 slerpTo__Q23EGG5QuatfCFRCQ23EGG5QuatffRQ23EGG5Quatf=0x800a2a80
 __ct__Q23EGG9Matrix34fFffffffffffff=0x800a1d6c
 DrawDL__Q23EGG6DrawGXFQ33EGG6DrawGX2DLRCQ34nw4r4math5MTX34=0x80089640
-#
 sInstance__13RPSysSceneMgr=0x8043c468
 sInstance__11RPSysSystem=0x8043c440
 sInstance__17RPSysSceneCreator=0x8043c458
@@ -2831,4 +2835,4 @@ GXNtsc480IntDf=0x80330ea8
 GXMpal480IntDf=0x80330ee4
 GXPal528IntDf=0x80330f20
 GXEurgb60Hz480IntDf=0x80330f5c
-sSceneAttributeTable__17RPSysSceneCreator=0x80316ce8
+changeScene__13RPSndAudioMgrFv=0x801b3b7c

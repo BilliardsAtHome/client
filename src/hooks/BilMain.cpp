@@ -1,6 +1,6 @@
-#include "BilMain.h"
+#include "hooks/BilMain.h"
 
-#include "Simulation.h"
+#include "core/Simulation.h"
 
 #include <Pack/RPSystem.h>
 

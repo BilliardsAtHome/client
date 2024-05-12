@@ -1,7 +1,6 @@
-#include "Simulation.h"
+#include "core/Simulation.h"
 
-#include <Pack/RPKernel.h>
-#include <Pack/RPUtility.h>
+#include <Pack/RPSystem.h>
 #include <kokeshi.hpp>
 #include <libkiwi.h>
 #include <revolution/SC.h>

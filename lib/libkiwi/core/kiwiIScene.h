@@ -12,6 +12,7 @@ namespace kiwi {
  */
 class IScene : public RPSysScene {
     friend class SceneCreator;
+    template <typename> friend class SceneDecl;
 
 public:
     /**
@@ -143,6 +144,7 @@ private:
     template <typename TDerived> static RPSysScene* Create() {
         return new TDerived();
     }
+
 }; // namespace kiwi
 
 /**
@@ -155,9 +157,26 @@ public:
      * @brief Constructor
      */
     SceneDecl() {
-        SceneCreator::GetInstance().RegistScene<T>();
+        // Devirtualize calls
+        const SceneCreator::Info info = {
+            &IScene::Create<T>,
+            static_cast<T*>(NULL)->T::GetName(),
+            static_cast<T*>(NULL)->T::GetDirectory(),
+            static_cast<T*>(NULL)->T::GetID(),
+            static_cast<T*>(NULL)->T::GetPack(),
+            static_cast<T*>(NULL)->T::GetCreateType(),
+            static_cast<T*>(NULL)->T::GetExitType(),
+            static_cast<T*>(NULL)->T::GetCommonSound(),
+        };
+
+        SceneCreator::GetInstance().RegistScene(info);
     }
 };
+
+/**
+ * @brief Helper macro for creating SceneDecl
+ */
+#define K_SCENE_DECL(T) static kiwi::SceneDecl<T> SceneDecl_##T;
 
 } // namespace kiwi
 

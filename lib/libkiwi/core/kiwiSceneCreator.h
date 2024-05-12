@@ -1,6 +1,7 @@
 #ifndef LIBKIWI_CORE_SCENE_CREATOR_H
 #define LIBKIWI_CORE_SCENE_CREATOR_H
 #include <RPSystem/RPSysSceneCreator.h>
+#include <libkiwi_config.h>
 #include <types.h>
 
 namespace kiwi {
@@ -125,13 +126,24 @@ enum EExitType {
 };
 
 /**
- * @brief Scene exit type
- */
-
-/**
  * @brief Scene factory
  */
 class SceneCreator : private RPSysSceneCreator, private NonCopyable {
+public:
+    /**
+     * @brief Scene information
+     */
+    struct Info {
+        RPSysScene* (*ct)();      // Scene create function (for user scenes)
+        String name;              // Scene name
+        String dir;               // Resource directory
+        s32 id;                   // Scene ID (for RP scenes)
+        kiwi::EPackID pack;       // Pack ID
+        kiwi::ECreateType create; // How to create the scene
+        kiwi::EExitType exit;     // How to exit the scene
+        bool common;              // Use the RP common sound archive
+    };
+
 public:
     /**
      * @brief Access singleton instance
@@ -141,7 +153,7 @@ public:
     /**
      * @brief Register user scene class
      */
-    template <typename T> static void RegistScene();
+    static void RegistScene(const Info& info);
 
     /**
      * @brief Fade out into a new scene
@@ -181,10 +193,20 @@ public:
      */
     bool GetSceneCommonSound(s32 id) const;
 
+private:
+    LIBKIWI_KAMEK_PUBLIC
+
     RPSysScene* Create(s32 id);
     RPSysScene* CreateSystemScene(s32 id);
     RPSysScene* CreatePackScene(s32 id);
     RPSysScene* CreateUserScene(s32 id);
+
+private:
+    static const Info* GetSceneInfo(s32 id);
+
+private:
+    static TMap<s32, Info> sUserScenes;
+    static const Info scPackScenes[];
 };
 
 } // namespace kiwi

@@ -1,10 +1,6 @@
 #ifndef LIBKIWI_H
 #define LIBKIWI_H
 
-#ifndef LIBKIWI_BIG_ENDIAN
-#define LIBKIWI_BIG_ENDIAN
-#endif
-
 #include <libkiwi/core/kiwiColor.h>
 #include <libkiwi/core/kiwiConsoleOut.h>
 #include <libkiwi/core/kiwiController.h>
@@ -58,5 +54,6 @@
 #include <libkiwi/util/kiwiRandom.h>
 #include <libkiwi/util/kiwiStaticSingleton.h>
 #include <libkiwi/util/kiwiStorageFor.h>
+#include <libkiwi_config.h>
 #include <types.h>
 #endif

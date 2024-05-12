@@ -1,32 +1,19 @@
+#define LIBKIWI_INTERNAL
+
 #include <kokeshi.hpp>
 #include <libkiwi.h>
 
 namespace kiwi {
-namespace {
 
 /**
- * @brief Scene information
+ * @brief User-registered scenes
  */
-struct SceneEntry {
-    RPSysScene* (*ct)(); // Scene create function (for user scenes)
-    String name;         // Scene name
-    String dir;          // Resource directory
-    s32 id;              // Scene ID (for RP scenes)
-    EPackID pack;        // Pack ID
-    ECreateType create;  // How to create the scene
-    EExitType exit;      // How to exit the scene
-    bool common;         // Use the RP common sound archive
-};
+TMap<s32, SceneCreator::Info> SceneCreator::sUserScenes;
 
 /**
- * @brief Entries for user-registered scenes
+ * @brief Pack Project scenes
  */
-TMap<s32, SceneEntry> sUserSceneEntries;
-
-/**
- * @brief Entries for Pack Project scenes
- */
-const SceneEntry scPackSceneEntries[] = {
+const SceneCreator::Info SceneCreator::scPackScenes[] = {
 // clang-format off
 #ifdef PACK_SPORTS
     {NULL, "Logo",                         "RPCommon/",             ESceneID_RPSysBootScene,               EPackID_AllPack,    ECreateType_0, EExitType_1,  true},
@@ -71,8 +58,8 @@ const SceneEntry scPackSceneEntries[] = {
  *
  * @param id Scene ID
  */
-const SceneEntry* GetSceneEntry(s32 id) {
-    const SceneEntry* entry;
+const SceneCreator::Info* SceneCreator::GetSceneInfo(s32 id) {
+    const Info* info;
 
     // Supply -1 to use the current scene ID
     if (id < 0) {
@@ -80,25 +67,23 @@ const SceneEntry* GetSceneEntry(s32 id) {
     }
 
     // Check user scenes first
-    entry = sUserSceneEntries.Find(id);
-    if (entry != NULL) {
-        return entry;
+    info = sUserScenes.Find(id);
+    if (info != NULL) {
+        return info;
     }
 
     // Check RP scenes
-    for (int i = 0; i < LENGTHOF(scPackSceneEntries); i++) {
-        entry = &scPackSceneEntries[i];
+    for (int i = 0; i < LENGTHOF(scPackScenes); i++) {
+        info = &scPackScenes[i];
 
-        if (entry->id == id) {
-            return entry;
+        if (info->id == id) {
+            return info;
         }
     }
 
     K_ASSERT_EX(false, "No info on scene ID %d", id);
     return NULL;
 }
-
-} // namespace
 
 /**
  * @brief Access singleton instance
@@ -112,22 +97,14 @@ SceneCreator& SceneCreator::GetInstance() {
 /**
  * @brief Register user scene class
  */
-template <typename T> void SceneCreator::RegistScene() {
-    // Devirtualize calls
-    const SceneEntry entry = {
-        &IScene::Create<T>,
-        static_cast<T*>(NULL)->T::GetName(),
-        static_cast<T*>(NULL)->T::GetDirectory(),
-        static_cast<T*>(NULL)->T::GetID(),
-        static_cast<T*>(NULL)->T::GetPack(),
-        static_cast<T*>(NULL)->T::GetCreateType(),
-        static_cast<T*>(NULL)->T::GetExitType(),
-        static_cast<T*>(NULL)->T::GetCommonSound(),
-    };
+void SceneCreator::RegistScene(const Info& info) {
+    K_ASSERT_EX(info.id >= 0, "Invalid scene ID");
 
-    s32 id = static_cast<T*>(NULL)->T::GetID();
-    K_ASSERT_EX(id > ESceneID_Max, "This ID (%d) is reserved for RP", id);
-    sUserSceneEntries.Insert(id, entry);
+    // Don't allow duplicate scene IDs
+    const Info* p = GetSceneInfo(info.id);
+    K_ASSERT_EX(p == NULL, "Scene ID %d already used (%s)", p->name.CStr());
+
+    sUserScenes.Insert(info.id, info);
 }
 
 /**
@@ -175,16 +152,16 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                       //
  * @brief Get the specified scene's name
  */
 const char* SceneCreator::GetSceneName(s32 id) const {
-    const SceneEntry* entry = GetSceneEntry(id);
-    return entry->name;
+    const Info* info = GetSceneInfo(id);
+    return info->name;
 }
 
 /**
  * @brief Get the scene's resource directory name
  */
 const char* SceneCreator::GetSceneDirectory(s32 id) const {
-    const SceneEntry* entry = GetSceneEntry(id);
-    return entry->dir;
+    const Info* info = GetSceneInfo(id);
+    return info->dir;
 }
 // clang-format off
 KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                    // Wii Sports
@@ -196,16 +173,16 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                    // Wi
  * @brief Get the scene's supported Pack Project
  */
 EPackID SceneCreator::GetScenePack(s32 id) const {
-    const SceneEntry* entry = GetSceneEntry(id);
-    return entry->pack;
+    const Info* info = GetSceneInfo(id);
+    return info->pack;
 }
 
 /**
  * @brief Get the scene's create type
  */
 ECreateType SceneCreator::GetSceneCreateType(s32 id) const {
-    const SceneEntry* entry = GetSceneEntry(id);
-    return entry->create;
+    const Info* info = GetSceneInfo(id);
+    return info->create;
 }
 // clang-format off
 KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                     // Wii Sports
@@ -217,8 +194,8 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                     // W
  * @brief Get the scene's exit type
  */
 EExitType SceneCreator::GetSceneExitType(s32 id) const {
-    const SceneEntry* entry = GetSceneEntry(id);
-    return entry->exit;
+    const Info* info = GetSceneInfo(id);
+    return info->exit;
 }
 // clang-format off
 KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                   // Wii Sports
@@ -230,8 +207,8 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                   // Wii
  * @brief Whether the scene requires the RP common sound archive
  */
 bool SceneCreator::GetSceneCommonSound(s32 id) const {
-    const SceneEntry* entry = GetSceneEntry(id);
-    return entry->common;
+    const Info* info = GetSceneInfo(id);
+    return info->common;
 }
 // clang-format off
 KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                      // Wii Sports
@@ -321,9 +298,9 @@ RPSysScene* SceneCreator::CreatePackScene(s32 id) {
  * @param id Scene ID
  */
 RPSysScene* SceneCreator::CreateUserScene(s32 id) {
-    const SceneEntry* entry = GetSceneEntry(id);
-    K_ASSERT_EX(entry != NULL, "Cannot create scene ID %d", id);
-    return entry->ct();
+    const Info* info = GetSceneInfo(id);
+    K_ASSERT_EX(info != NULL, "Cannot create scene ID %d", id);
+    return info->ct();
 }
 
 } // namespace kiwi
