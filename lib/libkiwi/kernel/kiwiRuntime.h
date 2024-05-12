@@ -93,6 +93,10 @@ u32 GetDataSize() {
     return PtrDistance(GetDataStart(), GetDataEnd());
 }
 
+bool IsStack(const void* addr) {
+    return addr >= _stack_end && addr < _stack_addr;
+}
+
 } // namespace
 
 #ifdef __cplusplus
