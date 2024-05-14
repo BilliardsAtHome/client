@@ -161,7 +161,7 @@ public:
      * @param id Scene ID
      * @param arg1 Unknown
      */
-    bool ChangeSceneAfterFade(s32 id, bool arg1);
+    bool ChangeSceneAfterFade(s32 id, bool arg1 = false);
 
     /**
      * @brief Get the specified scene's name

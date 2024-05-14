@@ -13,6 +13,10 @@ namespace kiwi {
  */
 template <typename T, u32 N> class TArray {
 public:
+    u32 Length() const {
+        return N;
+    }
+
     T& At(int i) {
         K_ASSERT(i >= 0 && i < N);
         return mData[i];
@@ -51,6 +55,10 @@ private:
  */
 template <typename T, u32 M, u32 N> class TArray2D {
 public:
+    u32 Length() const {
+        return M;
+    }
+
     TArray<T, N>& At(int i) {
         K_ASSERT(i >= 0 && i < N);
         return mData[i];

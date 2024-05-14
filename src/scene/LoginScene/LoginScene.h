@@ -1,5 +1,6 @@
 #ifndef BAH_CLIENT_SCENE_LOGIN_SCENE_H
 #define BAH_CLIENT_SCENE_LOGIN_SCENE_H
+#include "scene/LoginScene/Keypad.h"
 #include "scene/SceneId.h"
 
 #include <Pack/RPUtility.h>
@@ -40,27 +41,47 @@ public:
         return "User Login";
     }
     /**
+     * @brief Get the scene's resource directory name
+     */
+    virtual kiwi::String GetDirectory() const {
+        return "LoginScene/";
+    }
+    /**
      * @brief Get the scene's ID
      */
     virtual s32 GetID() const {
         return ESceneID_LoginScene;
     }
+    /**
+     * @brief Get the scene's exit type
+     */
+    virtual kiwi::EExitType GetExitType() const {
+        return kiwi::EExitType_1;
+    }
 
     /**
      * @brief Setup scene
      */
-    virtual void Configure();
+    virtual void OnConfigure();
     /**
      * @brief Reload scene
      */
-    virtual void Reset();
+    virtual void OnReset();
     /**
      * @brief Scene logic
      */
-    virtual void Calculate();
+    virtual void OnCalculate();
+    /**
+     * @brief User-level draw
+     */
+    virtual void OnUserDraw();
 
 private:
-    RPUtlBaseFsm<LoginScene> mStateMachine;
+    static void KeypadOkCallback(const kiwi::String& result, void* arg);
+
+private:
+    RPUtlBaseFsm<LoginScene> mStateMachine; // Scene state
+    Keypad mKeypad;                         // Unique ID keypad
 };
 
 } // namespace BAH

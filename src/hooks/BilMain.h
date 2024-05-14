@@ -10,11 +10,8 @@ namespace BAH {
 /**
  * @brief Billiards game manager ("main" class)
  */
-class BilMain : kiwi::Override<RPBilMain> {
+class BilMain : private RPBilMain {
 public:
-    RP_UTL_FSM_STATE_DECL(AFTERSHOT);
-    RP_UTL_FSM_STATE_DECL(FOUL);
-
     void OnEndShot();
 };
 

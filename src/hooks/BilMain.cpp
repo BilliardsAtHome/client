@@ -3,6 +3,7 @@
 #include "core/Simulation.h"
 
 #include <Pack/RPSystem.h>
+#include <libkiwi.h>
 
 namespace BAH {
 
@@ -19,24 +20,10 @@ void BilMain::OnEndShot() {
     Simulation::GetInstance().OnEndShot();
 
     // Reload the billiards scene
-    RPSysSceneCreator::getInstance()->changeSceneAfterFade(
-        RPSysSceneCreator::ESceneID_RPBilScene);
+    kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(
+        kiwi::ESceneID_RPBilScene);
 }
-
-/**
- * @brief Enter AFTERSHOT state
- */
-void BilMain::State_AFTERSHOT_enter() {
-    OnEndShot();
-}
-KM_BRANCH_MF(0x802c57ec, BilMain, State_AFTERSHOT_enter);
-
-/**
- * @brief Enter FOUL state
- */
-void BilMain::State_FOUL_enter() {
-    OnEndShot();
-}
-KM_BRANCH_MF(0x802c563c, BilMain, State_FOUL_enter);
+KM_BRANCH_MF(0x802c57ec, BilMain, OnEndShot);
+KM_BRANCH_MF(0x802c563c, BilMain, OnEndShot);
 
 } // namespace BAH

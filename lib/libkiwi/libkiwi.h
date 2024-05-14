@@ -14,6 +14,7 @@
 #include <libkiwi/core/kiwiSceneCreator.h>
 #include <libkiwi/core/kiwiSceneHookMgr.h>
 #include <libkiwi/core/kiwiThread.h>
+#include <libkiwi/gfx/kiwiDebugPrint.h>
 #include <libkiwi/kernel/kiwiAssert.h>
 #include <libkiwi/kernel/kiwiMemoryMgr.h>
 #include <libkiwi/kernel/kiwiRuntime.h>

@@ -26,7 +26,7 @@ public:
     virtual ~IScene() {}
 
     /**
-     * @defgroup Information for custom scenes
+     * @brief Information for custom scenes
      */
     /*@{*/
     /**
@@ -101,36 +101,86 @@ public:
     virtual void pauseCallBack(bool enter) {}
 
     /**
+     * @brief Base state functions
+     */
+    /*@{*/
+    /**
      * @brief Setup scene
      */
-    virtual void Configure() {}
-
+    virtual void Configure();
     /**
      * @brief Load required assets
      */
-    virtual void LoadResource() {}
-
+    virtual void LoadResource();
     /**
      * @brief Reload scene
      */
-    virtual void Reset() {}
-
+    virtual void Reset();
     /**
      * @brief Scene logic
      */
-    virtual void Calculate() {}
-
+    virtual void Calculate();
 #ifdef PACK_RESORT
     /**
      * @brief Scene MotionPlus logic
      */
-    virtual void CalculateMPlus() {}
+    virtual void CalculateMPlus();
 #endif
-
     /**
      * @brief Exit scene
      */
-    virtual void Exit() {}
+    virtual void Exit();
+
+    /**
+     * @brief User-level draw
+     */
+    virtual void UserDraw();
+    /**
+     * @brief Debug-level draw
+     */
+    virtual void DebugDraw();
+    /*@}*/
+
+    /**
+     * @brief User state functions
+     */
+    /*@{*/
+    /**
+     * @brief Setup scene
+     */
+    virtual void OnConfigure() {}
+    /**
+     * @brief Load required assets
+     */
+    virtual void OnLoadResource() {}
+    /**
+     * @brief Reload scene
+     */
+    virtual void OnReset() {}
+    /**
+     * @brief Scene logic
+     */
+    virtual void OnCalculate() {}
+#ifdef PACK_RESORT
+    /**
+     * @brief Scene MotionPlus logic
+     */
+    virtual void OnCalculateMPlus() {}
+#endif
+    /**
+     * @brief Exit scene
+     */
+    virtual void OnExit() {}
+
+    /**
+     * @brief User-level draw
+     */
+    virtual void OnUserDraw() {}
+    /**
+     * @brief Debug-level draw
+     */
+    virtual void OnDebugDraw() {}
+    /*@}*/
 
     /**
      * @brief Any async task(s) to complete before entering this scene
