@@ -401,8 +401,9 @@ def build_module(args) -> bool:
     #
 
     # Identify module files
-    srcs = search_files(SRC_DIR, SRC_EXTENSIONS) + \
-        search_files(LIBRARY_DIR, SRC_EXTENSIONS)
+    # NOTE: Make sure library files are linked BEFORE module files
+    srcs = search_files(LIBRARY_DIR, SRC_EXTENSIONS) + \
+        search_files(SRC_DIR, SRC_EXTENSIONS)
     objs = [src_to_obj(f) for f in srcs]
 
     inc_dirs = search_dirs(SRC_DIR, recursive=False) + search_dirs(

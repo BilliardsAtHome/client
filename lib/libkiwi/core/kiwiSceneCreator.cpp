@@ -81,7 +81,6 @@ const SceneCreator::Info* SceneCreator::GetSceneInfo(s32 id) {
         }
     }
 
-    K_ASSERT_EX(false, "No info on scene ID %d", id);
     return NULL;
 }
 
@@ -231,10 +230,10 @@ RPSysScene* SceneCreator::Create(s32 id) {
         // Either system (all pack) or sports scene
         switch (GetScenePack(id)) {
         case EPackID_SportsPack:
-        case EPackID_PartyPack:
-        case EPackID_HealthPack:
-        case EPackID_MusicPack:  scene = CreatePackScene(id); break;
+        case EPackID_PartyPack:  scene = CreatePackScene(id); break;
         case EPackID_AllPack:    scene = CreateSystemScene(id); break;
+        case EPackID_MusicPack:
+        case EPackID_HealthPack:
         default:                 K_ASSERT_EX(false, "Invalid pack ID"); break;
         }
     }
@@ -250,7 +249,7 @@ RPSysScene* SceneCreator::Create(s32 id) {
 }
 // clang-format off
 KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                         // Wii Sports
-                KM_BRANCH_MF(0x80184838, SceneCreator, Create), // Wii Play
+                KM_BRANCH_MF(0x80184230, SceneCreator, Create), // Wii Play
                 KOKESHI_NOTIMPLEMENTED);                        // Wii Sports Resort
 // clang-format on
 

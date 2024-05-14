@@ -1,7 +1,7 @@
 #ifndef LIBKIWI_PRIM_HASHMAP_H
 #define LIBKIWI_PRIM_HASHMAP_H
 #include <libkiwi/prim/kiwiLinkList.h>
-#include <libkiwi/util/kiwiStorageFor.h>
+#include <libkiwi/prim/kiwiOptional.h>
 #include <types.h>
 
 namespace kiwi {
@@ -49,8 +49,8 @@ private:
         }
 
         // Key/value pair
-        StorageFor<TKey> key;
-        StorageFor<TValue> value;
+        Optional<TKey> key;
+        Optional<TValue> value;
 
         // Bucket is in use
         bool used;

@@ -1,6 +1,7 @@
 #ifndef LIBKIWI_CORE_SCENE_HOOK_MGR_H
 #define LIBKIWI_CORE_SCENE_HOOK_MGR_H
 #include <Pack/RPSystem.h>
+#include <libkiwi/core/kiwiSceneCreator.h>
 #include <libkiwi/prim/kiwiArray.h>
 #include <libkiwi/prim/kiwiLinkList.h>
 #include <libkiwi/util/kiwiStaticSingleton.h>
@@ -28,7 +29,7 @@ public:
         if (id == -1) {
             mGlobalHooks.PushBack(&hook);
         } else {
-            K_ASSERT(id < RPSysSceneCreator::RP_SCENE_MAX);
+            K_ASSERT(id < ESceneID_Max);
             mHookLists[id].PushBack(&hook);
         }
     }
@@ -43,7 +44,7 @@ public:
         if (id == -1) {
             mGlobalHooks.Remove(&hook);
         } else {
-            K_ASSERT(id < RPSysSceneCreator::RP_SCENE_MAX);
+            K_ASSERT(id < ESceneID_Max);
             mHookLists[id].Remove(&hook);
         }
     }
@@ -64,7 +65,7 @@ private:
         s32 id = RPSysSceneMgr::getInstance()->getCurrentSceneID();
 
         // Ignore custom scenes
-        if (id > RPSysSceneCreator::RP_SCENE_MAX) {
+        if (id >= ESceneID_Max) {
             return NULL;
         }
 
@@ -73,7 +74,7 @@ private:
 
 private:
     // Lists of scene hooks
-    TArray<TList<ISceneHook>, RPSysSceneCreator::RP_SCENE_MAX> mHookLists;
+    TArray<TList<ISceneHook>, ESceneID_Max> mHookLists;
     // Global hooks (always active)
     TList<ISceneHook> mGlobalHooks;
 };
@@ -89,7 +90,7 @@ public:
      * @param id Scene ID (-1 for all scenes)
      */
     explicit ISceneHook(s32 id) : mSceneID(id) {
-        K_ASSERT(id == -1 || id < RPSysSceneCreator::RP_SCENE_MAX);
+        K_ASSERT(id == -1 || id < ESceneID_Max);
         SceneHookMgr::GetInstance().AddHook(*this, mSceneID);
     }
 
