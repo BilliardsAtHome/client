@@ -156,13 +156,19 @@ String IStream::Read_string() {
         char ch = Read_s8();
         sTextBuffer[sTextBufferPos++] = ch;
 
+        // Null terminator
         if (ch == '\0') {
+            break;
+        }
+
+        // End-of-file
+        if (IsEOF()) {
             break;
         }
     }
 
     // No matter what happened, null terminator should be at the end
-    K_ASSERT_EX(sTextBuffer[sTextBufferPos] == '\0', "Buffer overflow");
+    sTextBuffer[sTextBufferPos] = '\0';
     return String(sTextBuffer);
 }
 

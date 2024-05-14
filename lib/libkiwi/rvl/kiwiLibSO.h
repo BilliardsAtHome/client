@@ -64,10 +64,8 @@ private:
                         const SockAddr* addr);
 
 private:
-    // IOS IP device handle
-    static s32 sDeviceHandle;
-    // Last IOS error code
-    static SOResult sLastError;
+    static s32 sDeviceHandle;   // IOS IP device handle
+    static SOResult sLastError; // Last IOS error code
 };
 
 /**

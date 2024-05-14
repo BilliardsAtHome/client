@@ -20,8 +20,7 @@ public:
     virtual void UpdatePresence() const;
 
 private:
-    // Handle to Dolphin device
-    s32 mHandle;
+    s32 mHandle; // Handle to Dolphin device
 };
 
 } // namespace kiwi

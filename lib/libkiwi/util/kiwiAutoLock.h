@@ -22,8 +22,7 @@ public:
     void Unlock();
 
 private:
-    // Locked object
-    T& mObject;
+    T& mObject; // Locked object
 };
 
 /**
@@ -54,8 +53,7 @@ public:
     }
 
 private:
-    // Interrupt status
-    BOOL mEnabled;
+    BOOL mEnabled; // Interrupt status
 };
 
 } // namespace kiwi

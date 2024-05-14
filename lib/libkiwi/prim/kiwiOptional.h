@@ -130,10 +130,8 @@ public:
     }
 
 private:
-    // Don't automatically construct T
-    u8 mBuffer[ROUND_UP(sizeof(T), __alignof(T))];
-    // Whether the optional has a value
-    bool mHasValue;
+    u8 mBuffer[sizeof(T)]; // Don't automatically construct T
+    bool mHasValue;        // Whether the optional has a value
 };
 
 namespace {

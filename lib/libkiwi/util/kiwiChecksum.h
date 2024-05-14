@@ -60,8 +60,8 @@ public:
     }
 
 private:
-    u32 mSum;
-    u32 mSumInv;
+    u32 mSum;    // Sum
+    u32 mSumInv; // Inverse sum
 };
 
 } // namespace kiwi

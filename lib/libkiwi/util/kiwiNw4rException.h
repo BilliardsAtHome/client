@@ -31,18 +31,12 @@ public:
      * Error info
      */
     struct Info {
-        // Exception type (see OSError)
-        u8 error;
-        // Last context before error
-        OSContext* ctx;
-        // Last DSISR value before error
-        u32 dsisr;
-        // Last DAR value before error
-        u32 dar;
-        // Last MSR value before error
-        u32 msr;
-        // Assertion info (if assertion failed)
-        Assert assert;
+        u8 error;       // Exception type (see OSError)
+        OSContext* ctx; // Last context before error
+        u32 dsisr;      // Last DSISR value before error
+        u32 dar;        // Last DAR value before error
+        u32 msr;        // Last MSR value before error
+        Assert assert;  // Assertion info (if assertion failed)
     };
 
     /**
@@ -76,34 +70,23 @@ private:
     void PrintSymbol(const void* addr);
 
 private:
-    // Exception/assertion info
-    Info mErrorInfo;
+    Info mErrorInfo; // Exception/assertion info
 
-    // Exception user callback
-    UserCallback mpUserCallback;
-    // Exception user callback argument
-    void* mpUserCallbackArg;
+    UserCallback mpUserCallback; // User callback
+    void* mpUserCallbackArg;     // User callback argument
 
-    // Exception thread
-    OSThread mThread;
-    // Exception thread stack
-    u8 mThreadStack[0x4000];
+    OSThread mThread;        // Exception thread
+    u8 mThreadStack[0x4000]; // Thread stack
 
-    // Thread message queue
-    OSMessageQueue mMessageQueue;
-    // Thread message buffer
-    OSMessage mMessageBuffer;
+    OSMessageQueue mMessageQueue; // Thread message queue
+    OSMessage mMessageBuffer;     // Thread message buffer
 
-    // Current GX render mode
-    const GXRenderModeObj* mpRenderMode;
+    const GXRenderModeObj* mpRenderMode; // Current GX render mode
 
-    // OS exception type names
-    static const char* scExceptionNames[OS_ERR_MAX];
+    static const char* scExceptionNames[OS_ERR_MAX]; // OS exception type names
 
-    // Exception stack trace depth
-    static const s32 scExceptionTraceDepth = 10;
-    // Assertion stack trace depth
-    static const s32 scAssertTraceDepth = 20;
+    static const s32 scExceptionTraceDepth = 10; // Exception stack trace depth
+    static const s32 scAssertTraceDepth = 20;    // Assertion stack trace depth
 };
 
 } // namespace kiwi

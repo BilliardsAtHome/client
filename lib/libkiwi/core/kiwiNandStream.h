@@ -64,8 +64,7 @@ private:
     virtual void SeekImpl(ESeekDir dir, s32 offset);
 
 private:
-    // NAND handle
-    NANDFileInfo mFileInfo;
+    NANDFileInfo mFileInfo; // NAND handle
 };
 
 } // namespace kiwi

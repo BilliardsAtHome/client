@@ -121,12 +121,9 @@ private:
                               void* arg) = 0;
 
 protected:
-    // Socket file descriptor
-    SOSocket mHandle;
-    // Socket protocol family
-    SOProtoFamily mFamily;
-    // Socket type
-    SOSockType mType;
+    SOSocket mHandle;      // File descriptor
+    SOProtoFamily mFamily; // Protocol family
+    SOSockType mType;      // Socket type
 };
 
 } // namespace kiwi

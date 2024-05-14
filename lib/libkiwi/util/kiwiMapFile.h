@@ -26,17 +26,13 @@ public:
      * Map file symbol
      */
     struct Symbol {
-        // Symbol linkage
-        ELinkType type;
-        // Symbol location
+        ELinkType type; // Linkage
         union {
-            void* addr;
-            u32 offset;
+            void* addr; // Address (unpacked)
+            u32 offset; // Offset (packed)
         };
-        // Symbol size
-        u32 size;
-        // Symbol name
-        char* name;
+        u32 size;   // Byte size
+        char* name; // Mangled name
     };
 
 public:
@@ -59,14 +55,10 @@ private:
     void Unpack();
 
 private:
-    // Map file type
-    ELinkType mLinkType;
-    // Map file text buffer
-    char* mpMapBuffer;
-    // Whether the map has been unpacked
-    bool mIsUnpacked;
-    // Map symbols
-    TList<Symbol> mSymbols;
+    ELinkType mLinkType;    // Linkage
+    char* mpMapBuffer;      // Text buffer
+    bool mIsUnpacked;       // Whether the map has been unpacked
+    TList<Symbol> mSymbols; // Map symbols
 };
 
 } // namespace kiwi

@@ -65,8 +65,7 @@ private:
     virtual s32 PeekImpl(void* dst, u32 size);
 
 private:
-    // DVD handle
-    DVDFileInfo mFileInfo;
+    DVDFileInfo mFileInfo; // DVD handle
 };
 
 } // namespace kiwi

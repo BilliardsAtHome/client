@@ -133,8 +133,7 @@ private:
     }
 
 private:
-    // Random seed
-    u32 mSeed;
+    u32 mSeed; // Random seed
 };
 
 /**

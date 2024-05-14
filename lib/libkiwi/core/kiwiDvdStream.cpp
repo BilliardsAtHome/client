@@ -97,9 +97,7 @@ s32 DvdStream::WriteImpl(const void* src, u32 size) {
  * @return s32 Number of bytes peeked, or error code
  */
 s32 DvdStream::PeekImpl(void* dst, u32 size) {
-    s32 n = ReadImpl(dst, size);
-    mPosition -= n;
-    return n;
+    return ReadImpl(dst, size);
 }
 
 } // namespace kiwi

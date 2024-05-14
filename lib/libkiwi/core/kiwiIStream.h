@@ -27,7 +27,7 @@ public:
     /**
      * @brief Constructor
      */
-    IStream() : mIsOpen(false) {}
+    IStream() : mIsOpen(false), mPosition(0) {}
 
     /**
      * @brief Destructor
@@ -35,6 +35,7 @@ public:
     virtual ~IStream() {}
 
     virtual void Close() = 0;
+    virtual bool IsEOF() const = 0;
 
     /**
      * @brief Check whether stream is available to use
@@ -105,10 +106,8 @@ protected:
     virtual s32 PeekImpl(void* dst, u32 size) = 0;
 
 protected:
-    // Stream open flag
-    bool mIsOpen;
-    // Position in data
-    u32 mPosition;
+    bool mIsOpen;  // Stream open flag
+    u32 mPosition; // Position in data
 };
 
 } // namespace kiwi

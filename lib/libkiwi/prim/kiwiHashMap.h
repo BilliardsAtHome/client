@@ -52,10 +52,8 @@ private:
         Optional<TKey> key;
         Optional<TValue> value;
 
-        // Bucket is in use
-        bool used;
-        // Chains
-        Bucket* chained;
+        bool used;       // Bucket is in use
+        Bucket* chained; // Chains
     };
 
 public:
@@ -275,9 +273,9 @@ private:
     Bucket& Create(const TKey& key);
 
 private:
-    u32 mSize;
-    u32 mCapacity;
-    Bucket* mpBuckets;
+    u32 mSize;         // Number of elements
+    u32 mCapacity;     // Maximum number of elements
+    Bucket* mpBuckets; // Element buckets
 };
 
 } // namespace kiwi

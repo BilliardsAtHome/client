@@ -33,8 +33,7 @@ private:
     static void Initialize();
     static u32 sStackCheckGuard;
 
-    // Guard value
-    volatile u32 mGuard;
+    volatile u32 mGuard; // Guard value
 };
 
 } // namespace kiwi

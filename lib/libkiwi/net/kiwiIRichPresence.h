@@ -82,8 +82,7 @@ public:
     }
 
 protected:
-    // Client ID
-    String mClient;
+    String mClient; // Client ID
 
     // Presence info
     String mDetails;

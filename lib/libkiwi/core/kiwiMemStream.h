@@ -76,10 +76,9 @@ private:
     virtual s32 PeekImpl(void* dst, u32 size);
 
 private:
-    u8* mBufferData;
-    u32 mBufferSize;
-
-    bool mOwnsBuffer;
+    u8* mBufferData;  // Memory buffer
+    u32 mBufferSize;  // Buffer size
+    bool mOwnsBuffer; // Whether the stream owns the buffer
 };
 
 } // namespace kiwi

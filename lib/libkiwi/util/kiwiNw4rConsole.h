@@ -69,35 +69,23 @@ private:
     void DrawDirectImpl() const;
 
 private:
-    // Console text buffer
-    char* mpTextBuffer;
+    char* mpTextBuffer; // Console text buffer
 
-    // Console width (in characters)
-    u16 mWidth;
-    // Console height (in characters)
-    u16 mHeight;
+    u16 mWidth;  // Console width (in characters)
+    u16 mHeight; // Console height (in characters)
 
-    // Line where printing begins
-    u16 mPrintTop;
-    // X offset for printing
-    u16 mPrintX;
+    u16 mPrintTop; // Line where printing begins
+    u16 mPrintX;   // X offset for printing
 
-    // Line where ring buffer begins
-    u16 mRingTopLine;
-    // Ring buffer capacity
-    s32 mRingNumLine;
+    u16 mRingTopLine; // Line where ring buffer begins
+    s32 mRingNumLine; // Ring buffer capacity
 
-    // Line where console view begins
-    s32 mViewTopLine;
-    // Console view base X position
-    s16 mViewX;
-    // Console view base Y position
-    s16 mViewY;
-    // Maximum lines visible
-    s16 mViewNumLine;
+    s32 mViewTopLine; // Line where console view begins
+    s16 mViewX;       // Console view base X position
+    s16 mViewY;       // Console view base Y position
+    s16 mViewNumLine; // Maximum lines visible
 
-    // Whether the console is visible
-    bool mIsVisible;
+    bool mIsVisible; // Whether the console is visible
 
     // Default console width (in characters)
     static const u32 scWidthDefault = 128;

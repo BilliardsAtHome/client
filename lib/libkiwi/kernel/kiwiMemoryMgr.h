@@ -41,10 +41,8 @@ private:
     ~MemoryMgr();
 
 private:
-    // Heap in MEM1 region
-    EGG::Heap* mpHeapMEM1;
-    // Heap in MEM2 region
-    EGG::Heap* mpHeapMEM2;
+    EGG::Heap* mpHeapMEM1; // Heap in MEM1 region
+    EGG::Heap* mpHeapMEM2; // Heap in MEM2 region
 
     // Main heap size
     static const u32 scHeapSize = OS_MEM_KB_TO_B(1024);

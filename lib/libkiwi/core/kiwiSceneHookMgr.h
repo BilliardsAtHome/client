@@ -73,10 +73,8 @@ private:
     }
 
 private:
-    // Lists of scene hooks
-    TArray<TList<ISceneHook>, ESceneID_Max> mHookLists;
-    // Global hooks (always active)
-    TList<ISceneHook> mGlobalHooks;
+    TArray<TList<ISceneHook>, ESceneID_Max> mHookLists; // Lists of scene hooks
+    TList<ISceneHook> mGlobalHooks; // Global hooks (always active)
 };
 
 /**
@@ -144,8 +142,7 @@ public:
     virtual void Pause(RPSysScene* scene, bool enter) {}
 
 private:
-    // Scene ID to which this hook belongs
-    s32 mSceneID;
+    s32 mSceneID; // Scene to which this hook belongs
 };
 
 } // namespace kiwi

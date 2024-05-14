@@ -48,30 +48,22 @@ public:
     static const u32 scTabSize = 4;
 
 private:
-    // Framebuffer in memory
-    u8* mpBuffer;
-    // Framebuffer size (in bytes)
-    u32 mBufferSize;
+    u8* mpBuffer;    // Framebuffer in memory
+    u32 mBufferSize; // Framebuffer size (in bytes)
 
-    // Framebuffer width (in pixels)
-    u16 mBufferWidth;
-    // Framebuffer height (in pixels)
-    u16 mBufferHeight;
-    // Framebuffer rows
-    u16 mBufferRows;
+    u16 mBufferWidth;  // Framebuffer width (in pixels)
+    u16 mBufferHeight; // Framebuffer height (in pixels)
+    u16 mBufferRows;   // Framebuffer rows
 
-    // Framebuffer text color
-    Color mBufferColor;
+    Color mBufferColor; // Framebuffer text color
 
     // Default buffer width (in pixels)
     static const u16 scBufferWidthDefault = 640;
     // Default buffer height (in pixels)
     static const u16 scBufferHeightDefault = 480;
 
-    // Font data pt. 1
-    static const u32 scFontData[];
-    // Font data pt. 2
-    static const u32 scFontData2[];
+    static const u32 scFontData[];  // Font data pt. 1
+    static const u32 scFontData2[]; // Font data pt. 2
 
     // Converts from ASCII index to font data index
     static const u8 scAscii2Font[128];

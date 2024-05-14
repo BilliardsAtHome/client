@@ -140,8 +140,7 @@ protected:
     s32 mReadOffset;
     s32 mWriteOffset;
 
-    // Sender (recv) or recipient (send)
-    SockAddr mAddress;
+    SockAddr mAddress; // Sender (recv) or recipient (send)
 };
 
 } // namespace kiwi

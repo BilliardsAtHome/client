@@ -42,8 +42,7 @@ public:
     }
 
 private:
-    // Internal array
-    T mData[N];
+    T mData[N]; // Internal array
 };
 
 /**
@@ -103,8 +102,7 @@ public:
     }
 
 private:
-    // Internal array
-    TArray<T, N> mData[M];
+    TArray<T, N> mData[M]; // Internal array
 };
 
 } // namespace kiwi

@@ -24,12 +24,9 @@ private:
      */
     explicit TListNode(T* elem) : mpNext(NULL), mpPrev(NULL), mpElement(elem) {}
 
-    // Next node in the linked-list
-    TListNode<T>* mpNext;
-    // Previous node in the linked-list
-    TListNode<T>* mpPrev;
-    // Underlying element
-    T* mpElement;
+    TListNode<T>* mpNext; // Next node in the linked-list
+    TListNode<T>* mpPrev; // Previous node in the linked-list
+    T* mpElement;         // Underlying element
 };
 
 /**

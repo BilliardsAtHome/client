@@ -50,10 +50,8 @@ private:
 private:
     static const u32 THREAD_STACK_SIZE = 0x4000;
 
-    // Current async task
-    volatile EState mState;
-    // Peer address
-    SockAddr mPeer;
+    volatile EState mState; // Current async task
+    SockAddr mPeer;         // Peer address
 
     // Active packet jobs
     TList<RecvJob> mRecvJobs;
@@ -72,8 +70,7 @@ private:
     static bool sSocketThreadCreated;
     static u8 sSocketThreadStack[THREAD_STACK_SIZE];
 
-    // Active async sockets
-    static TList<AsyncSocket> sSocketList;
+    static TList<AsyncSocket> sSocketList; // Active async sockets
 };
 
 } // namespace kiwi

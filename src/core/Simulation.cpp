@@ -97,13 +97,25 @@ K_DYNAMIC_SINGLETON_IMPL(Simulation);
  * @brief Constructor
  */
 Simulation::Simulation()
-    : kiwi::ISceneHook(RPSysSceneCreator::ESceneID_RPBilScene), mUniqueId("") {
+    : kiwi::ISceneHook(kiwi::ESceneID_RPBilScene), mUniqueId("") {
 
-    // Try to open unique ID from file
-    kiwi::NandStream strm("user.txt", kiwi::EOpenMode_Read);
-    if (strm.IsOpen()) {
-        mUniqueId = strm.Read_string();
-        K_LOG_EX("Found existing unique ID: %s\n", mUniqueId.CStr());
+    // Try to open unique ID from the DVD (file placed by user)
+    {
+        kiwi::DvdStream strm("user.txt");
+        if (strm.IsOpen()) {
+            mUniqueId = strm.Read_string();
+            K_LOG_EX("User from DVD: %s\n", mUniqueId.CStr());
+            return;
+        }
+    }
+
+    // Maybe it's instead on the NAND (saved from entry screen)
+    {
+        kiwi::NandStream strm("user.txt", kiwi::EOpenMode_Read);
+        if (strm.IsOpen()) {
+            mUniqueId = strm.Read_string();
+            K_LOG_EX("User from NAND: %s\n", mUniqueId.CStr());
+        }
     }
 }
 

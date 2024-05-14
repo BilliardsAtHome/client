@@ -235,12 +235,9 @@ private:
     void Append(T c);
 
 private:
-    // String buffer
-    T* mpBuffer;
-    // Allocated buffer size
-    u32 mCapacity;
-    // String length
-    u32 mLength;
+    T* mpBuffer;   // String buffer
+    u32 mCapacity; // Buffer size
+    u32 mLength;   // String length (not including null terminator)
 
     // Static string for empty StringImpls
     static const T* scEmptyCStr;
