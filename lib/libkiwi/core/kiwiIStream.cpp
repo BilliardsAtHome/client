@@ -163,6 +163,7 @@ String IStream::Read_string() {
 
     // No matter what happened, null terminator should be at the end
     K_ASSERT_EX(sTextBuffer[sTextBufferPos] == '\0', "Buffer overflow");
+    return String(sTextBuffer);
 }
 
 /**
@@ -171,7 +172,18 @@ String IStream::Read_string() {
  * @param str String to write
  */
 void IStream::Write_string(const String& str) {
-    Write(str.CStr(), str.Length());
+    // Memory already aligned
+    if (IsAlign(str.CStr())) {
+        Write(str.CStr(), str.Length());
+    }
+    // Use temporary, aligned memory
+    else {
+        char* work = new (GetAlign()) char[str.Length()];
+        std::strncpy(work, str.CStr(), str.Length());
+        Write(work, str.Length());
+        delete[] work;
+    }
+
     Write_s8(0x00);
 }
 

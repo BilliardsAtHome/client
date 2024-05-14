@@ -25,6 +25,9 @@ public:
     kiwi::String GetUniqueId() const {
         return mUniqueId;
     }
+    void SetUniqueId(const kiwi::String& id) {
+        mUniqueId = id;
+    }
 
     f32 GetCuePower() const {
         return mpCurrBreak->power;

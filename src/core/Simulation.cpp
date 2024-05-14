@@ -97,8 +97,15 @@ K_DYNAMIC_SINGLETON_IMPL(Simulation);
  * @brief Constructor
  */
 Simulation::Simulation()
-    : kiwi::ISceneHook(RPSysSceneCreator::ESceneID_RPBilScene),
-      mUniqueId("0") {}
+    : kiwi::ISceneHook(RPSysSceneCreator::ESceneID_RPBilScene), mUniqueId("") {
+
+    // Try to open unique ID from file
+    kiwi::NandStream strm("user.txt", kiwi::EOpenMode_Read);
+    if (strm.IsOpen()) {
+        mUniqueId = strm.Read_string();
+        K_LOG_EX("Found existing unique ID: %s\n", mUniqueId.CStr());
+    }
+}
 
 /**
  * @brief Destructor

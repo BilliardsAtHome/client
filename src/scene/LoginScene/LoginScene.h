@@ -3,7 +3,6 @@
 #include "scene/LoginScene/Keypad.h"
 #include "scene/SceneId.h"
 
-#include <Pack/RPUtility.h>
 #include <libkiwi.h>
 #include <types.h>
 
@@ -14,21 +13,10 @@ namespace BAH {
  */
 class LoginScene : public kiwi::IScene {
 public:
-    enum EState {
-        EState_NUMPAD,
-        EState_CONNECT,
-
-        EState_Max
-    };
-
-    RP_UTL_FSM_STATE_DECL(NUMPAD);
-    RP_UTL_FSM_STATE_DECL(CONNECT);
-
-public:
     /**
      * @brief Constructor
      */
-    LoginScene() : mStateMachine(this, EState_Max) {}
+    LoginScene() {}
     /**
      * @brief Destructor
      */
@@ -80,8 +68,7 @@ private:
     static void KeypadOkCallback(const kiwi::String& result, void* arg);
 
 private:
-    RPUtlBaseFsm<LoginScene> mStateMachine; // Scene state
-    Keypad mKeypad;                         // Unique ID keypad
+    Keypad mKeypad; // Unique ID keypad
 };
 
 } // namespace BAH
