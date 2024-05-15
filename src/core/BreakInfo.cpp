@@ -180,7 +180,7 @@ void BreakInfo::Upload() const {
     kiwi::HttpRequest request("127.0.0.1");
     request.SetURI("/billiards/api");
 
-    request.SetParameter("user", Simulation::GetInstance().GetUniqueId());
+    request.SetParameter("user", *Simulation::GetInstance().GetUniqueId());
 
     request.SetParameter("seed", kiwi::ToHexString(seed));
     request.SetParameter("kseed", kiwi::ToHexString(kseed));
@@ -202,7 +202,9 @@ void BreakInfo::Upload() const {
     request.SetParameter("checksum", kiwi::ToHexString(CalcChecksum()));
 
     const kiwi::HttpResponse& resp = request.Send();
-    K_ASSERT(resp.error == kiwi::EHttpErr_Success);
+    if (resp.error != kiwi::EHttpErr_Success) {
+        K_LOG_EX("HttpErr %d\n", resp.error);
+    }
 }
 
 } // namespace BAH
