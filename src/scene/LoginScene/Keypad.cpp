@@ -52,6 +52,10 @@ void Keypad::Calculate() {
     kiwi::WiiCtrl& ctrl =
         kiwi::CtrlMgr::GetInstance().GetWiiCtrl(kiwi::EPlayer_1);
 
+    if (!ctrl.Connected()) {
+        return;
+    }
+
     // Assume we probably will move the cursor
     mKeys[mSelectedKey].hover = false;
 
