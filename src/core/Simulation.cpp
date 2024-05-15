@@ -181,6 +181,11 @@ void Simulation::BeforeReset(RPSysScene* scene) {
  */
 void Simulation::AfterReset(RPSysScene* scene) {
 #pragma unused(scene)
+    // Seeded by OS clock
+    kiwi::Random random;
+    mpCurrBreak->kseed = random.GetSeed();
+
+    mpCurrBreak->frame = 0;
 
     // Just reload what we need to replay the shot
     if (mIsReplay) {
@@ -190,11 +195,6 @@ void Simulation::AfterReset(RPSysScene* scene) {
         return;
     }
 
-    // Seeded by OS clock
-    kiwi::Random random;
-    mpCurrBreak->kseed = random.GetSeed();
-
-    mpCurrBreak->frame = 0;
     mTimerUp = mpCurrBreak->up = 0;
     mTimerLeft = mpCurrBreak->left = 0;
     mTimerRight = mpCurrBreak->right = 0;
