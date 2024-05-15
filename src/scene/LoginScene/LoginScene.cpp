@@ -1,5 +1,7 @@
 #include "LoginScene.h"
 
+#include "core/Simulation.h"
+
 #include <Pack/RPAudio.h>
 #include <libkiwi.h>
 
@@ -54,12 +56,13 @@ void LoginScene::KeypadOkCallback(const kiwi::String& result, void* arg) {
 
     // Work buffer (byte-aligned for NAND requirements)
     kiwi::WorkBuffer buffer(sizeof(u32));
+    u32 uid = ksl::strtoul(result);
 
     // Write unique ID to buffer
     {
         kiwi::MemStream strm(buffer);
         ASSERT(strm.IsOpen());
-        strm.Write_u32(ksl::strtoul(result));
+        strm.Write_u32(uid);
     }
 
     // Save unique ID to the NAND
@@ -68,6 +71,8 @@ void LoginScene::KeypadOkCallback(const kiwi::String& result, void* arg) {
         ASSERT(strm.IsOpen());
         strm.Write(buffer, buffer.AlignedSize());
     }
+
+    Simulation::GetInstance().SetUniqueId(uid);
 
     // Exit to billiards
     kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(
