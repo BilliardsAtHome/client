@@ -9,7 +9,7 @@
 
 namespace kiwi {
 
-// Forward declaration
+// Forward declarations
 class ISceneHook;
 
 /**

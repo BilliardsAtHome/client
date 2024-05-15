@@ -17,7 +17,7 @@ bool DvdStream::Open(const String& path) {
     // Try to locate file on disc
     s32 entrynum = DVDConvertPathToEntrynum(path);
     if (entrynum < 0) {
-        K_LOG_EX("Can't find DVD file: %s\n", path);
+        K_LOG_EX("Can't find DVD file: %s\n", path.CStr());
         return false;
     }
 

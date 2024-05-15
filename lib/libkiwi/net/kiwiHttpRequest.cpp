@@ -129,7 +129,7 @@ bool HttpRequest::Request() {
 
     // Send request data
     Optional<u32> sent = mpSocket->Send(request);
-    return sent && sent.Value() == request.Length();
+    return sent && *sent == request.Length();
 }
 
 /**
@@ -171,7 +171,7 @@ bool HttpRequest::Receive() {
             end = work.Find("\r\n\r\n");
 
             // Server has terminated the connection
-            if (nrecv.Value() == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
+            if (*nrecv == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
                 mResponse.error = EHttpErr_Closed;
                 return false;
             }
@@ -266,9 +266,9 @@ bool HttpRequest::Receive() {
             mResponse.body += buffer;
 
             // Server is likely done and has terminated the connection
-            if (nrecv.Value() == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
+            if (*nrecv == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
                 // This is only okay if we've read enough of the body
-                if (!len || mResponse.body.Length() >= len.Value()) {
+                if (!len || mResponse.body.Length() >= *len) {
                     break;
                 }
 

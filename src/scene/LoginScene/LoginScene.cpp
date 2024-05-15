@@ -51,10 +51,22 @@ void LoginScene::KeypadOkCallback(const kiwi::String& result, void* arg) {
     LoginScene* self = static_cast<LoginScene*>(arg);
     ASSERT(self != NULL);
 
+    // Work buffer (byte-aligned for NAND requirements)
+    u8 work[32] ALIGN(32);
+    std::memset(work, 0, sizeof(work));
+
+    // Write unique ID to buffer
+    {
+        kiwi::MemStream strm(work, sizeof(work));
+        strm.Write_u32(ksl::strtoul(result));
+    }
+
     // Save unique ID to the NAND
-    kiwi::NandStream strm("user.txt", kiwi::EOpenMode_Write);
-    ASSERT(strm.IsOpen());
-    strm.Write_string(result);
+    {
+        kiwi::NandStream strm("user.bin", kiwi::EOpenMode_Write);
+        ASSERT(strm.IsOpen());
+        strm.Write(work, sizeof(work));
+    }
 
     // Exit to billiards
     kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(

@@ -11,9 +11,10 @@ namespace BAH {
 #pragma pack(push, 1)
 struct BreakInfo {
     BreakInfo();
-    void Read(kiwi::IStream& strm);
-    void Write(kiwi::IStream& strm) const;
+    void Read(kiwi::MemStream& strm);
+    void Write(kiwi::MemStream& strm) const;
 
+    u32 CalcChecksum() const;
     bool IsBetterThan(const BreakInfo& other) const;
     void Log() const;
     void Save(const char* name) const;
@@ -33,6 +34,8 @@ struct BreakInfo {
     EGG::Vector2f pos;
     f32 power;
     bool foul;
+
+    u32 checksum;
 };
 #pragma pack(pop)
 

@@ -96,25 +96,28 @@ K_DYNAMIC_SINGLETON_IMPL(Simulation);
 /**
  * @brief Constructor
  */
-Simulation::Simulation()
-    : kiwi::ISceneHook(kiwi::ESceneID_RPBilScene), mUniqueId("") {
+Simulation::Simulation() : kiwi::ISceneHook(kiwi::ESceneID_RPBilScene) {
 
     // Try to open unique ID from the DVD (file placed by user)
     {
-        kiwi::DvdStream strm("user.txt");
-        if (strm.IsOpen()) {
-            mUniqueId = strm.Read_string();
-            K_LOG_EX("User from DVD: %s\n", mUniqueId.CStr());
+        kiwi::MemStream* strm =
+            kiwi::FileRipper::Open("user.txt", kiwi::EStorage_DVD);
+
+        if (strm != NULL && strm->IsOpen()) {
+            mUniqueId = ksl::strtoul(strm->Read_string());
+            K_LOG_EX("User from DVD: %u\n", *mUniqueId);
             return;
         }
     }
 
     // Maybe it's instead on the NAND (saved from entry screen)
     {
-        kiwi::NandStream strm("user.txt", kiwi::EOpenMode_Read);
-        if (strm.IsOpen()) {
-            mUniqueId = strm.Read_string();
-            K_LOG_EX("User from NAND: %s\n", mUniqueId.CStr());
+        kiwi::MemStream* strm =
+            kiwi::FileRipper::Open("user.bin", kiwi::EStorage_NAND);
+
+        if (strm != NULL && strm->IsOpen()) {
+            mUniqueId = strm->Read_u32();
+            K_LOG_EX("User from NAND: %u\n", *mUniqueId);
         }
     }
 }
@@ -135,15 +138,17 @@ Simulation::~Simulation() {
  */
 void Simulation::Configure(RPSysScene* scene) {
 #pragma unused(scene)
-    mpCurrBreak = new BreakInfo();
-    mpBestBreak = new BreakInfo();
+    mpCurrBreak = new (32) BreakInfo();
+    mpBestBreak = new (32) BreakInfo();
     ASSERT(mpCurrBreak != NULL);
     ASSERT(mpBestBreak != NULL);
 
     // Previous best may still be on the NAND
-    kiwi::NandStream strm("best.brk", kiwi::EOpenMode_Read);
-    if (strm.IsOpen()) {
-        mpBestBreak->Read(strm);
+    kiwi::MemStream* strm =
+        kiwi::FileRipper::Open("best.brk", kiwi::EStorage_NAND);
+
+    if (strm != NULL && strm->IsOpen()) {
+        mpBestBreak->Read(*strm);
     } else {
         // Dummy record will instantly be broken
         mpBestBreak->frame = ULONG_MAX;

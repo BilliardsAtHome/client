@@ -5,6 +5,7 @@
 #include <libkiwi/core/kiwiConsoleOut.h>
 #include <libkiwi/core/kiwiController.h>
 #include <libkiwi/core/kiwiDvdStream.h>
+#include <libkiwi/core/kiwiFileRipper.h>
 #include <libkiwi/core/kiwiIBinary.h>
 #include <libkiwi/core/kiwiIScene.h>
 #include <libkiwi/core/kiwiIStream.h>

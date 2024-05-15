@@ -1,7 +1,16 @@
 #ifndef LIBKIWI_CORE_MEM_STREAM_H
 #define LIBKIWI_CORE_MEM_STREAM_H
+#include <libkiwi/core/kiwiFileRipper.h>
 #include <libkiwi/core/kiwiFileStream.h>
 #include <types.h>
+
+/**
+ * @brief Declare stream functions by type
+ */
+#define IO_FUNC_DECL(T)                                                        \
+    T Read_##T();                                                              \
+    void Write_##T(T value);                                                   \
+    T Peek_##T();
 
 namespace kiwi {
 
@@ -20,6 +29,7 @@ public:
     MemStream(void* buffer, u32 size, bool owns = false)
         : FileStream(EOpenMode_RW), mBufferSize(size), mOwnsBuffer(owns) {
         mBufferData = static_cast<u8*>(buffer);
+        mIsOpen = mBufferData != NULL;
     }
 
     /**
@@ -30,8 +40,9 @@ public:
      * @param owns Whether the stream owns the buffer
      */
     MemStream(const void* buffer, u32 size, bool owns = false)
-        : FileStream(EOpenMode_RW), mBufferSize(size), mOwnsBuffer(owns) {
+        : FileStream(EOpenMode_Read), mBufferSize(size), mOwnsBuffer(owns) {
         mBufferData = static_cast<u8*>(const_cast<void*>(buffer));
+        mIsOpen = mBufferData != NULL;
     }
 
     /**
@@ -65,9 +76,40 @@ public:
         return true;
     }
 
-    virtual s32 GetAlign() const {
+    /**
+     * Required byte-alignment
+     */
+    virtual s32 GetSizeAlign() const {
+        return 1;
+    }
+    virtual s32 GetOffsetAlign() const {
+        return 1;
+    }
+    virtual s32 GetBufferAlign() const {
         return 4;
     }
+
+    /**
+     * Primitive types
+     */
+    IO_FUNC_DECL(u8);
+    IO_FUNC_DECL(s8);
+    IO_FUNC_DECL(u16);
+    IO_FUNC_DECL(s16);
+    IO_FUNC_DECL(u32);
+    IO_FUNC_DECL(s32);
+    IO_FUNC_DECL(u64);
+    IO_FUNC_DECL(s64);
+    IO_FUNC_DECL(f32);
+    IO_FUNC_DECL(f64);
+    IO_FUNC_DECL(bool);
+
+    /**
+     * User types
+     */
+    String Read_string();
+    void Write_string(const String& str);
+    String Peek_string();
 
 private:
     virtual void SeekImpl(ESeekDir dir, s32 offset);

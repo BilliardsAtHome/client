@@ -22,10 +22,10 @@ public:
     void Tick();
     void OnEndShot();
 
-    kiwi::String GetUniqueId() const {
+    kiwi::Optional<u32> GetUniqueId() const {
         return mUniqueId;
     }
-    void SetUniqueId(const kiwi::String& id) {
+    void SetUniqueId(u32 id) {
         mUniqueId = id;
     }
 
@@ -46,7 +46,7 @@ private:
     virtual ~Simulation();
 
 private:
-    kiwi::String mUniqueId;
+    kiwi::Optional<u32> mUniqueId;
     int mTimerUp;
     int mTimerLeft;
     int mTimerRight;

@@ -20,14 +20,15 @@ BreakInfo::BreakInfo()
       right(0),
       pos(),
       power(0.0f),
-      foul(false) {}
+      foul(false),
+      checksum(0) {}
 
 /**
  * @brief Deserialize from stream
  *
  * @param strm Stream
  */
-void BreakInfo::Read(kiwi::IStream& strm) {
+void BreakInfo::Read(kiwi::MemStream& strm) {
     seed = strm.Read_u32();
     kseed = strm.Read_u32();
     sunk = strm.Read_u32();
@@ -40,15 +41,12 @@ void BreakInfo::Read(kiwi::IStream& strm) {
     pos.y = strm.Read_f32();
     power = strm.Read_f32();
     foul = strm.Read_bool();
+    checksum = strm.Read_u32();
 
-    // Checksum for integrity
-    kiwi::Checksum crc;
-    crc.Process(this, sizeof(BreakInfo));
-
-    u32 expected = crc.Result();
-    u32 got = strm.Read_u32();
-    K_WARN_EX(expected != got, "Checksum mismatch (expected %08X, got %08X)",
-              expected, got);
+    u32 expected = CalcChecksum();
+    K_WARN_EX(checksum != expected,
+              "Checksum mismatch (expected %08X, got %08X)", expected,
+              checksum);
 }
 
 /**
@@ -56,11 +54,7 @@ void BreakInfo::Read(kiwi::IStream& strm) {
  *
  * @param strm Stream
  */
-void BreakInfo::Write(kiwi::IStream& strm) const {
-    // Checksum for integrity
-    kiwi::Checksum crc;
-    crc.Process(this, sizeof(BreakInfo));
-
+void BreakInfo::Write(kiwi::MemStream& strm) const {
     strm.Write_u32(seed);
     strm.Write_u32(kseed);
     strm.Write_u32(sunk);
@@ -73,7 +67,18 @@ void BreakInfo::Write(kiwi::IStream& strm) const {
     strm.Write_f32(pos.y);
     strm.Write_f32(power);
     strm.Write_bool(foul);
-    strm.Write_u32(crc.Result());
+    strm.Write_u32(CalcChecksum());
+}
+
+/**
+ * @brief Calculate data checksum
+ */
+u32 BreakInfo::CalcChecksum() const {
+    kiwi::Checksum crc;
+
+    // Don't include 'checksum' member
+    crc.Process(this, sizeof(BreakInfo) - sizeof(u32));
+    return crc.Result();
 }
 
 /**
@@ -153,7 +158,7 @@ void BreakInfo::Save(const char* name) const {
         }
     }
 
-    Write(strm);
+    strm.Write(this, sizeof(BreakInfo));
 }
 
 /**
@@ -168,13 +173,13 @@ void BreakInfo::Upload() const {
     request.SetParameter("seed", kiwi::ToHexString(seed));
     request.SetParameter("kseed", kiwi::ToHexString(kseed));
 
-    request.SetParameter("sunk", kiwi::ToString(sunk));
-    request.SetParameter("off", kiwi::ToString(off));
-    request.SetParameter("frame", kiwi::ToString(frame));
+    request.SetParameter("sunk", sunk);
+    request.SetParameter("off", off);
+    request.SetParameter("frame", frame);
 
-    request.SetParameter("up", kiwi::ToString(up));
-    request.SetParameter("left", kiwi::ToString(left));
-    request.SetParameter("right", kiwi::ToString(right));
+    request.SetParameter("up", up);
+    request.SetParameter("left", left);
+    request.SetParameter("right", right);
 
     request.SetParameter("posx", kiwi::ToHexString(pos.x));
     request.SetParameter("posy", kiwi::ToHexString(pos.y));
@@ -182,9 +187,7 @@ void BreakInfo::Upload() const {
     request.SetParameter("power", kiwi::ToHexString(power));
     request.SetParameter("foul", kiwi::ToHexString(foul));
 
-    kiwi::Checksum crc;
-    crc.Process(this, sizeof(BreakInfo));
-    request.SetParameter("checksum", kiwi::ToHexString(crc.Result()));
+    request.SetParameter("checksum", kiwi::ToHexString(CalcChecksum()));
 
     const kiwi::HttpResponse& resp = request.Send();
     K_ASSERT(resp.error == kiwi::EHttpErr_Success);

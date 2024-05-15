@@ -53,7 +53,16 @@ public:
         return true;
     }
 
-    virtual s32 GetAlign() const {
+    /**
+     * Required byte-alignment
+     */
+    virtual s32 GetSizeAlign() const {
+        return 32;
+    }
+    virtual s32 GetOffsetAlign() const {
+        return 1;
+    }
+    virtual s32 GetBufferAlign() const {
         return 32;
     }
 

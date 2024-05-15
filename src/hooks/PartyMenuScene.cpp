@@ -13,7 +13,7 @@ namespace BAH {
 void PartyMenuScene::CalculateEx() {
     // Skip login process if unique ID is saved on the NAND
     kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(
-        !Simulation::GetInstance().GetUniqueId().Empty()
+        Simulation::GetInstance().GetUniqueId().HasValue()
             ? kiwi::ESceneID_RPBilScene
             : ESceneID_LoginScene);
 }

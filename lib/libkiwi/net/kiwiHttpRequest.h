@@ -130,6 +130,10 @@ public:
     void SetParameter(const String& name, const String& value) {
         mParams.Insert(name, value);
     }
+    template <typename T>
+    void SetParameter(const String& name, const T& value) {
+        SetParameter(name, kiwi::ToString(value));
+    }
 
     /**
      * @brief Change the requested resource
