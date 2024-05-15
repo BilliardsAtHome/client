@@ -1,6 +1,7 @@
 #include "LoginScene.h"
 
 #include <Pack/RPAudio.h>
+#include <libkiwi.h>
 
 namespace BAH {
 
@@ -52,12 +53,12 @@ void LoginScene::KeypadOkCallback(const kiwi::String& result, void* arg) {
     ASSERT(self != NULL);
 
     // Work buffer (byte-aligned for NAND requirements)
-    u8 work[32] ALIGN(32);
-    std::memset(work, 0, sizeof(work));
+    kiwi::WorkBuffer buffer(sizeof(u32));
 
     // Write unique ID to buffer
     {
-        kiwi::MemStream strm(work, sizeof(work));
+        kiwi::MemStream strm(buffer);
+        ASSERT(strm.IsOpen());
         strm.Write_u32(ksl::strtoul(result));
     }
 
@@ -65,7 +66,7 @@ void LoginScene::KeypadOkCallback(const kiwi::String& result, void* arg) {
     {
         kiwi::NandStream strm("user.bin", kiwi::EOpenMode_Write);
         ASSERT(strm.IsOpen());
-        strm.Write(work, sizeof(work));
+        strm.Write(buffer, buffer.AlignedSize());
     }
 
     // Exit to billiards

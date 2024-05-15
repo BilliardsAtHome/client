@@ -40,7 +40,7 @@ void BreakInfo::Read(kiwi::MemStream& strm) {
     pos.x = strm.Read_f32();
     pos.y = strm.Read_f32();
     power = strm.Read_f32();
-    foul = strm.Read_bool();
+    foul = strm.Read_s32();
     checksum = strm.Read_u32();
 
     u32 expected = CalcChecksum();
@@ -66,7 +66,7 @@ void BreakInfo::Write(kiwi::MemStream& strm) const {
     strm.Write_f32(pos.x);
     strm.Write_f32(pos.y);
     strm.Write_f32(power);
-    strm.Write_bool(foul);
+    strm.Write_s32(foul);
     strm.Write_u32(CalcChecksum());
 }
 
@@ -75,9 +75,8 @@ void BreakInfo::Write(kiwi::MemStream& strm) const {
  */
 u32 BreakInfo::CalcChecksum() const {
     kiwi::Checksum crc;
-
     // Don't include 'checksum' member
-    crc.Process(this, sizeof(BreakInfo) - sizeof(u32));
+    crc.Process(this, offsetof(BreakInfo, checksum));
     return crc.Result();
 }
 
@@ -119,19 +118,19 @@ bool BreakInfo::IsBetterThan(const BreakInfo& other) const {
  */
 void BreakInfo::Log() const {
     // clang-format off
-    LOG("BREAK = {");
-    LOG_EX("    seed:\t%08X",        seed);
-    LOG_EX("    kseed:\t%08X",       kseed);
-    LOG_EX("    sunk:\t%d",          sunk);
-    LOG_EX("    off:\t%d",           off);
-    LOG_EX("    frame:\t%d",         frame);
-    LOG_EX("    up:\t%d",            up);
-    LOG_EX("    left:\t%d",          left);
-    LOG_EX("    right:\t%d",         right);
-    LOG_EX("    pos:\t{%08X, %08X}", kiwi::BitCast<u32>(pos.x), kiwi::BitCast<u32>(pos.y));
-    LOG_EX("    power:\t%08X",       kiwi::BitCast<u32>(power));
-    LOG_EX("    foul:\t%s",          foul ? "true" : "false");
-    LOG("}");
+    LOG("BREAK = {\n");
+    LOG_EX("    seed:\t%08X\n",        seed);
+    LOG_EX("    kseed:\t%08X\n",       kseed);
+    LOG_EX("    sunk:\t%d\n",          sunk);
+    LOG_EX("    off:\t%d\n",           off);
+    LOG_EX("    frame:\t%d\n",         frame);
+    LOG_EX("    up:\t%d\n",            up);
+    LOG_EX("    left:\t%d\n",          left);
+    LOG_EX("    right:\t%d\n",         right);
+    LOG_EX("    pos:\t{%08X, %08X}\n", kiwi::BitCast<u32>(pos.x), kiwi::BitCast<u32>(pos.y));
+    LOG_EX("    power:\t%08X\n",       kiwi::BitCast<u32>(power));
+    LOG_EX("    foul:\t%s\n",          foul ? "true" : "false");
+    LOG("}\n");
     // clang-format on
 }
 
@@ -142,23 +141,36 @@ void BreakInfo::Log() const {
  * @return Success
  */
 void BreakInfo::Save(const char* name) const {
-    kiwi::NandStream strm(kiwi::EOpenMode_Write);
+    // Work buffer (byte-aligned for NAND requirements)
+    kiwi::WorkBuffer buffer(sizeof(BreakInfo));
 
-    while (true) {
-        // Attempt to open file
-        bool success = strm.Open(name);
-        if (success) {
-            break;
-        }
-
-        // Failed? Try again in one second
-        volatile s64 x = OSGetTime();
-        while (OSGetTime() - x < OS_SEC_TO_TICKS(1)) {
-            ;
-        }
+    // Write break info to buffer
+    {
+        kiwi::MemStream strm(buffer);
+        ASSERT(strm.IsOpen());
+        Write(strm);
     }
 
-    strm.Write(this, sizeof(BreakInfo));
+    // Save break info to the NAND
+    {
+        kiwi::NandStream strm(kiwi::EOpenMode_Write);
+
+        while (true) {
+            // Attempt to open file
+            bool success = strm.Open(name);
+            if (success) {
+                break;
+            }
+
+            // Failed? Try again in one second
+            volatile s64 x = OSGetTime();
+            while (OSGetTime() - x < OS_SEC_TO_TICKS(1)) {
+                ;
+            }
+        }
+
+        strm.Write(buffer, buffer.AlignedSize());
+    }
 }
 
 /**

@@ -2,6 +2,7 @@
 #define LIBKIWI_CORE_MEM_STREAM_H
 #include <libkiwi/core/kiwiFileRipper.h>
 #include <libkiwi/core/kiwiFileStream.h>
+#include <libkiwi/util/kiwiWorkBuffer.h>
 #include <types.h>
 
 /**
@@ -42,6 +43,19 @@ public:
     MemStream(const void* buffer, u32 size, bool owns = false)
         : FileStream(EOpenMode_Read), mBufferSize(size), mOwnsBuffer(owns) {
         mBufferData = static_cast<u8*>(const_cast<void*>(buffer));
+        mIsOpen = mBufferData != NULL;
+    }
+
+    /**
+     * @brief Constructor (for work buffer)
+     *
+     * @param buffer Work buffer
+     */
+    MemStream(const WorkBuffer& buffer)
+        : FileStream(EOpenMode_RW),
+          mBufferData(buffer.Contents()),
+          mBufferSize(buffer.Size()),
+          mOwnsBuffer(false) {
         mIsOpen = mBufferData != NULL;
     }
 

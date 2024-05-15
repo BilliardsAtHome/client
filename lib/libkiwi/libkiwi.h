@@ -55,6 +55,7 @@
 #include <libkiwi/util/kiwiOverride.h>
 #include <libkiwi/util/kiwiRandom.h>
 #include <libkiwi/util/kiwiStaticSingleton.h>
+#include <libkiwi/util/kiwiWorkBuffer.h>
 #include <libkiwi_config.h>
 #include <types.h>
 #endif
