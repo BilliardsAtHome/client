@@ -12,7 +12,8 @@ SocketBase::SocketBase(SOProtoFamily family, SOSockType type)
     : mHandle(-1), mFamily(family), mType(type) {
     // Create IOS socket
     mHandle = LibSO::Socket(mFamily, mType);
-    K_ASSERT_EX(IsOpen(), "Failed to create socket");
+    K_ASSERT_EX(IsOpen(), "Failed to create socket (%d)",
+                LibSO::GetLastError());
 
     // By default, enable port reuse
     bool success = SetReuseAddr(true);

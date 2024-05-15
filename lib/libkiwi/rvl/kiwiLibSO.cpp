@@ -24,6 +24,7 @@ enum {
     Ioctl_Create = 15,
     Ioctl_GetHostID = 16,
     Ioctl_INetAtoN = 21,
+    Ioctl_Startup = 31,
 };
 
 s32 LibSO::sDeviceHandle = -1;
@@ -39,8 +40,13 @@ void LibSO::Initialize() {
         return;
     }
 
+    // Open IOS device
     sDeviceHandle = IOS_Open("/dev/net/ip/top", IPC_OPEN_NONE);
     K_ASSERT_EX(sDeviceHandle >= 0, "Could not access IOS IP device");
+
+    // Call SOStartup ioctl
+    s32 result = IOS_Ioctl(sDeviceHandle, Ioctl_Startup, NULL, 0, NULL, 0);
+    K_ASSERT_EX(result == SO_SUCCESS, "Socket startup failed (%d)", result);
 }
 
 /**
