@@ -3,6 +3,7 @@
 #include <Pack/RPParty/RPPartyUtlModel.h>
 #include <Pack/RPUtility/RPUtlBaseFsm.h>
 #include <egg/core.h>
+#include <egg/gfx.h>
 #include <types.h>
 
 /**
@@ -21,18 +22,27 @@ public:
         EState_Dummy
     };
 
-    enum EDotState {
-        EDotState_0,
-        EDotState_1,
-        EDotState_2,
-        EDotState_3,
+    enum ECursor {
+        ECursor_AimHover,
+        ECursor_AimLock,
+        ECursor_AimMiss,
+        ECursor_CamHover,
+        ECursor_CamLock,
     };
 
 public:
+    bool IsWait() const {
+        K_ASSERT(mpStateMachine != NULL);
+        return mpStateMachine->IsState(EState_Wait);
+    }
+
+    void SetAimPosition(const EGG::Vector2f& pos) {
+        mAimPosition = pos;
+        mValidAim = true;
+    }
+
     void CalcAimPosition();
     void CalcAimForce();
-
-    void SetAimPosition(f32 ir_x, f32 ir_y) {}
 
 private:
     char _60[0x8];
@@ -51,7 +61,7 @@ private:
     u32 mNumFoul; // at 0x687C
 
     char _6880[0x68AC - 0x6880];
-    EDotState mDotState; // at 0x68AC
+    ECursor mCursor; // at 0x68AC
 };
 
 #endif
