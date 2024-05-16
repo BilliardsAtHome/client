@@ -9,14 +9,14 @@ namespace kiwi {
  */
 void IScene::Configure() {
     // Setup model scene
-    RPGrpModelResManager::GetInstance()->CreateResourceList(0x400);
-    RPGrpModelManager::GetInstance()->CreateModelScene(0, 0, 1, NULL, NULL);
+    RP_GET_INSTANCE(RPGrpModelResManager)->CreateResourceList(0x400);
+    RP_GET_INSTANCE(RPGrpModelManager)->CreateModelScene(0, 0, 1, NULL, NULL);
 
     // Setup renderer view
     RPGrpScreen* screen = new RPGrpScreen();
     screen->SetCanvasMode(RPGrpScreen::CANVASMODE_0);
-    RPGrpRenderer::GetInstance()->CreateView2D(1, screen);
-    RPGrpRenderer::GetInstance()->CorrectView();
+    RP_GET_INSTANCE(RPGrpRenderer)->CreateView2D(1, screen);
+    RP_GET_INSTANCE(RPGrpRenderer)->CorrectView();
 
     // User state function
     OnConfigure();
@@ -34,8 +34,8 @@ void IScene::LoadResource() {
  * @brief Reload scene
  */
 void IScene::Reset() {
-    RPSysCursorDrawMgr::GetInstance()->startDpdCheck();
-    RPSysCursorDrawMgr::GetInstance()->createActiveCursor();
+    RP_GET_INSTANCE(RPSysCursorDrawMgr)->startDpdCheck();
+    RP_GET_INSTANCE(RPSysCursorDrawMgr)->createActiveCursor();
 
     // User state function
     OnReset();

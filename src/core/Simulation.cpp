@@ -15,21 +15,14 @@ namespace {
  * @brief Count number of pocketed balls
  */
 u32 GetNumSunk() {
-    RPBilBallManager* m = RPBilBallManager::GetInstance();
-    ASSERT(m != NULL);
-
     u32 num = 0;
 
     for (int i = 0; i < RPBilBallManager::BALL_MAX; i++) {
-        RPBilBall* ball = m->GetBall(i);
+        RPBilBall* ball = RP_GET_INSTANCE(RPBilBallManager)->GetBall(i);
         ASSERT(ball != NULL);
 
         // Ignore cue ball
-        if (ball->IsCueBall()) {
-            continue;
-        }
-
-        if (ball->IsState(RPBilBall::EState_Pocket)) {
+        if (!ball->IsCueBall() && ball->IsState(RPBilBall::EState_Pocket)) {
             num++;
         }
     }
@@ -41,21 +34,14 @@ u32 GetNumSunk() {
  * @brief Count number of balls shot off of the table
  */
 u32 GetNumOff() {
-    RPBilBallManager* m = RPBilBallManager::GetInstance();
-    ASSERT(m != NULL);
-
     u32 num = 0;
 
     for (int i = 0; i < RPBilBallManager::BALL_MAX; i++) {
-        RPBilBall* ball = m->GetBall(i);
+        RPBilBall* ball = RP_GET_INSTANCE(RPBilBallManager)->GetBall(i);
         ASSERT(ball != NULL);
 
         // Ignore cue ball
-        if (ball->IsCueBall()) {
-            continue;
-        }
-
-        if (ball->IsState(RPBilBall::EState_OffTable)) {
+        if (!ball->IsCueBall() && ball->IsState(RPBilBall::EState_OffTable)) {
             num++;
         }
     }
@@ -67,11 +53,8 @@ u32 GetNumOff() {
  * @brief Check whether the break shot fouled
  */
 bool GetIsFoul() {
-    RPBilBallManager* m = RPBilBallManager::GetInstance();
-    ASSERT(m != NULL);
-
     for (int i = 0; i < RPBilBallManager::BALL_MAX; i++) {
-        RPBilBall* ball = m->GetBall(i);
+        RPBilBall* ball = RP_GET_INSTANCE(RPBilBallManager)->GetBall(i);
         ASSERT(ball != NULL);
 
         // Cue ball pocketed?
@@ -80,7 +63,7 @@ bool GetIsFoul() {
             return true;
         }
 
-        // Ball shot off the table?
+        // Any ball shot off the table?
         if (ball->IsState(RPBilBall::EState_OffTable)) {
             return true;
         }
@@ -248,7 +231,7 @@ void Simulation::Tick() {
     mpCurrBreak->frame++;
 
     // For some reason, CanCtrl is wrong on the very first scene tick
-    RPBilCtrl* cueCtrl = RPBilCtrlManager::GetInstance()->GetCtrl();
+    RPBilCtrl* cueCtrl = RP_GET_INSTANCE(RPBilCtrlManager)->GetCtrl();
     if (cueCtrl->CanCtrl() && !mIsFirstTick) {
         // Aim up
         if (mTimerUp > 0) {

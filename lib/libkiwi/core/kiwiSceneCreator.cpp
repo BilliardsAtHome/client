@@ -63,7 +63,7 @@ const SceneCreator::Info* SceneCreator::GetSceneInfo(s32 id) {
 
     // Supply -1 to use the current scene ID
     if (id < 0) {
-        id = RPSysSceneMgr::getInstance()->getCurrentSceneID();
+        id = RP_GET_INSTANCE(RPSysSceneMgr)->getCurrentSceneID();
     }
 
     // Check user scenes first
@@ -88,9 +88,7 @@ const SceneCreator::Info* SceneCreator::GetSceneInfo(s32 id) {
  * @brief Access singleton instance
  */
 SceneCreator& SceneCreator::GetInstance() {
-    RPSysSceneCreator* base = RPSysSceneCreator::getInstance();
-    K_ASSERT(base != NULL);
-    return *static_cast<SceneCreator*>(base);
+    return *static_cast<SceneCreator*>(RP_GET_INSTANCE(RPSysSceneCreator));
 }
 
 /**
@@ -114,24 +112,24 @@ void SceneCreator::RegistScene(const Info& info) {
  */
 bool SceneCreator::ChangeSceneAfterFade(s32 id, bool arg1) {
     // Ensure all threads are idle
-    if (!RPSysSceneMgr::getInstance()->isTaskFinished()) {
+    if (!RP_GET_INSTANCE(RPSysSceneMgr)->isTaskFinished()) {
         return false;
     }
 
     // Optionally reload current scene
-    s32 current = RPSysSceneMgr::getInstance()->getCurrentSceneID();
+    s32 current = RP_GET_INSTANCE(RPSysSceneMgr)->getCurrentSceneID();
     if (arg1) {
         id = current;
     }
 
     // Send request to scene manager
     bool success =
-        RPSysSceneMgr::getInstance()->changeNextSceneAfterFade(id, arg1);
+        RP_GET_INSTANCE(RPSysSceneMgr)->changeNextSceneAfterFade(id, arg1);
 
     // Fade out common sounds if we are switching sound archives
     if (GetSceneCommonSound(id) != GetSceneCommonSound(current)) {
-        s16 frame = RPSysSceneMgr::getInstance()->getFadeFrame();
-        RPSndAudioMgr::GetInstance()->setSystemSeFadeInFrame(frame);
+        s16 frame = RP_GET_INSTANCE(RPSysSceneMgr)->getFadeFrame();
+        RP_GET_INSTANCE(RPSndAudioMgr)->setSystemSeFadeInFrame(frame);
     }
 
     // Update last scene for exiting

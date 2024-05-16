@@ -59,7 +59,11 @@ void kiwi_fail_assert(const char* file, int line, const char* msg, ...);
 }
 #endif
 
-// Override RP_GET_INSTANCE
+// Override RP_GET_INSTANCE to NULL check singletons
+#ifdef RP_GET_INSTANCE
+#undef RP_GET_INSTANCE
+#endif
+
 #define RP_GET_INSTANCE(T)                                                     \
     (K_ASSERT(T::GetInstance() != NULL), T::GetInstance())
 

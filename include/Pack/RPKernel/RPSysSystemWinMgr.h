@@ -12,7 +12,7 @@ public:
     enum E_RESULT { RESULT_NONE, RESULT_WAIT, RESULT_YES, RESULT_NO };
 
 public:
-    static RPSysSystemWinMgr* getInstance() {
+    static RPSysSystemWinMgr* GetInstance() {
         return sInstance;
     }
 

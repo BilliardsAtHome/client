@@ -59,8 +59,8 @@ MemoryMgr::MemoryMgr() {
     K_ASSERT(mpHeapMEM1 != NULL);
     K_ASSERT(OSIsMEM1Region(mpHeapMEM1));
 
-    mpHeapMEM2 = EGG::ExpHeap::create(scHeapSize, RPSysSystem::getInstance()->getResourceHeap(), 0);
-    LogHeap("RPSysSystem:Resource", RPSysSystem::getInstance()->getResourceHeap());
+    mpHeapMEM2 = EGG::ExpHeap::create(scHeapSize, RP_GET_INSTANCE(RPSysSystem)->getResourceHeap(), 0);
+    LogHeap("RPSysSystem:Resource", RP_GET_INSTANCE(RPSysSystem)->getResourceHeap());
     LogHeap("libkiwi:MEM2", mpHeapMEM2);
 
     K_ASSERT(mpHeapMEM2 != NULL);

@@ -26,7 +26,7 @@ void KokeshiMain() {
     BAH::Simulation::CreateInstance();
 
     // Enter game loop
-    RPSysSystem::getInstance()->mainLoop();
+    RP_GET_INSTANCE(RPSysSystem)->mainLoop();
     // Main function should never return
     ASSERT(false);
 }

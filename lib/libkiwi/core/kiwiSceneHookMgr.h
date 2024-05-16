@@ -62,7 +62,7 @@ private:
      * @brief Gets list of hooks for the current scene
      */
     TList<ISceneHook>* GetActiveHooks() {
-        s32 id = RPSysSceneMgr::getInstance()->getCurrentSceneID();
+        s32 id = RP_GET_INSTANCE(RPSysSceneMgr)->getCurrentSceneID();
 
         // Ignore custom scenes
         if (id >= ESceneID_Max) {

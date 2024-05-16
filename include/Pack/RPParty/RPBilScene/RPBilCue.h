@@ -32,7 +32,6 @@ public:
 
 public:
     bool IsWait() const {
-        K_ASSERT(mpStateMachine != NULL);
         return mpStateMachine->IsState(EState_Wait);
     }
 

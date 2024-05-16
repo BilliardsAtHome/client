@@ -146,7 +146,7 @@ public:
 public:
     // @address 80184e10
     static RPSysSceneCreator* CreateInstance(EGG::Heap* heap);
-    static RPSysSceneCreator* getInstance() {
+    static RPSysSceneCreator* GetInstance() {
         return sInstance;
     }
 

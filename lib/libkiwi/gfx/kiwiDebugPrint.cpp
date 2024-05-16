@@ -104,7 +104,7 @@ void DebugPrint::PrintfOutline(f32 x, f32 y, f32 scale, bool center,
  */
 void DebugPrint::PrintImpl(f32 x, f32 y, f32 scale, bool center,
                            kiwi::Color color, const kiwi::String& msg) {
-    RPSysTextWriter::GetInstance()->Begin();
+    RP_GET_INSTANCE(RPSysTextWriter)->Begin();
     {
         // Text alignment
         u32 flag = RPSysTextWriter::DrawFlag_AlignCenterY;
@@ -112,16 +112,16 @@ void DebugPrint::PrintImpl(f32 x, f32 y, f32 scale, bool center,
             flag |= RPSysTextWriter::DrawFlag_AlignCenterX;
         }
 
-        u32 oldFlag = RPSysTextWriter::GetInstance()->GetDrawFlag();
+        u32 oldFlag = RP_GET_INSTANCE(RPSysTextWriter)->GetDrawFlag();
         {
-            RPSysTextWriter::GetInstance()->SetDrawFlag(flag);
-            RPSysTextWriter::GetInstance()->SetTextColor(color);
-            RPSysTextWriter::GetInstance()->SetScale(scale, scale);
-            RPSysTextWriter::GetInstance()->PrintfZeroCenter(x, y, msg);
+            RP_GET_INSTANCE(RPSysTextWriter)->SetDrawFlag(flag);
+            RP_GET_INSTANCE(RPSysTextWriter)->SetTextColor(color);
+            RP_GET_INSTANCE(RPSysTextWriter)->SetScale(scale, scale);
+            RP_GET_INSTANCE(RPSysTextWriter)->PrintfZeroCenter(x, y, msg);
         }
-        RPSysTextWriter::GetInstance()->SetDrawFlag(oldFlag);
+        RP_GET_INSTANCE(RPSysTextWriter)->SetDrawFlag(oldFlag);
     }
-    RPSysTextWriter::GetInstance()->End();
+    RP_GET_INSTANCE(RPSysTextWriter)->End();
 }
 
 } // namespace kiwi
