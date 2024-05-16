@@ -24,7 +24,9 @@ void BilScene::CalculateEx() {
     }
 
     // Stop context switches
-    BOOL enabled = OSDisableInterrupts();
+    kiwi::AutoInterruptLock lock;
+    // Reset DSP to mute "crash sound"
+    DSP_HW_REGS[DSP_CSR] |= 0x1;
 
     // Simulate the entire break
     while (!Simulation::GetInstance().IsFinished()) {
@@ -36,8 +38,6 @@ void BilScene::CalculateEx() {
     Simulation::GetInstance().BeforeReset();
     RPBilMain::GetInstance()->Reset();
     Simulation::GetInstance().AfterReset();
-
-    enabled = OSRestoreInterrupts(enabled);
 }
 KM_BRANCH_MF(0x802ba1e0, BilScene, CalculateEx);
 
