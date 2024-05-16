@@ -10,18 +10,10 @@ namespace BAH {
 /**
  * @brief Billiards simulation runner
  */
-class Simulation : public kiwi::DynamicSingleton<Simulation>,
-                   public kiwi::ISceneHook {
+class Simulation : public kiwi::DynamicSingleton<Simulation> {
     friend class kiwi::DynamicSingleton<Simulation>;
 
 public:
-    virtual void Configure(RPSysScene* scene);
-    virtual void BeforeReset(RPSysScene* scene);
-    virtual void AfterReset(RPSysScene* scene);
-
-    void Tick();
-    void OnEndShot();
-
     kiwi::Optional<u32> GetUniqueId() const {
         return mUniqueId;
     }
@@ -33,27 +25,44 @@ public:
         return mpCurrBreak->power;
     }
 
+    bool IsDoneAiming() const {
+        return mTimerUp <= 0 && mTimerLeft <= 0 && mTimerRight <= 0;
+    }
+
     bool IsReplay() const {
         return mIsReplay;
     }
 
-    bool IsDoneAiming() const {
-        return mTimerUp <= 0 && mTimerLeft <= 0 && mTimerRight <= 0;
+    bool IsFinished() const {
+        return mIsFinished;
     }
+
+    void BeforeReset();
+    void AfterReset();
+
+    void Tick();
+    void Finish();
 
 private:
     Simulation();
     virtual ~Simulation();
 
+    void LoadUniqueId();
+    void LoadBestBreak();
+
 private:
     kiwi::Optional<u32> mUniqueId;
+
     int mTimerUp;
     int mTimerLeft;
     int mTimerRight;
+
     BreakInfo* mpCurrBreak;
     BreakInfo* mpBestBreak;
-    bool mIsReplay;
+
     bool mIsFirstTick;
+    bool mIsReplay;
+    bool mIsFinished;
 };
 
 } // namespace BAH

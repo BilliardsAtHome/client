@@ -96,8 +96,43 @@ K_DYNAMIC_SINGLETON_IMPL(Simulation);
 /**
  * @brief Constructor
  */
-Simulation::Simulation() : kiwi::ISceneHook(kiwi::ESceneID_RPBilScene) {
+Simulation::Simulation()
+    : mTimerUp(0),
+      mTimerLeft(0),
+      mTimerRight(0),
+      mpCurrBreak(NULL),
+      mpBestBreak(NULL),
+      mIsFirstTick(false),
+      mIsReplay(false),
+      mIsFinished(false) {
+    LoadUniqueId();
 
+    mpCurrBreak = new (32) BreakInfo();
+    mpBestBreak = new (32) BreakInfo();
+    ASSERT(mpCurrBreak != NULL);
+    ASSERT(mpBestBreak != NULL);
+
+    // Previous best may still be on the NAND
+    LoadBestBreak();
+    // Default to max power
+    mpCurrBreak->power = 150.0f;
+}
+
+/**
+ * @brief Destructor
+ */
+Simulation::~Simulation() {
+    delete mpCurrBreak;
+    mpCurrBreak = NULL;
+
+    delete mpBestBreak;
+    mpBestBreak = NULL;
+}
+
+/**
+ * @brief Load user unique ID (from DVD or NAND)
+ */
+void Simulation::LoadUniqueId() {
     // Try to open unique ID from the DVD (file placed by user)
     {
         kiwi::MemStream* strm =
@@ -123,27 +158,11 @@ Simulation::Simulation() : kiwi::ISceneHook(kiwi::ESceneID_RPBilScene) {
 }
 
 /**
- * @brief Destructor
+ * @brief Load best break from NAND
  */
-Simulation::~Simulation() {
-    delete mpCurrBreak;
-    mpCurrBreak = NULL;
+void Simulation::LoadBestBreak() {
+    K_ASSERT(mpBestBreak != NULL);
 
-    delete mpBestBreak;
-    mpBestBreak = NULL;
-}
-
-/**
- * @brief Scene configure callback
- */
-void Simulation::Configure(RPSysScene* scene) {
-#pragma unused(scene)
-    mpCurrBreak = new (32) BreakInfo();
-    mpBestBreak = new (32) BreakInfo();
-    ASSERT(mpCurrBreak != NULL);
-    ASSERT(mpBestBreak != NULL);
-
-    // Previous best may still be on the NAND
     kiwi::MemStream* strm =
         kiwi::FileRipper::Open("best.brk", kiwi::EStorage_NAND);
 
@@ -153,47 +172,40 @@ void Simulation::Configure(RPSysScene* scene) {
         // Dummy record will instantly be broken
         mpBestBreak->frame = ULONG_MAX;
     }
-
-    // Default to max power
-    mpCurrBreak->power = 150.0f;
-    mIsReplay = false;
 }
 
 /**
  * @brief Scene reset (before) callback
  */
-void Simulation::BeforeReset(RPSysScene* scene) {
-#pragma unused(scene)
+void Simulation::BeforeReset() {
+    mIsFinished = false;
     mIsFirstTick = true;
 
-    // Reuse seed for replay
     if (mIsReplay) {
+        // Restore seed for replay
         RPUtlRandom::setSeed(mpBestBreak->seed);
-        return;
+    } else {
+        // Record starting seed
+        mpCurrBreak->seed = RPUtlRandom::getSeed();
     }
-
-    // Record next seed
-    mpCurrBreak->seed = RPUtlRandom::getSeed();
 }
 
 /**
  * @brief Scene reset (after) callback
  */
-void Simulation::AfterReset(RPSysScene* scene) {
-#pragma unused(scene)
-    // Seeded by OS clock
-    kiwi::Random random;
-    mpCurrBreak->kseed = random.GetSeed();
-
-    mpCurrBreak->frame = 0;
-
-    // Just reload what we need to replay the shot
+void Simulation::AfterReset() {
+    // Don't randomize replay simulation
     if (mIsReplay) {
         mTimerUp = mpBestBreak->up;
         mTimerLeft = mpBestBreak->left;
         mTimerRight = mpBestBreak->right;
         return;
     }
+
+    // Seeded by OS clock
+    kiwi::Random random;
+    mpCurrBreak->kseed = random.GetSeed();
+    mpCurrBreak->frame = 0;
 
     mTimerUp = mpCurrBreak->up = 0;
     mTimerLeft = mpCurrBreak->left = 0;
@@ -263,7 +275,6 @@ void Simulation::Tick() {
     if (wiiCtrl.Connected()) {
         wiiCtrl.Raw().pos.x =
             mIsReplay ? mpBestBreak->pos.x : mpCurrBreak->pos.x;
-
         wiiCtrl.Raw().pos.y =
             mIsReplay ? mpBestBreak->pos.y : mpCurrBreak->pos.y;
     }
@@ -272,9 +283,9 @@ void Simulation::Tick() {
 }
 
 /**
- * @brief End-of-shot callback
+ * @brief End of break shot
  */
-void Simulation::OnEndShot() {
+void Simulation::Finish() {
     // End replay
     if (mIsReplay) {
         mIsReplay = false;
@@ -291,15 +302,19 @@ void Simulation::OnEndShot() {
         mpCurrBreak->Upload();
     }
 
-    mIsReplay = mpCurrBreak->IsBetterThan(*mpBestBreak);
-    if (mIsReplay) {
-        // Record best shot
-        std::memcpy(mpBestBreak, mpCurrBreak, sizeof(BreakInfo));
-        mpBestBreak->Log();
+    // Check for new local best
+    if (mpCurrBreak->IsBetterThan(*mpBestBreak)) {
+        // Record break locally
+        mpCurrBreak->Log();
+        mpCurrBreak->Save("best.brk");
 
-        // Write best break to file
-        mpBestBreak->Save("best.brk");
+        // Prepare replay
+        *mpBestBreak = *mpCurrBreak;
+        mIsReplay = true;
     }
+
+    // Can reset the scene now
+    mIsFinished = true;
 }
 
 } // namespace BAH
