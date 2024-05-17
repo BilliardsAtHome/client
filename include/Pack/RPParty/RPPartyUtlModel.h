@@ -44,7 +44,7 @@ public:
     virtual void setModel(RPGrpModel* model);
     virtual void calcModel();
 
-public:
+private:
     EGG::Vector3f mPosition; // at 0x10
     EGG::Vector3f mVelocity; // at 0x1C
     EGG::Vector3f _28;       // at 0x28
