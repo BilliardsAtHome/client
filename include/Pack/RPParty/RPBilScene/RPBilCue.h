@@ -31,17 +31,10 @@ public:
     };
 
 public:
-    bool IsWait() const {
-        return mpStateMachine->IsState(EState_Wait);
-    }
-
     void SetAimPosition(const EGG::Vector2f& pos) {
         mAimPosition = pos;
         mValidAim = true;
     }
-
-    void CalcAimPosition();
-    void CalcAimForce();
 
 private:
     char _60[0x8];

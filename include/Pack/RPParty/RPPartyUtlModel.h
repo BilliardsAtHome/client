@@ -1,6 +1,8 @@
 #ifndef RP_PARTY_UTL_MODEL_H
 #define RP_PARTY_UTL_MODEL_H
+#include <Pack/RPGraphics/IRPGrpDrawObject.h>
 #include <Pack/RPKernel/IRPSysHostIOSocket.h>
+#include <Pack/RPSystem/RP_DEBUG_STUB_1.h>
 #include <egg/math/eggVector.h>
 #include <types.h>
 
@@ -10,7 +12,9 @@ class RPGrpModel;
 /**
  * @brief Party Pack model utility
  */
-class RPPartyUtlModel : public IRPSysHostIOSocket {
+class RPPartyUtlModel : public RP_DEBUG_STUB_1,
+                        public IRPSysHostIOSocket,
+                        public IRPGrpDrawObject {
 public:
     RPPartyUtlModel();
     virtual ~RPPartyUtlModel();
@@ -40,7 +44,7 @@ public:
     virtual void setModel(RPGrpModel* model);
     virtual void calcModel();
 
-private:
+public:
     EGG::Vector3f mPosition; // at 0x10
     EGG::Vector3f mVelocity; // at 0x1C
     EGG::Vector3f _28;       // at 0x28

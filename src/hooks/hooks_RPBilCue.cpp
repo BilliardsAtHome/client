@@ -36,6 +36,13 @@ KM_WRITE_32(0x802bfbf4, 0x60000000);
 KM_WRITE_32(0x802bfc3c, 0x60000000);
 
 /**
+ * @brief Don't overwrite aim position/distance after we set it
+ */
+KM_WRITE_32(0x802c073c, 0x60000000);
+KM_WRITE_32(0x802c0768, 0x60000000);
+KM_WRITE_32(0x802c0778, 0x60000000);
+
+/**
  * @brief Redirect cue power calculation to the simulated value
  */
 f32 bil_cue_get_power() {

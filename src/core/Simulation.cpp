@@ -231,36 +231,38 @@ void Simulation::Tick() {
     mpCurrBreak->frame++;
 
     // For some reason, CanCtrl is wrong on the very first scene tick
-    RPBilCtrl* cueCtrl = RP_GET_INSTANCE(RPBilCtrlManager)->GetCtrl();
-    if (cueCtrl->CanCtrl() && !mIsFirstTick) {
+    RPBilCtrl* ctrl = RP_GET_INSTANCE(RPBilCtrlManager)->GetCtrl();
+    if (ctrl->CanCtrl() && !mIsFirstTick) {
         // Aim up
         if (mTimerUp > 0) {
-            cueCtrl->TurnY(-CUE_TURN_SPEED_Y);
+            ctrl->TurnY(-CUE_TURN_SPEED_Y);
             mTimerUp--;
         }
 
         // Aim left
         if (mTimerLeft > 0) {
-            cueCtrl->TurnX(CUE_TURN_SPEED_X);
+            ctrl->TurnX(CUE_TURN_SPEED_X);
             mTimerLeft--;
         }
         // Aim right
         else if (mTimerRight > 0) {
-            cueCtrl->TurnX(-CUE_TURN_SPEED_X);
+            ctrl->TurnX(-CUE_TURN_SPEED_X);
             mTimerRight--;
         }
     }
 
-    kiwi::WiiCtrl& wiiCtrl =
-        kiwi::CtrlMgr::GetInstance().GetWiiCtrl(kiwi::EPlayer_1);
+    // Controller IR coordinates
+    f32 x = mIsReplay ? mpBestBreak->pos.x : mpCurrBreak->pos.x;
+    f32 y = mIsReplay ? mpBestBreak->pos.y : mpCurrBreak->pos.y;
 
-    // Override IR position
-    if (wiiCtrl.Connected()) {
-        wiiCtrl.Raw().pos.x =
-            mIsReplay ? mpBestBreak->pos.x : mpCurrBreak->pos.x;
-        wiiCtrl.Raw().pos.y =
-            mIsReplay ? mpBestBreak->pos.y : mpCurrBreak->pos.y;
-    }
+    // Map to screen position
+    EGG::Vector2f aim(x * (EGG::Screen::GetSizeXMax() / 2),
+                      -y * (EGG::Screen::GetSizeYMax() / 2));
+
+    // Update cue cursor
+    RPBilCue* cue = RP_GET_INSTANCE(RPBilCueManager)->GetCue(0);
+    K_ASSERT(cue != NULL);
+    cue->SetAimPosition(aim);
 
     mIsFirstTick = false;
 }
@@ -269,31 +271,31 @@ void Simulation::Tick() {
  * @brief End of break shot
  */
 void Simulation::Finish() {
-    // End replay
-    if (mIsReplay) {
-        mIsReplay = false;
-        return;
-    }
-
     // Record break results
-    mpCurrBreak->sunk = GetNumSunk();
-    mpCurrBreak->off = GetNumOff();
-    mpCurrBreak->foul = GetIsFoul();
+    if (!mIsReplay) {
+        mpCurrBreak->sunk = GetNumSunk();
+        mpCurrBreak->off = GetNumOff();
+        mpCurrBreak->foul = GetIsFoul();
 
-    // Upload 6+ breaks to submission server
-    if (mpCurrBreak->sunk + mpCurrBreak->off >= 6) {
-        mpCurrBreak->Upload();
+        // Upload 6+ breaks to submission server
+        if (mpCurrBreak->sunk + mpCurrBreak->off >= 6) {
+            mpCurrBreak->Upload();
+        }
+
+        // Check for new local best
+        if (mpCurrBreak->IsBetterThan(*mpBestBreak)) {
+            // Record break locally
+            mpCurrBreak->Log();
+            mpCurrBreak->Save("best.brk");
+
+            // Prepare replay
+            *mpBestBreak = *mpCurrBreak;
+            mIsReplay = true;
+        }
     }
-
-    // Check for new local best
-    if (mpCurrBreak->IsBetterThan(*mpBestBreak)) {
-        // Record break locally
-        mpCurrBreak->Log();
-        mpCurrBreak->Save("best.brk");
-
-        // Prepare replay
-        *mpBestBreak = *mpCurrBreak;
-        mIsReplay = true;
+    // End replay
+    else {
+        mIsReplay = false;
     }
 
     // Can reset the scene now
