@@ -230,8 +230,8 @@ void Simulation::AfterReset() {
         break;
 
     case EStyle_Jump:
-        // Randomize aiming UP frames -> [40f, 60f]
-        mTimerUp = mpCurrBreak->up = random.NextU32(40, 60);
+        // Randomize aiming UP frames -> [40f, 55f]
+        mTimerUp = mpCurrBreak->up = random.NextU32(40, 55);
 
         // 50% chance to aim sideways
         if (random.Chance(0.50f)) {
