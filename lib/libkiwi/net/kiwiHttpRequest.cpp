@@ -23,8 +23,12 @@ HttpRequest::HttpRequest(const String& host)
     mpSocket = new SyncSocket(SO_PF_INET, SO_SOCK_STREAM);
     K_ASSERT(mpSocket != NULL);
 
+    // Need non-blocking so timeout can be enforced
+    bool success = mpSocket->SetBlocking(false);
+    K_ASSERT(success);
+
     // Bind to any local port
-    bool success = mpSocket->Bind();
+    success = mpSocket->Bind();
     K_ASSERT(success);
 
     // Hostname required by HTTP 1.1
@@ -82,14 +86,26 @@ void HttpRequest::SendImpl() {
     K_ASSERT(mMethod < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
 
-    // Establish connection with server
+    // HTTP connections use port 80
     SockAddr4 addr(mHostName, 80);
-    if (mpSocket->Connect(addr)) {
-        // Send request, receive server's response
-        (void)Request();
-        (void)Receive();
-    } else {
-        mResponse.error = EHttpErr_CantConnect;
+
+    // Establish connection with server
+    Watch w;
+    w.Start();
+    while (true) {
+        // Successful connection
+        if (mpSocket->Connect(addr)) {
+            // Send request, receive server's response
+            (void)Request();
+            (void)Receive();
+            break;
+        }
+
+        // Timeout while connecting
+        if (w.Elapsed() >= mTimeOut) {
+            mResponse.error = EHttpErr_CantConnect;
+            break;
+        }
     }
 
     // User callback
@@ -142,7 +158,8 @@ bool HttpRequest::Receive() {
     K_ASSERT(mpSocket != NULL);
 
     // Beginning timestamp
-    s32 start = OSGetTick();
+    Watch w;
+    w.Start();
 
     /**
      * Receive response headers
@@ -178,7 +195,7 @@ bool HttpRequest::Receive() {
         }
 
         // Timeout check
-        if (OSGetTick() - start >= mTimeOut) {
+        if (w.Elapsed() >= mTimeOut) {
             mResponse.error = EHttpErr_TimedOut;
             return false;
         }
@@ -278,7 +295,7 @@ bool HttpRequest::Receive() {
         }
 
         // Timeout check
-        if (OSGetTick() - start >= mTimeOut) {
+        if (w.Elapsed() >= mTimeOut) {
             // May be the only way to end the body, so not a failure
             break;
         }

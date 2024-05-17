@@ -103,7 +103,7 @@ public:
     }
 
     /**
-     * @brief Set the maximum connection duration before timeout
+     * @brief Set the maximum state duration before timeout
      *
      * @param timeOut Time-out period, in milliseconds
      */
