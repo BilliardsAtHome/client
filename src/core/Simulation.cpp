@@ -206,7 +206,7 @@ void Simulation::AfterReset() {
         }
 
         // 80% chance to aim sideways
-        if (random.Chance(0.80f)) {
+        if (random.Chance(0.8f)) {
             // 50% chance to aim left vs. aim right
             if (random.Chance(0.5f)) {
                 // Randomize aiming SIDEWAYS frames -> [0f, 12f]
@@ -234,7 +234,7 @@ void Simulation::AfterReset() {
         mTimerUp = mpCurrBreak->up = random.NextU32(40, 55);
 
         // 50% chance to aim sideways
-        if (random.Chance(0.50f)) {
+        if (random.Chance(0.5f)) {
             // 50% chance to aim left vs. aim right
             if (random.Chance(0.5f)) {
                 // Randomize aiming SIDEWAYS frames -> [0f, 8f]
