@@ -194,34 +194,69 @@ void Simulation::AfterReset() {
     mTimerLeft = mpCurrBreak->left = 0;
     mTimerRight = mpCurrBreak->right = 0;
 
-    // 50% chance to aim up
-    if (random.Chance(0.5f)) {
-        // Randomize aiming UP frames -> [0f, 35f]
-        mTimerUp = mpCurrBreak->up = random.NextU32(35);
-    }
+    // Pick a random style
+    EStyle style = static_cast<EStyle>(random.NextU32(EStyle_Max));
 
-    // 80% chance to aim sideways
-    if (random.Chance(0.80f)) {
-        // 50% chance to aim left vs. aim right
+    switch (style) {
+    case EStyle_Normal:
+        // 50% chance to aim up
         if (random.Chance(0.5f)) {
-            // Randomize aiming SIDEWAYS frames -> [0f, 12f]
-            mTimerLeft = mpCurrBreak->left = random.NextU32(12);
-        } else {
-            // Randomize aiming SIDEWAYS frames -> [0f, 12f]
-            mTimerRight = mpCurrBreak->right = random.NextU32(12);
+            // Randomize aiming UP frames -> [0f, 35f]
+            mTimerUp = mpCurrBreak->up = random.NextU32(35);
         }
+
+        // 80% chance to aim sideways
+        if (random.Chance(0.80f)) {
+            // 50% chance to aim left vs. aim right
+            if (random.Chance(0.5f)) {
+                // Randomize aiming SIDEWAYS frames -> [0f, 12f]
+                mTimerLeft = mpCurrBreak->left = random.NextU32(12);
+            } else {
+                // Randomize aiming SIDEWAYS frames -> [0f, 12f]
+                mTimerRight = mpCurrBreak->right = random.NextU32(12);
+            }
+        }
+
+        // Base cue position
+        mpCurrBreak->pos = EGG::Vector2f(0.015f, 0.15f);
+
+        // Randomize X pos -> [-0.015, +0.015]
+        mpCurrBreak->pos.x *= random.NextF32();
+        // 50% chance to flip
+        mpCurrBreak->pos.x *= random.Sign();
+
+        // Randomize Y pos -> [+0.15, +0.30]
+        mpCurrBreak->pos.y += random.NextF32(0.15f);
+        break;
+
+    case EStyle_Jump:
+        // Randomize aiming UP frames -> [40f, 60f]
+        mTimerUp = mpCurrBreak->up = random.NextU32(40, 60);
+
+        // 50% chance to aim sideways
+        if (random.Chance(0.50f)) {
+            // 50% chance to aim left vs. aim right
+            if (random.Chance(0.5f)) {
+                // Randomize aiming SIDEWAYS frames -> [0f, 8f]
+                mTimerLeft = mpCurrBreak->left = random.NextU32(8);
+            } else {
+                // Randomize aiming SIDEWAYS frames -> [0f, 8f]
+                mTimerRight = mpCurrBreak->right = random.NextU32(8);
+            }
+        }
+
+        // Base cue position
+        mpCurrBreak->pos = EGG::Vector2f(0.015f, 0.15f);
+
+        // Randomize X pos -> [-0.015, +0.015]
+        mpCurrBreak->pos.x *= random.NextF32();
+        // 50% chance to flip
+        mpCurrBreak->pos.x *= random.Sign();
+
+        // Randomize Y pos -> [+0.15, +0.35]
+        mpCurrBreak->pos.y += random.NextF32(0.20f);
+        break;
     }
-
-    // Base cue position
-    mpCurrBreak->pos = EGG::Vector2f(0.015f, 0.15f);
-
-    // Randomize X pos -> [-0.015, +0.015]
-    mpCurrBreak->pos.x *= random.NextF32();
-    // 50% chance to flip
-    mpCurrBreak->pos.x *= random.Sign();
-
-    // Randomize Y pos -> [+0.15, +0.30]
-    mpCurrBreak->pos.y += random.NextF32(0.15f);
 }
 
 /**

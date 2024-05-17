@@ -13,6 +13,16 @@ namespace BAH {
 class Simulation : public kiwi::DynamicSingleton<Simulation> {
     friend class kiwi::DynamicSingleton<Simulation>;
 
+    /**
+     * @brief Randomization style
+     */
+    enum EStyle {
+        EStyle_Normal,
+        EStyle_Jump,
+
+        EStyle_Max
+    };
+
 public:
     kiwi::Optional<u32> GetUniqueId() const {
         return mUniqueId;
