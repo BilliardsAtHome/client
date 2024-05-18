@@ -22,6 +22,12 @@ public:
         EState_Dummy
     };
 
+    enum EDotState {
+        EDotState_Hit,
+        EDotState_MissClose,
+        EDotState_MissFar,
+    };
+
     enum ECursor {
         ECursor_AimHover,
         ECursor_AimLock,
@@ -31,6 +37,9 @@ public:
     };
 
 public:
+    void CalcPosition();
+    void CalcForce();
+
     void SetAimPosition(const EGG::Vector2f& pos) {
         mAimPosition = pos;
         mValidAim = true;
@@ -39,7 +48,8 @@ public:
 private:
     char _60[0x8];
     RPUtlBaseFsm<RPBilCue>* mpStateMachine; // at 0x68
-    char _6C[0xA4 - 0x6C];
+    EDotState mDotState;                    // at 0x6C
+    char _70[0xA4 - 0x70];
 
     bool mValidAim;             // at 0xA4
     EGG::Vector2f mAimPosition; // at 0xA8

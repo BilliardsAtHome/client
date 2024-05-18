@@ -2869,3 +2869,5 @@ setSceneStatus__13RPSysSceneMgrFQ33EGG5Fader7EStatus=0x80185478
 sTVMode__Q23EGG6Screen=0x8043bba8
 sTVModeHeights__Q23EGG6Screen=0x8043ac2c
 sTVModeWidths__Q23EGG6Screen=0x8043ac28
+CalcPosition__8RPBilCueFv=0x802bd8e8
+CalcForce__8RPBilCueFv=0x802bd62c
