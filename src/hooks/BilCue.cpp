@@ -35,21 +35,27 @@ void BilCue::State_WAIT_calc_Ex() {
         return;
     }
 
-    // Wait until simulation has finished aiming
-    if (!Simulation::GetInstance().IsDoneAiming()) {
-        return;
-    }
-
     // Determine position in world-space
     CalcPosition();
     ASSERT(mValidAim);
 
+    // Update dot cursor
+    switch (mDotState) {
+    case EDotState_Hit:       mCursor = ECursor_AimHover; break;
+    case EDotState_MissClose: mCursor = ECursor_AimMiss; break;
+    case EDotState_MissFar:   mCursor = ECursor_CamHover; break;
+    default:                  ASSERT_EX(false, "Invalid dot state"); break;
+    }
+
     // Determine angular force onto ball
     CalcForce();
 
-    // Move towards taking the shot
-    ASSERT(mpStateMachine != NULL);
-    mpStateMachine->ChangeState(EState_Pull);
+    // Wait until simulation has finished aiming
+    if (Simulation::GetInstance().IsDoneAiming()) {
+        // Move towards taking the shot
+        ASSERT(mpStateMachine != NULL);
+        mpStateMachine->ChangeState(EState_Pull);
+    }
 }
 KM_BRANCH_MF(0x802bf9d4, BilCue, State_WAIT_calc_Ex);
 
