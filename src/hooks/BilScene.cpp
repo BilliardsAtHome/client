@@ -28,10 +28,12 @@ void BilScene::CalculateEx() {
     // Reset DSP to mute "crash sound"
     DSP_HW_REGS[DSP_CSR] |= 0x1;
 
-    // Prepare the break
-    Simulation::GetInstance().BeforeReset();
-    RPBilMain::GetInstance()->Reset();
-    Simulation::GetInstance().AfterReset();
+    // Need to reset early if this is the first break
+    if (Simulation::GetInstance().IsFirstRun()) {
+        Simulation::GetInstance().BeforeReset();
+        RPBilMain::GetInstance()->Reset();
+        Simulation::GetInstance().AfterReset();
+    }
 
     // Simulate the entire break
     while (!Simulation::GetInstance().IsFinished()) {
@@ -39,12 +41,10 @@ void BilScene::CalculateEx() {
         RPBilMain::GetInstance()->Calculate();
     }
 
-    // Need to reset again if we will replay
-    if (Simulation::GetInstance().IsReplay()) {
-        Simulation::GetInstance().BeforeReset();
-        RPBilMain::GetInstance()->Reset();
-        Simulation::GetInstance().AfterReset();
-    }
+    // Prepare for the next break
+    Simulation::GetInstance().BeforeReset();
+    RPBilMain::GetInstance()->Reset();
+    Simulation::GetInstance().AfterReset();
 }
 KM_BRANCH_MF(0x802ba1e0, BilScene, CalculateEx);
 
@@ -52,10 +52,5 @@ KM_BRANCH_MF(0x802ba1e0, BilScene, CalculateEx);
  * @brief Remove "Press B" layout
  */
 KM_WRITE_32(0x802d25f4, 0x4E800020);
-
-/**
- * @brief Skip camera animations
- */
-KM_WRITE_32(0x801bde3c, 0x48000100);
 
 } // namespace BAH

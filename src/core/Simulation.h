@@ -39,6 +39,10 @@ public:
         return mTimerUp <= 0 && mTimerLeft <= 0 && mTimerRight <= 0;
     }
 
+    bool IsFirstRun() const {
+        return mIsFirstRun;
+    }
+
     bool IsReplay() const {
         return mIsReplay;
     }
@@ -70,7 +74,9 @@ private:
     BreakInfo* mpCurrBreak;
     BreakInfo* mpBestBreak;
 
+    bool mIsFirstRun;
     bool mIsFirstTick;
+
     bool mIsReplay;
     bool mIsFinished;
 };

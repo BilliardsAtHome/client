@@ -85,6 +85,7 @@ Simulation::Simulation()
       mTimerRight(0),
       mpCurrBreak(NULL),
       mpBestBreak(NULL),
+      mIsFirstRun(true),
       mIsFirstTick(false),
       mIsReplay(false),
       mIsFinished(false) {
@@ -306,6 +307,9 @@ void Simulation::Tick() {
  * @brief End of break shot
  */
 void Simulation::Finish() {
+    mIsFirstRun = false;
+    mIsFinished = true;
+
     // Record break results
     if (!mIsReplay) {
         mpCurrBreak->sunk = GetNumSunk();
@@ -332,9 +336,6 @@ void Simulation::Finish() {
     else {
         mIsReplay = false;
     }
-
-    // Can reset the scene now
-    mIsFinished = true;
 }
 
 } // namespace BAH
