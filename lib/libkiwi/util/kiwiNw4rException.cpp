@@ -327,8 +327,6 @@ void Nw4rException::DefaultCallback(const Info& info, void* arg) {
  * Dumps error information to the console
  */
 void Nw4rException::DumpError() {
-    VISetBlack(FALSE);
-    VIFlush();
     OSDisableInterrupts();
     OSDisableScheduler();
     OSEnableInterrupts();
