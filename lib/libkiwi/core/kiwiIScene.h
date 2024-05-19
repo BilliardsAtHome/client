@@ -183,7 +183,7 @@ public:
     /*@}*/
 
     /**
-     * @brief Any async task(s) to complete before entering this scene
+     * @brief Any async task(s) to start before entering this scene
      */
     virtual void taskAsync() {}
 

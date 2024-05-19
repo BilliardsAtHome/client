@@ -20,7 +20,6 @@ KM_BRANCH_MF(0x802c0390, BilCue, CalculateEx);
  * @brief HOLD state logic (extension)
  */
 void BilCue::State_HOLD_calc_Ex() {
-    // Move towards taking the shot
     ASSERT(mpStateMachine != NULL);
     mpStateMachine->ChangeState(EState_Wait);
 }
@@ -52,7 +51,6 @@ void BilCue::State_WAIT_calc_Ex() {
 
     // Wait until simulation has finished aiming
     if (Simulation::GetInstance().IsDoneAiming()) {
-        // Move towards taking the shot
         ASSERT(mpStateMachine != NULL);
         mpStateMachine->ChangeState(EState_Pull);
     }

@@ -1,4 +1,4 @@
-#include "LoginScene.h"
+#include "scene/LoginScene/LoginScene.h"
 
 #include "core/Simulation.h"
 

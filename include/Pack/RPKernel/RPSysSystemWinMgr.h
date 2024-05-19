@@ -16,6 +16,8 @@ public:
         return sInstance;
     }
 
+    void createSystemWindow();
+
     void setSystemWindow(E_WINDOW_TYPE type, u32 group, RPSysMessage* msg,
                          int argc, ...);
 

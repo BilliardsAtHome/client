@@ -23,8 +23,6 @@ void KokeshiMain() {
               "16:9 aspect ratio is not supported.\nPlease change to 4:3 in "
               "the console settings.");
 
-    BAH::Simulation::CreateInstance();
-
     // Enter game loop
     RP_GET_INSTANCE(RPSysSystem)->mainLoop();
     // Main function should never return

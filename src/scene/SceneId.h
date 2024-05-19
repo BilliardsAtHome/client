@@ -9,7 +9,8 @@ namespace BAH {
  * @brief Billiards@home scene ID list
  */
 enum ESceneID {
-    ESceneID_LoginScene = kiwi::ESceneID_Max,
+    ESceneID_SetupScene = kiwi::ESceneID_Max,
+    ESceneID_LoginScene,
 };
 
 } // namespace BAH
