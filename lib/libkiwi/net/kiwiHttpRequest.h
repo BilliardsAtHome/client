@@ -1,6 +1,6 @@
 #ifndef LIBKIWI_NET_HTTP_REQUEST_H
 #define LIBKIWI_NET_HTTP_REQUEST_H
-#include <libkiwi/kernel/kiwiAssert.h>
+#include <libkiwi/debug/kiwiAssert.h>
 #include <libkiwi/net/kiwiSyncSocket.h>
 #include <libkiwi/prim/kiwiHashMap.h>
 #include <libkiwi/prim/kiwiOptional.h>

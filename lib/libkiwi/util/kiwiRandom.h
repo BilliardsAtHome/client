@@ -1,6 +1,6 @@
 #ifndef LIBKIWI_UTIL_RANDOM_H
 #define LIBKIWI_UTIL_RANDOM_H
-#include <libkiwi/kernel/kiwiAssert.h>
+#include <libkiwi/debug/kiwiAssert.h>
 #include <revolution/OS.h>
 #include <types.h>
 

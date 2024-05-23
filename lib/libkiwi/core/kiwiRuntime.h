@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_KERNEL_RUNTIME_H
-#define LIBKIWI_KERNEL_RUNTIME_H
+#ifndef LIBKIWI_CORE_RUNTIME_H
+#define LIBKIWI_CORE_RUNTIME_H
 #include <libkiwi/math/kiwiAlgorithm.h>
 #include <revolution/OS.h>
 #include <types.h>
@@ -32,6 +32,10 @@ extern void* const _f_data;
 extern void* const _e_data;
 
 namespace {
+
+/**
+ * ELF section functions
+ */
 
 const void* GetInitStart() {
     return &_f_init;

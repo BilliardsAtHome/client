@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_UTIL_MAP_FILE_H
-#define LIBKIWI_UTIL_MAP_FILE_H
+#ifndef LIBKIWI_DEBUG_MAP_FILE_H
+#define LIBKIWI_DEBUG_MAP_FILE_H
 #include <libkiwi/prim/kiwiLinkList.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 #include <types.h>

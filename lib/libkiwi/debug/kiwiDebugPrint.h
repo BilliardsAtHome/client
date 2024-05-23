@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_GFX_DEBUG_PRINT_H
-#define LIBKIWI_GFX_DEBUG_PRINT_H
+#ifndef LIBKIWI_DEBUG_DEBUG_PRINT_H
+#define LIBKIWI_DEBUG_DEBUG_PRINT_H
 #include <libkiwi/core/kiwiColor.h>
 #include <libkiwi/prim/kiwiString.h>
 #include <types.h>

@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_RVL_LIBSO_H
-#define LIBKIWI_RVL_LIBSO_H
+#ifndef LIBKIWI_SUPPORT_LIBSO_H
+#define LIBKIWI_SUPPORT_LIBSO_H
 #include <cstring>
 #include <libkiwi/prim/kiwiString.h>
 #include <revolution/SO.h>

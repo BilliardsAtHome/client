@@ -1,6 +1,6 @@
 #ifndef LIBKIWI_CORE_THREAD_H
 #define LIBKIWI_CORE_THREAD_H
-#include <libkiwi/kernel/kiwiAssert.h>
+#include <libkiwi/debug/kiwiAssert.h>
 #include <libkiwi/prim/kiwiBitCast.h>
 #include <revolution/OS.h>
 #include <types.h>

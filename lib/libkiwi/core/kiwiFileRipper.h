@@ -1,6 +1,6 @@
 #ifndef LIBKIWI_CORE_FILE_RIPPER_H
 #define LIBKIWI_CORE_FILE_RIPPER_H
-#include <libkiwi/kernel/kiwiMemoryMgr.h>
+#include <libkiwi/core/kiwiMemoryMgr.h>
 #include <types.h>
 
 namespace kiwi {

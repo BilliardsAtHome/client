@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_RVL_LIBGX_H
-#define LIBKIWI_RVL_LIBGX_H
+#ifndef LIBKIWI_SUPPORT_LIBGX_H
+#define LIBKIWI_SUPPORT_LIBGX_H
 #include <revolution/GX.h>
 #include <types.h>
 

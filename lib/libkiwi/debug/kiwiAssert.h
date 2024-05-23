@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_KERNEL_ASSERT_H
-#define LIBKIWI_KERNEL_ASSERT_H
+#ifndef LIBKIWI_DEBUG_ASSERT_H
+#define LIBKIWI_DEBUG_ASSERT_H
 #include <types.h>
 
 // General macros for external usage

@@ -1,6 +1,6 @@
 #ifndef LIBKIWI_PRIM_VECTOR_H
 #define LIBKIWI_PRIM_VECTOR_H
-#include <libkiwi/kernel/kiwiAssert.h>
+#include <libkiwi/debug/kiwiAssert.h>
 #include <types.h>
 
 namespace kiwi {

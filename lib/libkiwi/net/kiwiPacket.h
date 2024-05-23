@@ -3,7 +3,7 @@
 #include <climits>
 #include <libkiwi/math/kiwiAlgorithm.h>
 #include <libkiwi/prim/kiwiOptional.h>
-#include <libkiwi/rvl/kiwiLibSO.h>
+#include <libkiwi/support/kiwiLibSO.h>
 #include <revolution/OS.h>
 #include <types.h>
 

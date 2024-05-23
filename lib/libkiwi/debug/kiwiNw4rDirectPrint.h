@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_UTIL_NW4R_DIRECT_PRINT_H
-#define LIBKIWI_UTIL_NW4R_DIRECT_PRINT_H
+#ifndef LIBKIWI_DEBUG_NW4R_DIRECT_PRINT_H
+#define LIBKIWI_DEBUG_NW4R_DIRECT_PRINT_H
 #include <libkiwi/core/kiwiColor.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 #include <types.h>

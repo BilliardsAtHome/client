@@ -1,6 +1,5 @@
 #include <cstdio>
 #include <libkiwi.h>
-#include <revolution/BASE.h>
 #include <revolution/KPAD.h>
 #include <revolution/VI.h>
 
@@ -16,7 +15,7 @@ namespace {
  *
  * @param ctx OS context
  */
-asm void ContextGetFP(register OSContext* ctx){
+asm void ContextGetFP(register OSContext* ctx) {
     // clang-format off
     mfmsr r5
     ori r5, r5, MSR_FP
@@ -99,34 +98,6 @@ asm void ContextGetFP(register OSContext* ctx){
 _exit:
     blr
     // clang-format on
-}
-
-/**
- * Gets value of the DSISR register
- */
-u32 Mfdsisr() {
-    register u32 _dsisr;
-    // clang-format off
-    asm {
-        mfdsisr _dsisr
-    }
-    // clang-format on
-
-    return _dsisr;
-}
-
-/**
- * Gets value of the DAR register
- */
-u32 Mfdar() {
-    register u32 _dar;
-    // clang-format off
-    asm {
-        mfdar _dar
-    }
-    // clang-format on
-
-    return _dar;
 }
 
 } // namespace
@@ -217,7 +188,7 @@ void Nw4rException::FailAssert(const char* file, int line, const char* msg) {
  */
 void* Nw4rException::ThreadFunc(void* arg) {
 #pragma unused(arg)
-    PPCMtmsr(PPCMfmsr() & ~(MSR_FE0 | MSR_FE1));
+    Mtmsr(Mfmsr() & ~(MSR_FE0 | MSR_FE1));
 
     // Thread waits until error handler
     OSMessage msg;
@@ -249,7 +220,13 @@ void Nw4rException::ErrorHandler(u8 error, OSContext* ctx, u32 dsisr, u32 dar,
     info.ctx = ctx;
     info.dsisr = dsisr;
     info.dar = dar;
-    info.msr = PPCMfmsr();
+    info.msr = Mfmsr();
+
+    // Vector data breakpoints to the debugger
+    if (error == OS_ERR_DSI && (dsisr & DSISR_DABR)) {
+        kiwi::Debugger::GetInstance().BreakErrorHandler(error, ctx, dsisr, dar);
+        return;
+    }
 
     ContextGetFP(ctx);
     OSSetErrorHandler(error, NULL);
@@ -260,7 +237,7 @@ void Nw4rException::ErrorHandler(u8 error, OSContext* ctx, u32 dsisr, u32 dar,
     if (OSGetCurrentThread() == NULL) {
         VISetPreRetraceCallback(NULL);
         VISetPostRetraceCallback(NULL);
-        PPCMtmsr(PPCMfmsr() | MSR_RI);
+        Mtmsr(Mfmsr() | MSR_RI);
         GetInstance().DumpError();
     }
 
@@ -352,7 +329,11 @@ void Nw4rException::DumpError() {
         }
     }
 
-    PPCHalt();
+    // Spin lock
+    volatile int x = 1;
+    while (x) {
+        ;
+    }
 }
 
 /**
