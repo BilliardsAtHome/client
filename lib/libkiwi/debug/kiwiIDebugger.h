@@ -25,16 +25,20 @@ public:
 
         // NOTE: DSI handler reserved for Nw4rException.
         // OSSetErrorHandler(OS_ERR_DSI, BreakCallback);
-
-        // Wait for debugger to be attached
-        bool success = Attach();
-        K_ASSERT(success);
     }
 
     /**
      * @brief Destructor
      */
     virtual ~IDebugger() {}
+
+    /**
+     * @brief Attach the debugger
+     * @note Register EventCallback to fit your communication type
+     *
+     * @return Success
+     */
+    virtual bool Attach() = 0;
 
 protected:
     /**
@@ -46,14 +50,6 @@ protected:
         EExecState_Paused,
         EExecState_BreakPoint
     };
-
-    /**
-     * @brief Attach the debugger
-     * @note Register EventCallback to fit your communication type
-     *
-     * @return Success
-     */
-    virtual bool Attach() = 0;
 
     /**
      * @brief Receive and process the next debugger command

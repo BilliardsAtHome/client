@@ -13,12 +13,12 @@ namespace kiwi {
  * @brief USB Gecko debugger support
  */
 class GeckoDebugger : public IDebugger,
-                      public GlobalInstance<IDebugger>,
+                      private GlobalInstance<IDebugger>,
                       public DynamicSingleton<GeckoDebugger> {
     friend class GlobalInstance<IDebugger>;
     friend class DynamicSingleton<GeckoDebugger>;
 
-protected:
+public:
     /**
      * @brief Attach the debugger (USB Gecko)
      *

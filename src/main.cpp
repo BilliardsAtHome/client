@@ -12,11 +12,13 @@
 void KokeshiMain() {
 #ifndef NDEBUG
     // Setup libkiwi debugging utilities
-    kiwi::GeckoDebugger::CreateInstance();
     kiwi::Nw4rException::CreateInstance();
     kiwi::MapFile::CreateInstance();
     kiwi::MapFile::GetInstance().Open(kokeshi::scMapfilePath,
                                       kiwi::MapFile::ELinkType_Relocatable);
+
+    kiwi::GeckoDebugger::CreateInstance();
+    kiwi::GeckoDebugger::GetInstance().Attach();
 #endif
 
     kiwi::LibSO::Initialize();

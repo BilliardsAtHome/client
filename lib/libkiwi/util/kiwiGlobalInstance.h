@@ -48,7 +48,7 @@ public:
     /**
      * Gets reference to global instance
      */
-    static T& GetInstance() {
+    static T& Get() {
         AutoLock<OSMutex> lock(sMutex);
         K_ASSERT(sInstance != NULL);
         return *sInstance;
@@ -59,7 +59,7 @@ public:
      *
      * @param instance New instance
      */
-    static void SetInstance(T& instance) {
+    static void Set(T& instance) {
         AutoLock<OSMutex> lock(sMutex);
         sInstance = &instance;
     }
@@ -67,7 +67,7 @@ public:
     /**
      * Tests whether a global instance is registered
      */
-    static bool HasInstance() {
+    static bool Exists() {
         AutoLock<OSMutex> lock(sMutex);
         return sInstance != NULL;
     }
