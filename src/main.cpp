@@ -12,7 +12,7 @@
 void KokeshiMain() {
 #ifndef NDEBUG
     // Setup libkiwi debugging utilities
-    kiwi::Debugger::CreateInstance();
+    kiwi::GeckoDebugger::CreateInstance();
     kiwi::Nw4rException::CreateInstance();
     kiwi::MapFile::CreateInstance();
     kiwi::MapFile::GetInstance().Open(kokeshi::scMapfilePath,

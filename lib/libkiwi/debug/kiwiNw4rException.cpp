@@ -224,7 +224,9 @@ void Nw4rException::ErrorHandler(u8 error, OSContext* ctx, u32 dsisr, u32 dar,
 
     // Vector data breakpoints to the debugger
     if (error == OS_ERR_DSI && (dsisr & DSISR_DABR)) {
-        kiwi::Debugger::GetInstance().BreakErrorHandler(error, ctx, dsisr, dar);
+        kiwi::GlobalInstance<IDebugger>::GetInstance().BreakCallback(
+            error, ctx, dsisr, dar);
+
         return;
     }
 

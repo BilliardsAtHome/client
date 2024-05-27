@@ -22,15 +22,21 @@ class MemStream : public FileStream {
 public:
     /**
      * @brief Constructor
+     */
+    MemStream() : FileStream(EOpenMode_RW) {
+        Open(NULL, 0);
+    }
+
+    /**
+     * @brief Constructor
      *
      * @param buffer Buffer
      * @param size Buffer size
      * @param owns Whether the stream owns the buffer
      */
     MemStream(void* buffer, u32 size, bool owns = false)
-        : FileStream(EOpenMode_RW), mBufferSize(size), mOwnsBuffer(owns) {
-        mBufferData = static_cast<u8*>(buffer);
-        mIsOpen = mBufferData != NULL;
+        : FileStream(EOpenMode_RW) {
+        Open(buffer, size, owns);
     }
 
     /**
@@ -41,9 +47,8 @@ public:
      * @param owns Whether the stream owns the buffer
      */
     MemStream(const void* buffer, u32 size, bool owns = false)
-        : FileStream(EOpenMode_Read), mBufferSize(size), mOwnsBuffer(owns) {
-        mBufferData = static_cast<u8*>(const_cast<void*>(buffer));
-        mIsOpen = mBufferData != NULL;
+        : FileStream(EOpenMode_Read) {
+        Open(const_cast<void*>(buffer), size, owns);
     }
 
     /**
@@ -51,27 +56,25 @@ public:
      *
      * @param buffer Work buffer
      */
-    MemStream(const WorkBuffer& buffer)
-        : FileStream(EOpenMode_RW),
-          mBufferData(buffer.Contents()),
-          mBufferSize(buffer.Size()),
-          mOwnsBuffer(false) {
-        mIsOpen = mBufferData != NULL;
+    MemStream(const WorkBuffer& buffer) : FileStream(EOpenMode_RW) {
+        Open(buffer.Contents(), buffer.Size(), false);
     }
 
     /**
      * @brief Destructor
      */
     virtual ~MemStream() {
-        if (mOwnsBuffer) {
-            delete mBufferData;
-        }
+        Close();
     }
 
     /**
      * @brief Close stream
      */
-    virtual void Close() {}
+    virtual void Close() {
+        if (mOwnsBuffer) {
+            delete mBufferData;
+        }
+    }
 
     virtual u32 GetSize() const {
         return mBufferSize;
@@ -101,6 +104,25 @@ public:
     }
     virtual s32 GetBufferAlign() const {
         return 4;
+    }
+
+    /**
+     * @brief Open a new buffer
+     *
+     * @param buffer Buffer
+     * @param size Buffer size
+     * @param owns Whether the stream owns the buffer
+     */
+    void Open(void* buffer, u32 size, bool owns = false) {
+        if (IsOpen()) {
+            Close();
+        }
+
+        mBufferData = static_cast<u8*>(buffer);
+        mBufferSize = size;
+        mOwnsBuffer = owns;
+
+        mIsOpen = mBufferData != NULL;
     }
 
     /**

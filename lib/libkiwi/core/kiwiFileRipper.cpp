@@ -73,7 +73,7 @@ void* FileRipper::Rip(FileStream& strm, const FileRipperArg& arg) {
  * @param where Storage on which the file is located
  * @return File stream
  */
-MemStream* FileRipper::Open(const String& path, EStorage where) {
+MemStream FileRipper::Open(const String& path, EStorage where) {
     void* file;
     u32 size;
 
@@ -84,11 +84,11 @@ MemStream* FileRipper::Open(const String& path, EStorage where) {
 
     // Couldn't find file
     if (file == NULL) {
-        return NULL;
+        return MemStream();
     }
 
     // Stream takes ownership of the buffer
-    return new MemStream(file, size, true);
+    return MemStream(file, size, true);
 }
 
 } // namespace kiwi

@@ -119,11 +119,12 @@ Simulation::~Simulation() {
 void Simulation::LoadUniqueId() {
     // Try to open unique ID from the DVD (file placed by user)
     {
-        kiwi::MemStream* strm =
+        kiwi::MemStream strm =
             kiwi::FileRipper::Open("user.txt", kiwi::EStorage_DVD);
 
-        if (strm != NULL && strm->IsOpen()) {
-            mUniqueId = ksl::strtoul(strm->Read_string());
+        if (strm.IsOpen()) {
+            mUniqueId = ksl::strtoul(strm.Read_string());
+
             K_LOG_EX("User from DVD: %u\n", *mUniqueId);
             return;
         }
@@ -131,12 +132,14 @@ void Simulation::LoadUniqueId() {
 
     // Maybe it's instead on the NAND (saved from entry screen)
     {
-        kiwi::MemStream* strm =
+        kiwi::MemStream strm =
             kiwi::FileRipper::Open("user.bin", kiwi::EStorage_NAND);
 
-        if (strm != NULL && strm->IsOpen()) {
-            mUniqueId = strm->Read_u32();
+        if (strm.IsOpen()) {
+            mUniqueId = strm.Read_u32();
+
             K_LOG_EX("User from NAND: %u\n", *mUniqueId);
+            return;
         }
     }
 }
@@ -147,11 +150,11 @@ void Simulation::LoadUniqueId() {
 void Simulation::LoadBestBreak() {
     K_ASSERT(mpBestBreak != NULL);
 
-    kiwi::MemStream* strm =
+    kiwi::MemStream strm =
         kiwi::FileRipper::Open("best.brk", kiwi::EStorage_NAND);
 
-    if (strm != NULL && strm->IsOpen()) {
-        mpBestBreak->Read(*strm);
+    if (strm.IsOpen()) {
+        mpBestBreak->Read(strm);
     } else {
         // Dummy record will instantly be broken
         mpBestBreak->frame = ULONG_MAX;

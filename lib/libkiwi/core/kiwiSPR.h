@@ -32,7 +32,16 @@ REG_RW(cr)
 
 REG_RW(ctr)
 
+/**
+ * DABR
+ * Data Address Breakpoint Register
+ */
 REG_RW(dabr)
+// clang-format off
+#define DABR_DR (1 << (31 - 31)) // Data read enable
+#define DABR_DW (1 << (31 - 30)) // Data write enable
+#define DABR_BT (1 << (31 - 29)) // Breakpoint translation enable
+// clang-format on
 
 REG_RW(dar)
 
@@ -72,6 +81,35 @@ REG_RW(ear)
  * FPSCR
  * Floating-Point Status and Control Register
  */
+inline u32 Mffpscr() {
+    register u64 fpscr;
+
+    // clang-format off
+    asm {
+        mffs f31
+        stfd f31, fpscr
+    }
+    // clang-format on
+
+    return fpscr;
+}
+
+inline void Mtfpscr(register u32 val) {
+    register struct {
+        f32 pad;
+        f32 data;
+    } fpscr;
+
+    // clang-format off
+    asm {
+        li r4, 0
+        stw val, fpscr.data
+        stw r4, fpscr.pad
+        lfd f31, fpscr.pad
+        mtfs f31
+    }
+    // clang-format on
+}
 // clang-format off
 #define FPSCR_FX       (1       << (31 - 0))  // Floating-point exception summary
 #define FPSCR_FEX      (1       << (31 - 1))  // Floating-point enabled exception summary

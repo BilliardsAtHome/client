@@ -46,7 +46,7 @@ public:
 
 private:
     static T* sInstance;   // Static instance
-    static OSMutex sMutex; // Mutex lock for initialization
+    static OSMutex sMutex; // Mutex lock for safe access
 };
 
 } // namespace kiwi

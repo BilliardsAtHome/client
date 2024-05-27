@@ -20,7 +20,8 @@
 #include <libkiwi/core/kiwiThread.h>
 #include <libkiwi/debug/kiwiAssert.h>
 #include <libkiwi/debug/kiwiDebugPrint.h>
-#include <libkiwi/debug/kiwiDebugger.h>
+#include <libkiwi/debug/kiwiGeckoDebugger.h>
+#include <libkiwi/debug/kiwiIDebugger.h>
 #include <libkiwi/debug/kiwiMapFile.h>
 #include <libkiwi/debug/kiwiNw4rConsole.h>
 #include <libkiwi/debug/kiwiNw4rDirectPrint.h>
@@ -45,6 +46,7 @@
 #include <libkiwi/prim/kiwiOptional.h>
 #include <libkiwi/prim/kiwiPair.h>
 #include <libkiwi/prim/kiwiSTL.h>
+#include <libkiwi/prim/kiwiSmartPtr.h>
 #include <libkiwi/prim/kiwiString.h>
 #include <libkiwi/prim/kiwiVector.h>
 #include <libkiwi/support/kiwiLibGX.h>
@@ -53,6 +55,7 @@
 #include <libkiwi/util/kiwiBuildTarget.h>
 #include <libkiwi/util/kiwiChecksum.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
+#include <libkiwi/util/kiwiGlobalInstance.h>
 #include <libkiwi/util/kiwiNonCopyable.h>
 #include <libkiwi/util/kiwiOverride.h>
 #include <libkiwi/util/kiwiRandom.h>

@@ -1,6 +1,7 @@
 #ifndef LIBKIWI_CORE_FILE_RIPPER_H
 #define LIBKIWI_CORE_FILE_RIPPER_H
 #include <libkiwi/core/kiwiMemoryMgr.h>
+#include <libkiwi/prim/kiwiSmartPtr.h>
 #include <types.h>
 
 namespace kiwi {
@@ -70,7 +71,7 @@ public:
      * @param where Storage on which the file is located
      * @return File stream
      */
-    static MemStream* Open(const String& path, EStorage where);
+    static MemStream Open(const String& path, EStorage where);
 };
 
 } // namespace kiwi
