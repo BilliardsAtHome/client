@@ -6,14 +6,14 @@
 #define LOG(msg) K_LOG(msg)
 #define LOG_EX(msg, ...) K_LOG_EX(msg, __VA_ARGS__)
 
-#define ASSERT(msg) K_ASSERT(msg)
-#define ASSERT_EX(msg, ...) K_ASSERT_EX(msg, __VA_ARGS__)
+#define ASSERT(exp) K_ASSERT(exp)
+#define ASSERT_EX(exp, ...) K_ASSERT_EX(exp, __VA_ARGS__)
 
-#define STATIC_ASSERT(expr) K_STATIC_ASSERT(expr)
-#define STATIC_ASSERT_EX(expr, msg) K_STATIC_ASSERT_EX(expr, msg)
+#define STATIC_ASSERT(exp) K_STATIC_ASSERT(exp)
+#define STATIC_ASSERT_EX(exp, msg) K_STATIC_ASSERT_EX(exp, msg)
 
 // For compiling modern libraries
-#define static_assert(expr, msg) K_STATIC_ASSERT_EX(expr, msg)
+#define static_assert(exp, msg) K_STATIC_ASSERT_EX(exp, msg)
 
 #ifndef NDEBUG
 // Log a message to the console
@@ -45,8 +45,8 @@
 #endif
 
 // Compile-time assertion
-#define K_STATIC_ASSERT(expr) extern u8 __K_PREDICATE[(expr) ? 1 : -1]
-#define K_STATIC_ASSERT_EX(expr, msg) K_STATIC_ASSERT(expr)
+#define K_STATIC_ASSERT(exp) extern u8 __K_PREDICATE[(exp) ? 1 : -1]
+#define K_STATIC_ASSERT_EX(exp, msg) K_STATIC_ASSERT(exp)
 
 #ifdef __cplusplus
 extern "C" {
