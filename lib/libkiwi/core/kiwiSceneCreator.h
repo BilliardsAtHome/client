@@ -1,8 +1,8 @@
 #ifndef LIBKIWI_CORE_SCENE_CREATOR_H
 #define LIBKIWI_CORE_SCENE_CREATOR_H
 #include <RPSystem/RPSysSceneCreator.h>
-#include <libkiwi_config.h>
-#include <types.h>
+#include <libkiwi/k_config.h>
+#include <libkiwi/k_types.h>
 
 namespace kiwi {
 

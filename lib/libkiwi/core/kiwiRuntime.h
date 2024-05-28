@@ -1,8 +1,8 @@
 #ifndef LIBKIWI_CORE_RUNTIME_H
 #define LIBKIWI_CORE_RUNTIME_H
+#include <libkiwi/k_types.h>
 #include <libkiwi/math/kiwiAlgorithm.h>
 #include <revolution/OS.h>
-#include <types.h>
 
 namespace kiwi {
 

@@ -1,9 +1,9 @@
 #ifndef LIBKIWI_UTIL_DYNAMIC_SINGLETON_H
 #define LIBKIWI_UTIL_DYNAMIC_SINGLETON_H
+#include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiAutoLock.h>
 #include <libkiwi/util/kiwiNonCopyable.h>
 #include <revolution/OS.h>
-#include <types.h>
 
 #define K_DYNAMIC_SINGLETON_IMPL(T)                                            \
     T* kiwi::DynamicSingleton<T>::sInstance = NULL;                            \

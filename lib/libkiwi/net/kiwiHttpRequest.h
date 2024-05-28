@@ -1,11 +1,11 @@
 #ifndef LIBKIWI_NET_HTTP_REQUEST_H
 #define LIBKIWI_NET_HTTP_REQUEST_H
 #include <libkiwi/debug/kiwiAssert.h>
+#include <libkiwi/k_types.h>
 #include <libkiwi/net/kiwiSyncSocket.h>
 #include <libkiwi/prim/kiwiHashMap.h>
 #include <libkiwi/prim/kiwiOptional.h>
 #include <libkiwi/prim/kiwiString.h>
-#include <types.h>
 
 namespace kiwi {
 

@@ -1,8 +1,8 @@
 #ifndef LIBKIWI_UTIL_GLOBAL_INSTANCE_H
 #define LIBKIWI_UTIL_GLOBAL_INSTANCE_H
+#include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiAutoLock.h>
 #include <revolution/OS.h>
-#include <types.h>
 
 #define K_GLOBAL_INSTANCE_IMPL(T)                                              \
     T* kiwi::GlobalInstance<T>::sInstance = NULL;                              \

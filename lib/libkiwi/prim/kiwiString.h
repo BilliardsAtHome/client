@@ -1,9 +1,9 @@
 #ifndef LIBKIWI_PRIM_STRING_H
 #define LIBKIWI_PRIM_STRING_H
+#include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiBitCast.h>
 #include <libkiwi/prim/kiwiHashMap.h>
 #include <libkiwi/prim/kiwiVector.h>
-#include <types.h>
 
 namespace kiwi {
 

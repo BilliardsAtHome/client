@@ -1,8 +1,8 @@
 #ifndef LIBKIWI_CORE_FILE_RIPPER_H
 #define LIBKIWI_CORE_FILE_RIPPER_H
 #include <libkiwi/core/kiwiMemoryMgr.h>
+#include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiSmartPtr.h>
-#include <types.h>
 
 namespace kiwi {
 

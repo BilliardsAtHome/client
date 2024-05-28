@@ -1,7 +1,7 @@
 #ifndef LIBKIWI_DEBUG_STACK_CHECKER_H
 #define LIBKIWI_DEBUG_STACK_CHECKER_H
+#include <libkiwi/k_types.h>
 #include <revolution/OS.h>
-#include <types.h>
 
 namespace kiwi {
 

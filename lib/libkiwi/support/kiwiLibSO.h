@@ -1,9 +1,9 @@
 #ifndef LIBKIWI_SUPPORT_LIBSO_H
 #define LIBKIWI_SUPPORT_LIBSO_H
 #include <cstring>
+#include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
 #include <revolution/SO.h>
-#include <types.h>
 
 namespace kiwi {
 

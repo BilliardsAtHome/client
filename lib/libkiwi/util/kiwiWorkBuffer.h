@@ -1,7 +1,7 @@
 #ifndef LIBKIWI_UTIL_WORK_BUFFER_H
 #define LIBKIWI_UTIL_WORK_BUFFER_H
 #include <libkiwi/debug/kiwiAssert.h>
-#include <types.h>
+#include <libkiwi/k_types.h>
 
 namespace kiwi {
 

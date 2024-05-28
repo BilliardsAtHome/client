@@ -1,8 +1,8 @@
 #ifndef LIBKIWI_PRIM_HASHMAP_H
 #define LIBKIWI_PRIM_HASHMAP_H
+#include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiLinkList.h>
 #include <libkiwi/prim/kiwiOptional.h>
-#include <types.h>
 
 namespace kiwi {
 

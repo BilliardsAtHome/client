@@ -1,7 +1,7 @@
 #ifndef KIWI_CORE_MESSAGE_H
 #define KIWI_CORE_MESSAGE_H
 #include <libkiwi/core/kiwiIBinary.h>
-#include <types.h>
+#include <libkiwi/k_types.h>
 
 namespace kiwi {
 

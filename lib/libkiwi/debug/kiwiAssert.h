@@ -1,6 +1,6 @@
 #ifndef LIBKIWI_DEBUG_ASSERT_H
 #define LIBKIWI_DEBUG_ASSERT_H
-#include <types.h>
+#include <libkiwi/k_types.h>
 
 // General macros for external usage
 #define LOG(msg) K_LOG(msg)
@@ -22,26 +22,24 @@
 #define K_LOG_EX(msg, ...) kiwi_log(msg, __VA_ARGS__)
 
 // Log a message to the console when a condition is met
-#define K_WARN(exp, msg) ((exp) ? (K_LOG(msg), 1) : 0)
+#define K_WARN(exp, msg) ((exp) ? K_LOG(msg) : (void)0)
 // Log a variadic message to the console when a condition is met
-#define K_WARN_EX(exp, msg, ...) ((exp) ? (K_LOG_EX(msg, __VA_ARGS__), 1) : 0)
+#define K_WARN_EX(exp, msg, ...) ((exp) ? K_LOG_EX(msg, __VA_ARGS__) : (void)0)
 
-// Assert a condition and halt execution when it fails to hold.
-// Can be used as either an expression or statement.
+// Assert a condition and halt execution when it fails to hold
 #define K_ASSERT(exp)                                                          \
-    (!(exp) ? (kiwi_fail_assert(__FILE__, __LINE__, #exp), 0) : 1)
+    (!(exp) ? kiwi_fail_assert(__FILE__, __LINE__, #exp) : (void)0)
 // Assert a condition and halt execution when it fails to hold,
-// displaying a custom error message.
-// Can be used as either an expression or statement.
+// displaying a custom error message
 #define K_ASSERT_EX(exp, ...)                                                  \
-    (!(exp) ? (kiwi_fail_assert(__FILE__, __LINE__, __VA_ARGS__), 0) : 1)
+    (!(exp) ? kiwi_fail_assert(__FILE__, __LINE__, __VA_ARGS__) : (void)0)
 #else
-#define K_LOG(msg)
-#define K_LOG_EX(msg, ...)
-#define K_WARN(exp, msg)
-#define K_WARN_EX(exp, msg, ...)
-#define K_ASSERT(exp, ...)
-#define K_ASSERT_EX(exp, ...)
+#define K_LOG(msg) (void)0
+#define K_LOG_EX(msg, ...) (void)0
+#define K_WARN(exp, msg) (void)0
+#define K_WARN_EX(exp, msg, ...) (void)0
+#define K_ASSERT(exp, ...) (void)0
+#define K_ASSERT_EX(exp, ...) (void)0
 #endif
 
 // Compile-time assertion
@@ -58,13 +56,5 @@ void kiwi_fail_assert(const char* file, int line, const char* msg, ...);
 #ifdef __cplusplus
 }
 #endif
-
-// Override RP_GET_INSTANCE to NULL check singletons
-#ifdef RP_GET_INSTANCE
-#undef RP_GET_INSTANCE
-#endif
-
-#define RP_GET_INSTANCE(T)                                                     \
-    (K_ASSERT(T::GetInstance() != NULL), T::GetInstance())
 
 #endif

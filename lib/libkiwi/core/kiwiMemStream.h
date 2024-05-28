@@ -2,8 +2,8 @@
 #define LIBKIWI_CORE_MEM_STREAM_H
 #include <libkiwi/core/kiwiFileRipper.h>
 #include <libkiwi/core/kiwiFileStream.h>
+#include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiWorkBuffer.h>
-#include <types.h>
 
 /**
  * @brief Declare stream functions by type

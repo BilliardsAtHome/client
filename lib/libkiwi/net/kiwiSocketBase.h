@@ -1,8 +1,8 @@
 #ifndef LIBKIWI_NET_SOCKET_BASE_H
 #define LIBKIWI_NET_SOCKET_BASE_H
+#include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiOptional.h>
 #include <libkiwi/support/kiwiLibSO.h>
-#include <types.h>
 
 namespace kiwi {
 

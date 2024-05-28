@@ -62,6 +62,9 @@
 #include <libkiwi/util/kiwiStaticSingleton.h>
 #include <libkiwi/util/kiwiWatch.h>
 #include <libkiwi/util/kiwiWorkBuffer.h>
-#include <libkiwi_config.h>
-#include <types.h>
+
+// Order important from here
+
+#include <libkiwi/k_config.h>
+#include <libkiwi/k_types.h>
 #endif

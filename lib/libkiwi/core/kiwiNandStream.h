@@ -1,8 +1,8 @@
 #ifndef LIBKIWI_CORE_NAND_STREAM_H
 #define LIBKIWI_CORE_NAND_STREAM_H
 #include <libkiwi/core/kiwiFileStream.h>
+#include <libkiwi/k_types.h>
 #include <revolution/NAND.h>
-#include <types.h>
 
 namespace kiwi {
 

@@ -1,8 +1,8 @@
 #ifndef LIBKIWI_DEBUG_NW4R_EXCEPTION_H
 #define LIBKIWI_DEBUG_NW4R_EXCEPTION_H
+#include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 #include <revolution/OS.h>
-#include <types.h>
 
 namespace kiwi {
 

@@ -1,11 +1,11 @@
 #ifndef LIBKIWI_NET_PACKET_H
 #define LIBKIWI_NET_PACKET_H
 #include <climits>
+#include <libkiwi/k_types.h>
 #include <libkiwi/math/kiwiAlgorithm.h>
 #include <libkiwi/prim/kiwiOptional.h>
 #include <libkiwi/support/kiwiLibSO.h>
 #include <revolution/OS.h>
-#include <types.h>
 
 namespace kiwi {
 

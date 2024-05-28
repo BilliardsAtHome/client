@@ -1,8 +1,8 @@
 #ifndef LIBKIWI_DEBUG_DEBUG_PRINT_H
 #define LIBKIWI_DEBUG_DEBUG_PRINT_H
 #include <libkiwi/core/kiwiColor.h>
+#include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
-#include <types.h>
 
 namespace kiwi {
 

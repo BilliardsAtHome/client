@@ -1,6 +1,6 @@
 #ifndef LIBKIWI_CORE_SPR_H
 #define LIBKIWI_CORE_SPR_H
-#include <types.h>
+#include <libkiwi/k_types.h>
 
 /**
  * Special-purpose register functions

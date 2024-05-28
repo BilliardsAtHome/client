@@ -1,7 +1,7 @@
 #ifndef LIBKIWI_NET_EMU_RICH_PRESENCE_H
 #define LIBKIWI_NET_EMU_RICH_PRESENCE_H
+#include <libkiwi/k_types.h>
 #include <libkiwi/net/kiwiIRichPresence.h>
-#include <types.h>
 
 namespace kiwi {
 
