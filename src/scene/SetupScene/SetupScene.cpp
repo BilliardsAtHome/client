@@ -63,7 +63,7 @@ void SetupScene::LoadAssets() {
     // Misc. resources
     RP_GET_INSTANCE(RPSysKokeshiManager)->LoadStaticResource();
     RP_GET_INSTANCE(RPSysEffectMgr)->LoadResource();
-    RP_GET_INSTANCE(RPSysSaveDataMgr)->createBannerFile();
+    RP_GET_INSTANCE(RPSysSaveDataMgr)->initBanner();
     RP_GET_INSTANCE(RPSysSystem)->createTimeStamp();
 }
 
@@ -71,6 +71,8 @@ void SetupScene::LoadAssets() {
  * @brief Setup game globals
  */
 void SetupScene::SetupGame() {
+    // If there is no prior save we at least want the banner
+    RP_GET_INSTANCE(RPSysSaveDataMgr)->createBannerFile();
     // Stop potential save data corruption
     RP_GET_INSTANCE(RPSysSaveDataMgr)->setSaveDisable(true);
 
