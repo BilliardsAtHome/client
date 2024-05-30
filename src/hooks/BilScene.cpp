@@ -8,14 +8,6 @@
 namespace BAH {
 
 /**
- * @brief Register any custom draw objects with the scene renderer
- */
-void BilScene::RegistDrawObject() {
-    RPGrpRenderer::GetInstance()->AppendDrawObject(&Simulation::GetInstance());
-}
-KM_BRANCH(0x802baa3c, BilScene::RegistDrawObject);
-
-/**
  * @brief Scene logic
  */
 void BilScene::CalculateEx() {

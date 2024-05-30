@@ -338,12 +338,4 @@ void Simulation::Finish() {
     }
 }
 
-/**
- * @brief User level draw (break statistics)
- */
-void Simulation::UserDraw() {
-    kiwi::DebugPrint::PrintfOutline(0.0f, 0.0f, 1.0f, true, kiwi::Color::WHITE,
-                                    kiwi::Color::GREY, "Best break so far:");
-}
-
 } // namespace BAH

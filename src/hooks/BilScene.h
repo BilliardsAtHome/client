@@ -10,8 +10,6 @@ namespace BAH {
  */
 class BilScene : private RPBilScene {
 public:
-    static void RegistDrawObject();
-
     void CalculateEx();
 };
 
