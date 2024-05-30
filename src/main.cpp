@@ -21,7 +21,8 @@ void KokeshiMain() {
     kiwi::GeckoDebugger::GetInstance().Attach();
 #endif
 
-    kiwi::LibSO::Initialize();
+    kiwi::LibSO::Initialize(); // Initialize socket library
+
     ASSERT_EX(SCGetAspectRatio() == SC_ASPECT_STD,
               "16:9 aspect ratio is not supported.\nPlease change to 4:3 in "
               "the console settings.");
@@ -29,10 +30,9 @@ void KokeshiMain() {
     // Enter first scene
     kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(
         BAH::ESceneID_SetupScene);
-    // Enter game loop
-    RP_GET_INSTANCE(RPSysSystem)->mainLoop();
-    // Main function should never return
-    ASSERT(false);
+
+    RP_GET_INSTANCE(RPSysSystem)->mainLoop(); // Enter game loop
+    ASSERT(false); // Main function should never return
 }
 KOKESHI_BY_PACK(KM_CALL(0x80183b6c, KokeshiMain), // Wii Sports
                 KM_CALL(0x80183784, KokeshiMain), // Wii Play
