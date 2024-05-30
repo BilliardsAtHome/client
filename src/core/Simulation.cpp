@@ -93,6 +93,7 @@ Simulation::Simulation()
     mpBestBreak = new (32) BreakInfo();
     ASSERT(mpCurrBreak != NULL);
     ASSERT(mpBestBreak != NULL);
+
     // Load previous session information
     LoadUniqueId();
     LoadBestBreak();
