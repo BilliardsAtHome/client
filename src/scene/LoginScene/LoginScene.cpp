@@ -36,10 +36,15 @@ void LoginScene::OnCalculate() {
 void LoginScene::OnUserDraw() {
     kiwi::DebugPrint::PrintfOutline(0.0f, 0.7f, 1.0f, true, kiwi::Color::WHITE,
                                     kiwi::Color::GREY, "Enter your unique ID:");
+    kiwi::DebugPrint::PrintfOutline(0.0f, 0.6f, 1.0f, true, kiwi::Color::RED,
+                                    kiwi::Color::GREY, "(from the bot)");
 
     kiwi::DebugPrint::PrintfOutline(
-        0.0f, -0.8f, 1.0f, true, kiwi::Color::YELLOW, kiwi::Color::GREY,
-        "Use the /get-id Discord command if you are unsure");
+        0.0f, -0.6f, 0.8f, true, kiwi::Color::WHITE, kiwi::Color::GREY,
+        "Enter the number with the D-Pad/A Button.");
+    kiwi::DebugPrint::PrintfOutline(
+        0.0f, -0.7f, 0.8f, true, kiwi::Color::YELLOW, kiwi::Color::GREY,
+        "Use the /get-id bot command to check/get one.");
 
     mKeypad.UserDraw();
 }
@@ -73,6 +78,9 @@ void LoginScene::KeypadOkCallback(const kiwi::String& result, void* arg) {
     }
 
     Simulation::GetInstance().SetUniqueId(uid);
+
+    // Disable audio (stop the "crash sound")
+    __OSStopAudioSystem();
 
     // Exit to billiards
     kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(

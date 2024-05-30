@@ -89,15 +89,14 @@ Simulation::Simulation()
       mIsFirstTick(false),
       mIsReplay(false),
       mIsFinished(false) {
-    LoadUniqueId();
-
     mpCurrBreak = new (32) BreakInfo();
     mpBestBreak = new (32) BreakInfo();
     ASSERT(mpCurrBreak != NULL);
     ASSERT(mpBestBreak != NULL);
-
-    // Previous best may still be on the NAND
+    // Load previous session information
+    LoadUniqueId();
     LoadBestBreak();
+
     // Default to max power
     mpCurrBreak->power = 150.0f;
 }
@@ -148,7 +147,7 @@ void Simulation::LoadUniqueId() {
  * @brief Load best break from NAND
  */
 void Simulation::LoadBestBreak() {
-    K_ASSERT(mpBestBreak != NULL);
+    ASSERT(mpBestBreak != NULL);
 
     kiwi::MemStream strm =
         kiwi::FileRipper::Open("best.brk", kiwi::EStorage_NAND);
@@ -300,7 +299,7 @@ void Simulation::Tick() {
 
     // Update cue cursor
     RPBilCue* cue = RP_GET_INSTANCE(RPBilCueManager)->GetCue(0);
-    K_ASSERT(cue != NULL);
+    ASSERT(cue != NULL);
     cue->SetAimPosition(aim);
 
     mIsFirstTick = false;
@@ -339,6 +338,14 @@ void Simulation::Finish() {
     else {
         mIsReplay = false;
     }
+}
+
+/**
+ * @brief User level draw (break statistics)
+ */
+void Simulation::UserDraw() {
+    kiwi::DebugPrint::PrintfOutline(0.0f, 0.0f, 1.0f, true, kiwi::Color::WHITE,
+                                    kiwi::Color::GREY, "Best break so far:");
 }
 
 } // namespace BAH

@@ -2,6 +2,7 @@
 #define BAH_CLIENT_SIMULATION_H
 #include "BreakInfo.h"
 
+#include <Pack/RPGraphics.h>
 #include <libkiwi.h>
 #include <types.h>
 
@@ -10,7 +11,8 @@ namespace BAH {
 /**
  * @brief Billiards simulation runner
  */
-class Simulation : public kiwi::DynamicSingleton<Simulation> {
+class Simulation : public kiwi::DynamicSingleton<Simulation>,
+                   public IRPGrpDrawObject {
     friend class kiwi::DynamicSingleton<Simulation>;
 
     /**
@@ -31,12 +33,12 @@ public:
         mUniqueId = id;
     }
 
-    f32 GetCuePower() const {
-        return mpCurrBreak->power;
-    }
-
     bool IsDoneAiming() const {
         return mTimerUp <= 0 && mTimerLeft <= 0 && mTimerRight <= 0;
+    }
+
+    f32 GetCuePower() const {
+        return mpCurrBreak->power;
     }
 
     bool IsFirstRun() const {
@@ -63,6 +65,8 @@ private:
 
     void LoadUniqueId();
     void LoadBestBreak();
+
+    virtual void UserDraw();
 
 private:
     kiwi::Optional<u32> mUniqueId;

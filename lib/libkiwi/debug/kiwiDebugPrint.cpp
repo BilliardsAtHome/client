@@ -106,19 +106,19 @@ void DebugPrint::PrintImpl(f32 x, f32 y, f32 scale, bool center,
                            kiwi::Color color, const kiwi::String& msg) {
     RP_GET_INSTANCE(RPSysTextWriter)->Begin();
     {
+        u32 flag = 0;
+        u32 oldFlag = RP_GET_INSTANCE(RPSysTextWriter)->GetDrawFlag();
+
         // Text alignment
-        u32 flag = RPSysTextWriter::DrawFlag_AlignCenterY;
         if (center) {
             flag |= RPSysTextWriter::DrawFlag_AlignCenterX;
+            flag |= RPSysTextWriter::DrawFlag_AlignCenterY;
         }
 
-        u32 oldFlag = RP_GET_INSTANCE(RPSysTextWriter)->GetDrawFlag();
-        {
-            RP_GET_INSTANCE(RPSysTextWriter)->SetDrawFlag(flag);
-            RP_GET_INSTANCE(RPSysTextWriter)->SetTextColor(color);
-            RP_GET_INSTANCE(RPSysTextWriter)->SetScale(scale, scale);
-            RP_GET_INSTANCE(RPSysTextWriter)->PrintfZeroCenter(x, y, msg);
-        }
+        RP_GET_INSTANCE(RPSysTextWriter)->SetDrawFlag(flag);
+        RP_GET_INSTANCE(RPSysTextWriter)->SetTextColor(color);
+        RP_GET_INSTANCE(RPSysTextWriter)->SetScale(scale, scale);
+        RP_GET_INSTANCE(RPSysTextWriter)->PrintfZeroCenter(x, y, msg);
         RP_GET_INSTANCE(RPSysTextWriter)->SetDrawFlag(oldFlag);
     }
     RP_GET_INSTANCE(RPSysTextWriter)->End();

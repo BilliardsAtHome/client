@@ -2899,3 +2899,4 @@ sInstance__14RPPartyGameMgr=0x8043c6c8
 Reset__14RPPartyGameMgrFv=0x801e4a90
 DestroyInstance__14RPPartyGameMgrFv=0x801e4ad4
 SetEfbClearColor__13RPGrpRendererFUcUcUc=0x801ad9cc
+GetInstance__Q44nw4r3snd6detail9AxManagerFv=0x800312e0

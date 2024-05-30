@@ -8,6 +8,14 @@
 namespace BAH {
 
 /**
+ * @brief Register any custom draw objects with the scene renderer
+ */
+void BilScene::RegistDrawObject() {
+    RPGrpRenderer::GetInstance()->AppendDrawObject(&Simulation::GetInstance());
+}
+KM_BRANCH(0x802baa3c, BilScene::RegistDrawObject);
+
+/**
  * @brief Scene logic
  */
 void BilScene::CalculateEx() {
@@ -19,31 +27,29 @@ void BilScene::CalculateEx() {
     // Replay runs alongside framerate
     if (Simulation::GetInstance().IsReplay()) {
         Simulation::GetInstance().Tick();
-        RPBilMain::GetInstance()->Calculate();
+        RP_GET_INSTANCE(RPBilMain)->Calculate();
         return;
     }
 
     // Stop context switches
     kiwi::AutoInterruptLock lock;
-    // Reset DSP to mute "crash sound"
-    DSP_HW_REGS[DSP_CSR] |= 0x1;
 
     // Need to reset early if this is the first break
     if (Simulation::GetInstance().IsFirstRun()) {
         Simulation::GetInstance().BeforeReset();
-        RPBilMain::GetInstance()->Reset();
+        RP_GET_INSTANCE(RPBilMain)->Reset();
         Simulation::GetInstance().AfterReset();
     }
 
     // Simulate the entire break
     while (!Simulation::GetInstance().IsFinished()) {
         Simulation::GetInstance().Tick();
-        RPBilMain::GetInstance()->Calculate();
+        RP_GET_INSTANCE(RPBilMain)->Calculate();
     }
 
     // Prepare for the next break
     Simulation::GetInstance().BeforeReset();
-    RPBilMain::GetInstance()->Reset();
+    RP_GET_INSTANCE(RPBilMain)->Reset();
     Simulation::GetInstance().AfterReset();
 }
 KM_BRANCH_MF(0x802ba1e0, BilScene, CalculateEx);

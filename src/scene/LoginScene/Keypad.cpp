@@ -5,8 +5,8 @@
 namespace BAH {
 namespace {
 
-const f32 BUFFER_Y = 0.5f;
-const f32 KEY_SIZE = 0.25f;
+const f32 BUFFER_Y = 0.4f;
+const f32 KEY_SIZE = 0.2f;
 const f32 KEYPAD_X = -((KEY_SIZE * 3.0f) / 3.0f);
 const f32 KEYPAD_Y = 0.2f;
 
