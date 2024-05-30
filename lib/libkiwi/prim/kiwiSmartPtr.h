@@ -88,10 +88,7 @@ public:
      * @brief Destroy and release object
      */
     void Destroy() {
-        if (mpData != NULL) {
-            delete mpData;
-            mpData = NULL;
-        }
+        delete mpData;
     }
 
     /**

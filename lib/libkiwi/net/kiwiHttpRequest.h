@@ -99,7 +99,6 @@ public:
             "Don't destroy this object while async request is pending.");
 
         delete mpSocket;
-        mpSocket = NULL;
     }
 
     /**

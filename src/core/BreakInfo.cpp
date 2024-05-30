@@ -177,7 +177,7 @@ void BreakInfo::Save(const char* name) const {
  * @brief Upload break result to the submission server
  */
 void BreakInfo::Upload() const {
-    kiwi::HttpRequest request("127.0.0.1");
+    kiwi::HttpRequest request("aspyn.gay");
     request.SetURI("/billiards/api");
 
     request.SetParameter("user", *Simulation::GetInstance().GetUniqueId());

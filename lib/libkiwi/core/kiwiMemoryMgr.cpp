@@ -73,10 +73,7 @@ MemoryMgr::MemoryMgr() {
  */
 MemoryMgr::~MemoryMgr() {
     delete mpHeapMEM1;
-    mpHeapMEM1 = NULL;
-
     delete mpHeapMEM2;
-    mpHeapMEM2 = NULL;
 }
 
 /**

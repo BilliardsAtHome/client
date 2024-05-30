@@ -39,10 +39,8 @@ public:
     ~TVector() {
         // Destroy objects
         Clear();
-
         // Free array buffer
         delete mpData;
-        mpData = NULL;
     }
 
     /**

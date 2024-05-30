@@ -29,7 +29,6 @@ public:
      */
     ~RecvJob() {
         delete packet;
-        packet = NULL;
     }
 
     /**
@@ -112,7 +111,6 @@ public:
      */
     ~SendJob() {
         delete packet;
-        packet = NULL;
     }
 
     /**

@@ -61,7 +61,6 @@ Nw4rDirectPrint::Nw4rDirectPrint() {
  */
 Nw4rDirectPrint::~Nw4rDirectPrint() {
     delete mpBuffer;
-    mpBuffer = NULL;
 }
 
 /**

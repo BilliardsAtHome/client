@@ -106,10 +106,7 @@ Simulation::Simulation()
  */
 Simulation::~Simulation() {
     delete mpCurrBreak;
-    mpCurrBreak = NULL;
-
     delete mpBestBreak;
-    mpBestBreak = NULL;
 }
 
 /**
