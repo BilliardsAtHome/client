@@ -80,7 +80,8 @@ K_DYNAMIC_SINGLETON_IMPL(Simulation);
  * @brief Constructor
  */
 Simulation::Simulation()
-    : mTimerUp(0),
+    : kiwi::ISceneHook(kiwi::ESceneID_RPBilScene),
+      mTimerUp(0),
       mTimerLeft(0),
       mTimerRight(0),
       mpCurrBreak(NULL),
@@ -88,10 +89,14 @@ Simulation::Simulation()
       mIsFirstRun(true),
       mIsFirstTick(false),
       mIsReplay(false),
-      mIsFinished(false) {
+      mIsFinished(false),
+      mNumBreak(0) {
+    std::memset(mNumBall, 0, sizeof(mNumBall));
+
     mpCurrBreak = new (32) BreakInfo();
-    mpBestBreak = new (32) BreakInfo();
     ASSERT(mpCurrBreak != NULL);
+
+    mpBestBreak = new (32) BreakInfo();
     ASSERT(mpBestBreak != NULL);
 
     // Load previous session information
@@ -108,6 +113,81 @@ Simulation::Simulation()
 Simulation::~Simulation() {
     delete mpCurrBreak;
     delete mpBestBreak;
+}
+
+/**
+ * @brief Configure callback
+ */
+void Simulation::Configure(RPSysScene* scene) {
+#pragma unused(scene)
+
+    RP_GET_INSTANCE(RPGrpRenderer)->AppendDrawObject(this);
+}
+
+/**
+ * @brief User-level draw (break statistics)
+ */
+void Simulation::UserDraw() {
+    if (IsReplay()) {
+        return;
+    }
+
+    /**
+     * Best break statistics
+     */
+
+    kiwi::DebugPrint::PrintfOutline(0.2f, 0.7f, 0.8f, true, kiwi::Color::CYAN,
+                                    kiwi::Color::BLACK, "[Best break]");
+
+    kiwi::DebugPrint::PrintfOutline(
+        0.2f, 0.6f, 0.8f, true, kiwi::Color::WHITE, kiwi::Color::BLACK,
+        "> %d balls (%d sunk, %d off)", mpBestBreak->sunk + mpBestBreak->off,
+        mpBestBreak->sunk, mpBestBreak->off);
+
+    kiwi::DebugPrint::PrintfOutline(
+        0.2f, 0.5f, 0.8f, true, kiwi::Color::WHITE, kiwi::Color::BLACK,
+        "> in %03d frames (%.2f sec)", mpBestBreak->frame,
+        mpBestBreak->frame / 60.0f);
+
+    kiwi::DebugPrint::PrintfOutline(
+        0.2f, 0.4f, 0.8f, true, kiwi::Color::WHITE, kiwi::Color::BLACK,
+        "> %02df up, %02df left, %02df right", mpBestBreak->up,
+        mpBestBreak->left, mpBestBreak->right);
+
+    kiwi::DebugPrint::PrintfOutline(0.2f, 0.3f, 0.8f, true, kiwi::Color::YELLOW,
+                                    kiwi::Color::BLACK, "> %s",
+                                    mpBestBreak->foul ? "foul" : "no foul");
+
+    /**
+     * Session statistics
+     */
+
+    kiwi::DebugPrint::PrintfOutline(0.2f, -0.3f, 0.8f, true, kiwi::Color::CYAN,
+                                    kiwi::Color::BLACK, "[This session]");
+
+    kiwi::DebugPrint::PrintfOutline(0.2f, -0.4f, 0.8f, true, kiwi::Color::WHITE,
+                                    kiwi::Color::BLACK, "> %d total breaks",
+                                    mNumBreak);
+
+    kiwi::DebugPrint::PrintfOutline(0.2f, -0.5f, 0.8f, true, kiwi::Color::WHITE,
+                                    kiwi::Color::BLACK, "> distribution:");
+
+    kiwi::DebugPrint::PrintfOutline(0.2f, -0.6f, 0.8f, true, kiwi::Color::WHITE,
+                                    kiwi::Color::BLACK, "{%d, %d, %d, %d, %d}",
+                                    mNumBall[0], mNumBall[1], mNumBall[2],
+                                    mNumBall[3], mNumBall[4]);
+    kiwi::DebugPrint::PrintfOutline(0.2f, -0.7f, 0.8f, true, kiwi::Color::WHITE,
+                                    kiwi::Color::BLACK, "{%d, %d, %d, %d, %d}",
+                                    mNumBall[5], mNumBall[6], mNumBall[7],
+                                    mNumBall[8], mNumBall[9]);
+
+    /**
+     * User information
+     */
+
+    kiwi::DebugPrint::PrintfOutline(-0.5f, -0.9f, 0.8f, true, kiwi::Color::RED,
+                                    kiwi::Color::BLACK, "Unique ID: %06d",
+                                    mUniqueId.Value());
 }
 
 /**
@@ -315,6 +395,10 @@ void Simulation::Finish() {
         mpCurrBreak->sunk = GetNumSunk();
         mpCurrBreak->off = GetNumOff();
         mpCurrBreak->foul = GetIsFoul();
+
+        // Track statistics
+        mNumBreak++;
+        mNumBall[mpCurrBreak->sunk]++;
 
         // Upload 6+ breaks to submission server
         if (mpCurrBreak->sunk + mpCurrBreak->off >= 6) {

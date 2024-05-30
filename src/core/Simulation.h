@@ -2,6 +2,7 @@
 #define BAH_CLIENT_SIMULATION_H
 #include "BreakInfo.h"
 
+#include <Pack/RPGraphics.h>
 #include <libkiwi.h>
 #include <types.h>
 
@@ -10,7 +11,9 @@ namespace BAH {
 /**
  * @brief Billiards simulation runner
  */
-class Simulation : public kiwi::DynamicSingleton<Simulation> {
+class Simulation : public kiwi::DynamicSingleton<Simulation>,
+                   public kiwi::ISceneHook,
+                   public IRPGrpDrawObject {
     friend class kiwi::DynamicSingleton<Simulation>;
 
     /**
@@ -61,6 +64,9 @@ private:
     Simulation();
     virtual ~Simulation();
 
+    virtual void Configure(RPSysScene* scene);
+    virtual void UserDraw();
+
     void LoadUniqueId();
     void LoadBestBreak();
 
@@ -79,6 +85,9 @@ private:
 
     bool mIsReplay;
     bool mIsFinished;
+
+    u32 mNumBreak;
+    u32 mNumBall[10];
 };
 
 } // namespace BAH

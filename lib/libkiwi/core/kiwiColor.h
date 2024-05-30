@@ -64,6 +64,9 @@ public:
     static const Color BLUE;
     static const Color PURPLE;
     static const Color PINK;
+
+    static const Color CYAN;
+
     static const Color BLACK;
     static const Color WHITE;
     static const Color BROWN;
