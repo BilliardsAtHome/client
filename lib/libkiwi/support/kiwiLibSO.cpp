@@ -108,6 +108,8 @@ void LibSO::Initialize() {
         s32 result = sIosDevice.Ioctl(Ioctl_SOStartup);
         K_ASSERT_EX(result >= 0, "SOStartup failed (%d)", result);
     }
+
+    WaitForDHCP();
 }
 
 /**
