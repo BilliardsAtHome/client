@@ -26,14 +26,14 @@ public:
      * @brief Destructor
      */
     ~IosObject() {
-        delete Ptr();
+        Ptr()->~T();
     }
 
     /**
      * @brief Access object address
      */
     void* Base() const {
-        K_ASSERT(Size() == 1);
+        K_ASSERT(Capacity() == 1);
         return At(0).base;
     }
     /**

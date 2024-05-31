@@ -56,9 +56,9 @@ s32 IosDevice::Ioctl(s32 id, const Optional<IosVectors>& in,
                      const Optional<IosVectors>& out) const {
     K_ASSERT_EX(mHandle > 0, "Please open this device");
 
-    K_ASSERT_EX(!in || in->Size() == 1,
+    K_ASSERT_EX(!in || in->Capacity() == 1,
                 "Ioctl only supports one argument per vector");
-    K_ASSERT_EX(!out || out->Size() == 1,
+    K_ASSERT_EX(!out || out->Capacity() == 1,
                 "Ioctl only supports one argument per vector");
 
     return IOS_Ioctl(mHandle, id,
@@ -88,25 +88,25 @@ s32 IosDevice::IoctlV(s32 id, const Optional<IosVectors>& in,
     // No parameters
     case 0: return IOS_Ioctlv(mHandle, id, 0, 0, NULL);
     // Only input vectors
-    case IN: return IOS_Ioctlv(mHandle, id, in->Size(), 0, *in);
+    case IN: return IOS_Ioctlv(mHandle, id, in->Capacity(), 0, *in);
     // Only output vectors
-    case OUT: return IOS_Ioctlv(mHandle, id, 0, out->Size(), *out);
+    case OUT: return IOS_Ioctlv(mHandle, id, 0, out->Capacity(), *out);
 
     // Both input & output vectors
     case (IN | OUT): {
         // Vectors need to be contiguous for IOS
-        IosVectors all(in->Size() + out->Size());
+        IosVectors all(in->Capacity() + out->Capacity());
         int i = 0;
 
         // Copy into contiguous buffer
-        for (int j = 0; j < in->Size();) {
+        for (int j = 0; j < in->Capacity();) {
             all[i++] = (*in)[j++];
         }
-        for (int j = 0; j < out->Size();) {
+        for (int j = 0; j < out->Capacity();) {
             all[i++] = (*out)[j++];
         }
 
-        return IOS_Ioctlv(mHandle, id, in->Size(), out->Size(), all);
+        return IOS_Ioctlv(mHandle, id, in->Capacity(), out->Capacity(), all);
     }
 
     default: K_ASSERT(false); return IPC_RESULT_INVALID_INTERNAL;

@@ -31,8 +31,11 @@ void* CreateFB(const GXRenderModeObj* mode) {
     // Calculate framebuffer size in bytes
     u32 size = ROUND_UP(mode->fbWidth, 16) * mode->xfbHeight * sizeof(u16);
 
-    // Try using heap
-    void* fb = new (32) u8[size];
+    // Try using heap, but be careful to not throw a nested exception
+    void* fb = NULL;
+    if (MemoryMgr::GetInstance().GetFreeSize(EMemory_MEM1) != 0) {
+        fb = new (32) u8[size];
+    }
 
     // Force allocation from OS arena
     if (fb == NULL) {

@@ -28,7 +28,7 @@ enum {
     Ioctl_SOStartup = 31,
 
     // dev/net/ncd/manage
-    Ioctl_NCDGetLinkStatus = 7,
+    IoctlV_NCDGetLinkStatus = 7,
 
     // dev/net/kd/request
     Ioctl_NWC24iStartupSocket = 6,
@@ -69,10 +69,19 @@ void LibSO::Initialize() {
         ncd_manage.Open("/dev/net/ncd/manage", 1000);
         K_ASSERT(ncd_manage.IsOpen());
 
+        // Output vectors
+        enum {
+            V_OSTAT, // Output vector for link status
+            V_OMAX,  // Total output vector count
+        };
+        IosVectors output(V_OMAX);
+
         IosObject<NCDLinkStatus> linkStatus;
+        output[V_OSTAT].Set(linkStatus.Base(), linkStatus.Size());
+
         s32 result =
-            ncd_manage.Ioctl(Ioctl_NCDGetLinkStatus, kiwi::nullopt, linkStatus);
-        K_ASSERT_EX(result >= 0, "NCDGetLinkStatus failed");
+            ncd_manage.IoctlV(IoctlV_NCDGetLinkStatus, kiwi::nullopt, output);
+        K_ASSERT_EX(result >= 0, "NCDGetLinkStatus failed (%d)", result);
 
         K_ASSERT_EX(linkStatus->linkState >= 0, "Received invalid link status");
     }
@@ -90,7 +99,7 @@ void LibSO::Initialize() {
         IosObject<NWC24Result> dummy;
         s32 result =
             kd_request.Ioctl(Ioctl_NWC24iStartupSocket, kiwi::nullopt, dummy);
-        K_ASSERT_EX(result >= 0, "NWC24iStartupSocket failed");
+        K_ASSERT_EX(result >= 0, "NWC24iStartupSocket failed (%d)", result);
     }
 
     /**
@@ -103,7 +112,7 @@ void LibSO::Initialize() {
         K_ASSERT_EX(sIosDevice.IsOpen(), "Couldn't open /dev/net/ip/top");
 
         s32 result = sIosDevice.Ioctl(Ioctl_SOStartup);
-        K_ASSERT_EX(result >= 0, "SOStartup failed");
+        K_ASSERT_EX(result >= 0, "SOStartup failed (%d)", result);
     }
 }
 

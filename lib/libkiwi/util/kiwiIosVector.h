@@ -28,12 +28,12 @@ public:
         /**
          * @brief Set vector contents
          *
-         * @param base Memory base
-         * @param length Memory size
+         * @param _base Memory base
+         * @param _length Memory size
          */
-        void Set(void* base, u32 length) {
-            base = base;
-            length = length;
+        void Set(void* _base, u32 _length) {
+            base = _base;
+            length = _length;
         }
 
         /**
@@ -66,7 +66,7 @@ public:
     /**
      * @brief Access number of vectors
      */
-    u32 Size() const {
+    u32 Capacity() const {
         return mCapacity;
     }
 
