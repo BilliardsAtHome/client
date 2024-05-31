@@ -26,7 +26,7 @@ public:
      * @brief Destructor
      */
     ~IosObject() {
-        Ptr()->~T();
+        delete Ptr();
     }
 
     /**
@@ -93,7 +93,11 @@ private:
     void Allocate() {
         void* base = new (32, EMemory_MEM2) T();
         K_ASSERT(base != NULL && OSIsMEM2Region(base));
-        At(0).Set(base, Size());
+
+        // Don't use Set! Base needs to be set before Size()
+        Data& d = At(0);
+        d.base = base;
+        d.length = Size();
     }
 };
 

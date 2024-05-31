@@ -69,21 +69,12 @@ void LibSO::Initialize() {
         ncd_manage.Open("/dev/net/ncd/manage", 1000);
         K_ASSERT(ncd_manage.IsOpen());
 
-        // Output vectors
-        enum {
-            V_OSTAT, // Output vector for link status
-            V_OMAX,  // Total output vector count
-        };
-        IosVectors output(V_OMAX);
-
         IosObject<NCDLinkStatus> linkStatus;
-        output[V_OSTAT].Set(linkStatus.Base(), linkStatus.Size());
-
         s32 result =
-            ncd_manage.IoctlV(IoctlV_NCDGetLinkStatus, kiwi::nullopt, output);
+            ncd_manage.IoctlV(IoctlV_NCDGetLinkStatus, NULL, &linkStatus);
         K_ASSERT_EX(result >= 0, "NCDGetLinkStatus failed (%d)", result);
 
-        K_ASSERT_EX(linkStatus->linkState >= 0, "Received invalid link status");
+        K_ASSERT(linkStatus->linkState >= 0);
     }
 
     /**
@@ -96,10 +87,13 @@ void LibSO::Initialize() {
         kd_request.Open("/dev/net/kd/request", 1000);
         K_ASSERT(kd_request.IsOpen());
 
-        IosObject<NWC24Result> dummy;
+        IosObject<NWC24Result> commonResult;
         s32 result =
-            kd_request.Ioctl(Ioctl_NWC24iStartupSocket, kiwi::nullopt, dummy);
+            kd_request.Ioctl(Ioctl_NWC24iStartupSocket, NULL, &commonResult);
         K_ASSERT_EX(result >= 0, "NWC24iStartupSocket failed (%d)", result);
+
+        K_ASSERT(commonResult->result >= 0);
+        K_ASSERT(commonResult->exResult >= 0);
     }
 
     /**
@@ -151,7 +145,7 @@ s32 LibSO::Socket(SOProtoFamily family, SOSockType type) {
     // IOS must auto-detect protocol
     args->protocol = SO_IPPROTO_IP;
 
-    s32 result = sIosDevice.Ioctl(Ioctl_SOCreate, args, kiwi::nullopt);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOCreate, &args, NULL);
     sLastError = result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
 
     return result;
@@ -169,7 +163,7 @@ SOResult LibSO::Close(SOSocket socket) {
     IosObject<s32> fd;
     *fd = socket;
 
-    s32 result = sIosDevice.Ioctl(Ioctl_SOClose, fd, kiwi::nullopt);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOClose, &fd, NULL);
     sLastError = static_cast<SOResult>(result);
 
     return sLastError;
@@ -193,7 +187,7 @@ SOResult LibSO::Listen(SOSocket socket, s32 backlog) {
     args->fd = socket;
     args->backlog = backlog;
 
-    s32 result = sIosDevice.Ioctl(Ioctl_SOListen, args, kiwi::nullopt);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOListen, &args, NULL);
     sLastError = static_cast<SOResult>(result);
 
     return sLastError;
@@ -220,7 +214,7 @@ s32 LibSO::Accept(SOSocket socket, SockAddr& addr) {
     out->len = addr.len;
 
     // Result >= 0 == peer descriptor
-    s32 result = sIosDevice.Ioctl(Ioctl_SOAccept, fd, out);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOAccept, &fd, &out);
     sLastError = result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
 
     if (result >= 0) {
@@ -255,7 +249,7 @@ SOResult LibSO::Bind(SOSocket socket, SockAddr& addr) {
     args->hasDest = TRUE;
     args->dest = addr;
 
-    s32 result = sIosDevice.Ioctl(Ioctl_SOBind, args, kiwi::nullopt);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOBind, &args, NULL);
     sLastError = static_cast<SOResult>(result);
 
     return sLastError;
@@ -284,7 +278,7 @@ SOResult LibSO::Connect(SOSocket socket, const SockAddr& addr) {
     args->hasDest = TRUE;
     args->dest = addr;
 
-    s32 result = sIosDevice.Ioctl(Ioctl_SOConnect, args, kiwi::nullopt);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOConnect, &args, NULL);
     sLastError = static_cast<SOResult>(result);
 
     return sLastError;
@@ -309,7 +303,7 @@ SOResult LibSO::GetSockName(SOSocket socket, SockAddr& addr) {
     IosObject<SockAddr> self;
     self->len = addr.len;
 
-    s32 result = sIosDevice.Ioctl(Ioctl_SOGetSocketName, fd, self);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOGetSocketName, &fd, &self);
     sLastError = static_cast<SOResult>(result);
 
     if (result >= 0) {
@@ -338,7 +332,7 @@ SOResult LibSO::GetPeerName(SOSocket socket, SockAddr& addr) {
     IosObject<SockAddr> peer;
     peer->len = addr.len;
 
-    s32 result = sIosDevice.Ioctl(Ioctl_SOGetPeerName, fd, peer);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOGetPeerName, &fd, &peer);
     sLastError = static_cast<SOResult>(result);
 
     if (result >= 0) {
@@ -511,7 +505,7 @@ s32 LibSO::RecvImpl(SOSocket socket, void* dst, u32 len, u32 flags,
         output[V_OADDR].Clear();
     }
 
-    s32 result = sIosDevice.IoctlV(Ioctl_SORecvFrom, input, output);
+    s32 result = sIosDevice.IoctlV(Ioctl_SORecvFrom, &input, &output);
     sLastError = result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
 
     return result;
@@ -569,7 +563,7 @@ s32 LibSO::SendImpl(SOSocket socket, const void* src, u32 len, u32 flags,
     }
 
     // Request send
-    s32 result = sIosDevice.IoctlV(Ioctl_SOSendTo, input);
+    s32 result = sIosDevice.IoctlV(Ioctl_SOSendTo, &input);
     sLastError = result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
 
     return result;
@@ -601,7 +595,7 @@ s32 LibSO::Fcntl(SOSocket socket, SOFcntlCmd cmd, ...) {
     args->cmd = cmd;
     args->arg = arg;
 
-    s32 result = sIosDevice.Ioctl(Ioctl_SOFcntl, args, kiwi::nullopt);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOFcntl, &args, NULL);
     sLastError = result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
 
     return result;
@@ -625,7 +619,7 @@ SOResult LibSO::Shutdown(SOSocket socket, SOShutdownType how) {
     args->fd = socket;
     args->type = how;
 
-    s32 result = sIosDevice.Ioctl(Ioctl_SOShutdown, args, kiwi::nullopt);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOShutdown, &args, NULL);
     sLastError = static_cast<SOResult>(result);
 
     return sLastError;
@@ -657,7 +651,7 @@ s32 LibSO::Poll(SOPollFD fds[], u32 numfds, s64 timeout) {
     K_ASSERT(p != NULL);
     std::memcpy(p, fds, numfds * sizeof(SOPollFD));
 
-    s32 result = sIosDevice.Ioctl(Ioctl_SOPoll, msec, output);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOPoll, &msec, &output);
     sLastError = result >= 0 ? SO_SUCCESS : static_cast<SOResult>(result);
 
     // Output provides search results
@@ -693,7 +687,7 @@ bool LibSO::INetAtoN(const String& name, SockAddr4& addr) {
 
     IosObject<SOInAddr> output;
 
-    s32 result = sIosDevice.Ioctl(Ioctl_SOINetAtoN, input, output);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOINetAtoN, &input, &output);
     sLastError = result == 1 ? SO_SUCCESS : SO_EINVAL;
 
     if (result == 1) {
@@ -836,7 +830,7 @@ SOResult LibSO::SetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
     args->val = val;
     args->len = len;
 
-    s32 result = sIosDevice.Ioctl(Ioctl_SOSetSockOpt, args, kiwi::nullopt);
+    s32 result = sIosDevice.Ioctl(Ioctl_SOSetSockOpt, &args, NULL);
     sLastError = static_cast<SOResult>(result);
 
     return sLastError;

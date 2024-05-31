@@ -52,20 +52,19 @@ bool IosDevice::Close() {
  * @param out Output data
  * @return IOS result code
  */
-s32 IosDevice::Ioctl(s32 id, const Optional<IosVectors>& in,
-                     const Optional<IosVectors>& out) const {
+s32 IosDevice::Ioctl(s32 id, const IosVectors* in, IosVectors* out) const {
     K_ASSERT_EX(mHandle > 0, "Please open this device");
 
-    K_ASSERT_EX(!in || in->Capacity() == 1,
+    K_ASSERT_EX(in == NULL || in->Capacity() == 1,
                 "Ioctl only supports one argument per vector");
-    K_ASSERT_EX(!out || out->Capacity() == 1,
+    K_ASSERT_EX(out == NULL || out->Capacity() == 1,
                 "Ioctl only supports one argument per vector");
 
     return IOS_Ioctl(mHandle, id,
-                     in ? in->At(0).base : NULL,   //
-                     in ? in->At(0).length : 0,    //
-                     out ? out->At(0).base : NULL, //
-                     out ? out->At(0).length : 0);
+                     in != NULL ? in->At(0).base : NULL,   //
+                     in != NULL ? in->At(0).length : 0,    //
+                     out != NULL ? out->At(0).base : NULL, //
+                     out != NULL ? out->At(0).length : 0);
 }
 
 /**
@@ -76,13 +75,12 @@ s32 IosDevice::Ioctl(s32 id, const Optional<IosVectors>& in,
  * @param out Output vectors
  * @return IOS result code
  */
-s32 IosDevice::IoctlV(s32 id, const Optional<IosVectors>& in,
-                      const Optional<IosVectors>& out) const {
+s32 IosDevice::IoctlV(s32 id, const IosVectors* in, IosVectors* out) const {
     K_ASSERT_EX(mHandle > 0, "Please open this device");
 
     // Mark which sets of vectors are present
     enum { IN = (1 << 0), OUT = (1 << 1) };
-    u32 type = 0 | (in * IN) | (out * OUT);
+    u32 type = (in != NULL ? IN : 0) | (out != NULL ? OUT : 0);
 
     switch (type) {
     // No parameters

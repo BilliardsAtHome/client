@@ -62,8 +62,8 @@ public:
      * @param out Output data
      * @return IOS result code
      */
-    s32 Ioctl(s32 id, const Optional<IosVectors>& in = kiwi::nullopt,
-              const Optional<IosVectors>& out = kiwi::nullopt) const;
+    s32 Ioctl(s32 id, const IosVectors* in = NULL,
+              IosVectors* out = NULL) const;
 
     /**
      * @brief Perform I/O control (multiple vectors) on this device
@@ -73,8 +73,8 @@ public:
      * @param out Output vectors
      * @return IOS result code
      */
-    s32 IoctlV(s32 id, const Optional<IosVectors>& in = kiwi::nullopt,
-               const Optional<IosVectors>& out = kiwi::nullopt) const;
+    s32 IoctlV(s32 id, const IosVectors* in = NULL,
+               IosVectors* out = NULL) const;
 
 private:
     String mName; // Virtual file path
