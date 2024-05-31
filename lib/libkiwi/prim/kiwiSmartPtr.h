@@ -125,16 +125,16 @@ public:
     }
 
     /**
-     * @brief Dereference pointer
+     * @brief Pointer access
      */
-    T& operator->() {
+    T* operator->() {
         K_ASSERT(mpData != NULL);
         return *Get();
     }
     /**
-     * @brief Dereference pointer (read-only)
+     * @brief Pointer access (read-only)
      */
-    const T& operator->() const {
+    const T* operator->() const {
         K_ASSERT(mpData != NULL);
         return *Get();
     }

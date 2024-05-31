@@ -1,8 +1,11 @@
 #ifndef LIBKIWI_SUPPORT_LIBSO_H
 #define LIBKIWI_SUPPORT_LIBSO_H
 #include <cstring>
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
+#include <libkiwi/util/kiwiIosDevice.h>
+#include <libkiwi/util/kiwiIosObject.h>
 #include <revolution/SO.h>
 
 namespace kiwi {
@@ -64,8 +67,8 @@ private:
                         const SockAddr* addr);
 
 private:
-    static s32 sDeviceHandle;   // IOS IP device handle
-    static SOResult sLastError; // Last IOS error code
+    static IosDevice sIosDevice; // IOS IP device handle
+    static SOResult sLastError;  // Last IOS error code
 };
 
 /**
@@ -263,6 +266,13 @@ struct SockAddr6 : public SOSockAddrIn6 {
  */
 inline String ToString(const SockAddr& t) {
     return Format("%s:%d", LibSO::INetNtoP(t).CStr(), t.port);
+}
+
+/**
+ * @brief IOS expects object length to be the address length
+ */
+template <> u32 IosObject<SockAddr>::Size() const {
+    return Ref().len;
 }
 
 K_STATIC_ASSERT(sizeof(SockAddr) == sizeof(SOSockAddr));
