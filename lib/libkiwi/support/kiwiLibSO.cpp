@@ -55,7 +55,7 @@ SOResult LibSO::sLastError = SO_SUCCESS;
  */
 void LibSO::Initialize() {
     // Prevent double initialization
-    if (sIosDevice.IsOpen() >= 0) {
+    if (sIosDevice.IsOpen()) {
         return;
     }
 
