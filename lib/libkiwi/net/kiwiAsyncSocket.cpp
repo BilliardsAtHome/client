@@ -17,7 +17,7 @@ public:
      * @param _callback Completion callback
      * @param _arg Callback user argument
      */
-    RecvJob(Packet* _packet, void* _dst, SockAddr* _peer,
+    RecvJob(Packet* _packet, void* _dst, SockAddrAny* _peer,
             Callback _callback = NULL, void* _arg = NULL)
         : packet(_packet), dst(_dst), callback(_callback), arg(_arg) {
         K_ASSERT(packet != NULL);
@@ -249,7 +249,8 @@ AsyncSocket::~AsyncSocket() {
  * @param arg Callback user argument
  * @return Success
  */
-bool AsyncSocket::Connect(const SockAddr& addr, Callback callback, void* arg) {
+bool AsyncSocket::Connect(const SockAddrAny& addr, Callback callback,
+                          void* arg) {
     K_ASSERT(IsOpen());
 
     mState = EState_Connecting;
@@ -292,8 +293,9 @@ AsyncSocket* AsyncSocket::Accept(AcceptCallback callback, void* arg) {
  * @param arg Callback user argument
  * @return Socket library result
  */
-SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
-                               Callback callback, void* arg) {
+SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv,
+                               SockAddrAny* addr, Callback callback,
+                               void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(dst != NULL);
     K_ASSERT_EX(!IsStack(dst), "Don't use stack memory for async");
@@ -324,7 +326,7 @@ SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
  * @return Socket library result
  */
 SOResult AsyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
-                               const SockAddr* addr, Callback callback,
+                               const SockAddrAny* addr, Callback callback,
                                void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(src != NULL);

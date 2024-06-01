@@ -11,7 +11,8 @@ namespace kiwi {
  * @param arg Callback user argument
  * @return Success
  */
-bool SyncSocket::Connect(const SockAddr& addr, Callback callback, void* arg) {
+bool SyncSocket::Connect(const SockAddrAny& addr, Callback callback,
+                         void* arg) {
     K_ASSERT(IsOpen());
 
     s32 result = LibSO::Connect(mHandle, addr);
@@ -63,7 +64,7 @@ SyncSocket* SyncSocket::Accept(AcceptCallback callback, void* arg) {
  * @param arg Callback user argument
  * @return Socket library result
  */
-SOResult SyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
+SOResult SyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddrAny* addr,
                               Callback callback, void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(dst != NULL);
@@ -110,7 +111,7 @@ _exit:
  * @return Socket library result
  */
 SOResult SyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
-                              const SockAddr* addr, Callback callback,
+                              const SockAddrAny* addr, Callback callback,
                               void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(src != NULL);

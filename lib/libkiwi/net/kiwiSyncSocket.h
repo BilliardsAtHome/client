@@ -24,7 +24,7 @@ public:
      */
     virtual ~SyncSocket() {}
 
-    virtual bool Connect(const SockAddr& addr, Callback callback = NULL,
+    virtual bool Connect(const SockAddrAny& addr, Callback callback = NULL,
                          void* arg = NULL);
     virtual SyncSocket* Accept(AcceptCallback callback = NULL,
                                void* arg = NULL);
@@ -40,10 +40,10 @@ private:
     SyncSocket(SOSocket socket, SOProtoFamily family, SOSockType type)
         : SocketBase(socket, family, type) {}
 
-    virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
+    virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SockAddrAny* addr,
                               Callback callback, void* arg);
     virtual SOResult SendImpl(const void* src, u32 len, u32& nsend,
-                              const SockAddr* addr, Callback callback,
+                              const SockAddrAny* addr, Callback callback,
                               void* arg);
 };
 

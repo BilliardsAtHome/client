@@ -58,7 +58,7 @@ void SocketBase::GetHostAddr(SockAddr4& addr) {
  * @param addr[in,out] Local address
  * @return Success
  */
-bool SocketBase::Bind(SockAddr& addr) const {
+bool SocketBase::Bind(SockAddrAny& addr) const {
     K_ASSERT(IsOpen());
     K_ASSERT(mFamily == addr.in.family);
 
@@ -169,7 +169,7 @@ bool SocketBase::Close() {
  * @param[out] addr Socket address
  * @return Success
  */
-bool SocketBase::GetSocketAddr(SockAddr& addr) const {
+bool SocketBase::GetSocketAddr(SockAddrAny& addr) const {
     K_ASSERT(IsOpen());
     K_ASSERT(mFamily == addr.in.family);
 
@@ -182,7 +182,7 @@ bool SocketBase::GetSocketAddr(SockAddr& addr) const {
  * @param[out] addr Peer address
  * @return Success
  */
-bool SocketBase::GetPeerAddr(SockAddr& addr) const {
+bool SocketBase::GetPeerAddr(SockAddrAny& addr) const {
     K_ASSERT(IsOpen());
     K_ASSERT(mFamily == addr.in.family);
 
@@ -262,7 +262,7 @@ Optional<u32> SocketBase::RecvBytes(void* buf, u32 len, Callback callback,
  * @param arg Callback user argument
  * @return Number of bytes received
  */
-Optional<u32> SocketBase::RecvBytesFrom(void* buf, u32 len, SockAddr& addr,
+Optional<u32> SocketBase::RecvBytesFrom(void* buf, u32 len, SockAddrAny& addr,
                                         Callback callback, void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(buf != NULL);
@@ -330,8 +330,8 @@ Optional<u32> SocketBase::SendBytes(const void* buf, u32 len, Callback callback,
  * @return Number of bytes sent
  */
 Optional<u32> SocketBase::SendBytesTo(const void* buf, u32 len,
-                                      const SockAddr& addr, Callback callback,
-                                      void* arg) {
+                                      const SockAddrAny& addr,
+                                      Callback callback, void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(buf != NULL);
     K_ASSERT(len > 0);

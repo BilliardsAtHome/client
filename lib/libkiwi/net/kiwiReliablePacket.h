@@ -54,7 +54,7 @@ public:
      * @param size Packet buffer size
      * @param dest Packet recipient
      */
-    ReliablePacket(u32 size, const SockAddr* dest = NULL)
+    ReliablePacket(u32 size, const SockAddrAny* dest = NULL)
         : Packet(size, dest) {}
 
     /**

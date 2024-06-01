@@ -17,7 +17,7 @@ public:
     AsyncSocket(SOProtoFamily family, SOSockType type);
     virtual ~AsyncSocket();
 
-    virtual bool Connect(const SockAddr& addr, Callback callback = NULL,
+    virtual bool Connect(const SockAddrAny& addr, Callback callback = NULL,
                          void* arg = NULL);
     virtual AsyncSocket* Accept(AcceptCallback callback = NULL,
                                 void* arg = NULL);
@@ -41,17 +41,17 @@ private:
     void CalcRecv();
     void CalcSend();
 
-    virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SockAddr* addr,
+    virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SockAddrAny* addr,
                               Callback callback, void* arg);
     virtual SOResult SendImpl(const void* src, u32 len, u32& nsend,
-                              const SockAddr* addr, Callback callback,
+                              const SockAddrAny* addr, Callback callback,
                               void* arg);
 
 private:
     static const u32 THREAD_STACK_SIZE = 0x4000;
 
     volatile EState mState; // Current async task
-    SockAddr mPeer;         // Peer address
+    SockAddrAny mPeer;      // Peer address
 
     // Active packet jobs
     TList<RecvJob> mRecvJobs;

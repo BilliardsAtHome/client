@@ -11,7 +11,7 @@
 namespace kiwi {
 
 // Forward declarations
-class SockAddr;
+class SockAddrAny;
 class SockAddr4;
 class SockAddr6;
 
@@ -26,21 +26,21 @@ public:
     static s32 Socket(SOProtoFamily family, SOSockType type);
     static SOResult Close(SOSocket socket);
     static SOResult Listen(SOSocket socket, s32 backlog = SOMAXCONN);
-    static s32 Accept(SOSocket socket, SockAddr& addr);
-    static SOResult Bind(SOSocket socket, SockAddr& addr);
-    static SOResult Connect(SOSocket socket, const SockAddr& addr);
-    static SOResult GetSockName(SOSocket socket, SockAddr& addr);
-    static SOResult GetPeerName(SOSocket socket, SockAddr& addr);
+    static s32 Accept(SOSocket socket, SockAddrAny& addr);
+    static SOResult Bind(SOSocket socket, SockAddrAny& addr);
+    static SOResult Connect(SOSocket socket, const SockAddrAny& addr);
+    static SOResult GetSockName(SOSocket socket, SockAddrAny& addr);
+    static SOResult GetPeerName(SOSocket socket, SockAddrAny& addr);
 
     static s32 Read(SOSocket socket, void* dst, u32 len);
     static s32 Recv(SOSocket socket, void* dst, u32 len, u32 flags);
     static s32 RecvFrom(SOSocket socket, void* dst, u32 len, u32 flags,
-                        SockAddr& addr);
+                        SockAddrAny& addr);
 
     static s32 Write(SOSocket socket, const void* src, u32 len);
     static s32 Send(SOSocket socket, const void* src, u32 len, u32 flags);
     static s32 SendTo(SOSocket socket, const void* src, u32 len, u32 flags,
-                      const SockAddr& addr);
+                      const SockAddrAny& addr);
 
     static s32 Fcntl(SOSocket socket, SOFcntlCmd cmd, ...);
     static SOResult Shutdown(SOSocket socket, SOShutdownType how);
@@ -48,10 +48,11 @@ public:
 
     static bool INetAtoN(const String& str, SockAddr4& addr);
 
-    static bool INetPtoN(const String& str, SockAddr& addr);
-    static String INetNtoP(const SockAddr& addr);
+    static bool INetPtoN(const String& str, SockAddrAny& addr);
+    static String INetNtoP(const SockAddrAny& addr);
 
     static void GetHostID(SockAddr4& addr);
+    static bool GetHostByName(const String& str, SockAddrAny& addr);
 
     static SOResult GetSockOpt(SOSocket socket, SOSockOptLevel level,
                                SOSockOpt opt, void* val, u32 len);
@@ -62,9 +63,9 @@ public:
 
 private:
     static s32 RecvImpl(SOSocket socket, void* dst, u32 len, u32 flags,
-                        SockAddr* addr);
+                        SockAddrAny* addr);
     static s32 SendImpl(SOSocket socket, const void* src, u32 len, u32 flags,
-                        const SockAddr* addr);
+                        const SockAddrAny* addr);
 
 private:
     static IosDevice sIosDevice; // IOS IP device handle
@@ -74,12 +75,12 @@ private:
 /**
  * @brief SO IP address wrapper
  */
-struct SockAddr : public SOSockAddr {
+struct SockAddrAny : public SOSockAddr {
     /**
      * @brief Constructor
      */
-    SockAddr() {
-        std::memset(this, 0, sizeof(SockAddr));
+    SockAddrAny() {
+        std::memset(this, 0, sizeof(SockAddrAny));
     }
 
     /**
@@ -87,11 +88,11 @@ struct SockAddr : public SOSockAddr {
      *
      * @param addr Socket address
      */
-    SockAddr(const SockAddr& addr) {
+    SockAddrAny(const SockAddrAny& addr) {
         std::memcpy(this, &addr, addr.len);
     }
 
-    SockAddr& operator=(const SockAddr& addr) {
+    SockAddrAny& operator=(const SockAddrAny& addr) {
         std::memcpy(this, &addr, addr.len);
         return *this;
     }
@@ -101,11 +102,11 @@ struct SockAddr : public SOSockAddr {
      *
      * @param addr Socket address
      */
-    SockAddr(const SOSockAddr& addr) {
+    SockAddrAny(const SOSockAddr& addr) {
         std::memcpy(this, &addr, addr.len);
     }
 
-    SockAddr& operator=(const SOSockAddr& addr) {
+    SockAddrAny& operator=(const SOSockAddr& addr) {
         std::memcpy(this, &addr, addr.len);
         return *this;
     }
@@ -115,11 +116,11 @@ struct SockAddr : public SOSockAddr {
  * @brief SO IPv4 address wrapper to simplify upcasting
  */
 struct SockAddr4 : public SOSockAddrIn {
-    operator SockAddr&() {
-        return reinterpret_cast<SockAddr&>(*this);
+    operator SockAddrAny&() {
+        return reinterpret_cast<SockAddrAny&>(*this);
     }
-    operator const SockAddr&() const {
-        return reinterpret_cast<const SockAddr&>(*this);
+    operator const SockAddrAny&() const {
+        return reinterpret_cast<const SockAddrAny&>(*this);
     }
 
     /**
@@ -177,12 +178,12 @@ struct SockAddr4 : public SOSockAddrIn {
      *
      * @param addr Socket address
      */
-    SockAddr4(const SockAddr& addr) {
+    SockAddr4(const SockAddrAny& addr) {
         K_ASSERT_EX(addr.len == sizeof(SockAddr4), "Not for this class");
         std::memcpy(this, &addr, addr.len);
     }
 
-    SockAddr4& operator=(const SockAddr& addr) {
+    SockAddr4& operator=(const SockAddrAny& addr) {
         K_ASSERT_EX(addr.len == sizeof(SockAddr4), "Not for this class");
         std::memcpy(this, &addr, addr.len);
         return *this;
@@ -193,11 +194,11 @@ struct SockAddr4 : public SOSockAddrIn {
  * SO IPv6 address wrapper to simplify upcasting
  */
 struct SockAddr6 : public SOSockAddrIn6 {
-    operator SockAddr&() {
-        return reinterpret_cast<SockAddr&>(*this);
+    operator SockAddrAny&() {
+        return reinterpret_cast<SockAddrAny&>(*this);
     }
-    operator const SockAddr&() const {
-        return reinterpret_cast<const SockAddr&>(*this);
+    operator const SockAddrAny&() const {
+        return reinterpret_cast<const SockAddrAny&>(*this);
     }
 
     /**
@@ -249,12 +250,12 @@ struct SockAddr6 : public SOSockAddrIn6 {
      *
      * @param addr Socket address
      */
-    SockAddr6(const SockAddr& addr) {
+    SockAddr6(const SockAddrAny& addr) {
         K_ASSERT_EX(addr.len == sizeof(SockAddr6), "Not for this class");
         std::memcpy(this, &addr, addr.len);
     }
 
-    SockAddr6& operator=(const SockAddr& addr) {
+    SockAddr6& operator=(const SockAddrAny& addr) {
         K_ASSERT_EX(addr.len == sizeof(SockAddr6), "Not for this class");
         std::memcpy(this, &addr, addr.len);
         return *this;
@@ -264,18 +265,18 @@ struct SockAddr6 : public SOSockAddrIn6 {
 /**
  * @brief Convert socket address to string
  */
-inline String ToString(const SockAddr& t) {
+inline String ToString(const SockAddrAny& t) {
     return Format("%s:%d", LibSO::INetNtoP(t).CStr(), t.port);
 }
 
 /**
  * @brief IOS expects object length to be the address length
  */
-template <> u32 IosObject<SockAddr>::Size() const {
+template <> u32 IosObject<SockAddrAny>::Size() const {
     return Ref().len;
 }
 
-K_STATIC_ASSERT(sizeof(SockAddr) == sizeof(SOSockAddr));
+K_STATIC_ASSERT(sizeof(SockAddrAny) == sizeof(SOSockAddr));
 K_STATIC_ASSERT(sizeof(SockAddr4) == sizeof(SOSockAddrIn));
 K_STATIC_ASSERT(sizeof(SockAddr6) == sizeof(SOSockAddrIn6));
 
