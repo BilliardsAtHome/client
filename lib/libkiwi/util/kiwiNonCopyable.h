@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_UTIL_NONCOPYABLE_H
-#define LIBKIWI_UTIL_NONCOPYABLE_H
+#ifndef LIBKIWI_UTIL_NON_COPYABLE_H
+#define LIBKIWI_UTIL_NON_COPYABLE_H
 #include <libkiwi/debug/kiwiAssert.h>
 #include <libkiwi/k_types.h>
 

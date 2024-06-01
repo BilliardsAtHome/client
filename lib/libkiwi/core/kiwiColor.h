@@ -1,13 +1,13 @@
 #ifndef LIBKIWI_CORE_COLOR_H
 #define LIBKIWI_CORE_COLOR_H
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
-#include <libkiwi/math/kiwiAlgorithm.h>
 #include <nw4r/ut.h>
 
 namespace kiwi {
 
 /**
- * RGBA/YUV color
+ * @brief RGBA/YUV color
  */
 class Color {
 public:
@@ -30,21 +30,21 @@ public:
     }
 
     /**
-     * Convert color to u32 (RGBA order)
+     * @brief Convert color to u32 (RGBA order)
      */
     u32 rgba32() const {
         return r << 24 | g << 16 | b << 8 | a;
     }
 
     /**
-     * Convert color to u32 (ARGB order)
+     * @brief Convert color to u32 (ARGB order)
      */
     u32 argb32() const {
         return a << 24 | r << 16 | g << 8 | b;
     }
 
     /**
-     * Convert RGB color to YUV format
+     * @brief Convert RGB color to YUV format
      */
     Color yuv() const {
         u8 y = (0.257f * r + 0.504f * g + 0.098f * b + 16.0f);

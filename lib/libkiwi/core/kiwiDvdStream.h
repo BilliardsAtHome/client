@@ -1,6 +1,7 @@
 #ifndef LIBKIWI_CORE_DVD_STREAM_H
 #define LIBKIWI_CORE_DVD_STREAM_H
 #include <libkiwi/core/kiwiFileStream.h>
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <revolution/DVD.h>
 
