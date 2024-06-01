@@ -3,12 +3,12 @@
 namespace kiwi {
 
 /**
- * @brief Load a file
+ * @brief Rips a file's contents
  *
  * @param path Path to the file
- * @param where Storage on which the file is located
+ * @param where Storage device on which the file is located
  * @param arg Ripping parameters
- * @return File data
+ * @return File data (owned by you!)
  */
 void* FileRipper::Rip(const String& path, EStorage where,
                       const FileRipperArg& arg) {
@@ -24,12 +24,13 @@ void* FileRipper::Rip(const String& path, EStorage where,
     default: K_ASSERT_EX(false, "Invalid storage type"); return NULL;
     }
 }
+
 /**
- * @brief Load a file
+ * @brief Rips a file's contents
  *
- * @param strm Stream to file
+ * @param strm Stream to the file
  * @param arg Ripping parameters
- * @return File data
+ * @return File data (owned by you!)
  */
 void* FileRipper::Rip(FileStream& strm, const FileRipperArg& arg) {
     // Bad stream
@@ -67,10 +68,10 @@ void* FileRipper::Rip(FileStream& strm, const FileRipperArg& arg) {
 }
 
 /**
- * @brief Load a file and open a stream
+ * @brief Rips a file's contents and opens a stream to it
  *
  * @param path Path to the file
- * @param where Storage on which the file is located
+ * @param where Storage device on which the file is located
  * @return File stream
  */
 MemStream FileRipper::Open(const String& path, EStorage where) {

@@ -78,7 +78,7 @@ public:
 
 private:
     /**
-     * @brief Convert generic (EButton) mask to button mask for KPAD
+     * @brief Converts generic (EButton) mask to button mask for KPAD
      *
      * @param mask Generic (EButton) mask
      * @return u32 KPAD button mask
@@ -98,10 +98,10 @@ private:
  */
 class CtrlMgr : public ExtView<EGG::CoreControllerMgr> {
 public:
-    K_EXTVIEW_GET_INSTANCE_DEF(CtrlMgr, EGG::CoreControllerMgr::getInstance);
+    K_EXTVIEW_GET_INSTANCE(CtrlMgr, EGG::CoreControllerMgr::getInstance);
 
     /**
-     * @brief Access Wii Remote controller by player
+     * @brief Gets Wii Remote controller by player index
      *
      * @param i Player index
      */

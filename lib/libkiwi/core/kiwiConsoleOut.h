@@ -14,7 +14,7 @@ namespace detail {
 class ConsoleOut : private NonCopyable {
 public:
     /**
-     * @brief Output pipe operator
+     * @brief Logs output to the console
      *
      * @param t Value (attempted to convert to string)
      * @return ConsoleOut reference

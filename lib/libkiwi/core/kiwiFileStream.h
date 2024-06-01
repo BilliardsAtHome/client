@@ -1,17 +1,18 @@
 #ifndef LIBKIWI_CORE_FILE_STREAM_H
 #define LIBKIWI_CORE_FILE_STREAM_H
 #include <libkiwi/core/kiwiIStream.h>
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
 
 /**
- * @brief File access
+ * @brief File access type
  */
 enum EOpenMode { EOpenMode_Read, EOpenMode_Write, EOpenMode_RW };
 
 /**
- * @brief Stream to a physical file
+ * @brief Stream to a file
  */
 class FileStream : public IStream {
 public:
@@ -23,9 +24,9 @@ public:
     explicit FileStream(EOpenMode mode) : mOpenMode(mode) {}
 
     /**
-     * @brief Destructor
+     * @brief Gets the size of the currently open file
      */
-    virtual ~FileStream() {}
+    virtual u32 GetSize() const = 0;
 
     /**
      * @brief Tests whether the stream has hit the end-of-file
@@ -33,8 +34,6 @@ public:
     virtual bool IsEOF() const {
         return mPosition >= GetSize();
     }
-
-    virtual u32 GetSize() const = 0;
 
 protected:
     EOpenMode mOpenMode; // File access type

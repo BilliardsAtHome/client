@@ -7,7 +7,7 @@
 /**
  * @brief Boilerplate GetInstance function for ExtView singleton classes
  */
-#define K_EXTVIEW_GET_INSTANCE_DEF(TSelf, baseFunc)                            \
+#define K_EXTVIEW_GET_INSTANCE(TSelf, baseFunc)                                \
     static TSelf& GetInstance() {                                              \
         K_ASSERT(baseFunc() != NULL);                                          \
         return *reinterpret_cast<TSelf*>(baseFunc());                          \

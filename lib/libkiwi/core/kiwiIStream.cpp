@@ -3,10 +3,10 @@
 namespace kiwi {
 
 /**
- * @brief Seek around through the stream
+ * @brief Advances this stream's position
  *
- * @param dir Seek origin
- * @param offset Seek amount
+ * @param dir Seek direction
+ * @param offset Seek offset
  */
 void IStream::Seek(ESeekDir dir, s32 offset) {
     K_ASSERT_EX(IsOpen(), "Stream is not available");
@@ -20,11 +20,11 @@ void IStream::Seek(ESeekDir dir, s32 offset) {
 }
 
 /**
- * @brief Read data from the stream
+ * @brief Reads data from this stream
  *
  * @param dst Destination buffer
  * @param size Number of bytes to read
- * @return s32 Number of bytes read, or error code
+ * @return Number of bytes read, or DVD error code
  */
 s32 IStream::Read(void* dst, u32 size) {
     K_ASSERT(dst != NULL);
@@ -47,11 +47,11 @@ s32 IStream::Read(void* dst, u32 size) {
 }
 
 /**
- * @brief Write data to the stream
+ * @brief Writes data to this stream
  *
  * @param src Source buffer
  * @param size Number of bytes to write
- * @return s32 Number of bytes written, or error code
+ * @return Number of bytes written, or DVD error code
  */
 s32 IStream::Write(const void* src, u32 size) {
     K_ASSERT(src != NULL);
@@ -74,11 +74,12 @@ s32 IStream::Write(const void* src, u32 size) {
 }
 
 /**
- * @brief Peek data in the stream
+ * @brief Reads data from this stream without advancing the stream's
+ * position (internal implementation)
  *
  * @param dst Destination buffer
- * @param size Number of bytes to peek
- * @return s32 Number of bytes peeked, or error code
+ * @param size Number of bytes to read
+ * @return Number of bytes read, or DVD error code
  */
 s32 IStream::Peek(void* dst, u32 size) {
     K_ASSERT(dst != NULL);

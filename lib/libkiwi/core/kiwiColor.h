@@ -30,21 +30,21 @@ public:
     }
 
     /**
-     * @brief Convert color to u32 (RGBA order)
+     * @brief Converts color to u32 (RGBA order)
      */
     u32 rgba32() const {
         return r << 24 | g << 16 | b << 8 | a;
     }
 
     /**
-     * @brief Convert color to u32 (ARGB order)
+     * @brief Converts color to u32 (ARGB order)
      */
     u32 argb32() const {
         return a << 24 | r << 16 | g << 8 | b;
     }
 
     /**
-     * @brief Convert RGB color to YUV format
+     * @brief Converts RGB color to YUV format
      */
     Color yuv() const {
         u8 y = (0.257f * r + 0.504f * g + 0.098f * b + 16.0f);

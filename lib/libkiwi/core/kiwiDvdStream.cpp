@@ -3,14 +3,14 @@
 namespace kiwi {
 
 /**
- * @brief Open stream to DVD file
+ * @brief Opens stream to DVD file
  *
  * @param path File path
  * @return Success
  */
 bool DvdStream::Open(const String& path) {
     // Close existing file
-    if (mIsOpen) {
+    if (IsOpen()) {
         Close();
     }
 
@@ -23,6 +23,7 @@ bool DvdStream::Open(const String& path) {
 
     // Get handle to file
     if (!DVDFastOpen(entrynum, &mFileInfo)) {
+        K_LOG_EX("Can't open DVD file: %s\n", path.CStr());
         return false;
     }
 
@@ -31,7 +32,7 @@ bool DvdStream::Open(const String& path) {
 }
 
 /**
- * @brief Close stream
+ * @brief Closes this stream
  */
 void DvdStream::Close() {
     DVDClose(&mFileInfo);
@@ -39,14 +40,14 @@ void DvdStream::Close() {
 }
 
 /**
- * @brief Get file byte size
+ * @brief Gets the size of the currently open file
  */
 u32 DvdStream::GetSize() const {
     return mFileInfo.size;
 }
 
 /**
- * @brief Seek stream
+ * @brief Advances this stream's position (internal implementation)
  *
  * @param dir Seek direction
  * @param offset Seek offset
@@ -66,11 +67,11 @@ void DvdStream::SeekImpl(ESeekDir dir, s32 offset) {
 }
 
 /**
- * @brief Read data from the stream
+ * @brief Reads data from this stream (internal implementation)
  *
  * @param dst Destination buffer
  * @param size Number of bytes to read
- * @return s32 Number of bytes read, or error code
+ * @return Number of bytes read, or DVD error code
  */
 s32 DvdStream::ReadImpl(void* dst, u32 size) {
     K_ASSERT(dst != NULL);
@@ -78,25 +79,28 @@ s32 DvdStream::ReadImpl(void* dst, u32 size) {
 }
 
 /**
- * @brief Write data to the stream
+ * @brief Writes data to this stream (internal implementation)
  *
  * @param src Source buffer
  * @param size Number of bytes to write
- * @return s32 Number of bytes written, or error code
+ * @return Number of bytes written, or DVD error code
  */
 s32 DvdStream::WriteImpl(const void* src, u32 size) {
+    K_ASSERT(src != NULL);
     K_ASSERT_EX(false, "Can't write to the DVD");
-    return 0;
+    return DVD_RESULT_FATAL;
 }
 
 /**
- * @brief Peek data in the stream
+ * @brief Reads data from this stream without advancing the stream's
+ * position (internal implementation)
  *
  * @param dst Destination buffer
- * @param size Number of bytes to peek
- * @return s32 Number of bytes peeked, or error code
+ * @param size Number of bytes to read
+ * @return Number of bytes read, or DVD error code
  */
 s32 DvdStream::PeekImpl(void* dst, u32 size) {
+    K_ASSERT(dst != NULL);
     return ReadImpl(dst, size);
 }
 

@@ -1,8 +1,8 @@
 #ifndef LIBKIWI_CORE_FILE_RIPPER_H
 #define LIBKIWI_CORE_FILE_RIPPER_H
 #include <libkiwi/core/kiwiMemoryMgr.h>
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
-#include <libkiwi/prim/kiwiSmartPtr.h>
 
 namespace kiwi {
 
@@ -23,13 +23,14 @@ enum EStorage {
  */
 struct FileRipperArg {
     // Where the file contents are stored.
-    // Leave this as NULL to have the ripper allocate memory.
+    // Leave this as NULL to have the ripper allocate memory
     void* dst;
 
     // Where the file size is stored
     u32* size;
 
-    // Memory region to use for the destination buffer (when dst is NULL)
+    // Memory region to use if the ripper must allocate its own destination
+    // buffer
     kiwi::EMemory region;
 
     /**
@@ -44,31 +45,31 @@ struct FileRipperArg {
 class FileRipper {
 public:
     /**
-     * @brief Load a file
+     * @brief Rips a file's contents
      *
      * @param path Path to the file
-     * @param where Storage on which the file is located
+     * @param where Storage device on which the file is located
      * @param arg Ripping parameters
-     * @return File data
+     * @return File data (owned by you!)
      */
     static void* Rip(const String& path, EStorage where,
                      const FileRipperArg& arg = FileRipperArg());
 
     /**
-     * @brief Load a file
+     * @brief Rips a file's contents
      *
-     * @param strm Stream to file
+     * @param strm Stream to the file
      * @param arg Ripping parameters
-     * @return File data
+     * @return File data (owned by you!)
      */
     static void* Rip(FileStream& strm,
                      const FileRipperArg& arg = FileRipperArg());
 
     /**
-     * @brief Load a file and open a stream
+     * @brief Rips a file's contents and opens a stream to it
      *
      * @param path Path to the file
-     * @param where Storage on which the file is located
+     * @param where Storage device on which the file is located
      * @return File stream
      */
     static MemStream Open(const String& path, EStorage where);

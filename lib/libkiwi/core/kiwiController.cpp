@@ -3,7 +3,7 @@
 namespace kiwi {
 
 /**
- * @brief Convert generic (EButton) mask to button mask for KPAD
+ * @brief Converts generic (EButton) mask to button mask for KPAD
  *
  * @param mask Generic (EButton) mask
  * @return u32 KPAD button mask
@@ -37,7 +37,7 @@ u32 WiiCtrl::ConvertMask(u32 mask) {
 }
 
 /**
- * @brief Access Wii Remote controller by player
+ * @brief Gets Wii Remote controller by player index
  *
  * @param i Player index
  */

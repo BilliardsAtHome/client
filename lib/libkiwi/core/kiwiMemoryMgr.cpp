@@ -1,11 +1,11 @@
+#include <egg/core.h>
 #include <libkiwi.h>
 
 namespace kiwi {
 namespace {
 
 /**
- * @brief Print heap information
- * @note DON'T USE STRING HERE IT ALLOCATES MEMORY
+ * @brief Prints heap information
  *
  * @param name Heap name
  * @param heap Heap object
@@ -21,11 +21,12 @@ void LogHeap(const char* name, EGG::Heap* heap) {
 }
 
 /**
- * @brief Catch erroneous double-frees
+ * @brief Catches erroneous double-frees
  *
  * @param block Target of delete operation
  */
 void CheckDoubleFree(const void* block) {
+#ifndef NDEBUG
     // NULL delete is OK
     if (block == NULL) {
         return;
@@ -43,6 +44,7 @@ void CheckDoubleFree(const void* block) {
     MEMiExpHeapMBlock* memBlock = static_cast<MEMiExpHeapMBlock*>(
         AddToPtr(memBlock, -sizeof(MEMiExpHeapMBlock)));
     K_ASSERT_EX(memBlock->state == 'UD', "Double free!");
+#endif
 }
 
 } // namespace
@@ -53,19 +55,18 @@ void CheckDoubleFree(const void* block) {
 MemoryMgr::MemoryMgr() {
     // clang-format off
     mpHeapMEM1 = EGG::ExpHeap::create(scHeapSize, RPSysSystem::getSystemHeap(), 0);
-    LogHeap("RPSysSystem:System", RPSysSystem::getSystemHeap());
-    LogHeap("libkiwi:MEM1", mpHeapMEM1);
+    mpHeapMEM2 = EGG::ExpHeap::create(scHeapSize, RP_GET_INSTANCE(RPSysSystem)->getResourceHeap(), 0);
+
+    LogHeap("RPSysSystem:System",   RPSysSystem::getSystemHeap());
+    LogHeap("RPSysSystem:Resource", RP_GET_INSTANCE(RPSysSystem)->getResourceHeap());
+    LogHeap("libkiwi:MEM1",         mpHeapMEM1);
+    LogHeap("libkiwi:MEM2",         mpHeapMEM2);
+    // clang-format on
 
     K_ASSERT(mpHeapMEM1 != NULL);
-    K_ASSERT(OSIsMEM1Region(mpHeapMEM1));
-
-    mpHeapMEM2 = EGG::ExpHeap::create(scHeapSize, RP_GET_INSTANCE(RPSysSystem)->getResourceHeap(), 0);
-    LogHeap("RPSysSystem:Resource", RP_GET_INSTANCE(RPSysSystem)->getResourceHeap());
-    LogHeap("libkiwi:MEM2", mpHeapMEM2);
-
     K_ASSERT(mpHeapMEM2 != NULL);
+    K_ASSERT(OSIsMEM1Region(mpHeapMEM1));
     K_ASSERT(OSIsMEM2Region(mpHeapMEM2));
-    // clang-format on
 }
 
 /**
@@ -124,39 +125,105 @@ u32 MemoryMgr::GetFreeSize(EMemory memory) {
 
 } // namespace kiwi
 
+/**
+ * @brief Allocates a block of memory
+ *
+ * @param size Block size
+ * @return void* Pointer to allocated block
+ */
 void* operator new(std::size_t size) {
     return kiwi::MemoryMgr::GetInstance().Alloc(size, 4, kiwi::EMemory_MEM1);
 }
+/**
+ * @brief Allocates a block of memory for an array
+ *
+ * @param size Block size
+ * @return void* Pointer to allocated block
+ */
 void* operator new[](std::size_t size) {
     return kiwi::MemoryMgr::GetInstance().Alloc(size, 4, kiwi::EMemory_MEM1);
 }
 
+/**
+ * @brief Allocates a block of memory
+ *
+ * @param size Block size
+ * @param align Block address alignment
+ * @return void* Pointer to allocated block
+ */
 void* operator new(std::size_t size, s32 align) {
     return kiwi::MemoryMgr::GetInstance().Alloc(size, align,
                                                 kiwi::EMemory_MEM1);
 }
+/**
+ * @brief Allocates a block of memory for an array
+ *
+ * @param size Block size
+ * @param align Block address alignment
+ * @return void* Pointer to allocated block
+ */
 void* operator new[](std::size_t size, s32 align) {
     return kiwi::MemoryMgr::GetInstance().Alloc(size, align,
                                                 kiwi::EMemory_MEM1);
 }
 
+/**
+ * @brief Allocates a block of memory
+ *
+ * @param size Block size
+ * @param memory Target memory region
+ * @return void* Pointer to allocated block
+ */
 void* operator new(std::size_t size, kiwi::EMemory memory) {
     return kiwi::MemoryMgr::GetInstance().Alloc(size, 4, memory);
 }
+/**
+ * @brief Allocates a block of memory for an array
+ *
+ * @param size Block size
+ * @param memory Target memory region
+ * @return void* Pointer to allocated block
+ */
 void* operator new[](std::size_t size, kiwi::EMemory memory) {
     return kiwi::MemoryMgr::GetInstance().Alloc(size, 4, memory);
 }
 
+/**
+ * @brief Allocates a block of memory
+ *
+ * @param size Block size
+ * @param align Block address alignment
+ * @param memory Target memory region
+ * @return void* Pointer to allocated block
+ */
 void* operator new(std::size_t size, s32 align, kiwi::EMemory memory) {
     return kiwi::MemoryMgr::GetInstance().Alloc(size, align, memory);
 }
+/**
+ * @brief Allocates a block of memory for an array
+ *
+ * @param size Block size
+ * @param align Block address alignment
+ * @param memory Target memory region
+ * @return void* Pointer to allocated block
+ */
 void* operator new[](std::size_t size, s32 align, kiwi::EMemory memory) {
     return kiwi::MemoryMgr::GetInstance().Alloc(size, align, memory);
 }
 
+/**
+ * Frees a block of memory
+ *
+ * @param block Block
+ */
 void operator delete(void* block) {
     kiwi::MemoryMgr::GetInstance().Free(block);
 }
+/**
+ * Frees a block of memory used by an array
+ *
+ * @param block Block
+ */
 void operator delete[](void* block) {
     kiwi::MemoryMgr::GetInstance().Free(block);
 }

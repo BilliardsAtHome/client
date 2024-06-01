@@ -49,9 +49,6 @@ public:
     virtual bool CanWrite() const {
         return true;
     }
-    virtual bool CanPeek() const {
-        return true;
-    }
 
     /**
      * Required byte-alignment
