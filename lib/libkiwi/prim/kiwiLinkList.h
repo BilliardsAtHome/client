@@ -191,6 +191,9 @@ public:
         TListNode<T>* mpNode;
     };
 
+    typedef void (*ForEachFunc)(T& elem);
+    typedef void (*ForEachFuncConst)(const T& elem);
+
 public:
     /**
      * Constructor
@@ -358,10 +361,37 @@ public:
      * @param elem
      */
     void Remove(const T* elem) {
-        for (Iterator it = Begin(); it != End(); it++) {
+        for (Iterator it = Begin(); it != End(); ++it) {
             if (&*it == elem) {
                 Erase(it);
             }
+        }
+    }
+
+    /**
+     * @brief Applies the specified function to every element in the list
+     *
+     * @param func For-each function
+     */
+    void ForEach(ForEachFunc func) {
+        K_ASSERT(func != NULL);
+
+        for (Iterator it = Begin(); it != End(); ++it) {
+            func(it);
+        }
+    }
+
+    /**
+     * @brief Applies the specified function to every element in the list
+     * (read-only)
+     *
+     * @param func For-each function (const-view)
+     */
+    void ForEach(ForEachFuncConst func) {
+        K_ASSERT(func != NULL);
+
+        for (Iterator it = Begin(); it != End(); ++it) {
+            func(it);
         }
     }
 
@@ -371,6 +401,32 @@ private:
 };
 
 } // namespace kiwi
+
+/**
+ * @brief Applies code to each list element
+ * @note The current iterator can be accessed through the variable 'it'.
+ *
+ * @param list List reference
+ * @param T List element type
+ * @param stmt Code to run during each iteration
+ */
+#define K_LIST_FOREACH(list, T, stmt)                                          \
+    for (TList<T>::Iterator it = list.Begin(); it != list.End(); ++it) {       \
+        stmt                                                                   \
+    }
+
+/**
+ * @brief Applies code to each list element (const-view)
+ * @note The current iterator can be accessed through the variable 'it'.
+ *
+ * @param list List reference (const-view)
+ * @param T List element type
+ * @param stmt Code to run during each iteration
+ */
+#define K_LIST_FOREACH_CONST(list, T, stmt)                                    \
+    for (TList<T>::ConstIterator it = list.Begin(); it != list.End(); ++it) {  \
+        stmt                                                                   \
+    }
 
 // Implementation header
 #ifndef LIBKIWI_PRIM_LINKLIST_IMPL_HPP

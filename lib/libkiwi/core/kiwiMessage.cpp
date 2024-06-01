@@ -13,14 +13,9 @@ Message::Message(const void* bin) {
 }
 
 /**
- * @brief Destructor
- */
-Message::~Message() {}
-
-/**
- * @brief Deserialize binary message file
+ * @brief Deserializes binary contents (internal implementation)
  *
- * @param bin Binary message (KMSG)
+ * @param header Binary file header
  */
 void Message::DeserializeImpl(const Header& bin) {
     // Find first block
@@ -48,9 +43,9 @@ void Message::DeserializeImpl(const Header& bin) {
 }
 
 /**
- * @brief Serialize binary message file
+ * @brief Serializes binary contents (internal implementation)
  *
- * @param bin Binary message (KMSG)
+ * @param header Binary file header
  */
 void Message::SerializeImpl(Header& bin) const {
     K_ASSERT_EX(false, "Not supported.");

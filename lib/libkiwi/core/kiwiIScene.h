@@ -55,7 +55,7 @@ public:
     virtual s32 GetID() const = 0;
 
     /**
-     * @brief Gets the scene's target Pack Project
+     * @brief Gets the scene's target pack
      */
     virtual EPackID GetPack() const {
         return EPackID_AllPack;

@@ -1,12 +1,14 @@
-#ifndef KIWI_CORE_MESSAGE_H
-#define KIWI_CORE_MESSAGE_H
+#ifndef LIBKIWI_CORE_MESSAGE_H
+#define LIBKIWI_CORE_MESSAGE_H
 #include <libkiwi/core/kiwiIBinary.h>
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
 
 /**
- * @brief Binary message file, similar to BMG
+ * @brief Binary message file
+ * @note Does not own file memory
  */
 class Message : IBinary {
 private:
@@ -14,7 +16,7 @@ private:
     static const u32 scVersion = K_VERSION(1, 0);
 
     /**
-     * @brief Message descriptor
+     * @brief Message descriptor block
      */
     struct DESCBlock : Block {
         static const u32 scKind = 'DESC';
@@ -24,7 +26,7 @@ private:
     };
 
     /**
-     * @brief Message pool data
+     * @brief Message data block
      */
     struct DATABlock : Block {
         static const u32 scKind = 'DATA';
@@ -34,18 +36,22 @@ private:
     };
 
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param bin Binary file (KMSG)
+     */
     explicit Message(const void* bin);
-    virtual ~Message();
 
     /**
-     * @brief Get the kind/magic of this object
+     * @brief Gets the kind/magic of this object
      */
     virtual u32 GetBinaryKind() const {
         return scKind;
     }
 
     /**
-     * @brief Get the serialized size of this object
+     * @brief Gets the serialized size of this object
      */
     virtual u32 GetBinarySize() const {
         K_ASSERT(mpDescBlock != NULL);
@@ -56,16 +62,32 @@ public:
     }
 
     /**
-     * @brief Get the expected version of this object
+     * @brief Gets the expected version of this object
      */
     virtual u16 GetVersion() const {
         return scVersion;
     }
 
+    /**
+     * @brief Gets message text by ID
+     *
+     * @param id Message ID
+     * @return Message text
+     */
     const wchar_t* GetMessage(u32 id) const;
 
 private:
+    /**
+     * @brief Deserializes binary contents (internal implementation)
+     *
+     * @param header Binary file header
+     */
     virtual void DeserializeImpl(const Header& header);
+    /**
+     * @brief Serializes binary contents (internal implementation)
+     *
+     * @param header Binary file header
+     */
     virtual void SerializeImpl(Header& header) const;
 
 private:

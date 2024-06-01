@@ -1,5 +1,6 @@
 #ifndef LIBKIWI_CORE_SPR_H
 #define LIBKIWI_CORE_SPR_H
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 /**

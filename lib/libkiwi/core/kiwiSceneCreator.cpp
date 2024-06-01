@@ -54,7 +54,7 @@ const SceneCreator::Info SceneCreator::scPackScenes[] = {
 };
 
 /**
- * @brief Get information on the specified scene
+ * @brief Gets information on the specified scene
  *
  * @param id Scene ID
  */
@@ -85,14 +85,7 @@ const SceneCreator::Info* SceneCreator::GetSceneInfo(s32 id) {
 }
 
 /**
- * @brief Access singleton instance
- */
-SceneCreator& SceneCreator::GetInstance() {
-    return *static_cast<SceneCreator*>(RP_GET_INSTANCE(RPSysSceneCreator));
-}
-
-/**
- * @brief Register user scene class
+ * @brief Registers user scene class
  */
 void SceneCreator::RegistScene(const Info& info) {
     K_ASSERT_EX(info.id >= 0, "Invalid scene ID");
@@ -105,9 +98,9 @@ void SceneCreator::RegistScene(const Info& info) {
 }
 
 /**
- * @brief Fade out into a new scene
+ * @brief Fades out into a new scene
  *
- * @param id Scene ID (-1 to reload scene)
+ * @param id Scene ID
  * @param arg1 Unknown
  */
 bool SceneCreator::ChangeSceneAfterFade(s32 id, bool arg1) {
@@ -146,7 +139,7 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                       //
 // clang-format on
 
 /**
- * @brief Get the specified scene's name
+ * @brief Gets the specified scene's name
  */
 const char* SceneCreator::GetSceneName(s32 id) const {
     const Info* info = GetSceneInfo(id);
@@ -154,7 +147,7 @@ const char* SceneCreator::GetSceneName(s32 id) const {
 }
 
 /**
- * @brief Get the scene's resource directory name
+ * @brief Gets the specified scene's resource directory name
  */
 const char* SceneCreator::GetSceneDirectory(s32 id) const {
     const Info* info = GetSceneInfo(id);
@@ -167,7 +160,7 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                    // Wi
 // clang-format on
 
 /**
- * @brief Get the scene's supported Pack Project
+ * @brief Gets the specified scene's target pack
  */
 EPackID SceneCreator::GetScenePack(s32 id) const {
     const Info* info = GetSceneInfo(id);
@@ -175,7 +168,7 @@ EPackID SceneCreator::GetScenePack(s32 id) const {
 }
 
 /**
- * @brief Get the scene's create type
+ * @brief Gets the specified scene's create type
  */
 ECreateType SceneCreator::GetSceneCreateType(s32 id) const {
     const Info* info = GetSceneInfo(id);
@@ -188,7 +181,7 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                     // W
 // clang-format on
 
 /**
- * @brief Get the scene's exit type
+ * @brief Gets the specified scene's exit type
  */
 EExitType SceneCreator::GetSceneExitType(s32 id) const {
     const Info* info = GetSceneInfo(id);
@@ -201,7 +194,8 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                   // Wii
 // clang-format on
 
 /**
- * @brief Whether the scene requires the RP common sound archive
+ * @brief Tests whether the specified scene requires the RP common sound
+ * archive
  */
 bool SceneCreator::GetSceneCommonSound(s32 id) const {
     const Info* info = GetSceneInfo(id);
@@ -214,7 +208,7 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                      // 
 // clang-format on
 
 /**
- * @brief Create a new scene by ID
+ * @brief Creates a new scene by ID
  *
  * @param id Scene ID
  */
@@ -252,7 +246,7 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                         // Wii Sports
 // clang-format on
 
 /**
- * @brief Create a new system scene by ID
+ * @brief Creates a new system scene by ID
  *
  * @param id Scene ID
  */
@@ -271,7 +265,7 @@ RPSysScene* SceneCreator::CreateSystemScene(s32 id) {
 }
 
 /**
- * @brief Create a new game scene by ID
+ * @brief Creates a new game scene by ID
  *
  * @param id Scene ID
  */
@@ -290,7 +284,7 @@ RPSysScene* SceneCreator::CreatePackScene(s32 id) {
 }
 
 /**
- * @brief Create a new user scene by ID
+ * @brief Creates a new user scene by ID
  *
  * @param id Scene ID
  */

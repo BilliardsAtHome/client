@@ -160,7 +160,7 @@ protected:
      *
      * @param dst Destination buffer
      * @param size Number of bytes to read
-     * @return Number of bytes read, or DVD error code
+     * @return Number of bytes read, or error code
      */
     virtual s32 ReadImpl(void* dst, u32 size) = 0;
 
@@ -169,7 +169,7 @@ protected:
      *
      * @param src Source buffer
      * @param size Number of bytes to write
-     * @return Number of bytes written, or DVD error code
+     * @return Number of bytes written, or error code
      */
     virtual s32 WriteImpl(const void* src, u32 size) = 0;
 
@@ -179,7 +179,7 @@ protected:
      *
      * @param dst Destination buffer
      * @param size Number of bytes to read
-     * @return Number of bytes read, or DVD error code
+     * @return Number of bytes read, or error code
      */
     virtual s32 PeekImpl(void* dst, u32 size) = 0;
 
