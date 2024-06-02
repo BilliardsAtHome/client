@@ -6,7 +6,7 @@ namespace detail {
 /**
  * @brief Constructor
  */
-ThreadImpl::ThreadImpl() : mpOSThread(NULL), mpThreadStack(NULL) {
+ThreadImpl::ThreadImpl() : mpThreadStack(NULL) {
     // Thread & stack aligned to 32
     mpOSThread = new (32) OSThread();
     K_ASSERT(mpOSThread != NULL);
@@ -34,7 +34,7 @@ ThreadImpl::~ThreadImpl() {
 }
 
 /**
- * @brief Begin execution on this thread
+ * @brief Begins execution on this thread
  */
 void ThreadImpl::Start() {
     K_ASSERT(mpOSThread != NULL);
@@ -47,7 +47,7 @@ void ThreadImpl::Start() {
 }
 
 /**
- * @brief Wait for this thread to finish executing
+ * @brief Waits for this thread to finish executing
  */
 void ThreadImpl::Join() {
     K_ASSERT(mpOSThread != NULL);
@@ -57,7 +57,7 @@ void ThreadImpl::Join() {
 }
 
 /**
- * @brief Set a function for this thread to run
+ * @brief Sets a function for this thread to run
  *
  * @param addr Function address (new SRR0 value)
  */
@@ -68,7 +68,7 @@ void ThreadImpl::SetFunction(const void* addr) {
 }
 
 /**
- * @brief Set a GPR's value in this thread
+ * @brief Sets a GPR's value in this thread
  *
  * @param i GPR number
  * @param value New value

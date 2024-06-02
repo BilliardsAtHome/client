@@ -1,6 +1,7 @@
 #ifndef LIBKIWI_CORE_THREAD_H
 #define LIBKIWI_CORE_THREAD_H
 #include <libkiwi/debug/kiwiAssert.h>
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiBitCast.h>
 #include <revolution/OS.h>
@@ -12,16 +13,48 @@ namespace detail {
  * @brief Common thread implementation
  */
 class ThreadImpl {
-protected:
-    ThreadImpl();
-    ~ThreadImpl();
-
-    void Start();
+public:
+    /**
+     * @brief Waits for this thread to finish executing
+     */
     void Join();
 
+protected:
+    /**
+     * @brief Constructor
+     */
+    ThreadImpl();
+
+    /**
+     * @brief Destructor
+     */
+    ~ThreadImpl();
+
+    /**
+     * @brief Begins execution on this thread
+     */
+    void Start();
+
+    /**
+     * @brief Sets a function for this thread to run
+     *
+     * @param addr Function address (new SRR0 value)
+     */
     void SetFunction(const void* addr);
+    /**
+     * @brief Sets a GPR's value in this thread
+     *
+     * @param i GPR number
+     * @param value New value
+     */
     void SetGPR(u32 i, u32 value);
 
+    /**
+     * @brief Sets a member function to run on this thread
+     *
+     * @param fn Function
+     * @param obj Class instance
+     */
     template <typename TFunc, typename TClass>
     void SetMemberFunction(TFunc fn, const TClass& obj);
 
@@ -29,8 +62,13 @@ private:
     OSThread* mpOSThread; // RVL thread
     u8* mpThreadStack;    // RVL thread stack
 
-    // OS thread parameters
+    /**
+     * @brief Thread stack size
+     */
     static const u32 scStackSize = 0x4000;
+    /**
+     * @brief Thread priority
+     */
     static const s32 scPriority = OS_PRIORITY_MAX / 2;
 };
 
@@ -38,6 +76,7 @@ private:
 
 /**
  * @brief Similar to std::thread
+ * @note Only allows GPR arguments
  */
 class Thread : public detail::ThreadImpl {
 public:
@@ -142,13 +181,6 @@ public:
         SetGPR(4, BitCast<u32>(arg));
         Start();
     }
-
-    /**
-     * @brief Block the main thread until this thread finishes executing
-     */
-    void Join() {
-        ThreadImpl::Join();
-    }
 };
 
 namespace detail {
@@ -166,14 +198,13 @@ struct MemberFunction {
 };
 
 /**
- * @brief Set a member function to run on this thread
+ * @brief Sets a member function to run on this thread
  *
  * @param fn Function
  * @param obj Class instance
  */
 template <typename TFunc, typename TClass>
-void ThreadImpl::SetMemberFunction(TFunc fn, const TClass& obj)
-    __attribute__((never_inline)) {
+K_DONT_INLINE void ThreadImpl::SetMemberFunction(TFunc fn, const TClass& obj) {
     K_STATIC_ASSERT_EX(sizeof(TFunc) == sizeof(MemberFunction),
                        "Not a member function");
 

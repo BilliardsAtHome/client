@@ -256,7 +256,7 @@ typedef StringImpl<wchar_t> WString;
  * @param args Format arguments
  */
 template <typename T>
-inline StringImpl<T> VFormat(const StringImpl<T>& fmt, std::va_list args) {
+K_INLINE StringImpl<T> VFormat(const StringImpl<T>& fmt, std::va_list args) {
     char buffer[1024];
     std::vsnprintf(buffer, sizeof(buffer), fmt, args);
     return StringImpl<T>(buffer);
@@ -269,7 +269,7 @@ inline StringImpl<T> VFormat(const StringImpl<T>& fmt, std::va_list args) {
  * @param args Format arguments
  */
 template <typename T>
-inline StringImpl<T> VFormat(const T* fmt, std::va_list args) {
+K_INLINE StringImpl<T> VFormat(const T* fmt, std::va_list args) {
     char buffer[1024];
     std::vsnprintf(buffer, sizeof(buffer), fmt, args);
     return StringImpl<T>(buffer);
@@ -282,7 +282,7 @@ inline StringImpl<T> VFormat(const T* fmt, std::va_list args) {
  * @param ... Format arguments
  */
 template <typename T>
-inline StringImpl<T> Format(const StringImpl<T>& fmt, ...) {
+K_INLINE StringImpl<T> Format(const StringImpl<T>& fmt, ...) {
     std::va_list list;
     va_start(list, fmt);
     StringImpl<T> str = VFormat(fmt, list);
@@ -297,7 +297,7 @@ inline StringImpl<T> Format(const StringImpl<T>& fmt, ...) {
  * @param fmt Format C-style string
  * @param ... Format arguments
  */
-template <typename T> inline StringImpl<T> Format(const T* fmt, ...) {
+template <typename T> K_INLINE StringImpl<T> Format(const T* fmt, ...) {
     std::va_list list;
     va_start(list, fmt);
     StringImpl<T> str = VFormat(fmt, list);
@@ -309,72 +309,72 @@ template <typename T> inline StringImpl<T> Format(const T* fmt, ...) {
 /**
  * @brief String hash support
  */
-template <typename T> inline hash_t Hash(const StringImpl<T>& key) {
+template <typename T> K_INLINE hash_t Hash(const StringImpl<T>& key) {
     return HashImpl(key.CStr(), key.Length() * sizeof(T));
 }
 
 // String conversion. Specialize these for custom types
-#define K_TO_STRING_FMT_DEF(T, fmt, val)                                       \
-    inline String ToString(const T& t) {                                       \
+#define TO_STRING_PRIM(T, fmt, val)                                            \
+    K_INLINE String ToString(const T& t) {                                     \
         return Format(fmt, val);                                               \
     }
-#define K_TO_HEX_STRING_FMT_DEF(T, fmt, val)                                   \
-    inline String ToHexString(const T& t) {                                    \
+#define TO_HEX_STRING_PRIM(T, fmt, val)                                        \
+    K_INLINE String ToHexString(const T& t) {                                  \
         return Format(fmt, val);                                               \
     }
 
 /**
  * @brief Convert integer to string
  */
-K_TO_STRING_FMT_DEF(int, "%d", t);
-K_TO_STRING_FMT_DEF(s32, "%ld", t);
-K_TO_STRING_FMT_DEF(s64, "%lld", t);
-K_TO_HEX_STRING_FMT_DEF(int, "0x%08X", t);
-K_TO_HEX_STRING_FMT_DEF(s32, "0x%08X", t);
-K_TO_HEX_STRING_FMT_DEF(s64, "0x%016X", t);
+TO_STRING_PRIM(int, "%d", t);
+TO_STRING_PRIM(s32, "%ld", t);
+TO_STRING_PRIM(s64, "%lld", t);
+TO_HEX_STRING_PRIM(int, "0x%08X", t);
+TO_HEX_STRING_PRIM(s32, "0x%08X", t);
+TO_HEX_STRING_PRIM(s64, "0x%016X", t);
 
-K_TO_STRING_FMT_DEF(unsigned int, "%u", t);
-K_TO_STRING_FMT_DEF(u32, "%lu", t);
-K_TO_STRING_FMT_DEF(u64, "%llu", t);
-K_TO_HEX_STRING_FMT_DEF(unsigned int, "0x%08X", t);
-K_TO_HEX_STRING_FMT_DEF(u32, "0x%08X", t);
-K_TO_HEX_STRING_FMT_DEF(u64, "0x%016X", t);
+TO_STRING_PRIM(unsigned int, "%u", t);
+TO_STRING_PRIM(u32, "%lu", t);
+TO_STRING_PRIM(u64, "%llu", t);
+TO_HEX_STRING_PRIM(unsigned int, "0x%08X", t);
+TO_HEX_STRING_PRIM(u32, "0x%08X", t);
+TO_HEX_STRING_PRIM(u64, "0x%016X", t);
 
 /**
  * @brief Convert decimal to string
  */
-K_TO_STRING_FMT_DEF(f32, "%f", t);
-K_TO_STRING_FMT_DEF(f64, "%f", t);
-K_TO_HEX_STRING_FMT_DEF(f32, "0x%08X", BitCast<u32>(t));
-K_TO_HEX_STRING_FMT_DEF(f64, "0x%016X", BitCast<u64>(t));
+TO_STRING_PRIM(f32, "%f", t);
+TO_STRING_PRIM(f64, "%f", t);
+TO_HEX_STRING_PRIM(f32, "0x%08X", BitCast<u32>(t));
+TO_HEX_STRING_PRIM(f64, "0x%016X", BitCast<u64>(t));
 
 /**
  * @brief Convert boolean to string
  */
-inline String ToString(bool t) {
+K_INLINE String ToString(bool t) {
     return t ? "true" : "false";
 }
-inline String ToHexString(bool t) {
+K_INLINE String ToHexString(bool t) {
     return t ? "0x01" : "0x00";
 }
 
 /**
  * @brief Convert string to string :D
  */
-inline String ToString(const String& t) {
+K_INLINE String ToString(const String& t) {
     return t;
 }
-inline String ToHexString(const String& t) {
+K_INLINE String ToHexString(const String& t) {
     K_ASSERT_EX(false, "Please reconsider...");
     return t;
 }
-inline String ToString(char c) {
+K_INLINE String ToString(char c) {
     return String(c);
 }
-inline String ToString(const char* t) {
+K_INLINE String ToString(const char* t) {
     return String(t);
 }
-inline String ToHexString(const char* t) {
+K_INLINE String ToHexString(const char* t) {
     K_ASSERT_EX(false, "Please reconsider...");
     return String(t);
 }
@@ -382,12 +382,12 @@ inline String ToHexString(const char* t) {
 /**
  * @brief Placeholder string conversion
  */
-template <typename T> inline String ToString(const T& t) {
+template <typename T> K_INLINE String ToString(const T& t) {
     return Format("<object at %p>", &t);
 }
 
-#undef K_TO_STRING_FMT_DEF
-#undef K_TO_HEX_STRING_FMT_DEF
+#undef TO_STRING_PRIM
+#undef TO_HEX_STRING_PRIM
 
 } // namespace kiwi
 

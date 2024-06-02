@@ -13,7 +13,7 @@ namespace {
  * @param vec IOS I/O vector
  */
 template <typename T>
-inline void MakeIOVector(const T& prim, IPCIOVector& vec) {
+K_INLINE void MakeIOVector(const T& prim, IPCIOVector& vec) {
     vec.base = (void*)&prim;
     vec.length = sizeof(T);
 }
@@ -25,7 +25,7 @@ inline void MakeIOVector(const T& prim, IPCIOVector& vec) {
  * @param vec IOS I/O vector
  */
 template <>
-inline void MakeIOVector<String>(const String& str, IPCIOVector& vec) {
+K_INLINE void MakeIOVector<String>(const String& str, IPCIOVector& vec) {
     vec.base = (void*)str.CStr();
     vec.length = str.Length();
 }

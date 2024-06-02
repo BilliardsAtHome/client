@@ -17,7 +17,7 @@ hash_t HashImpl(const void* key, s32 len);
  * @brief Key hasher
  * @note Specialize for your custom types
  */
-template <typename TKey> inline hash_t Hash(const TKey& key) {
+template <typename TKey> K_INLINE hash_t Hash(const TKey& key) {
     return HashImpl(&key, sizeof(TKey));
 }
 

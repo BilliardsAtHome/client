@@ -9,7 +9,7 @@
 
 #define REG_R(reg)                                                                   \
     /* clang-format off */                                                        \
-    inline u32 Mf##reg() {                                                        \
+    K_INLINE u32 Mf##reg() {                                                        \
         register u32 x;                                                           \
         asm volatile {                                                            \
             mf##reg x                                                             \
@@ -20,7 +20,7 @@
 
 #define REG_W(reg)                                                                   \
     /* clang-format off */                                                        \
-    inline void Mt##reg(register u32 x) {                                         \
+    K_INLINE void Mt##reg(register u32 x) {                                         \
         asm volatile {                                                            \
             mt##reg x                                                             \
         }                                                                         \
@@ -82,7 +82,7 @@ REG_RW(ear)
  * FPSCR
  * Floating-Point Status and Control Register
  */
-inline u32 Mffpscr() {
+K_INLINE u32 Mffpscr() {
     register u64 fpscr;
 
     // clang-format off
@@ -95,7 +95,7 @@ inline u32 Mffpscr() {
     return fpscr;
 }
 
-inline void Mtfpscr(register u32 val) {
+K_INLINE void Mtfpscr(register u32 val) {
     register struct {
         f32 pad;
         f32 data;

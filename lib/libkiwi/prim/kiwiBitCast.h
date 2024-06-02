@@ -8,7 +8,7 @@ namespace {
 /**
  * @brief std::bit_cast for C++03
  */
-template <typename TTo, typename TFrom> inline TTo BitCast(const TFrom& x) {
+template <typename TTo, typename TFrom> K_INLINE TTo BitCast(const TFrom& x) {
     // Not to standard, I know! But this will do.
     return reinterpret_cast<const TTo&>(x);
 }

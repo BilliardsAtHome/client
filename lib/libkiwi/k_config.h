@@ -11,6 +11,10 @@
 #define LIBKIWI_BIG_ENDIAN
 #endif
 
+// Function macros
+#define K_INLINE inline
+#define K_DONT_INLINE __attribute__((never_inline))
+
 // Expose private members only to Kamek hooks
 #ifdef LIBKIWI_INTERNAL
 #define LIBKIWI_KAMEK_PUBLIC public:

@@ -265,7 +265,7 @@ struct SockAddr6 : public SOSockAddrIn6 {
 /**
  * @brief Convert socket address to string
  */
-inline String ToString(const SockAddrAny& t) {
+K_INLINE String ToString(const SockAddrAny& t) {
     return Format("%s:%d", LibSO::INetNtoP(t).CStr(), t.port);
 }
 

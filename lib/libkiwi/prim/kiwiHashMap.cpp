@@ -3,7 +3,7 @@
 namespace kiwi {
 namespace {
 
-inline u32 rotl32(register u32 x, register int r) {
+K_INLINE u32 rotl32(register u32 x, register int r) {
     // clang-format off
     asm {
         rotlw x, x, r
@@ -13,7 +13,7 @@ inline u32 rotl32(register u32 x, register int r) {
     return x;
 }
 
-inline u32 fmix32(u32 h) {
+K_INLINE u32 fmix32(u32 h) {
     h ^= h >> 16;
     h *= 0x85ebca6b;
     h ^= h >> 13;
