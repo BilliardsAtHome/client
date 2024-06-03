@@ -1,12 +1,13 @@
 #ifndef LIBKIWI_DEBUG_STACK_CHECKER_H
 #define LIBKIWI_DEBUG_STACK_CHECKER_H
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
-#include <revolution/OS.h>
 
 namespace kiwi {
 
 /**
  * @brief Buffer overflow checker
+ * @details Declare one after your buffer to check for overflows
  */
 class StackChecker {
 public:
@@ -31,9 +32,13 @@ public:
 
 private:
     static void Initialize();
+
+private:
+    // Initial guard value
     static u32 sStackCheckGuard;
 
-    volatile u32 mGuard; // Guard value
+    // Guard value on the stack
+    volatile u32 mGuard;
 };
 
 } // namespace kiwi
