@@ -1,5 +1,6 @@
 #ifndef LIBKIWI_DEBUG_NW4R_EXCEPTION_H
 #define LIBKIWI_DEBUG_NW4R_EXCEPTION_H
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 #include <revolution/OS.h>
@@ -7,14 +8,14 @@
 namespace kiwi {
 
 /**
- * Reimplementation of NW4R's exception
+ * @brief Reimplementation of NW4R's exception
  */
 class Nw4rException : public DynamicSingleton<Nw4rException> {
     friend class DynamicSingleton<Nw4rException>;
 
 public:
     /**
-     * Assertion info
+     * @brief Assertion info
      */
     struct Assert {
         // Name of source file where assertion occurred
@@ -28,7 +29,7 @@ public:
     };
 
     /**
-     * Error info
+     * @brief Error info
      */
     struct Info {
         u8 error;       // Exception type (see OSError)
@@ -40,7 +41,7 @@ public:
     };
 
     /**
-     * Exception user callback
+     * @brief Exception user callback
      * @param info Error info
      * @param arg User callback argument
      */

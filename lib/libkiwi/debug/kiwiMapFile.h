@@ -1,5 +1,6 @@
 #ifndef LIBKIWI_DEBUG_MAP_FILE_H
 #define LIBKIWI_DEBUG_MAP_FILE_H
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiLinkList.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
@@ -7,14 +8,14 @@
 namespace kiwi {
 
 /**
- * Kamek symbol map utility
+ * @brief Kamek symbol map utility
  */
 class MapFile : public DynamicSingleton<MapFile> {
     friend class DynamicSingleton<MapFile>;
 
 public:
     /**
-     * Module link type
+     * @brief Module link type
      */
     enum ELinkType {
         ELinkType_None,       // Map file not loaded
@@ -23,7 +24,7 @@ public:
     };
 
     /**
-     * Map file symbol
+     * @brief Map file symbol
      */
     struct Symbol {
         ELinkType type; // Linkage
@@ -37,21 +38,45 @@ public:
 
 public:
     /**
-     * Tests whether a map file has been loaded and unpacked
+     * @brief Tests whether a map file has been loaded and unpacked
      */
     bool IsAvailable() const {
         return mpMapBuffer != NULL && mIsUnpacked;
     }
 
+    /**
+     * @brief Opens a map file from the DVD
+     *
+     * @param path Map file path
+     * @param type Module linkage type
+     */
     void Open(const String& path, ELinkType type);
+    /**
+     * @brief Closes map file
+     */
     void Close();
 
+    /**
+     * @brief Queries text section symbol
+     *
+     * @param addr Symbol address
+     */
     const Symbol* QueryTextSymbol(const void* addr);
 
 private:
+    /**
+     * @brief Constructor
+     */
     MapFile();
-    ~MapFile();
 
+    /**
+     * @brief Destructor
+     */
+    virtual ~MapFile();
+
+    /**
+     * @brief Unpacks loaded map file
+     */
     void Unpack();
 
 private:

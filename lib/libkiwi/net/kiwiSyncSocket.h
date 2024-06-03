@@ -11,7 +11,7 @@ namespace kiwi {
 class SyncSocket : public SocketBase {
 public:
     /**
-     * Constructor
+     * @brief Constructor
      *
      * @param family Socket protocol family
      * @param type Socket type
@@ -31,7 +31,7 @@ public:
 
 private:
     /**
-     * Constructor
+     * @brief Constructor
      *
      * @param socket Socket descriptor
      * @param family Socket protocol family

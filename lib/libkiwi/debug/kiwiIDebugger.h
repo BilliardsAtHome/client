@@ -1,5 +1,6 @@
 #ifndef LIBKIWI_DEBUG_I_DEBUGGER_H
 #define LIBKIWI_DEBUG_I_DEBUGGER_H
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiOptional.h>
 #include <libkiwi/util/kiwiGlobalInstance.h>
@@ -33,7 +34,7 @@ public:
     virtual ~IDebugger() {}
 
     /**
-     * @brief Attach the debugger
+     * @brief Attaches the debugger
      * @note Register EventCallback to fit your communication type
      *
      * @return Success
@@ -52,7 +53,7 @@ protected:
     };
 
     /**
-     * @brief Receive and process the next debugger command
+     * @brief Receives and processes the next debugger command
      *
      * @note Call this function when there is input pending
      */
@@ -91,7 +92,7 @@ private:
                              ...);
 
     /**
-     * @brief Read data sent to the debugger
+     * @brief Reads data sent to the debugger
      *
      * @param dst Destination buffer
      * @param size Read length
@@ -100,7 +101,7 @@ private:
     virtual Optional<u32> Read(void* dst, u32 size) = 0;
 
     /**
-     * @brief Write data over the debugger
+     * @brief Writes data over the debugger
      *
      * @param src Source buffer
      * @param size Write length
@@ -109,7 +110,7 @@ private:
     virtual Optional<u32> Write(const void* src, u32 size) = 0;
 
     /**
-     * @brief Read data into an object
+     * @brief Reads data into an object
      *
      * @param t Destination object
      * @return Success
@@ -119,7 +120,7 @@ private:
     }
 
     /**
-     * @brief Write data from an object
+     * @brief Writes data from an object
      *
      * @param t Source object
      * @return Success

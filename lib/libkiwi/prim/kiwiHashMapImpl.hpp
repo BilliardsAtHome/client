@@ -10,7 +10,7 @@
 namespace kiwi {
 
 /**
- * Pre-increment operator
+ * @brief Pre-increment operator
  */
 template <typename TKey, typename TValue>
 TMap<TKey, TValue>::ConstIterator&

@@ -93,7 +93,7 @@ void DebugPrint::PrintfOutline(f32 x, f32 y, f32 scale, bool center,
 }
 
 /**
- * @brief Prints text to the screen
+ * @brief Prints text to the screen (internal implementation)
  *
  * @param x X position
  * @param y Y position

@@ -4,7 +4,7 @@
 namespace ksl {
 
 /**
- * Tests if character is a decimal digit
+ * @brief Tests if character is a decimal digit
  *
  * @param c Character
  */
@@ -13,7 +13,7 @@ bool isdigit(char c) {
 }
 
 /**
- * Tests if character is alphabetic
+ * @brief Tests if character is alphabetic
  *
  * @param c Character
  */
@@ -22,7 +22,7 @@ bool isalpha(char c) {
 }
 
 /**
- * Tests if character is uppercase
+ * @brief Tests if character is uppercase
  *
  * @param c Character
  */
@@ -31,7 +31,7 @@ bool isupper(char c) {
 }
 
 /**
- * Tests if character is lowercase
+ * @brief Tests if character is lowercase
  *
  * @param c Character
  */
@@ -40,7 +40,7 @@ bool islower(char c) {
 }
 
 /**
- * Finds first occurrence of character in string
+ * @brief Finds first occurrence of character in string
  *
  * @param str String to search
  * @param c Character to search for
@@ -61,7 +61,7 @@ char* strchr(const char* str, char c) {
 }
 
 /**
- * Gets string length, up to specified limit
+ * @brief Gets string length, up to specified limit
  *
  * @param str String to check
  * @param maxlen Maximum length
@@ -84,7 +84,7 @@ size_t strnlen(const char* str, size_t maxlen) {
 }
 
 /**
- * Converts string to signed long
+ * @brief Converts string to signed long
  *
  * @param str String to convert
  * @param[out] endptr Pointer to string data after the converted number
@@ -175,7 +175,7 @@ s32 strtol(const char* str, char** endptr, int base) {
 }
 
 /**
- * Converts string to unsigned long
+ * @brief Converts string to unsigned long
  *
  * @param str String to convert
  * @param[out] endptr Pointer to string data after the converted number
@@ -186,7 +186,7 @@ u32 strtoul(const char* str, char** endptr, int base) {
 }
 
 /**
- * Converts string to double value
+ * @brief Converts string to double value
  *
  * @param str String to convert
  * @return f64 Resulting value
@@ -212,7 +212,7 @@ f64 atof(const char* str) {
 }
 
 /**
- * Concatenates wide-char strings, up to the specified limit of
+ * @brief Concatenates wide-char strings, up to the specified limit of
  * characters
  *
  * @param dst String to concatenate to
@@ -246,7 +246,7 @@ wchar_t* wcsncat(wchar_t* dst, const wchar_t* src, size_t maxlen) {
 }
 
 /**
- * Compares two wide-char strings, up to the specified limit of
+ * @brief Compares two wide-char strings, up to the specified limit of
  * characters
  *
  * @param wcs1 String 1
@@ -272,7 +272,7 @@ int wcsncmp(const wchar_t* wcs1, const wchar_t* wcs2, size_t maxlen) {
 }
 
 /**
- * Finds the first occurrence of a sequence in a string
+ * @brief Finds the first occurrence of a sequence in a string
  *
  * @param str String to search
  * @param seq Sequence to search for

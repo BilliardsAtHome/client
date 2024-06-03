@@ -4,7 +4,7 @@
 namespace kiwi {
 
 /**
- * Gets "default" GX render mode based on VI format
+ * @brief Gets "default" GX render mode based on VI format
  */
 const GXRenderModeObj* LibGX::GetDefaultRenderMode() {
     switch (VIGetTvFormat()) {

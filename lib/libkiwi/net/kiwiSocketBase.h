@@ -7,12 +7,12 @@
 namespace kiwi {
 
 /**
- * IOS Berkeley socket wrapper
+ * @brief IOS Berkeley socket wrapper
  */
 class SocketBase : private NonCopyable {
 public:
     /**
-     * Generic socket operation callback
+     * @brief Generic socket operation callback
      *
      * @param result Socket library result
      * @param arg User callback argument
@@ -20,7 +20,7 @@ public:
     typedef void (*Callback)(SOResult result, void* arg);
 
     /**
-     * Connection accept callback
+     * @brief Connection accept callback
      *
      * @param result Socket library result
      * @param peer Peer socket object
@@ -37,7 +37,7 @@ public:
     virtual ~SocketBase();
 
     /**
-     * Tests whether the socket has a valid descriptor
+     * @brief Tests whether the socket has a valid descriptor
      */
     bool IsOpen() const {
         return mHandle >= 0;

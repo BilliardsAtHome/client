@@ -6,7 +6,7 @@
 namespace kiwi {
 
 /**
- * GX library wrapper/extension
+ * @brief GX library wrapper/extension
  */
 class LibGX {
 public:

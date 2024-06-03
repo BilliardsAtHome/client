@@ -6,7 +6,7 @@
 namespace kiwi {
 
 /**
- * Non-copyable mix-in
+ * @brief Non-copyable mix-in
  */
 class NonCopyable {
 protected:

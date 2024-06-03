@@ -7,21 +7,21 @@ namespace kiwi {
 namespace {
 
 /**
- * Get maximum of two values
+ * @brief Get maximum of two values
  */
 template <typename T> K_INLINE const T& Max(const T& a, const T& b) {
     return a < b ? b : a;
 }
 
 /**
- * Get minimum of two values
+ * @brief Get minimum of two values
  */
 template <typename T> K_INLINE const T& Min(const T& a, const T& b) {
     return b < a ? b : a;
 }
 
 /**
- * Absolute value
+ * @brief Absolute value
  */
 template <typename T> K_INLINE T Abs(const T& x) {
 #ifdef __MWCC__
@@ -39,7 +39,7 @@ template <typename T> K_INLINE T Log(const T& x) {
 }
 
 /**
- * Clamp value to range
+ * @brief Clamp value to range
  */
 template <typename T> K_INLINE T Clamp(const T& x, const T& min, const T& max) {
     if (x < min) {
@@ -54,7 +54,7 @@ template <typename T> K_INLINE T Clamp(const T& x, const T& min, const T& max) {
 }
 
 /**
- * Distance between two pointers
+ * @brief Distance between two pointers
  */
 K_INLINE std::ptrdiff_t PtrDistance(const void* start, const void* end) {
     return reinterpret_cast<std::uintptr_t>(end) -
@@ -62,7 +62,7 @@ K_INLINE std::ptrdiff_t PtrDistance(const void* start, const void* end) {
 }
 
 /**
- * Add offset to pointer
+ * @brief Add offset to pointer
  */
 K_INLINE void* AddToPtr(void* ptr, std::ptrdiff_t ofs) {
     return static_cast<char*>(ptr) + ofs;

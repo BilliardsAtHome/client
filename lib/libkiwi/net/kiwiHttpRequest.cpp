@@ -162,7 +162,7 @@ bool HttpRequest::Receive() {
     w.Start();
 
     /**
-     * Receive response headers
+     * @brief Receive response headers
      */
 
     // Need non-blocking because we greedily receive data
@@ -211,7 +211,7 @@ bool HttpRequest::Receive() {
     String headers = work.SubStr(0, end);
 
     /**
-     * Build header dictionary
+     * @brief Build header dictionary
      */
 
     // Must at least have one line (status code)
@@ -253,7 +253,7 @@ bool HttpRequest::Receive() {
     }
 
     /**
-     * Receive response body
+     * @brief Receive response body
      */
 
     // If we were given the length, we can be 100% sure

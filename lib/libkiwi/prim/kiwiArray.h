@@ -6,7 +6,7 @@
 namespace kiwi {
 
 /**
- * Templated array with bounds-checking in debug
+ * @brief Templated array with bounds-checking in debug
  *
  * @tparam T Array element type
  * @tparam N Array size
@@ -46,7 +46,7 @@ private:
 };
 
 /**
- * Templated 2D array with bounds-checking in debug
+ * @brief Templated 2D array with bounds-checking in debug
  *
  * @tparam T Array element type
  * @tparam M Outer array size

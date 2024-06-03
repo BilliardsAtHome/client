@@ -1,14 +1,12 @@
 #include <cstring>
 #include <libkiwi.h>
-#include <revolution/EXI.h>
-#include <revolution/OS.h>
 
 namespace kiwi {
 
 K_DYNAMIC_SINGLETON_IMPL(GeckoDebugger);
 
 /**
- * @brief Attach the debugger (USB Gecko)
+ * @brief Attaches the debugger (USB Gecko)
  *
  * @return Success
  */
@@ -25,11 +23,11 @@ bool GeckoDebugger::Attach() {
  * @param ctx Interrupt context
  */
 void GeckoDebugger::ExiCallback(EXIChannel chan, OSContext* ctx) {
-    DynamicSingleton::GetInstance().Calculate();
+    GetInstance().Calculate();
 }
 
 /**
- * @brief Read data sent to the debugger
+ * @brief Reads data sent to the debugger
  *
  * @param dst Destination buffer
  * @param size Read length
@@ -69,7 +67,7 @@ Optional<u32> GeckoDebugger::Read(void* dst, u32 size) {
 }
 
 /**
- * @brief Write data over the debugger
+ * @brief Writes data over the debugger
  *
  * @param src Source buffer
  * @param size Write length

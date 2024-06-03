@@ -12,12 +12,12 @@
 namespace kiwi {
 
 /**
- * Thread safe, dynamically allocated singleton
+ * @brief Thread safe, dynamically allocated singleton
  */
 template <typename T> class DynamicSingleton : private NonCopyable {
 public:
     /**
-     * Gets reference to singleton object
+     * @brief Gets reference to singleton object
      */
     static T& GetInstance() {
         AutoLock<OSMutex> lock(sMutex);
@@ -26,7 +26,7 @@ public:
     }
 
     /**
-     * Initializes singleton object
+     * @brief Initializes singleton object
      */
     static void CreateInstance() {
         AutoLock<OSMutex> lock(sMutex);
@@ -37,7 +37,7 @@ public:
     }
 
     /**
-     * Destroys singleton object
+     * @brief Destroys singleton object
      */
     static void DestroyInstance() {
         AutoLock<OSMutex> lock(sMutex);

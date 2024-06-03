@@ -5,8 +5,10 @@
 #include <revolution/OS.h>
 
 /**
- * Logs message to the console
- * @note Newline is automatically appended
+ * @brief Logs a message to the console
+ *
+ * @param msg Message
+ * @param ... Format string arguments
  */
 void kiwi_log(const char* msg, ...) {
     char msgbuf[1024];
@@ -20,8 +22,12 @@ void kiwi_log(const char* msg, ...) {
 }
 
 /**
- * Halts execution and displays assertion error to the screen
- * @note Newline is automatically appended
+ * @brief Halts the program and displays an error message to the screen/console
+ *
+ * @param file Source file name where assertion failed
+ * @param line Source file line where assertion failed
+ * @param msg Assertion message
+ * @param ... Format string arguments
  */
 void kiwi_fail_assert(const char* file, int line, const char* msg, ...) {
     char msgbuf[1024];

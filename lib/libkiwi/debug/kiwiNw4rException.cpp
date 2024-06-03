@@ -10,7 +10,7 @@ K_DYNAMIC_SINGLETON_IMPL(Nw4rException);
 namespace {
 
 /**
- * Fill in floating-point registers
+ * @brief Fill in floating-point registers
  * @note Reimplementation of OSFillFPUContext (deadstripped)
  *
  * @param ctx OS context
@@ -103,7 +103,7 @@ _exit:
 } // namespace
 
 /**
- * Initializes exception handler
+ * @brief Initializes exception handler
  */
 Nw4rException::Nw4rException()
     : mpUserCallback(DefaultCallback),
@@ -128,11 +128,11 @@ Nw4rException::Nw4rException()
 
     // Auto-detect render mode
     mpRenderMode = LibGX::GetDefaultRenderMode();
-    K_WARN(mpRenderMode == NULL, "No render mode!\n");
+    K_WARN_EX(mpRenderMode == NULL, "No render mode!\n");
 }
 
 /**
- * Sets user exception callback
+ * @brief Sets user exception callback
  *
  * @param callback Exception callback function
  * @param arg Exception callback argument
@@ -143,7 +143,7 @@ void Nw4rException::SetUserCallback(UserCallback callback, void* arg) {
 }
 
 /**
- * Writes text to the exception details
+ * @brief Writes text to the exception details
  * @note Written to Nw4rConsole and the debugger console
  *
  * @param fmt Format string
@@ -165,7 +165,7 @@ void Nw4rException::Printf(const char* fmt, ...) {
 }
 
 /**
- * Triggers an assertion error
+ * @brief Triggers an assertion error
  *
  * @param file Name of source file where assertion occurred
  * @param line Line in source file where assertion occurred
@@ -184,7 +184,7 @@ void Nw4rException::FailAssert(const char* file, int line, const char* msg) {
 }
 
 /**
- * Exception thread main function
+ * @brief Exception thread main function
  */
 void* Nw4rException::ThreadFunc(void* arg) {
 #pragma unused(arg)
@@ -205,7 +205,7 @@ void* Nw4rException::ThreadFunc(void* arg) {
 }
 
 /**
- * Handles errors (exception/assertion)
+ * @brief Handles errors (exception/assertion)
  *
  * @param error Exception type
  * @param ctx Exception context
@@ -252,7 +252,7 @@ void Nw4rException::ErrorHandler(u8 error, OSContext* ctx, u32 dsisr, u32 dar,
 }
 
 /**
- * Allows controlling the console using the D-Pad
+ * @brief Allows controlling the console using the D-Pad
  *
  * @param info Exception info
  * @param arg Callback argument
@@ -303,7 +303,7 @@ void Nw4rException::DefaultCallback(const Info& info, void* arg) {
 }
 
 /**
- * Dumps error information to the console
+ * @brief Dumps error information to the console
  */
 void Nw4rException::DumpError() {
     OSDisableInterrupts();
@@ -339,7 +339,7 @@ void Nw4rException::DumpError() {
 }
 
 /**
- * Dumps exception information to the console
+ * @brief Dumps exception information to the console
  */
 void Nw4rException::DumpException() {
     // Basic information
@@ -367,7 +367,7 @@ void Nw4rException::DumpException() {
 }
 
 /**
- * Dumps assertion information to the console
+ * @brief Dumps assertion information to the console
  */
 void Nw4rException::DumpAssert() {
     // Basic information
@@ -389,7 +389,7 @@ void Nw4rException::DumpAssert() {
 }
 
 /**
- * Prints heap information to the screen
+ * @brief Prints heap information to the screen
  */
 void Nw4rException::PrintHeapInfo() {
     Printf("---Heap Info---\n");
@@ -410,7 +410,7 @@ void Nw4rException::PrintHeapInfo() {
 }
 
 /**
- * Prints build information to the screen
+ * @brief Prints build information to the screen
  */
 void Nw4rException::PrintBuildInfo() {
     Printf("---Build Info---\n");
@@ -420,7 +420,7 @@ void Nw4rException::PrintBuildInfo() {
 }
 
 /**
- * Prints GPR information to the screen
+ * @brief Prints GPR information to the screen
  */
 void Nw4rException::PrintGPR() {
     Printf("---GPR Map---\n");
@@ -440,13 +440,13 @@ void Nw4rException::PrintGPR() {
 }
 
 /**
- * Prints stack trace information to the screen
+ * @brief Prints stack trace information to the screen
  *
  * @param depth Stack trace max depth
  */
 void Nw4rException::PrintStack(u32 depth) {
     /**
-     * Codewarrior stack frame
+     * @brief Codewarrior stack frame
      */
     struct StackFrame {
         const StackFrame* next;
@@ -484,7 +484,7 @@ void Nw4rException::PrintStack(u32 depth) {
 }
 
 /**
- * Prints "thank you" message
+ * @brief Prints "thank you" message
  */
 void Nw4rException::PrintThankYouMsg() {
     Printf("*************************************\n");
@@ -493,7 +493,7 @@ void Nw4rException::PrintThankYouMsg() {
 }
 
 /**
- * Prints symbol information using the map file
+ * @brief Prints symbol information using the map file
  */
 void Nw4rException::PrintSymbol(const void* addr) {
     // Symbol's offset from the start of game code
@@ -509,12 +509,13 @@ void Nw4rException::PrintSymbol(const void* addr) {
     // Non-game symbol, see if a map file has been loaded
     if (!MapFile::GetInstance().IsAvailable()) {
         /**
-         * If the map file is not available, we are in one of two situations:
+         * @brief If the map file is not available, we are in one of two
+         * situations:
          * 1. The exception occurred before the map file could be read
          * 2. The map file does not exist
          *
-         * Either way, we want to at least print the code's address relocatable
-         * address (relative to the start of the module).
+         * @brief Either way, we want to at least print the code's address
+         * relocatable address (relative to the start of the module).
          */
         Printf("%08X (RELOC)", textOffset);
         return;
@@ -524,9 +525,9 @@ void Nw4rException::PrintSymbol(const void* addr) {
     const MapFile::Symbol* sym = MapFile::GetInstance().QueryTextSymbol(addr);
 
     /**
-     * At this point we know the symbol is in module code, so the map file
-     * should always return a result. However, to prevent the exception handler
-     * from itself throwing an exception we do not assert this.
+     * @brief At this point we know the symbol is in module code, so the map
+     * file should always return a result. However, to prevent the exception
+     * handler from itself throwing an exception we do not assert this.
      */
     K_WARN_EX(sym == NULL,
               "Symbol missing(?) from module link map: reloc %08X\n",

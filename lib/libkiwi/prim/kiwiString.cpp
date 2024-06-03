@@ -22,7 +22,7 @@ template <typename T> const T* StrStr(const T* s1, const T* s2);
 } // namespace
 
 /**
- * Clears string buffer (yields empty string)
+ * @brief Clears string buffer (yields empty string)
  */
 template <typename T> void StringImpl<T>::Clear() {
     // Don't delete static memory
@@ -43,7 +43,7 @@ template <typename T> void StringImpl<T>::Clear() {
 }
 
 /**
- * Generates substring of this string
+ * @brief Generates substring of this string
  *
  * @param pos Substring start position
  * @param len Substring size
@@ -73,7 +73,7 @@ StringImpl<T> StringImpl<T>::SubStr(u32 pos, u32 len) const {
 }
 
 /**
- * Finds first occurrence of sequence in string
+ * @brief Finds first occurrence of sequence in string
  *
  * @param str Sequence to search for
  * @param pos Search offset (from string start)
@@ -95,7 +95,7 @@ u32 StringImpl<T>::Find(const StringImpl<T>& str, u32 pos) const {
 }
 
 /**
- * Finds first occurrence of sequence in string
+ * @brief Finds first occurrence of sequence in string
  *
  * @param s Sequence to search for
  * @param pos Search offset (from string start)
@@ -122,7 +122,7 @@ template <typename T> u32 StringImpl<T>::Find(const T* s, u32 pos) const {
 }
 
 /**
- * Finds first occurrence of sequence in string
+ * @brief Finds first occurrence of sequence in string
  *
  * @param c Character to search for
  * @param pos Search offset (from string start)
@@ -147,7 +147,7 @@ template <typename T> u32 StringImpl<T>::Find(T c, u32 pos) const {
 }
 
 /**
- * Whether this string starts with the specified prefix
+ * @brief Whether this string starts with the specified prefix
  *
  * @param str Prefix sequence
  */
@@ -157,7 +157,7 @@ bool StringImpl<T>::StartsWith(const StringImpl<T>& str) const {
 }
 
 /**
- * Whether this string starts with the specified prefix
+ * @brief Whether this string starts with the specified prefix
  *
  * @param s Prefix sequence
  */
@@ -167,7 +167,7 @@ template <typename T> bool StringImpl<T>::StartsWith(const T* s) const {
 }
 
 /**
- * Whether this string ends with the specified suffix
+ * @brief Whether this string ends with the specified suffix
  *
  * @param str Suffix sequence
  */
@@ -178,7 +178,7 @@ bool StringImpl<T>::EndsWith(const StringImpl<T>& str) const {
 }
 
 /**
- * Whether this string ends with the specified suffix
+ * @brief Whether this string ends with the specified suffix
  *
  * @param str Suffix sequence
  */
@@ -190,7 +190,7 @@ template <typename T> bool StringImpl<T>::EndsWith(const T* s) const {
 }
 
 /**
- * Split this string into tokens by the specified delimiter
+ * @brief Split this string into tokens by the specified delimiter
  *
  * @param str Delimiter sequence
  * @return List of tokens (may be empty)
@@ -226,7 +226,7 @@ TVector<StringImpl<T> > StringImpl<T>::Split(const StringImpl& delim) const {
 }
 
 /**
- * Tests for equality between string and specified data
+ * @brief Tests for equality between string and specified data
  *
  * @param str String to compare against
  */
@@ -242,7 +242,7 @@ bool StringImpl<T>::operator==(const StringImpl<T>& str) const {
 }
 
 /**
- * Tests for equality between string and specified data
+ * @brief Tests for equality between string and specified data
  *
  * @param str C-style string to compare against
  */
@@ -254,7 +254,7 @@ template <typename T> bool StringImpl<T>::operator==(const T* s) const {
 }
 
 /**
- * Reserves string buffer of specified size
+ * @brief Reserves string buffer of specified size
  *
  * @param n Number of characters to reserve (ignoring null terminator)
  */
@@ -282,7 +282,7 @@ template <typename T> void StringImpl<T>::Reserve(u32 n) {
 }
 
 /**
- * Shrink buffer to fit string contents
+ * @brief Shrink buffer to fit string contents
  */
 template <typename T> void StringImpl<T>::Shrink() {
     K_ASSERT(mCapacity > Length());
@@ -292,7 +292,7 @@ template <typename T> void StringImpl<T>::Shrink() {
 }
 
 /**
- * Assigns data to string
+ * @brief Assigns data to string
  * @note Data is copied, not owned
  *
  * @param str String to copy
@@ -310,7 +310,7 @@ template <typename T> void StringImpl<T>::Assign(const StringImpl<T>& str) {
 }
 
 /**
- * Assigns data to string
+ * @brief Assigns data to string
  * @note Data is copied, not owned
  *
  * @param s C-style string to copy
@@ -332,7 +332,7 @@ template <typename T> void StringImpl<T>::Assign(const T* s, u32 n) {
 }
 
 /**
- * Assigns data to string
+ * @brief Assigns data to string
  *
  * @param c Character to write
  */
@@ -349,7 +349,7 @@ template <typename T> void StringImpl<T>::Assign(T c) {
 }
 
 /**
- * Appends a string to this string
+ * @brief Appends a string to this string
  *
  * @param str String to append
  */
@@ -366,7 +366,7 @@ template <typename T> void StringImpl<T>::Append(const StringImpl<T>& str) {
 }
 
 /**
- * Appends a C-style string to this string
+ * @brief Appends a C-style string to this string
  *
  * @param s C-style string to append
  */
@@ -384,7 +384,7 @@ template <typename T> void StringImpl<T>::Append(const T* s) {
 }
 
 /**
- * Appends a character to this string
+ * @brief Appends a character to this string
  *
  * @param c Character to append
  */

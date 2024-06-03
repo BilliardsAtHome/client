@@ -50,7 +50,7 @@ void CheckDoubleFree(const void* block) {
 } // namespace
 
 /**
- * Constructor
+ * @brief Constructor
  */
 MemoryMgr::MemoryMgr() {
     // clang-format off
@@ -70,7 +70,7 @@ MemoryMgr::MemoryMgr() {
 }
 
 /**
- * Destructor
+ * @brief Destructor
  */
 MemoryMgr::~MemoryMgr() {
     delete mpHeapMEM1;
@@ -78,7 +78,7 @@ MemoryMgr::~MemoryMgr() {
 }
 
 /**
- * Allocates a block of memory
+ * @brief Allocates a block of memory
  *
  * @param size Block size
  * @param align Block alignment
@@ -100,7 +100,7 @@ void* MemoryMgr::Alloc(u32 size, s32 align, EMemory memory) {
 }
 
 /**
- * Frees a block of memory
+ * @brief Frees a block of memory
  *
  * @param block Block
  */
@@ -111,7 +111,7 @@ void MemoryMgr::Free(void* block) {
 }
 
 /**
- * Gets total size of available heap memory
+ * @brief Gets total size of available heap memory
  *
  * @param memory Target memory region
  */
@@ -212,7 +212,7 @@ void* operator new[](std::size_t size, s32 align, kiwi::EMemory memory) {
 }
 
 /**
- * Frees a block of memory
+ * @brief Frees a block of memory
  *
  * @param block Block
  */
@@ -220,7 +220,7 @@ void operator delete(void* block) {
     kiwi::MemoryMgr::GetInstance().Free(block);
 }
 /**
- * Frees a block of memory used by an array
+ * @brief Frees a block of memory used by an array
  *
  * @param block Block
  */

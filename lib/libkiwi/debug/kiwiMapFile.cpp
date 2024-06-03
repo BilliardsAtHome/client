@@ -1,5 +1,4 @@
 #include <cstring>
-#include <egg/core.h>
 #include <libkiwi.h>
 
 namespace kiwi {
@@ -7,20 +6,21 @@ namespace kiwi {
 K_DYNAMIC_SINGLETON_IMPL(MapFile);
 
 /**
- * Constructor
+ * @brief Constructor
  */
 MapFile::MapFile()
     : mLinkType(ELinkType_None), mpMapBuffer(NULL), mIsUnpacked(false) {}
 
 /**
- * Destructor
+ * @brief Destructor
  */
 MapFile::~MapFile() {
     Close();
 }
 
 /**
- * Opens a map file from the DVD
+ * @brief Opens a map file from the DVD
+ *
  * @param path Map file path
  * @param type Module linkage type
  */
@@ -44,7 +44,7 @@ void MapFile::Open(const String& path, ELinkType type) {
 }
 
 /**
- * Closes map file
+ * @brief Closes map file
  */
 void MapFile::Close() {
     TList<Symbol>::Iterator it = mSymbols.Begin();
@@ -61,7 +61,8 @@ void MapFile::Close() {
 }
 
 /**
- * Queries text section symbol
+ * @brief Queries text section symbol
+ *
  * @param addr Symbol address
  */
 const MapFile::Symbol* MapFile::QueryTextSymbol(const void* addr) {
@@ -86,18 +87,10 @@ const MapFile::Symbol* MapFile::QueryTextSymbol(const void* addr) {
 }
 
 /**
- * Unpacks loaded map file
+ * @brief Unpacks loaded map file
  */
 void MapFile::Unpack() {
-    // Don't unpack twice
-    if (IsAvailable()) {
-        return;
-    }
-
-    // Nothing to unpack
-    if (mpMapBuffer == NULL) {
-        return;
-    }
+    K_ASSERT(mpMapBuffer != NULL);
 
     // Skip map file header (2 lines)
     char* map = mpMapBuffer;

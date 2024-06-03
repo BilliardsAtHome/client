@@ -4,7 +4,7 @@
 namespace kiwi {
 
 /**
- * Async receive operation
+ * @brief Async receive operation
  */
 class AsyncSocket::RecvJob {
 public:
@@ -90,7 +90,7 @@ private:
 };
 
 /**
- * Async send operation
+ * @brief Async send operation
  */
 class AsyncSocket::SendJob {
 public:
@@ -162,7 +162,7 @@ u8 AsyncSocket::sSocketThreadStack[THREAD_STACK_SIZE];
 TList<AsyncSocket> AsyncSocket::sSocketList;
 
 /**
- * Socket thread function
+ * @brief Socket thread function
  */
 void* AsyncSocket::ThreadFunc(void* arg) {
 #pragma unused(arg)
@@ -180,7 +180,7 @@ void* AsyncSocket::ThreadFunc(void* arg) {
 }
 
 /**
- * Constructor
+ * @brief Constructor
  *
  * @param family Socket protocol family
  * @param type Socket type
@@ -196,7 +196,7 @@ AsyncSocket::AsyncSocket(SOProtoFamily family, SOSockType type)
 }
 
 /**
- * Constructor
+ * @brief Constructor
  *
  * @param socket Socket file descriptor
  * @param type Socket protocol family
@@ -213,7 +213,7 @@ AsyncSocket::AsyncSocket(SOSocket socket, SOProtoFamily family, SOSockType type)
 }
 
 /**
- * Prepares socket for async operation
+ * @brief Prepares socket for async operation
  */
 void AsyncSocket::Initialize() {
     // Make socket non-blocking
@@ -235,14 +235,14 @@ void AsyncSocket::Initialize() {
 }
 
 /**
- * Destructor
+ * @brief Destructor
  */
 AsyncSocket::~AsyncSocket() {
     sSocketList.Remove(this);
 }
 
 /**
- * Connects to another socket
+ * @brief Connects to another socket
  *
  * @param addr Remote address
  * @param callback Connection callback
@@ -264,7 +264,7 @@ bool AsyncSocket::Connect(const SockAddrAny& addr, Callback callback,
 }
 
 /**
- * Accepts remote connection
+ * @brief Accepts remote connection
  *
  * @param callback Acceptance callback
  * @param arg Callback user argument
@@ -283,7 +283,7 @@ AsyncSocket* AsyncSocket::Accept(AcceptCallback callback, void* arg) {
 }
 
 /**
- * Receives data and records sender address
+ * @brief Receives data and records sender address
  *
  * @param dst Destination buffer
  * @param len Buffer size
@@ -315,7 +315,7 @@ SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv,
 }
 
 /**
- * Sends data to specified connection
+ * @brief Sends data to specified connection
  *
  * @param dst Destination buffer
  * @param len Buffer size
@@ -350,7 +350,7 @@ SOResult AsyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
 }
 
 /**
- * Process pending tasks
+ * @brief Process pending tasks
  */
 void AsyncSocket::Calc() {
     s32 result;
@@ -402,7 +402,7 @@ void AsyncSocket::Calc() {
 }
 
 /**
- * Receives packet data over socket
+ * @brief Receives packet data over socket
  */
 void AsyncSocket::CalcRecv() {
     K_ASSERT(IsOpen());
@@ -425,7 +425,7 @@ void AsyncSocket::CalcRecv() {
 }
 
 /**
- * Sends packet data over socket
+ * @brief Sends packet data over socket
  */
 void AsyncSocket::CalcSend() {
     K_ASSERT(IsOpen());

@@ -5,7 +5,7 @@
 namespace kiwi {
 
 /**
- * IOS I/O control codes
+ * @brief IOS I/O control codes
  */
 enum {
     // dev/net/ip/top
@@ -49,7 +49,7 @@ IosDevice LibSO::sIosDevice;
 SOResult LibSO::sLastError = SO_SUCCESS;
 
 /**
- * Accesses IOS IP device for socket operation
+ * @brief Accesses IOS IP device for socket operation
  *
  * @note Please call this before other LibSO functions
  */
@@ -107,7 +107,7 @@ void LibSO::Initialize() {
 }
 
 /**
- * Determine the most recent error code
+ * @brief Determine the most recent error code
  */
 SOResult LibSO::GetLastError() {
     return sLastError;
@@ -119,7 +119,7 @@ struct SOSocketArgs {
     /* 0x08 */ s32 protocol;
 };
 /**
- * Creates a socket
+ * @brief Creates a socket
  *
  * @param family Protocol family
  * @param type Socket type
@@ -148,7 +148,7 @@ s32 LibSO::Socket(SOProtoFamily family, SOSockType type) {
 }
 
 /**
- * Closes a socket descriptor
+ * @brief Closes a socket descriptor
  *
  * @param socket Socket descriptor
  * @return IOS error code
@@ -170,7 +170,7 @@ struct SOListenArgs {
     /* 0x04 */ s32 backlog;
 };
 /**
- * Listens for socket connections
+ * @brief Listens for socket connections
  *
  * @param socket Socket descriptor
  * @param backlog Maximum pending connections (default 5)
@@ -190,7 +190,7 @@ SOResult LibSO::Listen(SOSocket socket, s32 backlog) {
 }
 
 /**
- * Accepts a new connection on a socket
+ * @brief Accepts a new connection on a socket
  *
  * @param socket Socket descriptor
  * @param[in,out] addr Remote address
@@ -226,7 +226,7 @@ struct SOBindArgs {
     /* 0x08 */ SockAddrAny dest;
 };
 /**
- * Binds a name to a socket
+ * @brief Binds a name to a socket
  *
  * @param socket Socket descriptor
  * @param addr[in,out] Local address (zero for random port)
@@ -257,7 +257,7 @@ struct SOConnectArgs {
     /* 0x08 */ SockAddrAny dest;
 };
 /**
- * Connects a socket
+ * @brief Connects a socket
  *
  * @param socket Socket descriptor
  * @param addr Remote address
@@ -281,7 +281,7 @@ SOResult LibSO::Connect(SOSocket socket, const SockAddrAny& addr) {
 }
 
 /**
- * Gets the socket name
+ * @brief Gets the socket name
  *
  * @param socket Socket descriptor
  * @param[in,out] addr Local address
@@ -310,7 +310,7 @@ SOResult LibSO::GetSockName(SOSocket socket, SockAddrAny& addr) {
 }
 
 /**
- * Gets the peer socket name
+ * @brief Gets the peer socket name
  *
  * @param socket Socket descriptor
  * @param[in,out] addr Remote address
@@ -339,7 +339,7 @@ SOResult LibSO::GetPeerName(SOSocket socket, SockAddrAny& addr) {
 }
 
 /**
- * Receives a message from a connected socket
+ * @brief Receives a message from a connected socket
  *
  * @param socket Socket descriptor
  * @param dst Destination buffer
@@ -354,7 +354,7 @@ s32 LibSO::Read(SOSocket socket, void* dst, u32 len) {
 }
 
 /**
- * Receives a message from a connected socket
+ * @brief Receives a message from a connected socket
  *
  * @param socket Socket descriptor
  * @param dst Destination buffer
@@ -370,7 +370,7 @@ s32 LibSO::Recv(SOSocket socket, void* dst, u32 len, u32 flags) {
 }
 
 /**
- * Receives a message from a specified address
+ * @brief Receives a message from a specified address
  *
  * @param socket Socket descriptor
  * @param dst Destination buffer
@@ -391,7 +391,7 @@ s32 LibSO::RecvFrom(SOSocket socket, void* dst, u32 len, u32 flags,
 }
 
 /**
- * Sends a message on a socket
+ * @brief Sends a message on a socket
  *
  * @param socket Socket descriptor
  * @param src Source buffer
@@ -406,7 +406,7 @@ s32 LibSO::Write(SOSocket socket, const void* src, u32 len) {
 }
 
 /**
- * Sends a message on a socket
+ * @brief Sends a message on a socket
  *
  * @param socket Socket descriptor
  * @param src Source buffer
@@ -422,7 +422,7 @@ s32 LibSO::Send(SOSocket socket, const void* src, u32 len, u32 flags) {
 }
 
 /**
- * Sends a message to a specified address
+ * @brief Sends a message to a specified address
  *
  * @param socket Socket descriptor
  * @param src Source buffer
@@ -447,7 +447,7 @@ struct SORecvArgs {
     /* 0x04 */ u32 flags;
 };
 /**
- * Receives a message and records its sender
+ * @brief Receives a message and records its sender
  *
  * @param socket Socket descriptor
  * @param dst Destination buffer
@@ -514,7 +514,7 @@ struct SOSendArgs {
     /* 0x0C */ SockAddrAny dest;
 };
 /**
- * Sends a message to a specified address
+ * @brief Sends a message to a specified address
  *
  * @param socket Socket descriptor
  * @param src Source buffer
@@ -571,7 +571,7 @@ struct SOFcntlArgs {
     /* 0x08 */ void* arg;
 };
 /**
- * Controls socket file descriptor
+ * @brief Controls socket file descriptor
  *
  * @param socket Socket descriptor
  * @param cmd Command
@@ -602,7 +602,7 @@ struct SOShutdownArgs {
     /* 0x04 */ s32 type;
 };
 /**
- * Shuts down specified part of socket connection
+ * @brief Shuts down specified part of socket connection
  *
  * @param socket Socket descriptor
  * @param how How to shutdown connection
@@ -622,7 +622,7 @@ SOResult LibSO::Shutdown(SOSocket socket, SOShutdownType how) {
 }
 
 /**
- * Wait for events on socket file descriptors
+ * @brief Wait for events on socket file descriptors
  *
  * @param[in,out] fds Socket descriptor array
  * @param numfds Socket descriptor array size
@@ -695,7 +695,7 @@ bool LibSO::INetAtoN(const String& name, SockAddr4& addr) {
 }
 
 /**
- * Converts a string to a socket address
+ * @brief Converts a string to a socket address
  *
  * @param str Address string
  * @param[out] addr Socket address
@@ -733,7 +733,7 @@ bool LibSO::INetPtoN(const String& str, SockAddrAny& addr) {
 }
 
 /**
- * Converts a socket address to a string
+ * @brief Converts a socket address to a string
  *
  * @param addr Socket address
  * @return Address string
@@ -762,7 +762,7 @@ String LibSO::INetNtoP(const SockAddrAny& addr) {
 }
 
 /**
- * Gets the host machine's IPv4 address
+ * @brief Gets the host machine's IPv4 address
  *
  * @param[out] addr Host address
  */

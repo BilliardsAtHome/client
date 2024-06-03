@@ -7,7 +7,7 @@
 namespace kiwi {
 
 /**
- * Templated linked-list node
+ * @brief Templated linked-list node
  * @note List node DOES NOT OWN ELEMENT
  */
 template <typename T> class TListNode : private NonCopyable {
@@ -18,7 +18,7 @@ template <typename T> class TListNode : private NonCopyable {
 
 private:
     /**
-     * Constructor
+     * @brief Constructor
      *
      * @param elem Node element
      */
@@ -30,12 +30,12 @@ private:
 };
 
 /**
- * Templated linked-list
+ * @brief Templated linked-list
  */
 template <typename T> class TList : private NonCopyable {
 public:
     /**
-     * Linked-list iterator
+     * @brief Linked-list iterator
      */
     class Iterator {
         template <typename> friend class TList;
@@ -43,7 +43,7 @@ public:
 
     public:
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param node Iterator node
          */
@@ -52,14 +52,14 @@ public:
         }
 
         /**
-         * Pre-increment operator
+         * @brief Pre-increment operator
          */
         Iterator& operator++() {
             mpNode = mpNode->mpNext;
             return *this;
         }
         /**
-         * Post-increment operator
+         * @brief Post-increment operator
          */
         Iterator operator++(int) {
             Iterator clone(*this);
@@ -68,14 +68,14 @@ public:
         }
 
         /**
-         * Pre-decrement operator
+         * @brief Pre-decrement operator
          */
         Iterator& operator--() {
             mpNode = mpNode->mpPrev;
             return *this;
         }
         /**
-         * Post-decrement operator
+         * @brief Post-decrement operator
          */
         Iterator operator--(int) {
             Iterator clone(*this);
@@ -84,14 +84,14 @@ public:
         }
 
         /**
-         * Gets pointer to element
+         * @brief Gets pointer to element
          */
         T* operator->() const {
             return mpNode->mpElement;
         }
 
         /**
-         * Gets reference to element
+         * @brief Gets reference to element
          */
         T& operator*() const {
             K_ASSERT(mpNode->mpElement != NULL);
@@ -110,14 +110,14 @@ public:
     };
 
     /**
-     * Linked-list iterator (const view)
+     * @brief Linked-list iterator (const view)
      */
     class ConstIterator {
         template <typename> friend class TList;
 
     public:
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param node Iterator node
          */
@@ -126,7 +126,7 @@ public:
         }
 
         /**
-         * Constructor
+         * @brief Constructor
          *
          * @param iter Iterator
          */
@@ -135,14 +135,14 @@ public:
         }
 
         /**
-         * Pre-increment operator
+         * @brief Pre-increment operator
          */
         ConstIterator& operator++() {
             mpNode = mpNode->mpNext;
             return *this;
         }
         /**
-         * Post-increment operator
+         * @brief Post-increment operator
          */
         ConstIterator operator++(int) {
             ConstIterator clone(*this);
@@ -151,14 +151,14 @@ public:
         }
 
         /**
-         * Pre-decrement operator
+         * @brief Pre-decrement operator
          */
         ConstIterator& operator--() {
             mpNode = mpNode->mpPrev;
             return *this;
         }
         /**
-         * Post-decrement operator
+         * @brief Post-decrement operator
          */
         ConstIterator operator--(int) {
             ConstIterator clone(*this);
@@ -167,14 +167,14 @@ public:
         }
 
         /**
-         * Gets pointer to element
+         * @brief Gets pointer to element
          */
         const T* operator->() const {
             return mpNode->mpElement;
         }
 
         /**
-         * Gets reference to element
+         * @brief Gets reference to element
          */
         const T& operator*() const {
             return *mpNode->mpElement;
@@ -196,82 +196,82 @@ public:
 
 public:
     /**
-     * Constructor
+     * @brief Constructor
      */
     explicit TList() : mSize(0), mEndNode(NULL) {
         mEndNode.mpNext = &mEndNode;
         mEndNode.mpPrev = &mEndNode;
     }
     /**
-     * Destructor
+     * @brief Destructor
      */
     ~TList() {
         Clear();
     }
 
     /**
-     * Erase all list elements
+     * @brief Erase all list elements
      */
     void Clear() {
         Erase(Begin(), End());
     }
 
     /**
-     * Gets iterator to beginning of list
+     * @brief Gets iterator to beginning of list
      */
     Iterator Begin() {
         return Iterator(mEndNode.mpNext);
     }
     /**
-     * Gets iterator to beginning of list (const view)
+     * @brief Gets iterator to beginning of list (const view)
      */
     ConstIterator Begin() const {
         return ConstIterator(Begin());
     }
 
     /**
-     * Gets iterator to end of list
+     * @brief Gets iterator to end of list
      */
     Iterator End() {
         return Iterator(&mEndNode);
     }
     /**
-     * Gets iterator to end of list (const-view)
+     * @brief Gets iterator to end of list (const-view)
      */
     ConstIterator End() const {
         return ConstIterator(End());
     }
 
     /**
-     * Gets list size
+     * @brief Gets list size
      */
     u32 GetSize() const {
         return mSize;
     }
 
     /**
-     * Tests whether list is empty
+     * @brief Tests whether list is empty
      */
     bool Empty() const {
         return GetSize() == 0;
     }
 
     /**
-     * Erases beginning element from list
+     * @brief Erases beginning element from list
      */
     void PopFront() {
         Erase(Begin());
     }
 
     /**
-     * Erases end element from list
+     * @brief Erases end element from list
      */
     void PopBack() {
         Erase(--End());
     }
 
     /**
-     * Prepends element to front of list
+     * @brief Prepends element to front of list
      *
      * @param elem New element
      */
@@ -280,7 +280,7 @@ public:
     }
 
     /**
-     * Appends element to end of list
+     * @brief Appends element to end of list
      *
      * @param elem New element
      */
@@ -289,14 +289,14 @@ public:
     }
 
     /**
-     * Gets reference to first element of list
+     * @brief Gets reference to first element of list
      */
     T& Front() {
         K_ASSERT(!Empty());
         return *Begin();
     }
     /**
-     * Gets reference to first element of list (const-view)
+     * @brief Gets reference to first element of list (const-view)
      */
     const T& Front() const {
         K_ASSERT(!Empty());
@@ -304,14 +304,14 @@ public:
     }
 
     /**
-     * Gets reference to last element of list
+     * @brief Gets reference to last element of list
      */
     T& Back() {
         K_ASSERT(!Empty());
         return *--End();
     }
     /**
-     * Gets reference to last element of list (const-view)
+     * @brief Gets reference to last element of list (const-view)
      */
     const T& Back() const {
         K_ASSERT(!Empty());
@@ -319,7 +319,7 @@ public:
     }
 
     /**
-     * Inserts node at iterator
+     * @brief Inserts node at iterator
      *
      * @param iter Iterator at which to insert node
      * @param node Node to insert
@@ -328,7 +328,7 @@ public:
     Iterator Insert(Iterator iter, TListNode<T>* node);
 
     /**
-     * Erases node at iterator
+     * @brief Erases node at iterator
      *
      * @param iter Iterator at which to erase node
      * @return Iterator to next node
@@ -339,7 +339,7 @@ public:
     }
 
     /**
-     * Erases node from list
+     * @brief Erases node from list
      *
      * @param node Node to erase
      * @return Iterator to next node
@@ -347,7 +347,7 @@ public:
     Iterator Erase(TListNode<T>* node);
 
     /**
-     * Erases range of nodes
+     * @brief Erases range of nodes
      *
      * @param begin Beginning of range (inclusive)
      * @param end End of range (exclusive)
@@ -356,7 +356,7 @@ public:
     Iterator Erase(Iterator begin, Iterator end);
 
     /**
-     * Removes first occurrence of element from list
+     * @brief Removes first occurrence of element from list
      *
      * @param elem
      */

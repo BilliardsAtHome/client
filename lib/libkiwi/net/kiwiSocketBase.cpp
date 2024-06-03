@@ -3,7 +3,7 @@
 namespace kiwi {
 
 /**
- * Constructor
+ * @brief Constructor
  *
  * @param family Socket protocol family
  * @param type Socket type
@@ -21,7 +21,7 @@ SocketBase::SocketBase(SOProtoFamily family, SOSockType type)
 }
 
 /**
- * Constructor
+ * @brief Constructor
  *
  * @param socket Socket file descriptor
  * @param type Socket protocol family
@@ -33,7 +33,7 @@ SocketBase::SocketBase(SOSocket socket, SOProtoFamily family, SOSockType type)
 }
 
 /**
- * Destructor
+ * @brief Destructor
  */
 SocketBase::~SocketBase() {
     K_ASSERT(IsOpen());
@@ -43,7 +43,7 @@ SocketBase::~SocketBase() {
 }
 
 /**
- * Gets the console's IP address
+ * @brief Gets the console's IP address
  *
  * @param addr[out] IPv4 address
  */
@@ -52,7 +52,7 @@ void SocketBase::GetHostAddr(SockAddr4& addr) {
 }
 
 /**
- * Binds socket to local address
+ * @brief Binds socket to local address
  *
  * @note Bind to port zero for a random port (written out)
  * @param addr[in,out] Local address
@@ -78,20 +78,20 @@ bool SocketBase::Bind(SockAddrAny& addr) const {
 }
 
 /**
- * Listens for incoming connections
+ * @brief Listens for incoming connections
  *
  * @param backlog Maximum pending connections
  * @return Success
  */
 bool SocketBase::Listen(s32 backlog) const {
     K_ASSERT(IsOpen());
-    K_WARN(mType == SO_SOCK_DGRAM, "Listen won't do anything for dgram.\n");
+    K_WARN_EX(mType == SO_SOCK_DGRAM, "Listen won't do anything for dgram.\n");
 
     return LibSO::Listen(mHandle, backlog) == SO_SUCCESS;
 }
 
 /**
- * Tests whether socket is blocking
+ * @brief Tests whether socket is blocking
  */
 bool SocketBase::IsBlocking() const {
     K_ASSERT(IsOpen());
@@ -101,7 +101,7 @@ bool SocketBase::IsBlocking() const {
 }
 
 /**
- * Toggles socket blocking
+ * @brief Toggles socket blocking
  *
  * @param enable Whether to enable blocking
  * @return Success
@@ -121,7 +121,7 @@ bool SocketBase::SetBlocking(bool enable) const {
 }
 
 /**
- * Toggle port reuse
+ * @brief Toggle port reuse
  *
  * @param enable Whether to enable port reuse
  * @return Success
@@ -133,7 +133,7 @@ bool SocketBase::SetReuseAddr(bool enable) const {
 }
 
 /**
- * Stops socket from reading/writing
+ * @brief Stops socket from reading/writing
  *
  * @param how How to shutdown connection
  * @return Success
@@ -146,7 +146,7 @@ bool SocketBase::Shutdown(SOShutdownType how) const {
 }
 
 /**
- * Closes socket
+ * @brief Closes socket
  *
  * @return Success
  */
@@ -164,7 +164,7 @@ bool SocketBase::Close() {
 }
 
 /**
- * Gets endpoint of socket
+ * @brief Gets endpoint of socket
  *
  * @param[out] addr Socket address
  * @return Success
@@ -177,7 +177,7 @@ bool SocketBase::GetSocketAddr(SockAddrAny& addr) const {
 }
 
 /**
- * Gets endpoint of peer
+ * @brief Gets endpoint of peer
  *
  * @param[out] addr Peer address
  * @return Success
@@ -190,7 +190,7 @@ bool SocketBase::GetPeerAddr(SockAddrAny& addr) const {
 }
 
 /**
- * Tests if socket can receive data
+ * @brief Tests if socket can receive data
  */
 bool SocketBase::CanRecv() const {
     K_ASSERT(IsOpen());
@@ -205,7 +205,7 @@ bool SocketBase::CanRecv() const {
 }
 
 /**
- * Tests if socket can send data
+ * @brief Tests if socket can send data
  */
 bool SocketBase::CanSend() const {
     K_ASSERT(IsOpen());
@@ -220,7 +220,7 @@ bool SocketBase::CanSend() const {
 }
 
 /**
- * Receives bytes from bound connection
+ * @brief Receives bytes from bound connection
  *
  * @param buf Destination buffer
  * @param len Buffer size
@@ -253,7 +253,7 @@ Optional<u32> SocketBase::RecvBytes(void* buf, u32 len, Callback callback,
 }
 
 /**
- * Receives bytes and records sender address
+ * @brief Receives bytes and records sender address
  *
  * @param buf Destination buffer
  * @param len Buffer size
@@ -287,7 +287,7 @@ Optional<u32> SocketBase::RecvBytesFrom(void* buf, u32 len, SockAddrAny& addr,
 }
 
 /**
- * Sends bytes to bound connection
+ * @brief Sends bytes to bound connection
  *
  * @param buf Source buffer
  * @param len Buffer size
@@ -320,7 +320,7 @@ Optional<u32> SocketBase::SendBytes(const void* buf, u32 len, Callback callback,
 }
 
 /**
- * Sends bytes to specified connection
+ * @brief Sends bytes to specified connection
  *
  * @param buf Source buffer
  * @param len Buffer size

@@ -10,7 +10,7 @@
 namespace kiwi {
 
 /**
- * Asynchronous (non-blocking) socket
+ * @brief Asynchronous (non-blocking) socket
  */
 class AsyncSocket : public SocketBase {
 public:
@@ -24,7 +24,7 @@ public:
 
 private:
     /**
-     * Async state
+     * @brief Async state
      */
     enum EState { EState_Thinking, EState_Connecting, EState_Accepting };
 

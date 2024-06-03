@@ -8,19 +8,19 @@
 namespace kiwi {
 
 /**
- * String wrapper
+ * @brief String wrapper
  */
 template <typename T> class StringImpl {
 public:
     /**
-     * Constructor
+     * @brief Constructor
      */
     StringImpl() : mpBuffer(NULL), mCapacity(0), mLength(0) {
         Clear();
     }
 
     /**
-     * Constructor
+     * @brief Constructor
      * @details Copy constructor
      *
      * @param str String to copy
@@ -31,7 +31,7 @@ public:
     }
 
     /**
-     * Constructor
+     * @brief Constructor
      * @details Substring constructor
      *
      * @param str String to copy
@@ -44,7 +44,7 @@ public:
     }
 
     /**
-     * Constructor
+     * @brief Constructor
      * @details C-style string constructor
      *
      * @param s C-style string
@@ -54,7 +54,7 @@ public:
     }
 
     /**
-     * Constructor
+     * @brief Constructor
      * @details Buffer/sequence constructor
      *
      * @param s Buffer/sequence
@@ -65,7 +65,7 @@ public:
     }
 
     /**
-     * Constructor
+     * @brief Constructor
      * @details Character constructor
      *
      * @param c Character
@@ -75,7 +75,7 @@ public:
     }
 
     /**
-     * Constructor
+     * @brief Constructor
      * @details Reserve space
      *
      * @param n Number of characters to reserve
@@ -85,7 +85,7 @@ public:
     }
 
     /**
-     * Destructor
+     * @brief Destructor
      */
     ~StringImpl() {
         // Don't delete static memory
@@ -98,35 +98,35 @@ public:
     }
 
     /**
-     * Implicit conversion operator to C-style string
+     * @brief Implicit conversion operator to C-style string
      */
     operator const T*() const {
         return CStr();
     }
 
     /**
-     * Gets the length of the underlying string (not including term)
+     * @brief Gets the length of the underlying string (not including term)
      */
     u32 Length() const {
         return mLength;
     }
 
     /**
-     * Tests whether the string is empty
+     * @brief Tests whether the string is empty
      */
     bool Empty() const {
         return Length() == 0;
     }
 
     /**
-     * Gets the underlying C-style string
+     * @brief Gets the underlying C-style string
      */
     const T* CStr() const {
         return mpBuffer;
     }
 
     /**
-     * Accesses a character in the string
+     * @brief Accesses a character in the string
      *
      * @param i Character index
      * @return Reference to character
@@ -137,7 +137,7 @@ public:
     }
 
     /**
-     * Accesses a character in the string
+     * @brief Accesses a character in the string
      *
      * @param i Character index
      * @return Reference to character
@@ -250,7 +250,7 @@ typedef StringImpl<char> String;
 typedef StringImpl<wchar_t> WString;
 
 /**
- * Creates a new string from format arguments
+ * @brief Creates a new string from format arguments
  *
  * @param fmt Format string
  * @param args Format arguments
@@ -263,7 +263,7 @@ K_INLINE StringImpl<T> VFormat(const StringImpl<T>& fmt, std::va_list args) {
 }
 
 /**
- * Creates a new string from format arguments
+ * @brief Creates a new string from format arguments
  *
  * @param fmt Format C-style string
  * @param args Format arguments
@@ -276,7 +276,7 @@ K_INLINE StringImpl<T> VFormat(const T* fmt, std::va_list args) {
 }
 
 /**
- * Creates a new string from format arguments
+ * @brief Creates a new string from format arguments
  *
  * @param fmt Format string
  * @param ... Format arguments
@@ -292,7 +292,7 @@ K_INLINE StringImpl<T> Format(const StringImpl<T>& fmt, ...) {
 }
 
 /**
- * Creates a new string from format arguments
+ * @brief Creates a new string from format arguments
  *
  * @param fmt Format C-style string
  * @param ... Format arguments

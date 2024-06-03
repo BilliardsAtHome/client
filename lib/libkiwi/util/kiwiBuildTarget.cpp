@@ -4,14 +4,14 @@
 namespace kiwi {
 
 /**
- * Gets module build date
+ * @brief Gets module build date
  */
 String GetBuildDate() {
     return __DATE__ " " __TIME__;
 }
 
 /**
- * Gets module build pack as a string
+ * @brief Gets module build pack as a string
  */
 String GetBuildPack() {
     // clang-format off
@@ -22,7 +22,7 @@ String GetBuildPack() {
 }
 
 /**
- * Gets module build target as a string
+ * @brief Gets module build target as a string
  */
 String GetBuildTarget() {
 #ifdef NDEBUG

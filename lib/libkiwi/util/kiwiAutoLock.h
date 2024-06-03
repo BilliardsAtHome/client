@@ -6,7 +6,7 @@
 namespace kiwi {
 
 /**
- * Generic scoped lock
+ * @brief Generic scoped lock
  */
 template <typename T> class AutoLock : private NonCopyable {
 public:
@@ -26,7 +26,7 @@ private:
 };
 
 /**
- * OSMutex specializations
+ * @brief OSMutex specializations
  */
 template <> K_INLINE void AutoLock<OSMutex>::Lock() {
     if (OSGetCurrentThread() != NULL) {
@@ -42,7 +42,7 @@ template <> K_INLINE void AutoLock<OSMutex>::Unlock() {
 typedef AutoLock<OSMutex> AutoMutexLock;
 
 /**
- * OS interrupt scoped lock
+ * @brief OS interrupt scoped lock
  */
 class AutoInterruptLock : private NonCopyable {
 public:

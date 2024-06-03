@@ -1,6 +1,7 @@
 #ifndef LIBKIWI_DEBUG_GECKO_DEBUGGER_H
 #define LIBKIWI_DEBUG_GECKO_DEBUGGER_H
 #include <libkiwi/debug/kiwiIDebugger.h>
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 #include <libkiwi/util/kiwiGlobalInstance.h>
@@ -20,7 +21,7 @@ class GeckoDebugger : public IDebugger,
 
 public:
     /**
-     * @brief Attach the debugger (USB Gecko)
+     * @brief Attaches the debugger (USB Gecko)
      *
      * @return Success
      */
@@ -36,7 +37,7 @@ private:
     static void ExiCallback(EXIChannel chan, OSContext* ctx);
 
     /**
-     * @brief Read data sent to the debugger
+     * @brief Reads data sent to the debugger
      *
      * @param dst Destination buffer
      * @param size Read length
@@ -45,7 +46,7 @@ private:
     virtual Optional<u32> Read(void* dst, u32 size);
 
     /**
-     * @brief Write data over the debugger
+     * @brief Writes data over the debugger
      *
      * @param src Source buffer
      * @param size Write length

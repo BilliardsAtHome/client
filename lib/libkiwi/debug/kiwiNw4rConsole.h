@@ -1,71 +1,161 @@
 #ifndef LIBKIWI_DEBUG_NW4R_CONSOLE_H
 #define LIBKIWI_DEBUG_NW4R_CONSOLE_H
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 
 namespace kiwi {
 
 /**
- * Reimplementation of NW4R's debug console
+     * @brief Reimplementation of NW4R's debug console
  */
 class Nw4rConsole : public DynamicSingleton<Nw4rConsole> {
     friend class DynamicSingleton<Nw4rConsole>;
 
 public:
     /**
-     * Toggles console visibilty
+     * @brief Toggles console visibilty
      */
     void SetVisible(bool vis) {
         mIsVisible = vis;
     }
 
     /**
-     * Scrolls display one character up
+     * @brief Scrolls display one character up
      */
     void ScrollUp() {
         ScrollY(-1);
     }
-
     /**
-     * Scrolls display one character down
+     * @brief Scrolls display one character down
      */
     void ScrollDown() {
         ScrollY(+1);
     }
 
     /**
-     * Scrolls display one character left
+     * @brief Scrolls display one character left
      */
     void ScrollLeft() {
         ScrollX(+1);
     }
-
     /**
-     * Scrolls display one character right
+     * @brief Scrolls display one character right
      */
     void ScrollRight() {
         ScrollX(-1);
     }
 
+    /**
+     * @brief Prints text to console
+     *
+     * @param fmt Format string
+     * @param ... Format args
+     */
     void Printf(const char* fmt, ...);
+
+    /**
+     * @brief Prints text to console
+     *
+     * @param fmt Format string
+     * @param args Format args
+     */
     void VPrintf(const char* fmt, std::va_list args);
+
+    /**
+     * @brief Draws console using DirectPrint
+     */
     void DrawDirect() const;
 
 private:
+    /**
+     * @brief Constructor
+     */
     Nw4rConsole();
-    ~Nw4rConsole();
 
+    /**
+     * @brief Destructor
+     */
+    virtual ~Nw4rConsole();
+
+    /**
+     * @brief Scrolls console display horizontally
+     *
+     * @param n Number of characters to scroll
+     */
     void ScrollX(s32 n);
+    /**
+     * @brief Scrolls console display vertically
+     *
+     * @param n Number of characters to scroll
+     */
     void ScrollY(s32 n);
+
+    /**
+     * @brief Gets position of specified character in the console text buffer
+     *
+     * @param line Character line
+     * @param pos Character position
+     * @return Character location in buffer
+     */
     char* GetTextPtr(u16 line, u16 pos) const;
+
+    /**
+     * @brief Advances text buffer to the next line
+     *
+     * @return Pointer to next line
+     */
     char* NextLine();
+
+    /**
+     * @brief Writes tab to text buffer
+     *
+     * @param dst Destination buffer
+     * @return Pointer to text after inserted characters
+     */
     char* PutTab(char* dst);
+
+    /**
+     * @brief Writes character to buffer (multi-byte supported)
+     *
+     * @param str Character to write
+     * @param dst Destination buffer
+     * @return Number of bytes written
+     */
     u32 PutChar(const char* str, char* dst);
+
+    /**
+     * @brief Terminates the current text buffer line
+     */
     void TerminateLine() const;
+
+    /**
+     * @brief Gets total number of lines in the console text buffer
+     */
     s32 GetTotalLines() const;
+
+    /**
+     * @brief Gets total number of lines printed to the console that are visible
+     * on screen
+     */
     s32 GetActiveLines() const;
+
+    /**
+     * @brief Gets total number of lines printed to the console that are part of
+     * the ring buffer
+     */
     s32 GetRingUsedLines() const;
+
+    /**
+     * @brief Prints string to console text buffer
+     *
+     * @param str Text string
+     */
     void PrintToBuffer(const char* str);
+
+    /**
+     * @brief Draws console using DirectPrint (internal implementation)
+     */
     void DrawDirectImpl() const;
 
 private:

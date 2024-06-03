@@ -16,7 +16,7 @@ class SockAddr4;
 class SockAddr6;
 
 /**
- * SO library wrapper/extension
+ * @brief SO library wrapper/extension
  */
 class LibSO {
 public:
@@ -191,7 +191,7 @@ struct SockAddr4 : public SOSockAddrIn {
 };
 
 /**
- * SO IPv6 address wrapper to simplify upcasting
+ * @brief SO IPv6 address wrapper to simplify upcasting
  */
 struct SockAddr6 : public SOSockAddrIn6 {
     operator SockAddrAny&() {

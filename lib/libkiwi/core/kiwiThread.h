@@ -85,7 +85,7 @@ public:
 
 public:
     /**
-     * Non-member function
+     * @brief Non-member function
      */
 
     /**
@@ -115,7 +115,7 @@ public:
     }
 
     /**
-     * Member function (non-const)
+     * @brief Member function (non-const)
      */
 
     /**
@@ -149,7 +149,7 @@ public:
     }
 
     /**
-     * Member function (const)
+     * @brief Member function (const)
      */
 
     /**

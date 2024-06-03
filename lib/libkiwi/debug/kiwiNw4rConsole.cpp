@@ -8,7 +8,7 @@ K_DYNAMIC_SINGLETON_IMPL(Nw4rConsole);
 namespace {
 
 /**
- * Determines character code width from the lead byte
+ * @brief Determines character code width from the lead byte
  */
 u32 CodeWidth(const char* s) {
     return *s >= 0x81 ? 2 : 1;
@@ -17,7 +17,7 @@ u32 CodeWidth(const char* s) {
 } // namespace
 
 /**
- * Constructor
+ * @brief Constructor
  */
 Nw4rConsole::Nw4rConsole() {
     // Initialize debug print
@@ -42,15 +42,14 @@ Nw4rConsole::Nw4rConsole() {
 }
 
 /**
- * Destructor
+ * @brief Destructor
  */
 Nw4rConsole::~Nw4rConsole() {
     delete[] mpTextBuffer;
-    mpTextBuffer = NULL;
 }
 
 /**
- * Print text to console
+ * @brief Prints text to console
  *
  * @param fmt Format string
  * @param ... Format args
@@ -63,7 +62,7 @@ void Nw4rConsole::Printf(const char* fmt, ...) {
 }
 
 /**
- * Print text to console
+ * @brief Prints text to console
  *
  * @param fmt Format string
  * @param args Format args
@@ -75,7 +74,7 @@ void Nw4rConsole::VPrintf(const char* fmt, std::va_list args) {
 }
 
 /**
- * Draws console using DirectPrint (wrapper function)
+ * @brief Draws console using DirectPrint
  */
 void Nw4rConsole::DrawDirect() const {
     // Not visible/not setup
@@ -86,8 +85,8 @@ void Nw4rConsole::DrawDirect() const {
     // Clear console framebuffer
     Nw4rDirectPrint::GetInstance().EraseXfb(
         mViewX - Nw4rDirectPrint::scFontCharWidth, mViewY - 3,
-        mWidth * Nw4rDirectPrint::scFontCharWidth + 12,
-        mViewNumLine * Nw4rDirectPrint::scFontLeading + 4);
+        mWidth * @brief Nw4rDirectPrint::scFontCharWidth + 12,
+        mViewNumLine * @brief Nw4rDirectPrint::scFontLeading + 4);
 
     // Draw console
     DrawDirectImpl();
@@ -97,7 +96,7 @@ void Nw4rConsole::DrawDirect() const {
 }
 
 /**
- * Scrolls console display horizontally
+ * @brief Scrolls console display horizontally
  *
  * @param n Number of characters to scroll
  */
@@ -106,7 +105,7 @@ void Nw4rConsole::ScrollX(s32 n) {
 }
 
 /**
- * Scrolls console display vertically
+ * @brief Scrolls console display vertically
  *
  * @param n Number of characters to scroll
  */
@@ -116,20 +115,20 @@ void Nw4rConsole::ScrollY(s32 n) {
 }
 
 /**
- * Gets position of specified character in the console text buffer
+ * @brief Gets position of specified character in the console text buffer
  *
  * @param line Character line
  * @param pos Character position
- * @return char* Character location in buffer
+ * @return Character location in buffer
  */
 char* Nw4rConsole::GetTextPtr(u16 line, u16 pos) const {
     return &mpTextBuffer[((mWidth + 1) * line) + pos];
 }
 
 /**
- * Advances text buffer to the next line
+ * @brief Advances text buffer to the next line
  *
- * @return char* Pointer to next line
+ * @return Pointer to next line
  */
 char* Nw4rConsole::NextLine() {
     *GetTextPtr(mPrintTop, mPrintX) = '\0';
@@ -150,10 +149,10 @@ char* Nw4rConsole::NextLine() {
 }
 
 /**
- * Writes tab to text buffer
+ * @brief Writes tab to text buffer
  *
  * @param dst Destination buffer
- * @return char* Pointer to text after inserted characters
+ * @return Pointer to text after inserted characters
  */
 char* Nw4rConsole::PutTab(char* dst) {
     do {
@@ -166,11 +165,11 @@ char* Nw4rConsole::PutTab(char* dst) {
 }
 
 /**
- * Writes character to buffer (multi-byte supported)
+ * @brief Writes character to buffer (multi-byte supported)
  *
  * @param str Character to write
  * @param dst Destination buffer
- * @return u32 Number of bytes written
+ * @return Number of bytes written
  */
 u32 Nw4rConsole::PutChar(const char* str, char* dst) {
     u32 width = CodeWidth(str);
@@ -190,14 +189,14 @@ u32 Nw4rConsole::PutChar(const char* str, char* dst) {
 }
 
 /**
- * Terminates the current text buffer line
+ * @brief Terminates the current text buffer line
  */
 void Nw4rConsole::TerminateLine() const {
     *GetTextPtr(mPrintTop, mPrintX) = '\0';
 }
 
 /**
- * Gets total number of lines in the console text buffer
+ * @brief Gets total number of lines in the console text buffer
  */
 s32 Nw4rConsole::GetTotalLines() const {
     AutoInterruptLock lock;
@@ -205,7 +204,7 @@ s32 Nw4rConsole::GetTotalLines() const {
 }
 
 /**
- * Gets total number of lines printed to the console that are visible
+ * @brief Gets total number of lines printed to the console that are visible
  * on screen
  */
 s32 Nw4rConsole::GetActiveLines() const {
@@ -219,7 +218,7 @@ s32 Nw4rConsole::GetActiveLines() const {
 }
 
 /**
- * Gets total number of lines printed to the console that are part of the
+ * @brief Gets total number of lines printed to the console that are part of the
  * ring buffer
  */
 s32 Nw4rConsole::GetRingUsedLines() const {
@@ -233,7 +232,7 @@ s32 Nw4rConsole::GetRingUsedLines() const {
 }
 
 /**
- * Print string to console text buffer
+ * @brief Prints string to console text buffer
  *
  * @param str Text string
  */
@@ -294,7 +293,7 @@ void Nw4rConsole::PrintToBuffer(const char* str) {
 }
 
 /**
- * Draw console using DirectPrint (implementation)
+ * @brief Draws console using DirectPrint (internal implementation)
  */
 void Nw4rConsole::DrawDirectImpl() const {
     s32 viewOffset = mViewTopLine - mRingNumLine;

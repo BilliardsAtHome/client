@@ -3,7 +3,7 @@
 namespace kiwi {
 
 /**
- * Allocates packet buffer
+ * @brief Allocates packet buffer
  *
  * @param size Packet size
  */
@@ -25,7 +25,7 @@ void Packet::Alloc(u32 size) {
 }
 
 /**
- * Releases packet buffer
+ * @brief Releases packet buffer
  */
 void Packet::Free() {
     AutoMutexLock lock(mBufferMutex);
@@ -37,7 +37,7 @@ void Packet::Free() {
 }
 
 /**
- * Clear existing state
+ * @brief Clear existing state
  */
 void Packet::Clear() {
     AutoMutexLock lock(mBufferMutex);
@@ -47,7 +47,7 @@ void Packet::Clear() {
 }
 
 /**
- * Reads data from packet buffer
+ * @brief Reads data from packet buffer
  *
  * @param dst Data destination
  * @param n Data size
@@ -71,7 +71,7 @@ u32 Packet::Read(void* dst, u32 n) {
 }
 
 /**
- * Writes data to packet buffer
+ * @brief Writes data to packet buffer
  *
  * @param src Data source
  * @param n Data size
@@ -96,7 +96,7 @@ u32 Packet::Write(const void* src, u32 n) {
 }
 
 /**
- * Receives data from socket
+ * @brief Receives data from socket
  *
  * @param socket Socket descriptor
  *
@@ -126,7 +126,7 @@ Optional<u32> Packet::Recv(SOSocket socket) {
 }
 
 /**
- * Writes data to socket
+ * @brief Writes data to socket
  *
  * @param socket Socket descriptor
  *

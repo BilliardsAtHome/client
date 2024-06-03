@@ -46,7 +46,7 @@ public:
     }
 
     /**
-     * Gets reference to global instance
+     * @brief Gets reference to global instance
      */
     static T& Get() {
         AutoLock<OSMutex> lock(sMutex);
@@ -55,7 +55,7 @@ public:
     }
 
     /**
-     * Change to new global instance
+     * @brief Change to new global instance
      *
      * @param instance New instance
      */
@@ -65,7 +65,7 @@ public:
     }
 
     /**
-     * Tests whether a global instance is registered
+     * @brief Tests whether a global instance is registered
      */
     static bool Exists() {
         AutoLock<OSMutex> lock(sMutex);

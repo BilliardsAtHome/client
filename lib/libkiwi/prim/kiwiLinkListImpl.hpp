@@ -10,7 +10,7 @@
 namespace kiwi {
 
 /**
- * Inserts node at iterator
+ * @brief Inserts node at iterator
  *
  * @param iter Iterator at which to insert node
  * @param node Node to insert
@@ -36,7 +36,7 @@ TList<T>::Iterator TList<T>::Insert(Iterator iter, TListNode<T>* node) {
 }
 
 /**
- * Erases node from list
+ * @brief Erases node from list
  *
  * @param node Node to erase
  * @return Iterator to next node
@@ -62,7 +62,7 @@ template <typename T> TList<T>::Iterator TList<T>::Erase(TListNode<T>* node) {
 }
 
 /**
- * Erases range of nodes
+ * @brief Erases range of nodes
  *
  * @param begin Beginning of range (inclusive)
  * @param end End of range (exclusive)

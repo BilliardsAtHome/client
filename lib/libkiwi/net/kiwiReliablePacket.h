@@ -7,13 +7,13 @@
 namespace kiwi {
 
 /**
- * Reliable packet header
+ * @brief Reliable packet header
  *
  * @note Concepts adapted from PRUDP
  */
 struct KUDPHeader {
     /**
-     * Constructor
+     * @brief Constructor
      */
     KUDPHeader()
         : magic(KUDP_MAGIC), size(0), sequence(0), fragment(0), flags(0) {}
@@ -28,7 +28,7 @@ struct KUDPHeader {
     static const u32 KUDP_MAGIC = 'KUv0';
 
     /**
-     * Packet flags
+     * @brief Packet flags
      */
     enum EFlags {
         // This packet is only a fragment of the message, and there are more
@@ -37,19 +37,19 @@ struct KUDPHeader {
 };
 
 /**
- * Reliable UDP protocol (KUDP) packet
+ * @brief Reliable UDP protocol (KUDP) packet
  */
 class ReliablePacket : public Packet {
 public:
     /**
-     * Size constraints to avoid going over MTU
+     * @brief Size constraints to avoid going over MTU
      */
     static const u16 MAX_BUFFER_SIZE = 1000;
     static const u16 MAX_CONTENT_SIZE = MAX_BUFFER_SIZE - sizeof(KUDPHeader);
 
 public:
     /**
-     * Constructor
+     * @brief Constructor
      *
      * @param size Packet buffer size
      * @param dest Packet recipient
@@ -58,7 +58,7 @@ public:
         : Packet(size, dest) {}
 
     /**
-     * Access KUDP protocol header
+     * @brief Access KUDP protocol header
      */
     KUDPHeader& GetHeader() {
         K_ASSERT(mpBuffer != NULL);
@@ -70,27 +70,27 @@ public:
     }
 
     /**
-     * Largest allowable message buffer
+     * @brief Largest allowable message buffer
      */
     virtual u32 GetMaxBuffer() const {
         return MAX_BUFFER_SIZE;
     }
 
     /**
-     * Message content size
+     * @brief Message content size
      */
     virtual u32 GetContentSize() const {
         return GetHeader().size;
     }
     /**
-     * Largest allowable message content
+     * @brief Largest allowable message content
      */
     virtual u32 GetMaxContent() const {
         return MAX_CONTENT_SIZE;
     }
 
     /**
-     * Message buffer overhead
+     * @brief Message buffer overhead
      */
     virtual u32 GetOverhead() const {
         return sizeof(KUDPHeader);

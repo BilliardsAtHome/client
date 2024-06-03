@@ -10,7 +10,7 @@ K_DYNAMIC_SINGLETON_IMPL(Nw4rDirectPrint);
 namespace {
 
 /**
- * Suspend execution until the next VI retrace
+ * @brief Suspends execution until the next VI retrace
  */
 void WaitVIRetrace() {
     AutoInterruptLock lock(true);
@@ -22,7 +22,7 @@ void WaitVIRetrace() {
 }
 
 /**
- * Create framebuffer
+ * @brief Creates framebuffer
  *
  * @param mode GX render configuration
  * @return Framebuffer
@@ -52,7 +52,7 @@ void* CreateFB(const GXRenderModeObj* mode) {
 } // namespace
 
 /**
- * Constructor
+ * @brief Constructor
  */
 Nw4rDirectPrint::Nw4rDirectPrint() {
     SetColor(Color::WHITE);
@@ -60,14 +60,14 @@ Nw4rDirectPrint::Nw4rDirectPrint() {
 }
 
 /**
- * Destructor
+ * @brief Destructor
  */
 Nw4rDirectPrint::~Nw4rDirectPrint() {
     delete mpBuffer;
 }
 
 /**
- * Setup XFB for printing
+ * @brief Sets up XFB for printing
  */
 void Nw4rDirectPrint::SetupXfb() {
     const GXRenderModeObj* mode = NULL;
@@ -97,7 +97,7 @@ void Nw4rDirectPrint::SetupXfb() {
 }
 
 /**
- * Changes framebuffer information
+ * @brief Changes framebuffer information
  *
  * @param buffer Framebuffer in memory
  * @param w Framebuffer width
@@ -113,7 +113,7 @@ void Nw4rDirectPrint::ChangeXfb(void* buffer, u16 w, u16 h) {
 }
 
 /**
- * Erases framebuffer contents
+ * @brief Erases framebuffer contents
  *
  * @param x X position
  * @param y Y position
@@ -158,14 +158,14 @@ void Nw4rDirectPrint::EraseXfb(s32 x, s32 y, s32 w, s32 h) const {
 }
 
 /**
- * Keeps main framebuffer copy updated via cache blocks
+ * @brief Keeps main framebuffer copy updated via cache blocks
  */
 void Nw4rDirectPrint::StoreCache() const {
     DCStoreRange(mpBuffer, mBufferSize);
 }
 
 /**
- * Draws string to framebuffer (wrapper function)
+ * @brief Draws string to framebuffer
  *
  * @param x Text X position
  * @param y Text Y position
@@ -190,31 +190,31 @@ void Nw4rDirectPrint::DrawString(s32 x, s32 y, const char* fmt, ...) const {
 }
 
 /**
- * Sets framebuffer color
+ * @brief Sets framebuffer color
  *
  * @param rgb Color (RGB)
  */
-void Nw4rDirectPrint::SetColor(const Color rgb) {
+void Nw4rDirectPrint::SetColor(Color rgb) {
     // Framebuffer uses YUV format, so we convert the color
     mBufferColor = rgb.yuv();
 }
 
 /**
- * Gets framebuffer dot/unit width (in pixels)
+ * @brief Gets framebuffer dot/unit width (in pixels)
  */
 s32 Nw4rDirectPrint::GetDotWidth() const {
     return mBufferWidth < 400 ? 1 : 2;
 }
 
 /**
- * Gets framebuffer dot/unit height (in pixels)
+ * @brief Gets framebuffer dot/unit height (in pixels)
  */
 s32 Nw4rDirectPrint::GetDotHeight() const {
     return mBufferHeight < 300 ? 1 : 2;
 }
 
 /**
- * Draws string to framebuffer (implementation)
+ * @brief Draws string to framebuffer (internal implementation)
  *
  * @param x Text X position
  * @param y Text Y position
@@ -261,7 +261,7 @@ void Nw4rDirectPrint::DrawStringImpl(s32 x, s32 y, const char* str) const {
 }
 
 /**
- * Draws line of string to framebuffer
+ * @brief Draws line of string to framebuffer
  *
  * @param x String X position
  * @param y String Y position
@@ -269,7 +269,6 @@ void Nw4rDirectPrint::DrawStringImpl(s32 x, s32 y, const char* str) const {
  * @param maxlen Max line width
  * @return char* String contents after what was drawn
  */
-
 const char* Nw4rDirectPrint::DrawStringLine(s32 x, s32 y, const char* str,
                                             s32 maxlen) const {
     if (mpBuffer == NULL || maxlen <= 0) {
@@ -324,7 +323,7 @@ const char* Nw4rDirectPrint::DrawStringLine(s32 x, s32 y, const char* str,
 }
 
 /**
- * Draws character to framebuffer
+ * @brief Draws character to framebuffer
  *
  * @param x Character X position
  * @param y Character Y position
@@ -401,6 +400,9 @@ void Nw4rDirectPrint::DrawStringChar(s32 x, s32 y, s32 code) const {
     }
 }
 
+/**
+ * @brief Font data pt. 1
+ */
 const u32 Nw4rDirectPrint::scFontData[] = {
     0x70871C30, 0x8988A250, 0x88808290, 0x88830C90, 0x888402F8, 0x88882210,
     0x71CF9C10, 0xF9CF9C70, 0x8208A288, 0xF200A288, 0x0BC11C78, 0x0A222208,
@@ -414,6 +416,9 @@ const u32 Nw4rDirectPrint::scFontData[] = {
     0x80020800, 0xF8011000, 0x70800000, 0x88822200, 0x08820400, 0x108F8800,
     0x20821000, 0x00022200, 0x20800020, 0x00000000};
 
+/**
+ * @brief Font data pt. 2
+ */
 const u32 Nw4rDirectPrint::scFontData2[] = {
     0x51421820, 0x53E7A420, 0x014A2C40, 0x01471000, 0x0142AA00, 0x03EAA400,
     0x01471A78, 0x00000000, 0x50008010, 0x20010820, 0xF8020040, 0x20420820,
@@ -429,6 +434,9 @@ const u32 Nw4rDirectPrint::scFontData2[] = {
     0x8A2A8888, 0x8A2A8878, 0x894A8808, 0x788536F0, 0x00000000, 0x00000000,
     0xF8000000, 0x10000000, 0x20000000, 0x40000000, 0xF8000000};
 
+/**
+ * @brief Converts from ASCII index to font data index
+ */
 const u8 Nw4rDirectPrint::scAscii2Font[128] = {
     0x7A, 0x7A, 0x7A, 0x7A, 0x7A, 0x7A, 0x7A, 0x7A, 0x7A, 0xFD, 0xFE, 0x7A,
     0x7A, 0x7A, 0x7A, 0x7A, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,

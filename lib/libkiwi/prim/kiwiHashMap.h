@@ -24,7 +24,7 @@ template <typename TKey> K_INLINE hash_t Hash(const TKey& key) {
 /**
  * @brief Key/value map
  *
- * TODO: Track load factor, expand + re-hash when high
+ * @brief TODO: Track load factor, expand + re-hash when high
  */
 template <typename TKey, typename TValue> class TMap {
     friend class ConstIterator; // Access 'Bucket' structure
@@ -80,11 +80,11 @@ public:
 
     public:
         /**
-         * Pre-increment operator
+         * @brief Pre-increment operator
          */
         ConstIterator& operator++();
         /**
-         * Post-increment operator
+         * @brief Post-increment operator
          */
         ConstIterator operator++(int) {
             ConstIterator clone(*this);
@@ -93,14 +93,14 @@ public:
         }
 
         /**
-         * Get key from this element
+         * @brief Get key from this element
          */
         const TKey& Key() const {
             K_ASSERT(mpIter != NULL);
             return *mpIter->key;
         }
         /**
-         * Get value from this element
+         * @brief Get value from this element
          */
         const TValue& Value() const {
             K_ASSERT(mpIter != NULL);
@@ -108,13 +108,13 @@ public:
         }
 
         /**
-         * Gets pointer to this value
+         * @brief Gets pointer to this value
          */
         const TValue* operator->() const {
             return &Value();
         }
         /**
-         * Gets reference to this value
+         * @brief Gets reference to this value
          */
         const TValue& operator*() const {
             return Value();
@@ -255,14 +255,14 @@ public:
     }
 
     /**
-     * Gets iterator to beginning of map (const view)
+     * @brief Gets iterator to beginning of map (const view)
      */
     ConstIterator Begin() const {
         return ConstIterator(mCapacity, mpBuckets);
     }
 
     /**
-     * Gets iterator to end of map (const-view)
+     * @brief Gets iterator to end of map (const-view)
      */
     ConstIterator End() const {
         return ConstIterator(0, NULL);

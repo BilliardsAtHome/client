@@ -22,14 +22,14 @@ enum EMemory {
 };
 
 /**
- * Memory manager
+ * @brief Memory manager
  */
 class MemoryMgr : public StaticSingleton<MemoryMgr> {
     friend class StaticSingleton<MemoryMgr>;
 
 public:
     /**
-     * Allocates a block of memory
+     * @brief Allocates a block of memory
      *
      * @param size Block size
      * @param align Block alignment
@@ -39,14 +39,14 @@ public:
     void* Alloc(u32 size, s32 align, EMemory region);
 
     /**
-     * Frees a block of memory
+     * @brief Frees a block of memory
      *
      * @param block Block
      */
     void Free(void* block);
 
     /**
-     * Gets total size of available heap memory
+     * @brief Gets total size of available heap memory
      *
      * @param memory Target memory region
      */
@@ -141,13 +141,13 @@ void* operator new(std::size_t size, s32 align, kiwi::EMemory memory);
 void* operator new[](std::size_t size, s32 align, kiwi::EMemory memory);
 
 /**
- * Frees a block of memory
+ * @brief Frees a block of memory
  *
  * @param block Block
  */
 void operator delete(void* block);
 /**
- * Frees a block of memory used by an array
+ * @brief Frees a block of memory used by an array
  *
  * @param block Block
  */

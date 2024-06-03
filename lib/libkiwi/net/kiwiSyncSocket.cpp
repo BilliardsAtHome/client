@@ -4,7 +4,7 @@
 namespace kiwi {
 
 /**
- * Connects to another socket
+ * @brief Connects to another socket
  *
  * @param addr Remote address
  * @param callback Connection callback
@@ -26,7 +26,7 @@ bool SyncSocket::Connect(const SockAddrAny& addr, Callback callback,
 }
 
 /**
- * Accepts remote connection
+ * @brief Accepts remote connection
  *
  * @param callback Acceptance callback
  * @param arg Callback user argument
@@ -54,7 +54,7 @@ SyncSocket* SyncSocket::Accept(AcceptCallback callback, void* arg) {
 }
 
 /**
- * Receives data and records sender address
+ * @brief Receives data and records sender address
  *
  * @param dst Destination buffer
  * @param len Buffer size
@@ -100,7 +100,7 @@ _exit:
 }
 
 /**
- * Sends data to specified connection
+ * @brief Sends data to specified connection
  *
  * @param dst Destination buffer
  * @param len Buffer size
