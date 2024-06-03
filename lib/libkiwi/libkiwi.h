@@ -50,6 +50,7 @@
 #include <libkiwi/prim/kiwiString.h>
 #include <libkiwi/prim/kiwiVector.h>
 #include <libkiwi/support/kiwiLibGX.h>
+#include <libkiwi/support/kiwiLibOS.h>
 #include <libkiwi/support/kiwiLibSO.h>
 #include <libkiwi/util/kiwiAutoLock.h>
 #include <libkiwi/util/kiwiBuildTarget.h>

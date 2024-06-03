@@ -5,9 +5,9 @@
 
 namespace kiwi {
 
-String GetBuildDate();
-String GetBuildPack();
-String GetBuildTarget();
+const char* GetBuildDate();
+const char* GetBuildPack();
+const char* GetBuildTarget();
 
 } // namespace kiwi
 

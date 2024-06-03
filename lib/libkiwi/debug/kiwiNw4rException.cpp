@@ -7,109 +7,13 @@ namespace kiwi {
 
 K_DYNAMIC_SINGLETON_IMPL(Nw4rException);
 
-namespace {
-
 /**
- * @brief Fill in floating-point registers
- * @note Reimplementation of OSFillFPUContext (deadstripped)
- *
- * @param ctx OS context
- */
-asm void ContextGetFP(register OSContext* ctx) {
-    // clang-format off
-    mfmsr r5
-    ori r5, r5, MSR_FP
-    mtmsr r5
-    isync
-
-    stfd f0,  ctx->fprs[0]
-    stfd f1,  ctx->fprs[1]
-    stfd f2,  ctx->fprs[2]
-    stfd f3,  ctx->fprs[3]
-    stfd f4,  ctx->fprs[4]
-    stfd f5,  ctx->fprs[5]
-    stfd f6,  ctx->fprs[6]
-    stfd f7,  ctx->fprs[7]
-    stfd f8,  ctx->fprs[8]
-    stfd f9,  ctx->fprs[9]
-    stfd f10, ctx->fprs[10]
-    stfd f11, ctx->fprs[11]
-    stfd f12, ctx->fprs[12]
-    stfd f13, ctx->fprs[13]
-    stfd f14, ctx->fprs[14]
-    stfd f15, ctx->fprs[15]
-    stfd f16, ctx->fprs[16]
-    stfd f17, ctx->fprs[17]
-    stfd f18, ctx->fprs[18]
-    stfd f19, ctx->fprs[19]
-    stfd f20, ctx->fprs[20]
-    stfd f21, ctx->fprs[21]
-    stfd f22, ctx->fprs[22]
-    stfd f23, ctx->fprs[23]
-    stfd f24, ctx->fprs[24]
-    stfd f25, ctx->fprs[25]
-    stfd f26, ctx->fprs[26]
-    stfd f27, ctx->fprs[27]
-    stfd f28, ctx->fprs[28]
-    stfd f29, ctx->fprs[29]
-    stfd f30, ctx->fprs[30]
-    stfd f31, ctx->fprs[31]
-
-    mffs f0
-    stfd f0, ctx->fpscr_pad
-    lfd f0, ctx->fprs[0]
-    mfspr r5, 0x398
-    rlwinm. r5, r5, 3, 31, 31
-    beq _exit
-
-    psq_st f0,  OSContext.psfs[0](ctx),  0, 0
-    psq_st f1,  OSContext.psfs[1](ctx),  0, 0
-    psq_st f2,  OSContext.psfs[2](ctx),  0, 0
-    psq_st f3,  OSContext.psfs[3](ctx),  0, 0
-    psq_st f4,  OSContext.psfs[4](ctx),  0, 0
-    psq_st f5,  OSContext.psfs[5](ctx),  0, 0
-    psq_st f6,  OSContext.psfs[6](ctx),  0, 0
-    psq_st f7,  OSContext.psfs[7](ctx),  0, 0
-    psq_st f8,  OSContext.psfs[8](ctx),  0, 0
-    psq_st f9,  OSContext.psfs[9](ctx),  0, 0
-    psq_st f10, OSContext.psfs[10](ctx), 0, 0
-    psq_st f11, OSContext.psfs[11](ctx), 0, 0
-    psq_st f12, OSContext.psfs[12](ctx), 0, 0
-    psq_st f13, OSContext.psfs[13](ctx), 0, 0
-    psq_st f14, OSContext.psfs[14](ctx), 0, 0
-    psq_st f15, OSContext.psfs[15](ctx), 0, 0
-    psq_st f16, OSContext.psfs[16](ctx), 0, 0
-    psq_st f17, OSContext.psfs[17](ctx), 0, 0
-    psq_st f18, OSContext.psfs[18](ctx), 0, 0
-    psq_st f19, OSContext.psfs[19](ctx), 0, 0
-    psq_st f20, OSContext.psfs[20](ctx), 0, 0
-    psq_st f21, OSContext.psfs[21](ctx), 0, 0
-    psq_st f22, OSContext.psfs[22](ctx), 0, 0
-    psq_st f23, OSContext.psfs[23](ctx), 0, 0
-    psq_st f24, OSContext.psfs[24](ctx), 0, 0
-    psq_st f25, OSContext.psfs[25](ctx), 0, 0
-    psq_st f26, OSContext.psfs[26](ctx), 0, 0
-    psq_st f27, OSContext.psfs[27](ctx), 0, 0
-    psq_st f28, OSContext.psfs[28](ctx), 0, 0
-    psq_st f29, OSContext.psfs[29](ctx), 0, 0
-    psq_st f30, OSContext.psfs[30](ctx), 0, 0
-    psq_st f31, OSContext.psfs[31](ctx), 0, 0
-
-_exit:
-    blr
-    // clang-format on
-}
-
-} // namespace
-
-/**
- * @brief Initializes exception handler
+ * @brief Constructor
  */
 Nw4rException::Nw4rException()
     : mpUserCallback(DefaultCallback),
       mpUserCallbackArg(NULL),
       mpRenderMode(NULL) {
-    // Create debug console
     Nw4rConsole::CreateInstance();
 
     // Create exception thread
@@ -144,7 +48,6 @@ void Nw4rException::SetUserCallback(UserCallback callback, void* arg) {
 
 /**
  * @brief Writes text to the exception details
- * @note Written to Nw4rConsole and the debugger console
  *
  * @param fmt Format string
  * @param ... Format arguments
@@ -180,7 +83,7 @@ void Nw4rException::FailAssert(const char* file, int line, const char* msg) {
     mErrorInfo.assert.sp = OSGetStackPointer();
 
     // Invalid error type to signal assertion
-    ErrorHandler(0xFF, OSGetCurrentContext(), Mfdsisr(), Mfdar());
+    ErrorHandler(EError_AssertFail, OSGetCurrentContext(), Mfdsisr(), Mfdar());
 }
 
 /**
@@ -211,26 +114,25 @@ void* Nw4rException::ThreadFunc(void* arg) {
  * @param ctx Exception context
  * @param dsisr Last DSISR value
  * @param dar Last DAR value
- * @param ...
  */
 void Nw4rException::ErrorHandler(u8 error, OSContext* ctx, u32 dsisr, u32 dar,
                                  ...) {
     Info& info = GetInstance().mErrorInfo;
-    info.error = error;
+    info.error = static_cast<EError>(error);
     info.ctx = ctx;
     info.dsisr = dsisr;
     info.dar = dar;
     info.msr = Mfmsr();
 
     // Vector data breakpoints to the debugger
-    if (error == OS_ERR_DSI && (dsisr & DSISR_DABR)) {
+    if (error == EError_DSI && (dsisr & DSISR_DABR)) {
         kiwi::GlobalInstance<IDebugger>::Get().BreakCallback(error, ctx, dsisr,
                                                              dar);
 
         return;
     }
 
-    ContextGetFP(ctx);
+    LibOS::FillFPUContext(ctx);
     OSSetErrorHandler(error, NULL);
 
     // Allow thread to continue
@@ -316,7 +218,7 @@ void Nw4rException::DumpError() {
     Nw4rConsole::GetInstance().SetVisible(true);
 
     // Dump information
-    if (mErrorInfo.error == 0xFF) {
+    if (mErrorInfo.error == EError_AssertFail) {
         DumpAssert();
     } else {
         DumpException();
@@ -414,8 +316,9 @@ void Nw4rException::PrintHeapInfo() {
  */
 void Nw4rException::PrintBuildInfo() {
     Printf("---Build Info---\n");
-    Printf("%s\n", GetBuildDate().CStr());
-    Printf("%s (%s)\n", GetBuildPack().CStr(), GetBuildTarget().CStr());
+
+    Printf("%s\n", GetBuildDate());
+    Printf("%s (%s)\n", GetBuildPack(), GetBuildTarget());
     Printf("\n");
 }
 
@@ -509,12 +412,12 @@ void Nw4rException::PrintSymbol(const void* addr) {
     // Non-game symbol, see if a map file has been loaded
     if (!MapFile::GetInstance().IsAvailable()) {
         /**
-         * @brief If the map file is not available, we are in one of two
+         * If the map file is not available, we are in one of two
          * situations:
          * 1. The exception occurred before the map file could be read
          * 2. The map file does not exist
          *
-         * @brief Either way, we want to at least print the code's address
+         * Either way, we want to at least print the code's address
          * relocatable address (relative to the start of the module).
          */
         Printf("%08X (RELOC)", textOffset);
@@ -525,7 +428,7 @@ void Nw4rException::PrintSymbol(const void* addr) {
     const MapFile::Symbol* sym = MapFile::GetInstance().QueryTextSymbol(addr);
 
     /**
-     * @brief At this point we know the symbol is in module code, so the map
+     * At this point we know the symbol is in module code, so the map
      * file should always return a result. However, to prevent the exception
      * handler from itself throwing an exception we do not assert this.
      */
@@ -549,6 +452,9 @@ void Nw4rException::PrintSymbol(const void* addr) {
     Printf("%s(+0x%04X)", sym->name, offset);
 }
 
+/**
+ * @brief OS exception names
+ */
 const char* Nw4rException::scExceptionNames[OS_ERR_MAX] = {
     "System Reset",
     "Machine Check",

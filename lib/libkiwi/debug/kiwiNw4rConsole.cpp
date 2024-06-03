@@ -20,7 +20,6 @@ u32 CodeWidth(const char* s) {
  * @brief Constructor
  */
 Nw4rConsole::Nw4rConsole() {
-    // Initialize debug print
     Nw4rDirectPrint::CreateInstance();
 
     mWidth = scWidthDefault;
@@ -85,8 +84,8 @@ void Nw4rConsole::DrawDirect() const {
     // Clear console framebuffer
     Nw4rDirectPrint::GetInstance().EraseXfb(
         mViewX - Nw4rDirectPrint::scFontCharWidth, mViewY - 3,
-        mWidth * @brief Nw4rDirectPrint::scFontCharWidth + 12,
-        mViewNumLine * @brief Nw4rDirectPrint::scFontLeading + 4);
+        mWidth * Nw4rDirectPrint::scFontCharWidth + 12,
+        mViewNumLine * Nw4rDirectPrint::scFontLeading + 4);
 
     // Draw console
     DrawDirectImpl();

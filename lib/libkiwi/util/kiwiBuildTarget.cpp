@@ -4,16 +4,16 @@
 namespace kiwi {
 
 /**
- * @brief Gets module build date
+ * @brief Gets the date and time at which the module was built
  */
-String GetBuildDate() {
+const char* GetBuildDate() {
     return __DATE__ " " __TIME__;
 }
 
 /**
- * @brief Gets module build pack as a string
+ * @brief Gets the pack for which the module was built
  */
-String GetBuildPack() {
+const char* GetBuildPack() {
     // clang-format off
     return KOKESHI_BY_PACK("Wii Sports",
                            "Wii Play",
@@ -22,9 +22,9 @@ String GetBuildPack() {
 }
 
 /**
- * @brief Gets module build target as a string
+ * @brief Gets the target for which the module was built
  */
-String GetBuildTarget() {
+const char* GetBuildTarget() {
 #ifdef NDEBUG
     return "Release";
 #else
