@@ -30,6 +30,14 @@ public:
     }
 
     /**
+     * @brief Destructor
+     * @details Automatically closes stream
+     */
+    virtual ~NandStream() {
+        Close();
+    }
+
+    /**
      * @brief Opens stream to NAND file
      *
      * @param path File path

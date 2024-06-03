@@ -64,6 +64,10 @@ bool NandStream::Open(const String& path) {
  * @brief Closes this stream
  */
 void NandStream::Close() {
+    if (!IsOpen()) {
+        return;
+    }
+
     NANDClose(&mFileInfo);
     mIsOpen = false;
 }

@@ -23,12 +23,10 @@ public:
 
     /**
      * @brief Destructor
-     * @details Automatically closes stream
      */
     virtual ~IStream() {
-        if (IsOpen()) {
-            Close();
-        }
+        // Warn for derived types :D
+        K_WARN_EX(IsOpen(), "Your class forgot to close the stream!");
     }
 
     /**

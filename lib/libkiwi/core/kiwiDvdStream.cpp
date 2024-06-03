@@ -35,6 +35,10 @@ bool DvdStream::Open(const String& path) {
  * @brief Closes this stream
  */
 void DvdStream::Close() {
+    if (!IsOpen()) {
+        return;
+    }
+
     DVDClose(&mFileInfo);
     mIsOpen = false;
 }

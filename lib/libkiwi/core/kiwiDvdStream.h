@@ -27,6 +27,14 @@ public:
     }
 
     /**
+     * @brief Destructor
+     * @details Automatically closes stream
+     */
+    virtual ~DvdStream() {
+        Close();
+    }
+
+    /**
      * @brief Opens stream to DVD file
      *
      * @param path File path

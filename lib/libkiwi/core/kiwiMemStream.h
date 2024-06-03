@@ -55,6 +55,14 @@ public:
     }
 
     /**
+     * @brief Destructor
+     * @details Automatically closes stream
+     */
+    virtual ~MemStream() {
+        Close();
+    }
+
+    /**
      * @brief Closes this stream
      */
     virtual void Close() {
