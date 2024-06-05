@@ -1,7 +1,26 @@
-#include <climits>
 #include <libkiwi.h>
 
 namespace kiwi {
+
+/**
+ * @brief Socket manager thread
+ */
+OSThread AsyncSocket::sSocketThread;
+
+/**
+ * @brief Thread guard
+ */
+bool AsyncSocket::sSocketThreadCreated = false;
+
+/**
+ * @brief Thread stack
+ */
+u8 AsyncSocket::sSocketThreadStack[THREAD_STACK_SIZE];
+
+/**
+ * @brief Open async sockets
+ */
+TList<AsyncSocket> AsyncSocket::sSocketList;
 
 /**
  * @brief Async receive operation
@@ -32,7 +51,7 @@ public:
     }
 
     /**
-     * @brief Check whether the receive is complete
+     * @brief Tests whether the receive operation is complete
      */
     bool IsComplete() const {
         K_ASSERT(packet != NULL);
@@ -40,13 +59,14 @@ public:
     }
 
     /**
-     * @brief Update job
+     * @brief Updates job using the specified socket
      *
      * @param socket Socket descriptor
      * @return Whether the job is complete
      */
     bool Calc(SOSocket socket) {
         K_ASSERT(packet != NULL);
+        K_ASSERT(socket >= 0);
 
         // Nothing left to do
         if (IsComplete()) {
@@ -77,16 +97,12 @@ public:
     }
 
 private:
-    // Packet associated with this job
-    Packet* packet;
-    // Original read address
-    void* dst;
-    // Peer address
-    SOSockAddr* peer;
+    Packet* packet;   // Packet to complete
+    void* dst;        // Where to store packet data
+    SOSockAddr* peer; // Where to store peer address
 
-    // Completion callback
-    Callback callback;
-    void* arg;
+    Callback callback; // Completion callback
+    void* arg;         // Completion callback user argument
 };
 
 /**
@@ -114,7 +130,7 @@ public:
     }
 
     /**
-     * @brief Check whether the send is complete
+     * @brief Tests whether the send operation is complete
      */
     bool IsComplete() const {
         K_ASSERT(packet != NULL);
@@ -122,13 +138,14 @@ public:
     }
 
     /**
-     * @brief Update job
+     * @brief Updates job using the specified socket
      *
      * @param socket Socket descriptor
      * @return Whether the job is complete
      */
     bool Calc(SOSocket socket) {
         K_ASSERT(packet != NULL);
+        K_ASSERT(socket >= 0);
 
         // Nothing left to do
         if (IsComplete()) {
@@ -148,18 +165,11 @@ public:
     }
 
 private:
-    // Packet associated with this job
-    Packet* packet;
+    Packet* packet; // Packet to complete
 
-    // Completion callback
-    Callback callback;
-    void* arg;
+    Callback callback; // Completion callback
+    void* arg;         // Completion callback user argument
 };
-
-OSThread AsyncSocket::sSocketThread;
-bool AsyncSocket::sSocketThreadCreated = false;
-u8 AsyncSocket::sSocketThreadStack[THREAD_STACK_SIZE];
-TList<AsyncSocket> AsyncSocket::sSocketList;
 
 /**
  * @brief Socket thread function
@@ -213,6 +223,13 @@ AsyncSocket::AsyncSocket(SOSocket socket, SOProtoFamily family, SOSockType type)
 }
 
 /**
+ * @brief Destructor
+ */
+AsyncSocket::~AsyncSocket() {
+    sSocketList.Remove(this);
+}
+
+/**
  * @brief Prepares socket for async operation
  */
 void AsyncSocket::Initialize() {
@@ -232,13 +249,6 @@ void AsyncSocket::Initialize() {
         sSocketThreadCreated = true;
         OSResumeThread(&sSocketThread);
     }
-}
-
-/**
- * @brief Destructor
- */
-AsyncSocket::~AsyncSocket() {
-    sSocketList.Remove(this);
 }
 
 /**
@@ -283,74 +293,7 @@ AsyncSocket* AsyncSocket::Accept(AcceptCallback callback, void* arg) {
 }
 
 /**
- * @brief Receives data and records sender address
- *
- * @param dst Destination buffer
- * @param len Buffer size
- * @param[out] nrecv Number of bytes received
- * @param[out] addr Sender address
- * @param callback Completion callback
- * @param arg Callback user argument
- * @return Socket library result
- */
-SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv,
-                               SockAddrAny* addr, Callback callback,
-                               void* arg) {
-    K_ASSERT(IsOpen());
-    K_ASSERT(dst != NULL);
-    K_ASSERT_EX(!IsStack(dst), "Don't use stack memory for async");
-
-    // Packet to hold incoming data
-    Packet* packet = new Packet(len);
-    K_ASSERT(packet != NULL);
-
-    // Asynchronous job
-    RecvJob* job = new RecvJob(packet, dst, addr, callback, arg);
-    K_ASSERT(job != NULL);
-    mRecvJobs.PushBack(job);
-
-    // Receive doesn't actually happen on this thread
-    nrecv = 0;
-    return SO_EWOULDBLOCK;
-}
-
-/**
- * @brief Sends data to specified connection
- *
- * @param dst Destination buffer
- * @param len Buffer size
- * @param[out] nsend Number of bytes sent
- * @param[out] addr Sender address
- * @param callback Completion callback
- * @param arg Callback user argument
- * @return Socket library result
- */
-SOResult AsyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
-                               const SockAddrAny* addr, Callback callback,
-                               void* arg) {
-    K_ASSERT(IsOpen());
-    K_ASSERT(src != NULL);
-    K_ASSERT_EX(!IsStack(src), "Don't use stack memory for async");
-
-    // Packet to hold incoming data
-    Packet* packet = new Packet(len, addr);
-    K_ASSERT(packet != NULL);
-
-    // Store data inside packet
-    packet->Write(src, len);
-
-    // Asynchronous job
-    SendJob* job = new SendJob(packet, callback, arg);
-    K_ASSERT(job != NULL);
-    mSendJobs.PushBack(job);
-
-    // Send doesn't actually happen on this thread
-    nsend = 0;
-    return SO_EWOULDBLOCK;
-}
-
-/**
- * @brief Process pending tasks
+ * @brief Processes pending socket tasks
  */
 void AsyncSocket::Calc() {
     s32 result;
@@ -445,6 +388,73 @@ void AsyncSocket::CalcSend() {
         mSendJobs.PopFront();
         delete &job;
     }
+}
+
+/**
+ * @brief Receives data and records sender address (internal implementation)
+ *
+ * @param dst Destination buffer
+ * @param len Buffer size
+ * @param[out] nrecv Number of bytes received
+ * @param[out] addr Sender address
+ * @param callback Completion callback
+ * @param arg Callback user argument
+ * @return Socket library result
+ */
+SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv,
+                               SockAddrAny* addr, Callback callback,
+                               void* arg) {
+    K_ASSERT(IsOpen());
+    K_ASSERT(dst != NULL);
+    K_ASSERT_EX(!IsStack(dst), "Don't use stack memory for async");
+
+    // Packet to hold incoming data
+    Packet* packet = new Packet(len);
+    K_ASSERT(packet != NULL);
+
+    // Asynchronous job
+    RecvJob* job = new RecvJob(packet, dst, addr, callback, arg);
+    K_ASSERT(job != NULL);
+    mRecvJobs.PushBack(job);
+
+    // Receive doesn't actually happen on this thread
+    nrecv = 0;
+    return SO_EWOULDBLOCK;
+}
+
+/**
+ * @brief Sends data to specified connection (internal implementation)
+ *
+ * @param src Source buffer
+ * @param len Buffer size
+ * @param[out] nsend Number of bytes sent
+ * @param addr Sender address
+ * @param callback Completion callback
+ * @param arg Callback user argument
+ * @return Socket library result
+ */
+SOResult AsyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
+                               const SockAddrAny* addr, Callback callback,
+                               void* arg) {
+    K_ASSERT(IsOpen());
+    K_ASSERT(src != NULL);
+    K_ASSERT_EX(!IsStack(src), "Don't use stack memory for async");
+
+    // Packet to hold incoming data
+    Packet* packet = new Packet(len, addr);
+    K_ASSERT(packet != NULL);
+
+    // Store data inside packet
+    packet->Write(src, len);
+
+    // Asynchronous job
+    SendJob* job = new SendJob(packet, callback, arg);
+    K_ASSERT(job != NULL);
+    mSendJobs.PushBack(job);
+
+    // Send doesn't actually happen on this thread
+    nsend = 0;
+    return SO_EWOULDBLOCK;
 }
 
 } // namespace kiwi
