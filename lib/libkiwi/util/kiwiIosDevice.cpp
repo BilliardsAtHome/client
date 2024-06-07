@@ -14,7 +14,7 @@ bool IosDevice::Open(const String& path, u32 timeOut) {
     s32 start = OSGetTick();
     do {
         mHandle = IOS_Open(path, IPC_OPEN_NONE);
-        if (mHandle >= 0) {
+        if (IsOpen()) {
             return true;
         }
     } while (OSGetTick() - start < OS_MSEC_TO_TICKS(timeOut));
@@ -28,14 +28,13 @@ bool IosDevice::Open(const String& path, u32 timeOut) {
  * @return Success
  */
 bool IosDevice::Close() {
-    // Nothing to do, no device is open
-    if (mHandle < 0) {
+    if (!IsOpen()) {
         return true;
     }
 
     s32 result = IOS_Close(mHandle);
 
-    // May not be allowed to close(?)
+    // May not always be allowed to close(?)
     if (result == IPC_RESULT_OK) {
         mHandle = -1;
         return true;
@@ -45,26 +44,30 @@ bool IosDevice::Close() {
 }
 
 /**
+ * @brief Perform I/O control (no parameters) on this device
+ *
+ * @param id Ioctl ID
+ * @return IOS result code
+ */
+s32 IosDevice::Ioctl(s32 id) const {
+    K_ASSERT_EX(IsOpen(), "Please open this device");
+
+    return IOS_Ioctl(mHandle, id, NULL, 0, NULL, 0);
+}
+
+/**
  * @brief Perform I/O control (single vectors) on this device
  *
  * @param id Ioctl ID
- * @param in Input data
- * @param out Output data
+ * @param in Input vector
+ * @param out Output vector
  * @return IOS result code
  */
-s32 IosDevice::Ioctl(s32 id, const IosVectors* in, IosVectors* out) const {
-    K_ASSERT_EX(mHandle > 0, "Please open this device");
+s32 IosDevice::Ioctl(s32 id, const IosVector& in, IosVector& out) const {
+    K_ASSERT_EX(IsOpen(), "Please open this device");
 
-    K_ASSERT_EX(in == NULL || in->Capacity() == 1,
-                "Ioctl only supports one argument per vector");
-    K_ASSERT_EX(out == NULL || out->Capacity() == 1,
-                "Ioctl only supports one argument per vector");
-
-    return IOS_Ioctl(mHandle, id,
-                     in != NULL ? in->At(0).base : NULL,   //
-                     in != NULL ? in->At(0).length : 0,    //
-                     out != NULL ? out->At(0).base : NULL, //
-                     out != NULL ? out->At(0).length : 0);
+    return IOS_Ioctl(mHandle, id, in.Base(), in.Length(), out.Base(),
+                     out.Length());
 }
 
 /**
@@ -75,40 +78,27 @@ s32 IosDevice::Ioctl(s32 id, const IosVectors* in, IosVectors* out) const {
  * @param out Output vectors
  * @return IOS result code
  */
-s32 IosDevice::IoctlV(s32 id, const IosVectors* in, IosVectors* out) const {
-    K_ASSERT_EX(mHandle > 0, "Please open this device");
+s32 IosDevice::IoctlV(s32 id, const TVector<IosVector>& in,
+                      const TVector<IosVector>& out) const {
+    K_ASSERT_EX(IsOpen(), "Please open this device");
 
-    // Mark which sets of vectors are present
-    enum { IN = (1 << 0), OUT = (1 << 1) };
-    u32 type = (in != NULL ? IN : 0) | (out != NULL ? OUT : 0);
+    // Vectors need to be contiguous and usually(?) in MEM2
+    IosVector* vectors =
+        new (32, EMemory_MEM2) IosVector[in.Size() + out.Size()];
 
-    switch (type) {
-    // No parameters
-    case 0: return IOS_Ioctlv(mHandle, id, 0, 0, NULL);
-    // Only input vectors
-    case IN: return IOS_Ioctlv(mHandle, id, in->Capacity(), 0, *in);
-    // Only output vectors
-    case OUT: return IOS_Ioctlv(mHandle, id, 0, out->Capacity(), *out);
-
-    // Both input & output vectors
-    case (IN | OUT): {
-        // Vectors need to be contiguous for IOS
-        IosVectors all(in->Capacity() + out->Capacity());
-        int i = 0;
-
-        // Copy into contiguous buffer
-        for (int j = 0; j < in->Capacity();) {
-            all[i++] = (*in)[j++];
-        }
-        for (int j = 0; j < out->Capacity();) {
-            all[i++] = (*out)[j++];
-        }
-
-        return IOS_Ioctlv(mHandle, id, in->Capacity(), out->Capacity(), all);
+    // Copy in user vectors
+    int i = 0;
+    for (int j = 0; j < in.Size();) {
+        vectors[i++] = in[j++];
+    }
+    for (int j = 0; j < out.Size();) {
+        vectors[i++] = out[j++];
     }
 
-    default: K_ASSERT(false); return IPC_RESULT_INVALID_INTERNAL;
-    }
+    s32 result = IOS_Ioctlv(mHandle, id, in.Size(), out.Size(), vectors);
+
+    delete[] vectors;
+    return result;
 }
 
 } // namespace kiwi

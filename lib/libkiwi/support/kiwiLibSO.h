@@ -68,8 +68,8 @@ private:
                         const SockAddrAny* addr);
 
 private:
-    static IosDevice sIosDevice; // IOS IP device handle
-    static SOResult sLastError;  // Last IOS error code
+    static IosDevice sDevNetIpTop; // IOS IP device handle
+    static SOResult sLastError;    // Last IOS error code
 };
 
 /**
@@ -267,13 +267,6 @@ struct SockAddr6 : public SOSockAddrIn6 {
  */
 K_INLINE String ToString(const SockAddrAny& t) {
     return Format("%s:%d", LibSO::INetNtoP(t).CStr(), t.port);
-}
-
-/**
- * @brief IOS expects object length to be the address length
- */
-template <> u32 IosObject<SockAddrAny>::Size() const {
-    return Ref().len;
 }
 
 K_STATIC_ASSERT(sizeof(SockAddrAny) == sizeof(SOSockAddr));
