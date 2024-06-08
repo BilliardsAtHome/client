@@ -118,6 +118,13 @@ public:
     }
 
     /**
+     * @brief Roll coin-flip (50% chance)
+     */
+    bool CoinFlip() {
+        return Chance(0.5f);
+    }
+
+    /**
      * @brief Roll random sign
      */
     f32 Sign() {

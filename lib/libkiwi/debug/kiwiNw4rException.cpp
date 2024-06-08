@@ -400,10 +400,10 @@ void Nw4rException::PrintThankYouMsg() {
  */
 void Nw4rException::PrintSymbol(const void* addr) {
     // Symbol's offset from the start of game code
-    std::ptrdiff_t textOffset = PtrDistance(GetTextStart(), addr);
+    std::ptrdiff_t textOffset = PtrDistance(GetModuleTextStart(), addr);
 
     // Symbol is from game (outside module)
-    if (textOffset < 0 || textOffset >= GetTextSize()) {
+    if (textOffset < 0 || textOffset >= GetModuleTextSize()) {
         // Print raw address
         Printf("%08X (game)", addr);
         return;
@@ -444,9 +444,10 @@ void Nw4rException::PrintSymbol(const void* addr) {
     }
 
     // Offset into function where exception occurred
-    u32 offset = sym->type == MapFile::ELinkType_Relocatable
-                     ? PtrDistance(AddToPtr(GetTextStart(), sym->offset), addr)
-                     : PtrDistance(sym->addr, addr);
+    u32 offset =
+        sym->type == MapFile::ELinkType_Relocatable
+            ? PtrDistance(AddToPtr(GetModuleTextStart(), sym->offset), addr)
+            : PtrDistance(sym->addr, addr);
 
     // Print function name and instruction offset
     Printf("%s(+0x%04X)", sym->name, offset);

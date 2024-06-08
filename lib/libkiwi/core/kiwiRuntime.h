@@ -1,5 +1,6 @@
 #ifndef LIBKIWI_CORE_RUNTIME_H
 #define LIBKIWI_CORE_RUNTIME_H
+#include <kokeshi.hpp>
 #include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/math/kiwiAlgorithm.h>
@@ -12,7 +13,7 @@ extern "C" {
 #endif
 
 /**
- * @name Linker Generated Symbols
+ * @name Linker Generated Symbols (for your module)
  */
 /**@{*/
 extern funcptr_t __ctor_loc;
@@ -37,135 +38,302 @@ extern void* const _f_data;
 extern void* const _e_data;
 /**@}*/
 
+/**
+ * @name Linker Generated Symbols (for the base DOL)
+ */
+/**@{*/
+extern void* const _f_dol_init;
+extern void* const _e_dol_init;
+
+extern void* const _f_dol_text;
+extern void* const _e_dol_text;
+
+extern void* const _f_dol_ctors;
+extern void* const _e_dol_ctors;
+
+extern void* const _f_dol_dtors;
+extern void* const _e_dol_dtors;
+
+extern void* const _f_dol_rodata;
+extern void* const _e_dol_rodata;
+
+extern void* const _f_dol_data;
+extern void* const _e_dol_data;
+/**@}*/
+
 namespace {
 
 /**
- * @name ELF section information
+ * @brief Gets the start address of the stack
+ * @note Stack grows upwards
+ */
+const void* GetStackStart() {
+    return _stack_addr;
+}
+/**
+ * @brief Gets the end address of the stack
+ * @note Stack grows upwards
+ */
+const void* GetStackEnd() {
+    return _stack_end;
+}
+
+/**
+ * @name Module section information
  */
 /**@{*/
 /**
+ * @brief Gets the start address of the module ELF
+ */
+const void* GetModuleStart() {
+    return kokeshi::sModuleInfo.start;
+}
+/**
+ * @brief Gets the size of the module ELF
+ */
+u32 GetModuleSize() {
+    return kokeshi::sModuleInfo.size;
+}
+/**
+ * @brief Gets the end address of the module ELF
+ */
+const void* GetModuleEnd() {
+    return AddToPtr(GetModuleStart(), GetModuleSize());
+}
+
+/**
  * @brief Gets the start address of the .init ELF section
  */
-const void* GetInitStart() {
+const void* GetModuleInitStart() {
     return &_f_init;
 }
 /**
  * @brief Gets the end address of the .init ELF section
  */
-const void* GetInitEnd() {
+const void* GetModuleInitEnd() {
     return &_e_init;
 }
 /**
  * @brief Gets the size of the .init ELF section
  */
-u32 GetInitSize() {
-    return PtrDistance(GetInitStart(), GetInitEnd());
+u32 GetModuleInitSize() {
+    return PtrDistance(GetModuleInitStart(), GetModuleInitEnd());
 }
 
 /**
  * @brief Gets the start address of the .text ELF section
  */
-const void* GetTextStart() {
+const void* GetModuleTextStart() {
     return &_f_text;
 }
 /**
  * @brief Gets the end address of the .text ELF section
  */
-const void* GetTextEnd() {
+const void* GetModuleTextEnd() {
     return &_e_text;
 }
 /**
  * @brief Gets the size of the .text ELF section
  */
-u32 GetTextSize() {
-    return PtrDistance(GetTextStart(), GetTextEnd());
+u32 GetModuleTextSize() {
+    return PtrDistance(GetModuleTextStart(), GetModuleTextEnd());
 }
 
 /**
  * @brief Gets the start address of the .ctors ELF section
  */
-const void* GetCtorsStart() {
+const void* GetModuleCtorsStart() {
     return &_f_ctors;
 }
 /**
  * @brief Gets the end address of the .ctors ELF section
  */
-const void* GetCtorsEnd() {
+const void* GetModuleCtorsEnd() {
     return &_e_ctors;
 }
 /**
  * @brief Gets the size of the .ctors ELF section
  */
-u32 GetCtorsSize() {
-    return PtrDistance(GetCtorsStart(), GetCtorsEnd());
+u32 GetModuleCtorsSize() {
+    return PtrDistance(GetModuleCtorsStart(), GetModuleCtorsEnd());
 }
 
 /**
  * @brief Gets the start address of the .dtors ELF section
  */
-const void* GetDtorsStart() {
+const void* GetModuleDtorsStart() {
     return &_f_dtors;
 }
 /**
  * @brief Gets the end address of the .dtors ELF section
  */
-const void* GetDtorsEnd() {
+const void* GetModuleDtorsEnd() {
     return &_e_dtors;
 }
 /**
  * @brief Gets the size of the .dtors ELF section
  */
-u32 GetDtorsSize() {
-    return PtrDistance(GetDtorsStart(), GetDtorsEnd());
+u32 GetModuleDtorsSize() {
+    return PtrDistance(GetModuleDtorsStart(), GetModuleDtorsEnd());
 }
 
 /**
  * @brief Gets the start address of the .rodata ELF section
  */
-const void* GetRodataStart() {
+const void* GetModuleRodataStart() {
     return &_f_rodata;
 }
 /**
  * @brief Gets the end address of the .rodata ELF section
  */
-const void* GetRodataEnd() {
+const void* GetModuleRodataEnd() {
     return &_e_rodata;
 }
 /**
  * @brief Gets the size of the .rodata ELF section
  */
-u32 GetRodataSize() {
-    return PtrDistance(GetRodataStart(), GetRodataEnd());
+u32 GetModuleRodataSize() {
+    return PtrDistance(GetModuleRodataStart(), GetModuleRodataEnd());
 }
 
 /**
  * @brief Gets the start address of the .data ELF section
  */
-const void* GetDataStart() {
+const void* GetModuleDataStart() {
     return &_f_data;
 }
 /**
  * @brief Gets the end address of the .data ELF section
  */
-const void* GetDataEnd() {
+const void* GetModuleDataEnd() {
     return &_e_data;
 }
 /**
  * @brief Gets the size of the .data ELF section
  */
-u32 GetDataSize() {
-    return PtrDistance(GetDataStart(), GetDataEnd());
+u32 GetModuleDataSize() {
+    return PtrDistance(GetModuleDataStart(), GetModuleDataEnd());
 }
 /**@}*/
 
 /**
- * @brief Tests whether a memory address lies on the stack
- *
- * @param addr Memory address
+ * @name DOL section information
  */
-bool IsStack(const void* addr) {
-    return addr >= _stack_end && addr < _stack_addr;
+/**@{*/
+/**
+ * @brief Gets the start address of the .init DOL section
+ */
+const void* GetDolInitStart() {
+    return &_f_dol_init;
 }
+/**
+ * @brief Gets the end address of the .init DOL section
+ */
+const void* GetDolInitEnd() {
+    return &_e_dol_init;
+}
+/**
+ * @brief Gets the size of the .init DOL section
+ */
+u32 GetDolInitSize() {
+    return PtrDistance(GetDolInitStart(), GetDolInitEnd());
+}
+
+/**
+ * @brief Gets the start address of the .text DOL section
+ */
+const void* GetDolTextStart() {
+    return &_f_dol_text;
+}
+/**
+ * @brief Gets the end address of the .text DOL section
+ */
+const void* GetDolTextEnd() {
+    return &_e_dol_text;
+}
+/**
+ * @brief Gets the size of the .text DOL section
+ */
+u32 GetDolTextSize() {
+    return PtrDistance(GetDolTextStart(), GetDolTextEnd());
+}
+
+/**
+ * @brief Gets the start address of the .ctors DOL section
+ */
+const void* GetDolCtorsStart() {
+    return &_f_dol_ctors;
+}
+/**
+ * @brief Gets the end address of the .ctors DOL section
+ */
+const void* GetDolCtorsEnd() {
+    return &_e_dol_ctors;
+}
+/**
+ * @brief Gets the size of the .ctors DOL section
+ */
+u32 GetDolCtorsSize() {
+    return PtrDistance(GetDolCtorsStart(), GetDolCtorsEnd());
+}
+
+/**
+ * @brief Gets the start address of the .dtors DOL section
+ */
+const void* GetDolDtorsStart() {
+    return &_f_dol_dtors;
+}
+/**
+ * @brief Gets the end address of the .dtors DOL section
+ */
+const void* GetDolDtorsEnd() {
+    return &_e_dol_dtors;
+}
+/**
+ * @brief Gets the size of the .dtors DOL section
+ */
+u32 GetDolDtorsSize() {
+    return PtrDistance(GetDolDtorsStart(), GetDolDtorsEnd());
+}
+
+/**
+ * @brief Gets the start address of the .rodata DOL section
+ */
+const void* GetDolRodataStart() {
+    return &_f_dol_rodata;
+}
+/**
+ * @brief Gets the end address of the .rodata DOL section
+ */
+const void* GetDolRodataEnd() {
+    return &_e_dol_rodata;
+}
+/**
+ * @brief Gets the size of the .rodata DOL section
+ */
+u32 GetDolRodataSize() {
+    return PtrDistance(GetDolRodataStart(), GetDolRodataEnd());
+}
+
+/**
+ * @brief Gets the start address of the .data DOL section
+ */
+const void* GetDolDataStart() {
+    return &_f_dol_data;
+}
+/**
+ * @brief Gets the end address of the .data DOL section
+ */
+const void* GetDolDataEnd() {
+    return &_e_dol_data;
+}
+/**
+ * @brief Gets the size of the .data DOL section
+ */
+u32 GetDolDataSize() {
+    return PtrDistance(GetDolDataStart(), GetDolDataEnd());
+}
+/**@}*/
 
 } // namespace
 

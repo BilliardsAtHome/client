@@ -123,6 +123,29 @@ u32 MemoryMgr::GetFreeSize(EMemory memory) {
     return heap->getAllocatableSize();
 }
 
+/**
+ * @brief Tests whether an address points to an allocation from this manager
+ *
+ * @param addr Memory address
+ */
+bool MemoryMgr::IsHeapMemory(const void* addr) const {
+    K_ASSERT(mpHeapMEM1 != NULL && mpHeapMEM2 != NULL);
+
+    // Check MEM1 heap
+    if (addr >= mpHeapMEM1->getStartAddress() &&
+        addr < mpHeapMEM1->getEndAddress()) {
+        return true;
+    }
+
+    // Check MEM2 heap
+    if (addr >= mpHeapMEM2->getStartAddress() &&
+        addr < mpHeapMEM2->getEndAddress()) {
+        return true;
+    }
+
+    return false;
+}
+
 } // namespace kiwi
 
 /**

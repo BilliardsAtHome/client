@@ -75,7 +75,7 @@ const MapFile::Symbol* MapFile::QueryTextSymbol(const void* addr) {
         // Resolve the symbol's address
         const void* symb = it->type == ELinkType_Static
                                ? it->addr
-                               : AddToPtr(GetTextStart(), it->offset);
+                               : AddToPtr(GetModuleTextStart(), it->offset);
 
         // Determine if the specified address falls within the symbol
         if (PtrDistance(symb, addr) < it->size) {

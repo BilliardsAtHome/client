@@ -52,6 +52,13 @@ public:
      */
     u32 GetFreeSize(EMemory region);
 
+    /**
+     * @brief Tests whether an address points to an allocation from this manager
+     *
+     * @param addr Memory address
+     */
+    bool IsHeapMemory(const void* addr) const;
+
 private:
     /**
      * @brief Constructor

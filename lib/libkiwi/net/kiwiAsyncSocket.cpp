@@ -406,7 +406,7 @@ SOResult AsyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv,
                                void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(dst != NULL);
-    K_ASSERT_EX(!IsStack(dst), "Don't use stack memory for async");
+    K_ASSERT_EX(!PtrUtil::IsStack(dst), "Don't use stack memory for async");
 
     // Packet to hold incoming data
     Packet* packet = new Packet(len);
@@ -438,7 +438,7 @@ SOResult AsyncSocket::SendImpl(const void* src, u32 len, u32& nsend,
                                void* arg) {
     K_ASSERT(IsOpen());
     K_ASSERT(src != NULL);
-    K_ASSERT_EX(!IsStack(src), "Don't use stack memory for async");
+    K_ASSERT_EX(!PtrUtil::IsStack(src), "Don't use stack memory for async");
 
     // Packet to hold incoming data
     Packet* packet = new Packet(len, addr);

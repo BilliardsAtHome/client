@@ -42,6 +42,17 @@
 namespace kokeshi {
 
 /**
+ * @brief Information about the currently loaded Kamek module
+ */
+struct ModuleInfo {
+    void* start; // Starting address
+    u32 size;    // Binary size
+};
+
+// Located in OS globals free space
+ModuleInfo sModuleInfo : 0x80003200;
+
+/**
  * @brief Path to code module
  */
 static const char* scModulePath = KOKESHI_MODULE_PATH ".bin";
@@ -51,7 +62,20 @@ static const char* scModulePath = KOKESHI_MODULE_PATH ".bin";
  */
 static const char* scMapfilePath = KOKESHI_MODULE_PATH ".map";
 
+/**
+ * @brief Allocate memory
+ *
+ * @param size Block size
+ * @param sys Use system (MEM1) heap
+ */
 void* Alloc(std::size_t size, bool sys);
+
+/**
+ * @brief Free memory
+ *
+ * @param block Memory block
+ * @param sys Use system (MEM1) heap
+ */
 void Free(void* block, bool sys);
 
 } // namespace kokeshi

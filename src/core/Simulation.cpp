@@ -281,7 +281,7 @@ void Simulation::AfterReset() {
     switch (style) {
     case EStyle_Normal:
         // 50% chance to aim up
-        if (random.Chance(0.5f)) {
+        if (random.CoinFlip()) {
             // Randomize aiming UP frames -> [0f, 35f]
             mTimerUp = mpCurrBreak->up = random.NextU32(35);
         }
@@ -289,7 +289,7 @@ void Simulation::AfterReset() {
         // 80% chance to aim sideways
         if (random.Chance(0.8f)) {
             // 50% chance to aim left vs. aim right
-            if (random.Chance(0.5f)) {
+            if (random.CoinFlip()) {
                 // Randomize aiming SIDEWAYS frames -> [0f, 12f]
                 mTimerLeft = mpCurrBreak->left = random.NextU32(12);
             } else {
@@ -315,9 +315,9 @@ void Simulation::AfterReset() {
         mTimerUp = mpCurrBreak->up = random.NextU32(40, 55);
 
         // 50% chance to aim sideways
-        if (random.Chance(0.5f)) {
+        if (random.CoinFlip()) {
             // 50% chance to aim left vs. aim right
-            if (random.Chance(0.5f)) {
+            if (random.CoinFlip()) {
                 // Randomize aiming SIDEWAYS frames -> [0f, 8f]
                 mTimerLeft = mpCurrBreak->left = random.NextU32(8);
             } else {
