@@ -1,13 +1,15 @@
 #ifndef LIBKIWI_NET_HTTP_REQUEST_H
 #define LIBKIWI_NET_HTTP_REQUEST_H
 #include <libkiwi/debug/kiwiAssert.h>
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
-#include <libkiwi/net/kiwiSyncSocket.h>
 #include <libkiwi/prim/kiwiHashMap.h>
-#include <libkiwi/prim/kiwiOptional.h>
 #include <libkiwi/prim/kiwiString.h>
 
 namespace kiwi {
+
+// Forward declarations
+class SyncSocket;
 
 /**
  * @brief HTTP error
@@ -64,7 +66,7 @@ struct HttpResponse {
 };
 
 /**
- * @brief HTTP 1.1 request wrapper
+ * @brief HTTP (1.1) request wrapper
  */
 class HttpRequest {
 public:
@@ -88,6 +90,11 @@ public:
     typedef void (*ResponseCallback)(const HttpResponse& resp, void* arg);
 
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param host Server hostname
+     */
     explicit HttpRequest(const String& host);
 
     /**
@@ -102,7 +109,7 @@ public:
     }
 
     /**
-     * @brief Set the maximum state duration before timeout
+     * @brief Sets the maximum state duration before timeout
      *
      * @param timeOut Time-out period, in milliseconds
      */
@@ -111,7 +118,7 @@ public:
     }
 
     /**
-     * @brief Add/update a request header field
+     * @brief Adds/updates a request header field
      *
      * @param name Field name
      * @param value Field value
@@ -121,21 +128,18 @@ public:
     }
 
     /**
-     * @brief Add/update a URL parameter
+     * @brief Adds/updates a URL parameter
      *
      * @param name Parameter name
      * @param value Parameter value
      */
-    void SetParameter(const String& name, const String& value) {
-        mParams.Insert(name, value);
-    }
     template <typename T>
     void SetParameter(const String& name, const T& value) {
         SetParameter(name, kiwi::ToString(value));
     }
 
     /**
-     * @brief Change the requested resource
+     * @brief Changes the requested resource
      *
      * @param uri URI value
      */
@@ -143,26 +147,58 @@ public:
         mURI = uri;
     }
 
+    /**
+     * @brief Sends request synchronously
+     *
+     * @param method Request method
+     * @return Server response
+     */
     const HttpResponse& Send(EMethod method = EMethod_GET);
+
+    /**
+     * @brief Sends request asynchronously
+     *
+     * @param callback Response callback
+     * @param arg Callback user argument
+     * @param method Request method
+     */
     void SendAsync(ResponseCallback callback, void* arg = NULL,
                    EMethod method = EMethod_GET);
 
 private:
-    typedef TMap<String, String>::ConstIterator ParamIterator;
-    typedef TMap<String, String>::ConstIterator HeaderIterator;
-
     /**
-     * @brief Default connection timeout, in milliseconds
+     * @brief Sends request (internal implementation)
      */
-    static const u32 DEFAULT_TIMEOUT_MS = 2000;
-
-private:
     void SendImpl();
 
+    /**
+     * @brief Sends request data
+     *
+     * @return Success
+     */
     bool Request();
+    /**
+     * @brief Receives response data
+     *
+     * @return Successs
+     */
     bool Receive();
 
 private:
+    /**
+     * @brief Default connection timeout, in milliseconds
+     */
+    static const u32 DEFAULT_TIMEOUT = 2000;
+
+    /**
+     * @brief HTTP request method names
+     */
+    static const char* sMethodNames[EMethod_Max];
+    /**
+     * @brief HTTP protocol version
+     */
+    static const char* sProtocolVer;
+
     EMethod mMethod;  // Request method
     String mHostName; // Server host name
     String mURI;      // Requested resource

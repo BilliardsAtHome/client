@@ -31,12 +31,12 @@ struct FileRipperArg {
 
     // Memory region to use if the ripper must allocate its own destination
     // buffer
-    kiwi::EMemory region;
+    EMemory region;
 
     /**
      * @brief Constructor
      */
-    FileRipperArg() : dst(NULL), size(NULL), region(kiwi::EMemory_MEM2) {}
+    FileRipperArg() : dst(NULL), size(NULL), region(EMemory_MEM2) {}
 };
 
 /**

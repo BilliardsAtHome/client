@@ -1,12 +1,18 @@
 #include <libkiwi.h>
 
 namespace kiwi {
-namespace {
 
-const String sMethodNames[HttpRequest::EMethod_Max] = {"GET", "POST"};
-const String sProtocolVer = "1.1";
+typedef TMap<String, String>::ConstIterator ParamIterator;
+typedef TMap<String, String>::ConstIterator HeaderIterator;
 
-} // namespace
+/**
+ * @brief HTTP request method names
+ */
+const char* HttpRequest::sMethodNames[EMethod_Max] = {"GET", "POST"};
+/**
+ * @brief HTTP protocol version
+ */
+const char* HttpRequest::sProtocolVer = "1.1";
 
 /**
  * @brief Constructor
@@ -17,7 +23,7 @@ HttpRequest::HttpRequest(const String& host)
     : mHostName(host),
       mURI("/"),
       mpSocket(NULL),
-      mTimeOut(OS_MSEC_TO_TICKS(DEFAULT_TIMEOUT_MS)),
+      mTimeOut(OS_MSEC_TO_TICKS(DEFAULT_TIMEOUT)),
       mpResponseCallback(NULL),
       mpResponseCallbackArg(NULL) {
     mpSocket = new SyncSocket(SO_PF_INET, SO_SOCK_STREAM);
@@ -38,7 +44,7 @@ HttpRequest::HttpRequest(const String& host)
 }
 
 /**
- * @brief Send request synchronously
+ * @brief Sends request synchronously
  *
  * @param method Request method
  * @return Server response
@@ -57,7 +63,7 @@ const HttpResponse& HttpRequest::Send(EMethod method) {
 }
 
 /**
- * @brief Send request asynchronously
+ * @brief Sends request asynchronously
  *
  * @param callback Response callback
  * @param arg Callback user argument
@@ -65,7 +71,7 @@ const HttpResponse& HttpRequest::Send(EMethod method) {
  */
 void HttpRequest::SendAsync(ResponseCallback callback, void* arg,
                             EMethod method) {
-    K_ASSERT(callback != NULL);
+    K_ASSERT_EX(callback != NULL, "You will lose the reponse!");
     K_ASSERT(method < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
 
@@ -74,13 +80,11 @@ void HttpRequest::SendAsync(ResponseCallback callback, void* arg,
     mpResponseCallbackArg = arg;
 
     // Call on new thread
-    kiwi::Thread t(SendImpl, *this);
+    Thread t(SendImpl, *this);
 }
 
 /**
- * @brief Common send implementation
- *
- * @return Success
+ * @brief Sends request (internal implementation)
  */
 void HttpRequest::SendImpl() {
     K_ASSERT(mMethod < EMethod_Max);
@@ -89,13 +93,13 @@ void HttpRequest::SendImpl() {
     // HTTP connections use port 80
     SockAddr4 addr(mHostName, 80);
 
-    // Establish connection with server
     Watch w;
     w.Start();
+
+    // Establish connection with server
     while (true) {
         // Successful connection
         if (mpSocket->Connect(addr)) {
-            // Send request, receive server's response
             (void)Request();
             (void)Receive();
             break;
@@ -112,10 +116,15 @@ void HttpRequest::SendImpl() {
     if (mpResponseCallback != NULL) {
         mpResponseCallback(mResponse, mpResponseCallbackArg);
     }
+
+#ifndef NDEBUG
+    // Signal to destructor
+    mpResponseCallback = NULL;
+#endif
 }
 
 /**
- * @brief Send request data
+ * @brief Sends request data
  *
  * @return Success
  */
@@ -132,8 +141,8 @@ bool HttpRequest::Request() {
     }
 
     // Build request line
-    request = Format("%s %s HTTP/%s\n", sMethodNames[mMethod].CStr(),
-                     request.CStr(), sProtocolVer.CStr());
+    request = Format("%s %s HTTP/%s\n", sMethodNames[mMethod], request.CStr(),
+                     sProtocolVer);
 
     // Build header fields
     for (HeaderIterator it = mHeader.Begin(); it != mHeader.End(); ++it) {
@@ -149,7 +158,7 @@ bool HttpRequest::Request() {
 }
 
 /**
- * @brief Receive response data
+ * @brief Receives response data
  *
  * @return Successs
  */
@@ -162,7 +171,9 @@ bool HttpRequest::Receive() {
     w.Start();
 
     /**
-     * @brief Receive response headers
+     *
+     * Receive response headers
+     *
      */
 
     // Need non-blocking because we greedily receive data
@@ -211,7 +222,9 @@ bool HttpRequest::Receive() {
     String headers = work.SubStr(0, end);
 
     /**
-     * @brief Build header dictionary
+     *
+     * Build header dictionary
+     *
      */
 
     // Must at least have one line (status code)
@@ -253,7 +266,9 @@ bool HttpRequest::Receive() {
     }
 
     /**
-     * @brief Receive response body
+     *
+     * Receive response body
+     *
      */
 
     // If we were given the length, we can be 100% sure

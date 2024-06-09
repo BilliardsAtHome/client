@@ -15,7 +15,7 @@ namespace kiwi {
  * @param fmt Format string
  * @param ... Format arguments
  */
-void DebugPrint::Printf(f32 x, f32 y, f32 scale, bool center, kiwi::Color color,
+void DebugPrint::Printf(f32 x, f32 y, f32 scale, bool center, Color color,
                         const char* fmt, ...) {
     if (!RPGrpRenderer::IsDrawLayout()) {
         return;
@@ -23,7 +23,7 @@ void DebugPrint::Printf(f32 x, f32 y, f32 scale, bool center, kiwi::Color color,
 
     std::va_list list;
     va_start(list, fmt);
-    kiwi::String msg = kiwi::VFormat(fmt, list);
+    String msg = VFormat(fmt, list);
     va_end(list);
 
     PrintImpl(x, y, scale, center, color, msg);
@@ -41,16 +41,15 @@ void DebugPrint::Printf(f32 x, f32 y, f32 scale, bool center, kiwi::Color color,
  * @param fmt Format string
  * @param ... Format arguments
  */
-void DebugPrint::PrintfShadow(f32 x, f32 y, f32 scale, bool center,
-                              kiwi::Color text, kiwi::Color shadow,
-                              const char* fmt, ...) {
+void DebugPrint::PrintfShadow(f32 x, f32 y, f32 scale, bool center, Color text,
+                              Color shadow, const char* fmt, ...) {
     if (!RPGrpRenderer::IsDrawLayout()) {
         return;
     }
 
     std::va_list list;
     va_start(list, fmt);
-    kiwi::String msg = kiwi::VFormat(fmt, list);
+    String msg = VFormat(fmt, list);
     va_end(list);
 
     // Shadow
@@ -71,16 +70,15 @@ void DebugPrint::PrintfShadow(f32 x, f32 y, f32 scale, bool center,
  * @param fmt Format string
  * @param ... Format arguments
  */
-void DebugPrint::PrintfOutline(f32 x, f32 y, f32 scale, bool center,
-                               kiwi::Color text, kiwi::Color outline,
-                               const char* fmt, ...) {
+void DebugPrint::PrintfOutline(f32 x, f32 y, f32 scale, bool center, Color text,
+                               Color outline, const char* fmt, ...) {
     if (!RPGrpRenderer::IsDrawLayout()) {
         return;
     }
 
     std::va_list list;
     va_start(list, fmt);
-    kiwi::String msg = kiwi::VFormat(fmt, list);
+    String msg = VFormat(fmt, list);
     va_end(list);
 
     // Outline
@@ -102,8 +100,8 @@ void DebugPrint::PrintfOutline(f32 x, f32 y, f32 scale, bool center,
  * @param color Text color
  * @param msg Text message
  */
-void DebugPrint::PrintImpl(f32 x, f32 y, f32 scale, bool center,
-                           kiwi::Color color, const kiwi::String& msg) {
+void DebugPrint::PrintImpl(f32 x, f32 y, f32 scale, bool center, Color color,
+                           const String& msg) {
     RP_GET_INSTANCE(RPSysTextWriter)->Begin();
     {
         u32 flag = 0;

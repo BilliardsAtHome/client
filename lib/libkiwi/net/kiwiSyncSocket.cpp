@@ -36,7 +36,7 @@ SyncSocket* SyncSocket::Accept(AcceptCallback callback, void* arg) {
     K_ASSERT(IsOpen());
 
     SyncSocket* peer = NULL;
-    kiwi::SockAddr4 addr; // TODO: Will forcing ipv4 cause problems?
+    SockAddr4 addr; // TODO: Will forcing ipv4 cause problems?
 
     s32 fd = LibSO::Accept(mHandle, addr);
 
@@ -71,7 +71,7 @@ SOResult SyncSocket::RecvImpl(void* dst, u32 len, u32& nrecv, SockAddrAny* addr,
     K_ASSERT(len > 0 && len < ULONG_MAX);
 
     s32 result;
-    kiwi::SockAddr4 peer; // TODO: Will forcing ipv4 cause problems?
+    SockAddr4 peer; // TODO: Will forcing ipv4 cause problems?
 
     nrecv = 0;
     while (nrecv < len) {

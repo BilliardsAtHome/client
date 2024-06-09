@@ -118,7 +118,7 @@ template <typename T> u32 StringImpl<T>::Find(const T* s, u32 pos) const {
     }
 
     // Determine index by pointer arithmetic
-    return kiwi::PtrDistance(mpBuffer, result) / sizeof(T);
+    return PtrDistance(mpBuffer, result) / sizeof(T);
 }
 
 /**
@@ -143,7 +143,7 @@ template <typename T> u32 StringImpl<T>::Find(T c, u32 pos) const {
     }
 
     // Determine index by pointer arithmetic
-    return kiwi::PtrDistance(mpBuffer, result) / sizeof(T);
+    return PtrDistance(mpBuffer, result) / sizeof(T);
 }
 
 /**
