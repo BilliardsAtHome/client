@@ -27,17 +27,17 @@ public:
     }
 
     /**
-     * @brief Retreive the current Unix epoch time (in seconds)
+     * @brief Retreives the current Unix epoch time (in seconds)
      */
     virtual u64 GetTimeNow() const;
 
     /**
-     * @brief Update Discord client/app ID
+     * @brief Updates Discord client/app ID
      */
     virtual void UpdateClient() const;
 
     /**
-     * @brief Update Discord presence status
+     * @brief Updates Discord presence status
      */
     virtual void UpdatePresence() const;
 

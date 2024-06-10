@@ -3,7 +3,7 @@
 namespace kiwi {
 
 /**
- * @brief Allocates packet buffer
+ * @brief Allocates message buffer of the specified size
  *
  * @param size Packet size
  */
@@ -18,6 +18,7 @@ void Packet::Alloc(u32 size) {
 
     // Protocol may have memory overhead
     mBufferSize = size + GetOverhead();
+
     mpBuffer = new u8[mBufferSize];
     K_ASSERT(mpBuffer != NULL);
 
@@ -25,7 +26,7 @@ void Packet::Alloc(u32 size) {
 }
 
 /**
- * @brief Releases packet buffer
+ * @brief Releases message buffer
  */
 void Packet::Free() {
     AutoMutexLock lock(mBufferMutex);
@@ -37,7 +38,7 @@ void Packet::Free() {
 }
 
 /**
- * @brief Clear existing state
+ * @brief Clears existing state
  */
 void Packet::Clear() {
     AutoMutexLock lock(mBufferMutex);
@@ -47,7 +48,7 @@ void Packet::Clear() {
 }
 
 /**
- * @brief Reads data from packet buffer
+ * @brief Reads data from message buffer
  *
  * @param dst Data destination
  * @param n Data size
@@ -71,14 +72,13 @@ u32 Packet::Read(void* dst, u32 n) {
 }
 
 /**
- * @brief Writes data to packet buffer
+ * @brief Writes data to message buffer
  *
  * @param src Data source
  * @param n Data size
  *
  * @return Number of bytes written
  */
-
 u32 Packet::Write(const void* src, u32 n) {
     K_ASSERT(mpBuffer != NULL);
     K_ASSERT(n <= GetMaxContent());
@@ -96,13 +96,14 @@ u32 Packet::Write(const void* src, u32 n) {
 }
 
 /**
- * @brief Receives data from socket
+ * @brief Receives message data from socket
  *
  * @param socket Socket descriptor
  *
  * @return Number of bytes received
  */
 Optional<u32> Packet::Recv(SOSocket socket) {
+    K_ASSERT(socket >= 0);
     K_ASSERT(mpBuffer != NULL);
 
     AutoMutexLock lock(mBufferMutex);
@@ -126,13 +127,14 @@ Optional<u32> Packet::Recv(SOSocket socket) {
 }
 
 /**
- * @brief Writes data to socket
+ * @brief Writes message data to socket
  *
  * @param socket Socket descriptor
  *
  * @return Number of bytes sent
  */
 Optional<u32> Packet::Send(SOSocket socket) {
+    K_ASSERT(socket >= 0);
     K_ASSERT(mpBuffer != NULL);
 
     AutoMutexLock lock(mBufferMutex);

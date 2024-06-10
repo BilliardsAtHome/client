@@ -58,7 +58,7 @@ StringImpl<T> StringImpl<T>::SubStr(u32 pos, u32 len) const {
     }
 
     // Clamp substring length
-    len = kiwi::Min(len, mLength - pos);
+    len = Min(len, mLength - pos);
 
     // Create C-style substring
     T* buffer = new T[len + 1];

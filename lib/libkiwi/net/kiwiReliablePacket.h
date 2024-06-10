@@ -1,6 +1,7 @@
 #ifndef LIBKIWI_NET_RELIABLE_PACKET_H
 #define LIBKIWI_NET_RELIABLE_PACKET_H
 #include <libkiwi/debug/kiwiAssert.h>
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/net/kiwiPacket.h>
 
@@ -8,8 +9,7 @@ namespace kiwi {
 
 /**
  * @brief Reliable packet header
- *
- * @note Concepts adapted from PRUDP
+ * @note Concepts adapted from NEX PRUDP
  */
 struct KUDPHeader {
     /**
@@ -31,7 +31,7 @@ struct KUDPHeader {
      * @brief Packet flags
      */
     enum EFlags {
-        // This packet is only a fragment of the message, and there are more
+        // This packet is only a message fragment, and there will be more
         EFlags_MoreFragments = (1 << 0),
     };
 };
@@ -42,9 +42,12 @@ struct KUDPHeader {
 class ReliablePacket : public Packet {
 public:
     /**
-     * @brief Size constraints to avoid going over MTU
+     * @brief Message buffer limit to stay under MTU
      */
     static const u16 MAX_BUFFER_SIZE = 1000;
+    /**
+     * @brief Message content limit
+     */
     static const u16 MAX_CONTENT_SIZE = MAX_BUFFER_SIZE - sizeof(KUDPHeader);
 
 public:
@@ -58,39 +61,42 @@ public:
         : Packet(size, dest) {}
 
     /**
-     * @brief Access KUDP protocol header
+     * @brief Accesses KUDP protocol header
      */
     KUDPHeader& GetHeader() {
         K_ASSERT(mpBuffer != NULL);
         return *reinterpret_cast<KUDPHeader*>(mpBuffer);
     }
+    /**
+     * @brief Accesses KUDP protocol header (read-only)
+     */
     const KUDPHeader& GetHeader() const {
         K_ASSERT(mpBuffer != NULL);
         return *reinterpret_cast<KUDPHeader*>(mpBuffer);
     }
 
     /**
-     * @brief Largest allowable message buffer
+     * @brief Gets the maximum size of the message buffer
      */
     virtual u32 GetMaxBuffer() const {
         return MAX_BUFFER_SIZE;
     }
 
     /**
-     * @brief Message content size
+     * @brief Gets the current size of the message payload
      */
     virtual u32 GetContentSize() const {
         return GetHeader().size;
     }
     /**
-     * @brief Largest allowable message content
+     * @brief Gets the maximum size of the message payload
      */
     virtual u32 GetMaxContent() const {
         return MAX_CONTENT_SIZE;
     }
 
     /**
-     * @brief Message buffer overhead
+     * @brief Gets the size of the message buffer overhead
      */
     virtual u32 GetOverhead() const {
         return sizeof(KUDPHeader);

@@ -1,13 +1,13 @@
 #ifndef LIBKIWI_NET_I_RICH_PRESENCE_H
 #define LIBKIWI_NET_I_RICH_PRESENCE_H
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
-#include <revolution/OS.h>
 
 namespace kiwi {
 
 /**
- * @brief Rich presence interface (common functionality between console/emu)
+ * @brief Rich presence interface
  */
 class IRichPresence {
 public:
@@ -29,54 +29,117 @@ public:
     virtual ~IRichPresence() {}
 
     /**
-     * @brief Whether there is an ongoing connection the RPC host
+     * @brief Tests whether there is a connection established
      */
     virtual bool IsConnected() const = 0;
+
     /**
-     * @brief Retreive the current Unix epoch time (in seconds)
+     * @brief Retreives the current Unix epoch time (in seconds)
      */
     virtual u64 GetTimeNow() const = 0;
 
     /**
-     * @brief Update Discord client/app ID
+     * @brief Updates Discord client/app ID
      */
     virtual void UpdateClient() const = 0;
+
     /**
-     * @brief Update Discord presence status
+     * @brief Updates Discord presence status
      */
     virtual void UpdatePresence() const = 0;
 
+    /**
+     * @brief Sets the activity's details
+     *
+     * @param details What the player is currently doing
+     */
     void SetDetails(const String& details) {
         mDetails = details;
     }
+    /**
+     * @brief Sets the activity's state
+     *
+     * @param state The user's current status
+     */
     void SetState(const String& state) {
         mState = state;
     }
 
+    /**
+     * @brief Sets the key of the large profile image
+     *
+     * @param key Key of the uploaded large profile image
+     */
     void SetLargeImageKey(const String& key) {
         mLargeImageKey = key;
     }
+    /**
+     * @brief Sets the tooltip for the large profile image
+     *
+     * @param text Tooltip for the large image
+     */
     void SetLargeImageText(const String& text) {
         mLargeImageText = text;
     }
 
+    /**
+     * @brief Sets the key of the small profile image
+     *
+     * @param key Key of the uploaded small profile image
+     */
     void SetSmallImageKey(const String& key) {
         mSmallImageKey = key;
     }
+    /**
+     * @brief Sets the tooltip for the small profile image
+     *
+     * @param text Tooltip for the small image
+     */
     void SetSmallImageText(const String& text) {
         mSmallImageText = text;
     }
 
+    /**
+     * @brief Sets the gameplay start time
+     * @note Will show time as "elapsed"
+     *
+     * @param start Epoch seconds for game start
+     */
     void SetStartTime(u64 start) {
         mStartTime = start;
+        mEndTime = 0;
     }
+    /**
+     * @brief Sets the gameplay start time to the current clock time
+     */
     void SetStartTimeNow() {
         mStartTime = GetTimeNow();
     }
 
+    /**
+     * @brief Sets the gameplay end time
+     * @note Will show time as "remaining"
+     *
+     * @param start Epoch seconds for game start
+     */
+    void SetEndTime(u64 end) {
+        mEndTime = end;
+        mStartTime = 0;
+    }
+
+    /**
+     * @brief Sets the number of players in the party
+     *
+     * @param num Current party size
+     */
     void SetPartyNum(s32 num) {
         mPartyNum = num;
     }
+    /**
+     * @brief Sets the maximum number of players in the party
+     *
+     * @param num Maximum party size
+     */
     void SetPartyMax(s32 max) {
         mPartyNum = max;
     }
@@ -84,25 +147,20 @@ public:
 protected:
     String mClient; // Client ID
 
-    // Presence info
-    String mDetails;
-    String mState;
+    String mDetails; // Presence details
+    String mState;   // Presence state
 
-    // Large image
-    String mLargeImageKey;
-    String mLargeImageText;
+    String mLargeImageKey;  // Large image name
+    String mLargeImageText; // Large image description
 
-    // Small image
-    String mSmallImageKey;
-    String mSmallImageText;
+    String mSmallImageKey;  // Small image name
+    String mSmallImageText; // Small image description
 
-    // Gameplay timestamps
-    u64 mStartTime;
-    u64 mEndTime;
+    u64 mStartTime; // Gameplay start epoch
+    u64 mEndTime;   // Gameplay end epoch
 
-    // Party size
-    s32 mPartyNum;
-    s32 mPartyMax;
+    s32 mPartyNum; // Party size
+    s32 mPartyMax; // Maximum party size
 };
 
 } // namespace kiwi

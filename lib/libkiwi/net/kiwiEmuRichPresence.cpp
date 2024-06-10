@@ -27,7 +27,7 @@ EmuRichPresence::EmuRichPresence(const String& client) : IRichPresence(client) {
 }
 
 /**
- * @brief Retreive the current Unix epoch time (in seconds)
+ * @brief Retreives the current Unix epoch time (in seconds)
  */
 u64 EmuRichPresence::GetTimeNow() const {
     K_ASSERT(IsConnected());
@@ -46,7 +46,7 @@ u64 EmuRichPresence::GetTimeNow() const {
 }
 
 /**
- * @brief Update Discord client/app ID
+ * @brief Updates Discord client/app ID
  */
 void EmuRichPresence::UpdateClient() const {
     K_ASSERT(IsConnected());
@@ -62,7 +62,7 @@ void EmuRichPresence::UpdateClient() const {
 }
 
 /**
- * @brief Update Discord presence status
+ * @brief Updates Discord presence status
  */
 void EmuRichPresence::UpdatePresence() const {
     K_ASSERT(IsConnected());
