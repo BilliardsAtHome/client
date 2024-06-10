@@ -59,7 +59,7 @@ const SceneCreator::Info SceneCreator::scPackScenes[] = {
  * @param id Scene ID
  */
 const SceneCreator::Info* SceneCreator::GetSceneInfo(s32 id) {
-    const Info* info;
+    const Info* pInfo;
 
     // Supply -1 to use the current scene ID
     if (id < 0) {
@@ -67,17 +67,17 @@ const SceneCreator::Info* SceneCreator::GetSceneInfo(s32 id) {
     }
 
     // Check user scenes first
-    info = sUserScenes.Find(id);
-    if (info != NULL) {
-        return info;
+    pInfo = sUserScenes.Find(id);
+    if (pInfo != NULL) {
+        return pInfo;
     }
 
     // Check RP scenes
     for (int i = 0; i < LENGTHOF(scPackScenes); i++) {
-        info = &scPackScenes[i];
+        pInfo = &scPackScenes[i];
 
-        if (info->id == id) {
-            return info;
+        if (pInfo->id == id) {
+            return pInfo;
         }
     }
 
@@ -86,15 +86,18 @@ const SceneCreator::Info* SceneCreator::GetSceneInfo(s32 id) {
 
 /**
  * @brief Registers user scene class
+ *
+ * @param rInfo Scene info
  */
-void SceneCreator::RegistScene(const Info& info) {
-    K_ASSERT_EX(info.id >= 0, "Invalid scene ID");
+void SceneCreator::RegistScene(const Info& rInfo) {
+    K_ASSERT_EX(rInfo.id >= 0, "Invalid scene ID");
 
     // Don't allow duplicate scene IDs
-    const Info* p = GetSceneInfo(info.id);
-    K_ASSERT_EX(p == NULL, "Scene ID %d already used (%s)", p->name.CStr());
+    const Info* pInfo = GetSceneInfo(rInfo.id);
+    K_ASSERT_EX(pInfo == NULL, "Scene ID %d already used (%s)",
+                pInfo->name.CStr());
 
-    sUserScenes.Insert(info.id, info);
+    sUserScenes.Insert(rInfo.id, rInfo);
 }
 
 /**
@@ -142,16 +145,16 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                       //
  * @brief Gets the specified scene's name
  */
 const char* SceneCreator::GetSceneName(s32 id) const {
-    const Info* info = GetSceneInfo(id);
-    return info->name;
+    const Info* pInfo = GetSceneInfo(id);
+    return pInfo->name;
 }
 
 /**
  * @brief Gets the specified scene's resource directory name
  */
 const char* SceneCreator::GetSceneDirectory(s32 id) const {
-    const Info* info = GetSceneInfo(id);
-    return info->dir;
+    const Info* pInfo = GetSceneInfo(id);
+    return pInfo->dir;
 }
 // clang-format off
 KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                    // Wii Sports
@@ -163,16 +166,16 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                    // Wi
  * @brief Gets the specified scene's target pack
  */
 EPackID SceneCreator::GetScenePack(s32 id) const {
-    const Info* info = GetSceneInfo(id);
-    return info->pack;
+    const Info* pInfo = GetSceneInfo(id);
+    return pInfo->pack;
 }
 
 /**
  * @brief Gets the specified scene's create type
  */
 ECreateType SceneCreator::GetSceneCreateType(s32 id) const {
-    const Info* info = GetSceneInfo(id);
-    return info->create;
+    const Info* pInfo = GetSceneInfo(id);
+    return pInfo->create;
 }
 // clang-format off
 KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                     // Wii Sports
@@ -184,8 +187,8 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                     // W
  * @brief Gets the specified scene's exit type
  */
 EExitType SceneCreator::GetSceneExitType(s32 id) const {
-    const Info* info = GetSceneInfo(id);
-    return info->exit;
+    const Info* pInfo = GetSceneInfo(id);
+    return pInfo->exit;
 }
 // clang-format off
 KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                   // Wii Sports
@@ -198,8 +201,8 @@ KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                   // Wii
  * archive
  */
 bool SceneCreator::GetSceneCommonSound(s32 id) const {
-    const Info* info = GetSceneInfo(id);
-    return info->common;
+    const Info* pInfo = GetSceneInfo(id);
+    return pInfo->common;
 }
 // clang-format off
 KOKESHI_BY_PACK(KOKESHI_NOTIMPLEMENTED,                                      // Wii Sports
@@ -289,9 +292,9 @@ RPSysScene* SceneCreator::CreatePackScene(s32 id) {
  * @param id Scene ID
  */
 RPSysScene* SceneCreator::CreateUserScene(s32 id) {
-    const Info* info = GetSceneInfo(id);
-    K_ASSERT_EX(info != NULL, "Cannot create scene ID %d", id);
-    return info->ct();
+    const Info* pInfo = GetSceneInfo(id);
+    K_ASSERT_EX(pInfo != NULL, "Cannot create scene ID %d", id);
+    return pInfo->pCt();
 }
 
 } // namespace kiwi

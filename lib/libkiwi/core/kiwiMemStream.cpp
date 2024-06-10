@@ -5,7 +5,6 @@
  */
 #define PRIM_DEF(T)                                                            \
     T MemStream::Read_##T() {                                                  \
-        T* ptr;                                                                \
         T value = static_cast<T>(0);                                           \
                                                                                \
         s32 n = Read(&value, sizeof(T));                                       \
@@ -15,14 +14,11 @@
     }                                                                          \
                                                                                \
     void MemStream::Write_##T(T value) {                                       \
-        T* ptr;                                                                \
-                                                                               \
         s32 n = Write(&value, sizeof(T));                                      \
         K_ASSERT(n > 0);                                                       \
     }                                                                          \
                                                                                \
     T MemStream::Peek_##T() {                                                  \
-        T* ptr;                                                                \
         T value = static_cast<T>(0);                                           \
                                                                                \
         s32 n = Peek(&value, sizeof(T));                                       \
@@ -52,6 +48,24 @@ PRIM_DEF(bool);
 /**@}*/
 
 /**
+ * @brief Opens stream to a memory buffer
+ *
+ * @param pBuffer Buffer
+ * @param size Buffer size
+ * @param owns Whether the stream owns the buffer
+ */
+void MemStream::Open(void* pBuffer, u32 size, bool owns) {
+    // Close existing buffer
+    Close();
+
+    mpBuffer = static_cast<u8*>(pBuffer);
+    mBufferSize = size;
+    mOwnsBuffer = owns;
+
+    mIsOpen = mpBuffer != NULL;
+}
+
+/**
  * @brief Advances this stream's position (internal implementation)
  *
  * @param dir Seek direction
@@ -74,28 +88,28 @@ void MemStream::SeekImpl(ESeekDir dir, s32 offset) {
 /**
  * @brief Reads data from this stream (internal implementation)
  *
- * @param dst Destination buffer
+ * @param pDst Destination buffer
  * @param size Number of bytes to read
  * @return Number of bytes read, or error code
  */
-s32 MemStream::ReadImpl(void* dst, u32 size) {
-    K_ASSERT(dst != NULL);
+s32 MemStream::ReadImpl(void* pDst, u32 size) {
+    K_ASSERT(pDst != NULL);
 
-    std::memcpy(dst, mBufferData + mPosition, size);
+    std::memcpy(pDst, mpBuffer + mPosition, size);
     return size;
 }
 
 /**
  * @brief Writes data to this stream (internal implementation)
  *
- * @param src Source buffer
+ * @param pSrc Source buffer
  * @param size Number of bytes to write
  * @return Number of bytes written, or error code
  */
-s32 MemStream::WriteImpl(const void* src, u32 size) {
-    K_ASSERT(src != NULL);
+s32 MemStream::WriteImpl(const void* pSrc, u32 size) {
+    K_ASSERT(pSrc != NULL);
 
-    std::memcpy(mBufferData + mPosition, src, size);
+    std::memcpy(mpBuffer + mPosition, pSrc, size);
     return size;
 }
 
@@ -103,12 +117,12 @@ s32 MemStream::WriteImpl(const void* src, u32 size) {
  * @brief Reads data from this stream without advancing the stream's
  * position (internal implementation)
  *
- * @param dst Destination buffer
+ * @param pDst Destination buffer
  * @param size Number of bytes to read
  * @return Number of bytes read, or error code
  */
-s32 MemStream::PeekImpl(void* dst, u32 size) {
-    return ReadImpl(dst, size);
+s32 MemStream::PeekImpl(void* pDst, u32 size) {
+    return ReadImpl(pDst, size);
 }
 
 /**
@@ -142,10 +156,10 @@ String MemStream::Read_string() {
 /**
  * @brief Writes a C-style string to this stream
  *
- * @param str String
+ * @param rStr String
  */
-void MemStream::Write_string(const String& str) {
-    Write(str.CStr(), str.Length());
+void MemStream::Write_string(const String& rStr) {
+    Write(rStr.CStr(), rStr.Length());
     Write_s8(0x00);
 }
 

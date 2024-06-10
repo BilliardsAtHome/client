@@ -24,10 +24,10 @@ enum EStorage {
 struct FileRipperArg {
     // Where the file contents are stored.
     // Leave this as NULL to have the ripper allocate memory
-    void* dst;
+    void* pDst;
 
     // Where the file size is stored
-    u32* size;
+    u32* pSize;
 
     // Memory region to use if the ripper must allocate its own destination
     // buffer
@@ -36,7 +36,7 @@ struct FileRipperArg {
     /**
      * @brief Constructor
      */
-    FileRipperArg() : dst(NULL), size(NULL), region(EMemory_MEM2) {}
+    FileRipperArg() : pDst(NULL), pSize(NULL), region(EMemory_MEM2) {}
 };
 
 /**
@@ -47,32 +47,32 @@ public:
     /**
      * @brief Rips a file's contents
      *
-     * @param path Path to the file
+     * @param rPath Path to the file
      * @param where Storage device on which the file is located
-     * @param arg Ripping parameters
+     * @param rArg Ripping parameters
      * @return File data (owned by you!)
      */
-    static void* Rip(const String& path, EStorage where,
-                     const FileRipperArg& arg = FileRipperArg());
+    static void* Rip(const String& rPath, EStorage where,
+                     const FileRipperArg& rArg = FileRipperArg());
 
     /**
      * @brief Rips a file's contents
      *
-     * @param strm Stream to the file
-     * @param arg Ripping parameters
+     * @param rStrm Stream to the file
+     * @param rArg Ripping parameters
      * @return File data (owned by you!)
      */
-    static void* Rip(FileStream& strm,
-                     const FileRipperArg& arg = FileRipperArg());
+    static void* Rip(FileStream& rStrm,
+                     const FileRipperArg& rArg = FileRipperArg());
 
     /**
      * @brief Rips a file's contents and opens a stream to it
      *
-     * @param path Path to the file
+     * @param rPath Path to the file
      * @param where Storage device on which the file is located
      * @return File stream
      */
-    static MemStream Open(const String& path, EStorage where);
+    static MemStream Open(const String& rPath, EStorage where);
 };
 
 } // namespace kiwi

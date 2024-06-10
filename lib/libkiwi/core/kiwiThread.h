@@ -38,9 +38,9 @@ protected:
     /**
      * @brief Sets a function for this thread to run
      *
-     * @param addr Function address (new SRR0 value)
+     * @param pAddr Function address (new SRR0 value)
      */
-    void SetFunction(const void* addr);
+    void SetFunction(const void* pAddr);
     /**
      * @brief Sets a GPR's value in this thread
      *
@@ -52,11 +52,11 @@ protected:
     /**
      * @brief Sets a member function to run on this thread
      *
-     * @param fn Function
-     * @param obj Class instance
+     * @param pFunc Function
+     * @param rObj Class instance
      */
     template <typename TFunc, typename TClass>
-    void SetMemberFunction(TFunc fn, const TClass& obj);
+    void SetMemberFunction(TFunc pFunc, const TClass& rObj);
 
 private:
     OSThread* mpOSThread; // RVL thread
@@ -91,26 +91,26 @@ public:
     /**
      * @brief Constructor
      *
-     * @param fn Static, no-parameter function
+     * @param pFunc Static, no-parameter function
      */
-    template <typename TRet> Thread(TRet (*fn)()) {
-        K_ASSERT(fn != NULL);
+    template <typename TRet> Thread(TRet (*pFunc)()) {
+        K_ASSERT(pFunc != NULL);
 
-        SetFunction(fn);
+        SetFunction(pFunc);
         Start();
     }
 
     /**
      * @brief Constructor
      *
-     * @param fn Static, single-parameter function
-     * @param arg Function argument
+     * @param pFunc Static, single-parameter function
+     * @param pArg Function argument
      */
-    template <typename TRet> Thread(TRet (*fn)(Param), Param arg) {
-        K_ASSERT(fn != NULL);
+    template <typename TRet> Thread(TRet (*pFunc)(Param), Param pArg) {
+        K_ASSERT(pFunc != NULL);
 
-        SetFunction(fn);
-        SetGPR(3, BitCast<u32>(arg));
+        SetFunction(pFunc);
+        SetGPR(3, BitCast<u32>(pArg));
         Start();
     }
 
@@ -121,30 +121,30 @@ public:
     /**
      * @brief Constructor
      *
-     * @param fn No-parameter member function
-     * @param obj Class instance
+     * @param pFunc No-parameter member function
+     * @param rObj Class instance
      */
     template <typename TRet, typename TClass>
-    Thread(TRet (TClass::*fn)(), TClass& obj) {
-        K_ASSERT(fn != NULL);
+    Thread(TRet (TClass::*pFunc)(), TClass& rObj) {
+        K_ASSERT(pFunc != NULL);
 
-        SetMemberFunction(fn, obj);
+        SetMemberFunction(pFunc, rObj);
         Start();
     }
 
     /**
      * @brief Constructor
      *
-     * @param fn Single-parameter member function
-     * @param obj Class instance
-     * @param arg Function argument
+     * @param pFunc Single-parameter member function
+     * @param rObj Class instance
+     * @param pArg Function argument
      */
     template <typename TRet, typename TClass>
-    Thread(TRet (TClass::*fn)(Param), TClass& obj, Param arg) {
-        K_ASSERT(fn != NULL);
+    Thread(TRet (TClass::*pFunc)(Param), TClass& rObj, Param pArg) {
+        K_ASSERT(pFunc != NULL);
 
-        SetMemberFunction(fn, obj);
-        SetGPR(4, BitCast<u32>(arg));
+        SetMemberFunction(pFunc, rObj);
+        SetGPR(4, BitCast<u32>(pArg));
         Start();
     }
 
@@ -155,30 +155,30 @@ public:
     /**
      * @brief Constructor
      *
-     * @param fn No-parameter, const member function
-     * @param obj Class instance
+     * @param pFunc No-parameter, const member function
+     * @param rObj Class instance
      */
     template <typename TRet, typename TClass>
-    Thread(TRet (TClass::*fn)() const, const TClass& obj) {
-        K_ASSERT(fn != NULL);
+    Thread(TRet (TClass::*pFunc)() const, const TClass& rObj) {
+        K_ASSERT(pFunc != NULL);
 
-        SetMemberFunction(fn, obj);
+        SetMemberFunction(pFunc, rObj);
         Start();
     }
 
     /**
      * @brief Constructor
      *
-     * @param fn Single-parameter, const member function
-     * @param obj Class instance
-     * @param arg Function argument
+     * @param pFunc Single-parameter, const member function
+     * @param rObj Class instance
+     * @param pArg Function argument
      */
     template <typename TRet, typename TClass>
-    Thread(TRet (TClass::*fn)(Param) const, const TClass& obj, Param arg) {
-        K_ASSERT(fn != NULL);
+    Thread(TRet (TClass::*pFunc)(Param) const, const TClass& rObj, Param pArg) {
+        K_ASSERT(pFunc != NULL);
 
-        SetMemberFunction(fn, obj);
-        SetGPR(4, BitCast<u32>(arg));
+        SetMemberFunction(pFunc, rObj);
+        SetGPR(4, BitCast<u32>(pArg));
         Start();
     }
 };
@@ -192,31 +192,32 @@ struct MemberFunction {
     s32 toff; // 'This' pointer offset for target object type
     s32 voff; // Vtable offset into class
     union {
-        s32 foff;   // Function offset into vtable
-        void* addr; // Raw function address (if voff is -1)
+        s32 foff;    // Function offset into vtable
+        void* pAddr; // Raw function address (if voff is -1)
     };
 };
 
 /**
  * @brief Sets a member function to run on this thread
  *
- * @param fn Function
- * @param obj Class instance
+ * @param pFunc Function
+ * @param rObj Class instance
  */
 template <typename TFunc, typename TClass>
-K_DONT_INLINE void ThreadImpl::SetMemberFunction(TFunc fn, const TClass& obj) {
+K_DONT_INLINE void ThreadImpl::SetMemberFunction(TFunc pFunc,
+                                                 const TClass& rObj) {
     K_STATIC_ASSERT_EX(sizeof(TFunc) == sizeof(MemberFunction),
                        "Not a member function");
 
-    register const MemberFunction* ptmf;
+    register const MemberFunction* pPtmf;
     register u32 self;
 
     // clang-format off
     asm volatile {
-        mr ptmf, r4 // fn  -> ptmf
-        mr self, r5 // obj -> self
+        mr pPtmf, r4 // pFunc -> pPtmf
+        mr self, r5 // rObj   -> self
     }
-    K_ASSERT(ptmf != NULL);
+    K_ASSERT(pPtmf != NULL);
     K_ASSERT(self != NULL);
     // clang-format on
 
@@ -224,21 +225,21 @@ K_DONT_INLINE void ThreadImpl::SetMemberFunction(TFunc fn, const TClass& obj) {
     K_ASSERT(mpOSThread->state == OS_THREAD_STATE_READY);
 
     // Adjust this pointer
-    self += ptmf->toff;
+    self += pPtmf->toff;
     SetGPR(3, self);
 
     // Non-virtual function?
-    if (ptmf->voff == -1) {
-        SetFunction(ptmf->addr);
+    if (pPtmf->voff == -1) {
+        SetFunction(pPtmf->pAddr);
         return;
     }
 
     // Find virtual function table
-    const void** vt = BitCast<const void**>(self + ptmf->voff);
+    const void** pVtbl = BitCast<const void**>(self + pPtmf->voff);
 
     // Find virtual function address
-    K_ASSERT(ptmf->foff >= 0);
-    SetFunction(vt[ptmf->foff / sizeof(void*)]);
+    K_ASSERT(pPtmf->foff >= 0);
+    SetFunction(pVtbl[pPtmf->foff / sizeof(void*)]);
 }
 
 } // namespace detail

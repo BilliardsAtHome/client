@@ -36,30 +36,30 @@ TList<ISceneHook>& SceneHookMgr::GetActiveHooks() {
 /**
  * @brief Registers new hook
  *
- * @param hook Scene hook
+ * @param rHook Scene hook
  * @param id Scene ID (-1 for all scenes)
  */
-void SceneHookMgr::AddHook(ISceneHook& hook, s32 id) {
+void SceneHookMgr::AddHook(ISceneHook& rHook, s32 id) {
     if (id == -1) {
-        mGlobalHooks.PushBack(&hook);
+        mGlobalHooks.PushBack(&rHook);
     } else {
         K_ASSERT_EX(id < ESceneID_Max, "Only game scenes have hooks");
-        mHookLists[id].PushBack(&hook);
+        mHookLists[id].PushBack(&rHook);
     }
 }
 
 /**
  * @brief Unregisters existing hook
  *
- * @param hook Scene hook
+ * @param rHook Scene hook
  * @param id Scene ID (-1 for all scenes)
  */
-void SceneHookMgr::RemoveHook(const ISceneHook& hook, s32 id) {
+void SceneHookMgr::RemoveHook(const ISceneHook& rHook, s32 id) {
     if (id == -1) {
-        mGlobalHooks.Remove(&hook);
+        mGlobalHooks.Remove(&rHook);
     } else {
         K_ASSERT_EX(id < ESceneID_Max, "Only game scenes have hooks");
-        mHookLists[id].Remove(&hook);
+        mHookLists[id].Remove(&rHook);
     }
 }
 

@@ -135,7 +135,7 @@ public:
      * @brief Scene information
      */
     struct Info {
-        RPSysScene* (*ct)();      // Scene create function (for user scenes)
+        RPSysScene* (*pCt)();     // Scene create function (for user scenes)
         String name;              // Scene name
         String dir;               // Resource directory
         s32 id;                   // Scene ID (for RP scenes)
@@ -150,8 +150,10 @@ public:
 
     /**
      * @brief Registers user scene class
+     *
+     * @param rInfo Scene info
      */
-    static void RegistScene(const Info& info);
+    static void RegistScene(const Info& rInfo);
 
     /**
      * @brief Fades out into a new scene

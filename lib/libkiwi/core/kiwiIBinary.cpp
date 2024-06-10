@@ -6,38 +6,38 @@ namespace kiwi {
  * @brief Deserializes binary contents after ensuring they belong to this
  * class
  *
- * @param bin Binary contents
+ * @param pBin Binary contents
  */
-void IBinary::Deserialize(const void* bin) {
-    K_ASSERT(bin != NULL);
-    const Header& header = *static_cast<const Header*>(bin);
+void IBinary::Deserialize(const void* pBin) {
+    K_ASSERT(pBin != NULL);
+    const Header& rHeader = *static_cast<const Header*>(pBin);
 
     // Check header kind
-    K_ASSERT_EX(GetBinaryKind() == header.block.kind,
-                "Not for this class. Got %08X (%s)", header.block.kind,
-                header.block.Kind());
+    K_ASSERT_EX(GetBinaryKind() == rHeader.block.kind,
+                "Not for this class. Got %08X (%s)", rHeader.block.kind,
+                rHeader.block.Kind());
 
     // Check header version
-    K_ASSERT_EX(GetVersion() == header.version,
+    K_ASSERT_EX(GetVersion() == rHeader.version,
                 "Not for this version. Expected %04X, got %04X", GetVersion(),
-                header.version);
+                rHeader.version);
 
-    DeserializeImpl(header);
+    DeserializeImpl(rHeader);
 }
 
 /**
  * @brief Serializes binary contents
  *
- * @param bin Binary contents
+ * @param pBin Binary contents
  */
-void IBinary::Serialize(void* bin) const {
-    K_ASSERT(bin != NULL);
-    Header& header = *static_cast<Header*>(bin);
+void IBinary::Serialize(void* pBin) const {
+    K_ASSERT(pBin != NULL);
+    Header& rHeader = *static_cast<Header*>(pBin);
 
-    header.version = GetVersion();
-    header.block.kind = GetBinaryKind();
+    rHeader.version = GetVersion();
+    rHeader.block.kind = GetBinaryKind();
 
-    SerializeImpl(header);
+    SerializeImpl(rHeader);
 }
 
 } // namespace kiwi

@@ -55,7 +55,7 @@ KOKESHI_BY_PACK(KM_BRANCH(0x80183098, Load), // Wii Sports
  * @param size Block size
  * @param sys Use system (MEM1) heap
  */
-void* Alloc(std::size_t size, bool sys) {
+void* Alloc(size_t size, bool sys) {
     return RP_GET_INSTANCE(RPSysSystem)
         ->alloc(sys ? RPSysSystem::getRootHeapMem1()
                     : RPSysSystem::getRootHeapMem2(),

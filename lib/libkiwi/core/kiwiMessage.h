@@ -39,9 +39,9 @@ public:
     /**
      * @brief Constructor
      *
-     * @param bin Binary file (KMSG)
+     * @param pBin Binary file (KMSG)
      */
-    explicit Message(const void* bin);
+    explicit Message(const void* pBin);
 
     /**
      * @brief Gets the kind/magic of this object
@@ -80,15 +80,15 @@ private:
     /**
      * @brief Deserializes binary contents (internal implementation)
      *
-     * @param header Binary file header
+     * @param rHeader Binary file header
      */
-    virtual void DeserializeImpl(const Header& header);
+    virtual void DeserializeImpl(const Header& rHeader);
     /**
      * @brief Serializes binary contents (internal implementation)
      *
-     * @param header Binary file header
+     * @param rHeader Binary file header
      */
-    virtual void SerializeImpl(Header& header) const;
+    virtual void SerializeImpl(Header& rHeader) const;
 
 private:
     Header* mpHeader;             // Binary file header

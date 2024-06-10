@@ -3,6 +3,7 @@
 #include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
+#include <libkiwi/util/kiwiPtrUtil.h>
 
 namespace kiwi {
 
@@ -102,10 +103,10 @@ public:
      * @brief Tests whether a given buffer pointer fits the alignment required
      * by this stream type
      *
-     * @param ptr Specified buffer pointer
+     * @param pBuffer Specified buffer pointer
      */
-    bool IsBufferAlign(const void* ptr) const {
-        return reinterpret_cast<u32>(ptr) % GetBufferAlign() == 0;
+    bool IsBufferAlign(const void* pBuffer) const {
+        return PtrUtil::IsAlignedPointer(pBuffer, GetBufferAlign());
     }
 
     /**
@@ -119,30 +120,30 @@ public:
     /**
      * @brief Reads data from this stream
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param size Number of bytes to read
      * @return Number of bytes read, or DVD error code
      */
-    s32 Read(void* dst, u32 size);
+    s32 Read(void* pDst, u32 size);
 
     /**
      * @brief Writes data to this stream
      *
-     * @param src Source buffer
+     * @param pSrc Source buffer
      * @param size Number of bytes to write
      * @return Number of bytes written, or DVD error code
      */
-    s32 Write(const void* src, u32 size);
+    s32 Write(const void* pSrc, u32 size);
 
     /**
      * @brief Reads data from this stream without advancing the stream's
      * position (internal implementation)
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param size Number of bytes to read
      * @return Number of bytes read, or DVD error code
      */
-    s32 Peek(void* dst, u32 size);
+    s32 Peek(void* pDst, u32 size);
 
 protected:
     /**
@@ -156,30 +157,30 @@ protected:
     /**
      * @brief Reads data from this stream (internal implementation)
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param size Number of bytes to read
      * @return Number of bytes read, or error code
      */
-    virtual s32 ReadImpl(void* dst, u32 size) = 0;
+    virtual s32 ReadImpl(void* pDst, u32 size) = 0;
 
     /**
      * @brief Writes data to this stream (internal implementation)
      *
-     * @param src Source buffer
+     * @param pSrc Source buffer
      * @param size Number of bytes to write
      * @return Number of bytes written, or error code
      */
-    virtual s32 WriteImpl(const void* src, u32 size) = 0;
+    virtual s32 WriteImpl(const void* pSrc, u32 size) = 0;
 
     /**
      * @brief Reads data from this stream without advancing the stream's
      * position (internal implementation)
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param size Number of bytes to read
      * @return Number of bytes read, or error code
      */
-    virtual s32 PeekImpl(void* dst, u32 size) = 0;
+    virtual s32 PeekImpl(void* pDst, u32 size) = 0;
 
 protected:
     bool mIsOpen;  // Stream open flag

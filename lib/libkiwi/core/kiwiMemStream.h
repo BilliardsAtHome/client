@@ -22,36 +22,36 @@ public:
     /**
      * @brief Constructor
      *
-     * @param buffer Buffer
+     * @param pBuffer Buffer
      * @param size Buffer size
      * @param owns Whether the stream owns the buffer
      */
-    MemStream(void* buffer, u32 size, bool owns = false)
+    MemStream(void* pBuffer, u32 size, bool owns = false)
         : FileStream(EOpenMode_RW) {
-        Open(buffer, size, owns);
+        Open(pBuffer, size, owns);
     }
 
     /**
      * @brief Constructor
      * @details For const pointer
      *
-     * @param buffer Read-only buffer
+     * @param pBuffer Read-only buffer
      * @param size Buffer size
      * @param owns Whether the stream owns the buffer
      */
-    MemStream(const void* buffer, u32 size, bool owns = false)
+    MemStream(const void* pBuffer, u32 size, bool owns = false)
         : FileStream(EOpenMode_Read) {
-        Open(const_cast<void*>(buffer), size, owns);
+        Open(const_cast<void*>(pBuffer), size, owns);
     }
 
     /**
      * @brief Constructor
      * @details For work buffer
      *
-     * @param buffer Work buffer
+     * @param rBuffer Work buffer
      */
-    explicit MemStream(const WorkBuffer& buffer) : FileStream(EOpenMode_RW) {
-        Open(buffer.Contents(), buffer.Size(), false);
+    explicit MemStream(const WorkBuffer& rBuffer) : FileStream(EOpenMode_RW) {
+        Open(rBuffer.Contents(), rBuffer.Size(), false);
     }
 
     /**
@@ -63,11 +63,19 @@ public:
     }
 
     /**
+     * @brief Opens stream to a memory buffer
+     *
+     * @param pBuffer Buffer
+     * @param size Buffer size
+     * @param owns Whether the stream owns the buffer
+     */
+    void Open(void* pBuffer, u32 size, bool owns = false);
+    /**
      * @brief Closes this stream
      */
     virtual void Close() {
         if (IsOpen() && mOwnsBuffer) {
-            delete mBufferData;
+            delete mpBuffer;
         }
     }
 
@@ -116,26 +124,6 @@ public:
         return 4;
     }
 
-    /**
-     * @brief Opens stream to a memory buffer
-     *
-     * @param buffer Buffer
-     * @param size Buffer size
-     * @param owns Whether the stream owns the buffer
-     */
-    void Open(void* buffer, u32 size, bool owns = false) {
-        // Close existing buffer
-        if (IsOpen()) {
-            Close();
-        }
-
-        mBufferData = static_cast<u8*>(buffer);
-        mBufferSize = size;
-        mOwnsBuffer = owns;
-
-        mIsOpen = mBufferData != NULL;
-    }
-
 /**
  * @brief Helper for declaring stream functions for primitive types
  */
@@ -173,9 +161,9 @@ public:
     /**
      * @brief Writes a C-style string to this stream
      *
-     * @param str String
+     * @param rStr String
      */
-    void Write_string(const String& str);
+    void Write_string(const String& rStr);
 
     /**
      * @brief Reads a C-style string from this stream without advancing the
@@ -196,33 +184,33 @@ private:
     /**
      * @brief Reads data from this stream (internal implementation)
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param size Number of bytes to read
      * @return Number of bytes read, or error code
      */
-    virtual s32 ReadImpl(void* dst, u32 size);
+    virtual s32 ReadImpl(void* pDst, u32 size);
 
     /**
      * @brief Writes data to this stream (internal implementation)
      *
-     * @param src Source buffer
+     * @param pSrc Source buffer
      * @param size Number of bytes to write
      * @return Number of bytes written, or error code
      */
-    virtual s32 WriteImpl(const void* src, u32 size);
+    virtual s32 WriteImpl(const void* pSrc, u32 size);
 
     /**
      * @brief Reads data from this stream without advancing the stream's
      * position (internal implementation)
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param size Number of bytes to read
      * @return Number of bytes read, or error code
      */
-    virtual s32 PeekImpl(void* dst, u32 size);
+    virtual s32 PeekImpl(void* pDst, u32 size);
 
 private:
-    u8* mBufferData;  // Memory buffer
+    u8* mpBuffer;     // Memory buffer
     u32 mBufferSize;  // Buffer size
     bool mOwnsBuffer; // Whether the stream owns the buffer
 };

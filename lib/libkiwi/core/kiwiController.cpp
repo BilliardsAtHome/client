@@ -44,10 +44,10 @@ u32 WiiCtrl::ConvertMask(u32 mask) {
 const WiiCtrl& CtrlMgr::GetWiiCtrl(EPlayer i) {
     K_ASSERT(i < EPlayer_Max);
 
-    EGG::CoreController* base = getNthController(i);
-    K_ASSERT(base != NULL);
+    EGG::CoreController* pBase = getNthController(i);
+    K_ASSERT(pBase != NULL);
 
-    return *reinterpret_cast<WiiCtrl*>(base);
+    return *reinterpret_cast<WiiCtrl*>(pBase);
 }
 
 } // namespace kiwi

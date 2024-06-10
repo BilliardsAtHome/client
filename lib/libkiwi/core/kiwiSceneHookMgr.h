@@ -23,18 +23,18 @@ public:
     /**
      * @brief Registers new hook
      *
-     * @param hook Scene hook
+     * @param rHook Scene hook
      * @param id Scene ID (-1 for all scenes)
      */
-    void AddHook(ISceneHook& hook, s32 id);
+    void AddHook(ISceneHook& rHook, s32 id);
 
     /**
      * @brief Unregisters existing hook
      *
-     * @param hook Scene hook
+     * @param rHook Scene hook
      * @param id Scene ID (-1 for all scenes)
      */
-    void RemoveHook(const ISceneHook& hook, s32 id);
+    void RemoveHook(const ISceneHook& rHook, s32 id);
 
 private:
     LIBKIWI_KAMEK_PUBLIC
@@ -106,41 +106,41 @@ public:
      * @brief Configure callback
      * @details Ran once on initial scene setup
      */
-    virtual void Configure(RPSysScene* scene) {}
+    virtual void Configure(RPSysScene* pScene) {}
 
     /**
      * @brief LoadResource callback
      * @details Ran once on asset loading
      */
-    virtual void LoadResource(RPSysScene* scene) {}
+    virtual void LoadResource(RPSysScene* pScene) {}
 
     /**
      * @brief Reset callback (before game logic)
      * @details Ran once on initial scene setup and on every restart
      */
-    virtual void BeforeReset(RPSysScene* scene) {}
+    virtual void BeforeReset(RPSysScene* pScene) {}
     /**
      * @brief Reset callback (after game logic)
      * @details Ran once on initial scene setup and on every restart
      */
-    virtual void AfterReset(RPSysScene* scene) {}
+    virtual void AfterReset(RPSysScene* pScene) {}
 
     /**
      * @brief Calculate callback (before game logic)
      * @details Ran once per frame
      */
-    virtual void BeforeCalculate(RPSysScene* scene) {}
+    virtual void BeforeCalculate(RPSysScene* pScene) {}
     /**
      * @brief Calculate callback (after game logic)
      * @details Ran once per frame
      */
-    virtual void AfterCalculate(RPSysScene* scene) {}
+    virtual void AfterCalculate(RPSysScene* pScene) {}
 
     /**
      * @brief Exit callback
      * @details Ran once on scene exit (including restarts)
      */
-    virtual void Exit(RPSysScene* scene) {}
+    virtual void Exit(RPSysScene* pScene) {}
 
     /**
      * @brief Pause callback
@@ -148,7 +148,7 @@ public:
      *
      * @param enter Whether the pause menu is opening
      */
-    virtual void Pause(RPSysScene* scene, bool enter) {}
+    virtual void Pause(RPSysScene* pScene, bool enter) {}
 
 private:
     s32 mSceneID; // Scene to which this hook belongs

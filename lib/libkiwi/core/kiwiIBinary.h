@@ -63,29 +63,29 @@ public:
      * @brief Deserializes binary contents after ensuring they belong to this
      * class
      *
-     * @param bin Binary contents
+     * @param pBin Binary contents
      */
-    void Deserialize(const void* bin);
+    void Deserialize(const void* pBin);
     /**
      * @brief Serializes binary contents
      *
-     * @param bin Binary contents
+     * @param pBin Binary contents
      */
-    void Serialize(void* bin) const;
+    void Serialize(void* pBin) const;
 
 private:
     /**
      * @brief Deserializes binary contents (internal implementation)
      *
-     * @param header Binary file header
+     * @param rHeader Binary file header
      */
-    virtual void DeserializeImpl(const Header& header) = 0;
+    virtual void DeserializeImpl(const Header& rHeader) = 0;
     /**
      * @brief Serializes binary contents (internal implementation)
      *
-     * @param header Binary file header
+     * @param rHeader Binary file header
      */
-    virtual void SerializeImpl(Header& header) const = 0;
+    virtual void SerializeImpl(Header& rHeader) const = 0;
 };
 
 } // namespace kiwi

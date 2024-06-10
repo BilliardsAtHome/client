@@ -34,30 +34,30 @@ public:
      * @param size Block size
      * @param align Block alignment
      * @param memory Target memory region
-     * @return void* Pointer to allocated block
+     * @return Pointer to allocated block
      */
-    void* Alloc(u32 size, s32 align, EMemory region);
+    void* Alloc(u32 size, s32 align, EMemory region) const;
 
     /**
      * @brief Frees a block of memory
      *
-     * @param block Block
+     * @param pBlock Block
      */
-    void Free(void* block);
+    void Free(void* pBlock) const;
 
     /**
      * @brief Gets total size of available heap memory
      *
      * @param memory Target memory region
      */
-    u32 GetFreeSize(EMemory region);
+    u32 GetFreeSize(EMemory region) const;
 
     /**
      * @brief Tests whether an address points to an allocation from this manager
      *
-     * @param addr Memory address
+     * @param pAddr Memory address
      */
-    bool IsHeapMemory(const void* addr) const;
+    bool IsHeapMemory(const void* pAddr) const;
 
 private:
     /**
@@ -68,6 +68,20 @@ private:
      * @brief Destructor
      */
     ~MemoryMgr();
+
+    /**
+     * @brief Gets the heap corresponding to the specified memory region
+     *
+     * @param memory Target memory region
+     */
+    EGG::Heap* GetHeap(EMemory memory) const {
+        K_ASSERT(memory < EMemory_Max);
+
+        EGG::Heap* pHeap = memory == EMemory_MEM1 ? mpHeapMEM1 : mpHeapMEM2;
+        K_ASSERT(pHeap != NULL);
+
+        return pHeap;
+    }
 
 private:
     EGG::Heap* mpHeapMEM1; // Heap in MEM1 region
@@ -83,50 +97,50 @@ private:
  * @brief Allocates a block of memory
  *
  * @param size Block size
- * @return void* Pointer to allocated block
+ * @return Pointer to allocated block
  */
-void* operator new(std::size_t size);
+void* operator new(size_t size);
 /**
  * @brief Allocates a block of memory for an array
  *
  * @param size Block size
- * @return void* Pointer to allocated block
+ * @return Pointer to allocated block
  */
-void* operator new[](std::size_t size);
+void* operator new[](size_t size);
 
 /**
  * @brief Allocates a block of memory
  *
  * @param size Block size
  * @param align Block address alignment
- * @return void* Pointer to allocated block
+ * @return Pointer to allocated block
  */
-void* operator new(std::size_t size, s32 align);
+void* operator new(size_t size, s32 align);
 /**
  * @brief Allocates a block of memory for an array
  *
  * @param size Block size
  * @param align Block address alignment
- * @return void* Pointer to allocated block
+ * @return Pointer to allocated block
  */
-void* operator new[](std::size_t size, s32 align);
+void* operator new[](size_t size, s32 align);
 
 /**
  * @brief Allocates a block of memory
  *
  * @param size Block size
  * @param memory Target memory region
- * @return void* Pointer to allocated block
+ * @return Pointer to allocated block
  */
-void* operator new(std::size_t size, kiwi::EMemory memory);
+void* operator new(size_t size, kiwi::EMemory memory);
 /**
  * @brief Allocates a block of memory for an array
  *
  * @param size Block size
  * @param memory Target memory region
- * @return void* Pointer to allocated block
+ * @return Pointer to allocated block
  */
-void* operator new[](std::size_t size, kiwi::EMemory memory);
+void* operator new[](size_t size, kiwi::EMemory memory);
 
 /**
  * @brief Allocates a block of memory
@@ -134,30 +148,30 @@ void* operator new[](std::size_t size, kiwi::EMemory memory);
  * @param size Block size
  * @param align Block address alignment
  * @param memory Target memory region
- * @return void* Pointer to allocated block
+ * @return Pointer to allocated block
  */
-void* operator new(std::size_t size, s32 align, kiwi::EMemory memory);
+void* operator new(size_t size, s32 align, kiwi::EMemory memory);
 /**
  * @brief Allocates a block of memory for an array
  *
  * @param size Block size
  * @param align Block address alignment
  * @param memory Target memory region
- * @return void* Pointer to allocated block
+ * @return Pointer to allocated block
  */
-void* operator new[](std::size_t size, s32 align, kiwi::EMemory memory);
+void* operator new[](size_t size, s32 align, kiwi::EMemory memory);
 
 /**
  * @brief Frees a block of memory
  *
- * @param block Block
+ * @param pBlock Block
  */
-void operator delete(void* block);
+void operator delete(void* pBlock);
 /**
  * @brief Frees a block of memory used by an array
  *
- * @param block Block
+ * @param pBlock Block
  */
-void operator delete[](void* block);
+void operator delete[](void* pBlock);
 
 #endif

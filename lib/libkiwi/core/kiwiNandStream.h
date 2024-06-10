@@ -22,11 +22,11 @@ public:
     /**
      * @brief Constructor
      *
-     * @param path File path
+     * @param rPath File path
      * @param mode Open mode
      */
-    NandStream(const String& path, EOpenMode mode) : FileStream(mode) {
-        Open(path);
+    NandStream(const String& rPath, EOpenMode mode) : FileStream(mode) {
+        Open(rPath);
     }
 
     /**
@@ -40,10 +40,10 @@ public:
     /**
      * @brief Opens stream to NAND file
      *
-     * @param path File path
+     * @param rPath File path
      * @return Success
      */
-    bool Open(const String& path);
+    bool Open(const String& rPath);
     /**
      * @brief Closes this stream
      */
@@ -99,35 +99,35 @@ private:
      * @param dir Seek direction
      * @param offset Seek offset
      */
-    virtual s32 ReadImpl(void* dst, u32 size);
+    virtual void SeekImpl(ESeekDir dir, s32 offset);
 
     /**
      * @brief Reads data from this stream (internal implementation)
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param size Number of bytes to read
-     * @return Number of bytes read, or NAND error code
+     * @return Number of bytes read, or DVD error code
      */
-    virtual s32 WriteImpl(const void* src, u32 size);
+    virtual s32 ReadImpl(void* pDst, u32 size);
 
     /**
      * @brief Writes data to this stream (internal implementation)
      *
-     * @param src Source buffer
+     * @param pSrc Source buffer
      * @param size Number of bytes to write
-     * @return Number of bytes written, or NAND error code
+     * @return Number of bytes written, or DVD error code
      */
-    virtual s32 PeekImpl(void* dst, u32 size);
+    virtual s32 WriteImpl(const void* pSrc, u32 size);
 
     /**
      * @brief Reads data from this stream without advancing the stream's
      * position (internal implementation)
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param size Number of bytes to read
-     * @return Number of bytes read, or NAND error code
+     * @return Number of bytes read, or DVD error code
      */
-    virtual void SeekImpl(ESeekDir dir, s32 offset);
+    virtual s32 PeekImpl(void* pDst, u32 size);
 
 private:
     NANDFileInfo mFileInfo; // NAND handle

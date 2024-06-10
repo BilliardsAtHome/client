@@ -68,7 +68,7 @@ static const char* scMapfilePath = KOKESHI_MODULE_PATH ".map";
  * @param size Block size
  * @param sys Use system (MEM1) heap
  */
-void* Alloc(std::size_t size, bool sys);
+void* Alloc(size_t size, bool sys);
 
 /**
  * @brief Free memory
