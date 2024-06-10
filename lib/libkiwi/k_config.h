@@ -22,4 +22,16 @@
 #define LIBKIWI_KAMEK_PUBLIC
 #endif
 
+// C++ exclusive options
+#ifdef __cplusplus
+
+// Some versions of CW allow rvalue references (for move semantics)
+#if defined(__MWERKS__) && __option(rvalue_refs)
+#define LIBKIWI_RVALUE_REFS
+#elif __cplusplus >= 199711L
+#define LIBKIWI_RVALUE_REFS
+#endif
+
+#endif // __cplusplus
+
 #endif
