@@ -49,13 +49,12 @@ TMap<TKey, TValue>::ConstIterator::operator++() {
 
 /**
  * @brief Constructor
+ * @details Copy constructor
  *
- * @param other Map to copy
+ * @param rOther Map to copy
  */
 template <typename TKey, typename TValue>
-TMap<TKey, TValue>::TMap(const TMap& other) {
-    // Copy capacity
-    mCapacity = other.mCapacity;
+TMap<TKey, TValue>::TMap(const TMap& rOther) : mCapacity(rOther.mCapacity) {
     K_ASSERT(mCapacity > 0);
     K_ASSERT(mCapacity < HASH_MAX);
 
@@ -64,7 +63,7 @@ TMap<TKey, TValue>::TMap(const TMap& other) {
     K_ASSERT(mpBuckets != NULL);
 
     // Re-insert all members
-    for (ConstIterator it = other.Begin(); it != other.End(); ++it) {
+    for (ConstIterator it = rOther.Begin(); it != rOther.End(); ++it) {
         Insert(it.Key(), it.Value());
     }
 }
@@ -72,26 +71,26 @@ TMap<TKey, TValue>::TMap(const TMap& other) {
 /**
  * @brief Remove a key
  *
- * @param key Key
- * @param[out] removed Removed value
+ * @param rKey Key
+ * @param[out] pRemoved Removed value
  * @return Success
  */
 template <typename TKey, typename TValue>
-bool TMap<TKey, TValue>::Remove(const TKey& key, TValue* removed) {
-    Bucket* bucket = Search(key);
+bool TMap<TKey, TValue>::Remove(const TKey& rKey, TValue* pRemoved) {
+    Bucket* pBucket = Search(rKey);
 
     // Can't remove, doesn't exist
-    if (bucket == NULL) {
+    if (pBucket == NULL) {
         return false;
     }
 
     // Write out value about to be removed
-    if (removed != NULL) {
-        *removed = *bucket->value;
+    if (pRemoved != NULL) {
+        *pRemoved = *pBucket->value;
     }
 
     // Just mark as unused
-    bucket->used = false;
+    pBucket->used = false;
     mSize--;
     return true;
 }
@@ -99,23 +98,23 @@ bool TMap<TKey, TValue>::Remove(const TKey& key, TValue* removed) {
 /**
  * @brief Find key in hashmap
  *
- * @param key Key
+ * @param rKey Key
  */
 template <typename TKey, typename TValue>
-TMap<TKey, TValue>::Bucket* TMap<TKey, TValue>::Search(const TKey& key) const {
+TMap<TKey, TValue>::Bucket* TMap<TKey, TValue>::Search(const TKey& rKey) const {
     // Calculate bucket index
-    u32 i = Hash(key) % mCapacity;
+    u32 i = Hash(rKey) % mCapacity;
 
     // Iterate through chains
-    for (Bucket* it = &mpBuckets[i]; it != NULL; it = it->chained) {
+    for (Bucket* pIt = &mpBuckets[i]; pIt != NULL; pIt = pIt->chained) {
         // Unused entry
-        if (!it->used) {
+        if (!pIt->used) {
             continue;
         }
 
         // Matches key
-        if (*it->key == key) {
-            return it;
+        if (*pIt->key == rKey) {
+            return pIt;
         }
     }
 
@@ -125,20 +124,20 @@ TMap<TKey, TValue>::Bucket* TMap<TKey, TValue>::Search(const TKey& key) const {
 /**
  * @brief Create key in hashmap
  *
- * @param key Key
+ * @param rKey Key
  */
 template <typename TKey, typename TValue>
-TMap<TKey, TValue>::Bucket& TMap<TKey, TValue>::Create(const TKey& key) {
+TMap<TKey, TValue>::Bucket& TMap<TKey, TValue>::Create(const TKey& rKey) {
     // Calculate bucket index
-    u32 i = Hash(key) % mCapacity;
+    u32 i = Hash(rKey) % mCapacity;
 
     // Iterate through chains
-    Bucket* last = NULL;
+    Bucket* pLast = NULL;
     for (Bucket* it = &mpBuckets[i]; it != NULL; it = it->chained) {
         // Unused entry
         if (!it->used) {
             // Override this entry
-            it->key = key;
+            it->key = rKey;
             it->value.Emplace();
             it->used = true;
             mSize++;
@@ -146,23 +145,23 @@ TMap<TKey, TValue>::Bucket& TMap<TKey, TValue>::Create(const TKey& key) {
         }
 
         // Matches key
-        if (*it->key == key) {
+        if (*it->key == rKey) {
             return *it;
         }
 
-        last = it;
+        pLast = it;
     }
 
     // Chain new bucket
-    K_ASSERT(last != NULL);
-    last->chained = new Bucket();
-    K_ASSERT(last->chained != NULL);
+    K_ASSERT(pLast != NULL);
+    pLast->chained = new Bucket();
+    K_ASSERT(pLast->chained != NULL);
 
-    last->chained->key = key;
-    last->chained->value.Emplace();
-    last->chained->used = true;
+    pLast->chained->key = rKey;
+    pLast->chained->value.Emplace();
+    pLast->chained->used = true;
     mSize++;
-    return *last->chained;
+    return *pLast->chained;
 }
 
 } // namespace kiwi

@@ -1,6 +1,7 @@
 #ifndef LIBKIWI_PRIM_LINKLIST_H
 #define LIBKIWI_PRIM_LINKLIST_H
 #include <libkiwi/debug/kiwiAssert.h>
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiNonCopyable.h>
 

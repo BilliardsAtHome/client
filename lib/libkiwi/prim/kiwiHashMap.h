@@ -1,5 +1,6 @@
 #ifndef LIBKIWI_PRIM_HASHMAP_H
 #define LIBKIWI_PRIM_HASHMAP_H
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiLinkList.h>
 #include <libkiwi/prim/kiwiOptional.h>
@@ -11,49 +12,57 @@ typedef u32 hash_t;
 // Largest representable hash
 static const hash_t HASH_MAX = (1 << (sizeof(hash_t) * 8)) - 1;
 
-hash_t HashImpl(const void* key, s32 len);
+/**
+ * @brief Hashes data of a specified size
+ * @details MurmurHash3 algorithm
+ *
+ * @param pKey Key
+ * @param len Key length
+ */
+hash_t HashImpl(const void* pKey, s32 len);
 
 /**
- * @brief Key hasher
- * @note Specialize for your custom types
+ * @brief Hashes a key of any type
+ * @note Specialize this for your custom types
+ *
+ * @param rKey Key
  */
-template <typename TKey> K_INLINE hash_t Hash(const TKey& key) {
-    return HashImpl(&key, sizeof(TKey));
+template <typename TKey> K_INLINE hash_t Hash(const TKey& rKey) {
+    return HashImpl(&rKey, sizeof(TKey));
 }
 
 /**
- * @brief Key/value map
+ * @brief Key/value pair map
  *
- * @brief TODO: Track load factor, expand + re-hash when high
+ * @todo Track load factor, expand + re-hash when high
  */
 template <typename TKey, typename TValue> class TMap {
     friend class ConstIterator; // Access 'Bucket' structure
 
 public:
     // Default bucket count
-    static const u32 DEFAULT_CAPACITY = 32;
+    static const u32 scDefaultCapacity = 32;
 
 private:
     struct Bucket {
         /**
          * @brief Constructor
          */
-        Bucket() : used(false), chained(NULL) {}
+        Bucket() : used(false), pChained(NULL) {}
 
         /**
          * @brief Destructor
          */
         ~Bucket() {
             // Recurse
-            delete chained;
+            delete pChained;
         }
 
-        // Key/value pair
         Optional<TKey> key;
         Optional<TValue> value;
 
-        bool used;       // Bucket is in use
-        Bucket* chained; // Chains
+        bool used;        // Bucket is in use
+        Bucket* pChained; // Chains
     };
 
 public:
@@ -65,12 +74,12 @@ public:
          * @brief Constructor
          *
          * @param capacity Map capacity
-         * @param buckets Array of buckets
+         * @param pBuckets Array of buckets
          */
-        ConstIterator(u32 capacity, const Bucket* buckets)
+        ConstIterator(u32 capacity, const Bucket* pBuckets)
             : mIndex(0),
               mCapacity(capacity),
-              mpBuckets(buckets),
+              mpBuckets(pBuckets),
               mpIter(mpBuckets) {
             // Find first non-empty value
             if (mpIter != NULL && !mpIter->used) {
@@ -141,7 +150,7 @@ public:
      *
      * @param capacity Starting number of buckets
      */
-    TMap(u32 capacity = DEFAULT_CAPACITY)
+    TMap(u32 capacity = scDefaultCapacity)
         : mSize(0), mCapacity(capacity), mpBuckets(NULL) {
         K_ASSERT(mCapacity > 0);
         K_ASSERT(mCapacity < HASH_MAX);
@@ -152,10 +161,11 @@ public:
 
     /**
      * @brief Constructor
+     * @details Copy constructor
      *
-     * @param other Map to copy
+     * @param rOther Map to copy
      */
-    TMap(const TMap& other);
+    TMap(const TMap& rOther);
 
     /**
      * @brief Destructor
@@ -168,50 +178,50 @@ public:
      * @brief Access a value by key
      * @note Inserts key if it does not already exist
      *
-     * @param key Key
+     * @param rKey Key
      * @return Existing value, or new entry
      */
-    TValue& operator[](const TKey& key) {
-        return *Create(key).value;
+    TValue& operator[](const TKey& rKey) {
+        return *Create(rKey).value;
     }
 
     /**
      * @brief Insert a new key or update an existing value
      *
-     * @param key Key
-     * @param value Value
+     * @param rKey Key
+     * @param rValue Value
      */
-    void Insert(const TKey& key, const TValue& value) {
-        Create(key).value = value;
+    void Insert(const TKey& rKey, const TValue& rValue) {
+        Create(rKey).value = rValue;
     }
 
     /**
      * @brief Remove a key
      *
-     * @param key Key
-     * @param[out] removed Removed value
+     * @param rKey Key
+     * @param[out] pRemoved Removed value
      * @return Success
      */
-    bool Remove(const TKey& key, TValue* removed = NULL);
+    bool Remove(const TKey& rKey, TValue* pRemoved = NULL);
 
     /**
      * @brief Look for the value corresponding to a key
      *
-     * @param key Key
+     * @param rKey Key
      * @return Value if it exists
      */
-    TValue* Find(const TKey& key) const {
-        Bucket* bucket = Search(key);
-        return bucket != NULL ? &*bucket->value : NULL;
+    TValue* Find(const TKey& rKey) const {
+        Bucket* pBucket = Search(rKey);
+        return pBucket != NULL ? &*pBucket->value : NULL;
     }
 
     /**
      * @brief Check whether a key exists
      *
-     * @param key Key
+     * @param rKey Key
      */
-    bool Contains(const TKey& key) const {
-        return Find(key) != NULL;
+    bool Contains(const TKey& rKey) const {
+        return Find(rKey) != NULL;
     }
 
     /**
@@ -269,8 +279,8 @@ public:
     }
 
 private:
-    Bucket* Search(const TKey& key) const;
-    Bucket& Create(const TKey& key);
+    Bucket* Search(const TKey& rKey) const;
+    Bucket& Create(const TKey& rKey);
 
 private:
     u32 mSize;         // Number of elements
