@@ -29,11 +29,11 @@ public:
     struct Symbol {
         ELinkType type; // Linkage
         union {
-            void* addr; // Address (unpacked)
-            u32 offset; // Offset (packed)
+            void* pAddr; // Address (unpacked)
+            u32 offset;  // Offset (packed)
         };
-        u32 size;   // Byte size
-        char* name; // Mangled name
+        u32 size;    // Byte size
+        char* pName; // Mangled name
     };
 
 public:
@@ -47,10 +47,10 @@ public:
     /**
      * @brief Opens a map file from the DVD
      *
-     * @param path Map file path
+     * @param rPath Map file path
      * @param type Module linkage type
      */
-    void Open(const String& path, ELinkType type);
+    void Open(const String& rPath, ELinkType type);
     /**
      * @brief Closes map file
      */
@@ -59,16 +59,15 @@ public:
     /**
      * @brief Queries text section symbol
      *
-     * @param addr Symbol address
+     * @param pAddr Symbol address
      */
-    const Symbol* QueryTextSymbol(const void* addr);
+    const Symbol* QueryTextSymbol(const void* pAddr) const;
 
 private:
     /**
      * @brief Constructor
      */
     MapFile();
-
     /**
      * @brief Destructor
      */

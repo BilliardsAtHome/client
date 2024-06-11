@@ -70,20 +70,20 @@ extern "C" {
 /**
  * @brief Logs a message to the console
  *
- * @param msg Message
+ * @param pMsg Message
  * @param ... Format string arguments
  */
-void kiwi_log(const char* msg, ...);
+void kiwi_log(const char* pMsg, ...);
 
 /**
  * @brief Halts the program and displays an error message to the screen/console
  *
- * @param file Source file name where assertion failed
+ * @param pFile Source file name where assertion failed
  * @param line Source file line where assertion failed
- * @param msg Assertion message
+ * @param pMsg Assertion message
  * @param ... Format string arguments
  */
-void kiwi_fail_assert(const char* file, int line, const char* msg, ...);
+void kiwi_fail_assert(const char* pFile, int line, const char* pMsg, ...);
 
 #ifdef __cplusplus
 }

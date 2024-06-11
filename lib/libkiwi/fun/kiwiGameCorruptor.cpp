@@ -8,15 +8,15 @@ namespace {
 /**
  * @brief Selects a random address in the specified range
  *
- * @param begin Beginning of range
- * @param end End of range
+ * @param pBegin Beginning of range
+ * @param pEnd End of range
  */
-void** GetRandomAddr(const void* begin, const void* end) {
-    K_ASSERT(begin != NULL);
-    K_ASSERT(end != NULL);
-    K_ASSERT(end > begin);
+void** GetRandomAddr(const void* pBegin, const void* pEnd) {
+    K_ASSERT(pBegin != NULL);
+    K_ASSERT(pEnd != NULL);
+    K_ASSERT(pEnd > pBegin);
 
-    u32 size = GetOffsetFromPtr(begin, end);
+    u32 size = GetOffsetFromPtr(pBegin, pEnd);
     u32 offset = 0;
 
     do {
@@ -27,7 +27,7 @@ void** GetRandomAddr(const void* begin, const void* end) {
     // Adjusting for alignment may take us out of the range
     while (offset >= size);
 
-    return const_cast<void**>(AddToPtr<void*>(begin, offset));
+    return const_cast<void**>(AddToPtr<void*>(pBegin, offset));
 }
 
 } // namespace
@@ -39,8 +39,8 @@ K_DYNAMIC_SINGLETON_IMPL(GameCorruptor);
  */
 GameCorruptor::GameCorruptor()
     : mDomainFlag(ECorruptDomain_Mem2),
-      mNumCorrupt(DEFAULT_NUM),
-      mInterval(OS_SEC_TO_TICKS(DEFAULT_INTERVAL)) {}
+      mNumCorrupt(scDefaultNum),
+      mInterval(OS_SEC_TO_TICKS(scDefaultInterval)) {}
 
 /**
  * @brief Destructor
@@ -51,10 +51,13 @@ GameCorruptor::~GameCorruptor() {
 
 /**
  * @brief Corruption alarm handler
+ *
+ * @param pAlarm OS alarm
+ * @param pCtx Alarm context
  */
-void GameCorruptor::AlarmHandler(OSAlarm* alarm, OSContext* ctx) {
-#pragma unused(alarm)
-#pragma unused(ctx)
+void GameCorruptor::AlarmHandler(OSAlarm* pAlarm, OSContext* pCtx) {
+#pragma unused(pAlarm)
+#pragma unused(pCtx)
 
     GetInstance().Corrupt();
 }
@@ -97,24 +100,24 @@ void GameCorruptor::Corrupt() const {
 /**
  * @brief Corrupts some code instructions in the specified range
  *
- * @param begin Beginning of range
- * @param end End of range
+ * @param pBegin Beginning of range
+ * @param pEnd End of range
  */
-void GameCorruptor::CorruptCode(const void* begin, const void* end) const {
-    K_LOG_EX("CorruptCode %08X-%08X\n", begin, end);
+void GameCorruptor::CorruptCode(const void* pBegin, const void* pEnd) const {
+    K_LOG_EX("CorruptCode %08X-%08X\n", pBegin, pEnd);
 }
 
 /**
  * @brief Corrupts some pieces of data in the specified range
  *
- * @param begin Beginning of range
- * @param end End of range
+ * @param pBegin Beginning of range
+ * @param pEnd End of range
  */
-void GameCorruptor::CorruptData(const void* begin, const void* end) const {
-    K_LOG_EX("CorruptData %08X-%08X\n", begin, end);
+void GameCorruptor::CorruptData(const void* pBegin, const void* pEnd) const {
+    K_LOG_EX("CorruptData %08X-%08X\n", pBegin, pEnd);
 
     for (int i = 0; i < mNumCorrupt;) {
-        void** addr = GetRandomAddr(begin, end);
+        void** addr = GetRandomAddr(pBegin, pEnd);
 
         // Don't corrupt libkiwi
         if (PtrUtil::IsLibKiwi(addr)) {
@@ -154,6 +157,16 @@ void GameCorruptor::CorruptData(const void* begin, const void* end) const {
 
         i++;
     }
+}
+
+/**
+ * @brief Corrupts some pieces of data in the specified heap
+ *
+ * @param pHeap Heap to corrupt
+ */
+void GameCorruptor::CorruptData(EGG::Heap* pHeap) const {
+    K_ASSERT(pHeap != NULL);
+    CorruptData(pHeap->getStartAddress(), pHeap->getEndAddress());
 }
 
 } // namespace kiwi

@@ -15,9 +15,9 @@ public:
     /**
      * @brief Constructor
      *
-     * @param client Client app ID
+     * @param rClient Client app ID
      */
-    explicit EmuRichPresence(const String& client);
+    explicit EmuRichPresence(const String& rClient);
 
     /**
      * @brief Tests whether there is a connection established

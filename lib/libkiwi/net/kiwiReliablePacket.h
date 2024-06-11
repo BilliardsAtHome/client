@@ -55,10 +55,10 @@ public:
      * @brief Constructor
      *
      * @param size Packet buffer size
-     * @param dest Packet recipient
+     * @param pAddr Packet recipient
      */
-    ReliablePacket(u32 size, const SockAddrAny* dest = NULL)
-        : Packet(size, dest) {}
+    ReliablePacket(u32 size, const SockAddrAny* pAddr = NULL)
+        : Packet(size, pAddr) {}
 
     /**
      * @brief Accesses KUDP protocol header

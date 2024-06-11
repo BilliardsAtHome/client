@@ -70,15 +70,15 @@ public:
      * @brief Assertion info
      */
     struct Assert {
-        const char* file; // Name of source file where assertion occurred
-        int line;         // Line in source file where assertion occurred
-        const char* msg;  // Assertion message/expression
-        const void* sp;   // Stack pointer value when assertion occurred
+        const char* pFile; // Name of source file where assertion occurred
+        int line;          // Line in source file where assertion occurred
+        const char* pMsg;  // Assertion message/expression
+        const void* pSP;   // Stack pointer value when assertion occurred
 
         /**
          * @brief Constructor
          */
-        Assert() : file(""), line(0), msg(""), sp(NULL) {}
+        Assert() : pFile(""), line(0), pMsg(""), pSP(NULL) {}
     };
 
     /**
@@ -86,52 +86,52 @@ public:
      * @see EError, Assert
      */
     struct Info {
-        EError error;   // Exception type
-        OSContext* ctx; // Last context before error
-        u32 dsisr;      // Last DSISR value before error
-        u32 dar;        // Last DAR value before error
-        u32 msr;        // Last MSR value before error
-        Assert assert;  // Assertion info (if assertion failed)
+        EError error;    // Exception type
+        OSContext* pCtx; // Last context before error
+        u32 dsisr;       // Last DSISR value before error
+        u32 dar;         // Last DAR value before error
+        u32 msr;         // Last MSR value before error
+        Assert assert;   // Assertion info (if assertion failed)
 
         /**
          * @brief Constructor
          */
-        Info() : error(EError_None), ctx(NULL), dsisr(0), dar(0), msr(0) {}
+        Info() : error(EError_None), pCtx(NULL), dsisr(0), dar(0), msr(0) {}
     };
 
     /**
      * @brief Exception user callback
      *
-     * @param info Error info
-     * @param arg User callback argument
+     * @param rInfo Error info
+     * @param pArg User callback argument
      */
-    typedef void (*UserCallback)(const Info& info, void* arg);
+    typedef void (*UserCallback)(const Info& rInfo, void* pArg);
 
 public:
     /**
      * @brief Sets user exception callback
      *
-     * @param callback Exception callback function
-     * @param arg Exception callback argument
+     * @param pCallback Exception callback function
+     * @param pArg Exception callback argument
      */
-    void SetUserCallback(UserCallback callback, void* arg);
+    void SetUserCallback(UserCallback pCallback, void* pArg = NULL);
 
     /**
      * @brief Writes text to the exception details
      *
-     * @param fmt Format string
+     * @param pMsg Format string
      * @param ... Format arguments
      */
-    void Printf(const char* fmt, ...);
+    void Printf(const char* pMsg, ...);
 
     /**
      * @brief Triggers an assertion error
      *
-     * @param file Name of source file where assertion occurred
+     * @param pFile Name of source file where assertion occurred
      * @param line Line in source file where assertion occurred
-     * @param msg Assertion message/expression
+     * @param pMsg Assertion message/expression
      */
-    void FailAssert(const char* file, int line, const char* msg);
+    void FailAssert(const char* pFile, int line, const char* pMsg);
 
 private:
     /**
@@ -141,26 +141,29 @@ private:
 
     /**
      * @brief Exception thread main function
+     *
+     * @param pArg Thread function argument
      */
-    static void* ThreadFunc(void* arg);
+    static void* ThreadFunc(void* pArg);
 
     /**
      * @brief Handles errors (exception/assertion)
      *
-     * @param error Exception type
-     * @param ctx Exception context
-     * @param dsisr Last DSISR value
-     * @param dar Last DAR value
+     * @param error Error type
+     * @param pCtx Exception context
+     * @param _dsisr DSISR value
+     * @param _dar DAR value
      */
-    static void ErrorHandler(u8 error, OSContext* ctx, u32 dsisr, u32 dar, ...);
+    static void ErrorHandler(u8 error, OSContext* ctx, u32 _dsisr, u32 _dar,
+                             ...);
 
     /**
      * @brief Allows controlling the console using the D-Pad
      *
-     * @param info Exception info
-     * @param arg Callback argument
+     * @param rInfo Exception info
+     * @param pArg Callback argument
      */
-    static void DefaultCallback(const Info& info, void* arg);
+    static void DefaultCallback(const Info& rInfo, void* pArg);
 
     /**
      * @brief Dumps error information to the console
@@ -200,8 +203,10 @@ private:
     void PrintThankYouMsg();
     /**
      * @brief Prints symbol information using the map file
+     *
+     * @param pAddr Symbol address
      */
-    void PrintSymbol(const void* addr);
+    void PrintSymbol(const void* pAddr);
 
 private:
     Info mErrorInfo; // Exception/assertion info

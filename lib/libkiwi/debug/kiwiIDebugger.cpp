@@ -36,27 +36,27 @@ struct GeckoContext {
     /**
      * @brief Constructor
      *
-     * @param ctx OS context
+     * @param rCtx OS context
      * @param _dsisr DSISR register value
      * @param _dar DAR register value
      */
-    GeckoContext(const OSContext& ctx, u32 _dsisr, u32 _dar);
+    GeckoContext(const OSContext& rCtx, u32 _dsisr, u32 _dar);
 
     /**
      * @brief Loads OS context
      *
-     * @param ctx OS context
+     * @param rCtx OS context
      * @param _dsisr DSISR register value
      * @param _dar DAR register value
      */
-    void Load(const OSContext& ctx, u32 _dsisr, u32 _dar);
+    void Load(const OSContext& rCtx, u32 _dsisr, u32 _dar);
 
     /**
      * @brief Saves to OS context
      *
-     * @param ctx OS context
+     * @param rCtx OS context
      */
-    void Save(OSContext& ctx) const;
+    void Save(OSContext& rCtx) const;
 };
 
 /**
@@ -71,62 +71,67 @@ GeckoContext::GeckoContext()
 /**
  * @brief Constructor
  *
- * @param ctx OS context
+ * @param rCtx OS context
  * @param _dsisr DSISR register value
  * @param _dar DAR register value
  */
-GeckoContext::GeckoContext(const OSContext& ctx, u32 _dsisr, u32 _dar) {
-    Load(ctx, _dsisr, _dar);
+GeckoContext::GeckoContext(const OSContext& rCtx, u32 _dsisr, u32 _dar) {
+    Load(rCtx, _dsisr, _dar);
 }
 
 /**
  * @brief Applies OS context
  *
- * @param ctx OS context
+ * @param rCtx OS context
  * @param _dsisr DSISR register value
  * @param _dar DAR register value
  */
-void GeckoContext::Load(const OSContext& ctx, u32 _dsisr, u32 _dar) {
-    cr = ctx.cr;
-    xer = ctx.xer;
-    ctr = ctx.ctr;
-    srr0 = ctx.srr0;
-    srr1 = ctx.srr1;
-    lr = ctx.lr;
+void GeckoContext::Load(const OSContext& rCtx, u32 _dsisr, u32 _dar) {
+    cr = rCtx.cr;
+    xer = rCtx.xer;
+    ctr = rCtx.ctr;
+    srr0 = rCtx.srr0;
+    srr1 = rCtx.srr1;
+    lr = rCtx.lr;
 
     dsisr = _dsisr;
     dar = _dar;
 
-    std::memcpy(gprs, ctx.gprs, sizeof(gprs));
-    std::memcpy(fprs, ctx.fprs, sizeof(fprs));
+    std::memcpy(gprs, rCtx.gprs, sizeof(gprs));
+    std::memcpy(fprs, rCtx.fprs, sizeof(fprs));
 }
 
 /**
  * @brief Saves to OS context
  *
- * @param ctx OS context
+ * @param rCtx OS context
  */
-void GeckoContext::Save(OSContext& ctx) const {
-    OSInitContext(&ctx, reinterpret_cast<void*>(srr0),
+void GeckoContext::Save(OSContext& rCtx) const {
+    OSInitContext(&rCtx, reinterpret_cast<void*>(srr0),
                   reinterpret_cast<void*>(gprs[1]));
 
-    ctx.cr = cr;
-    ctx.lr = lr;
-    ctx.ctr = ctr;
-    ctx.xer = xer;
-    ctx.fpscr = Mffpscr();
-    ctx.srr1 = srr1;
+    rCtx.cr = cr;
+    rCtx.lr = lr;
+    rCtx.ctr = ctr;
+    rCtx.xer = xer;
+    rCtx.fpscr = Mffpscr();
+    rCtx.srr1 = srr1;
 
-    std::memcpy(ctx.gprs, gprs, sizeof(ctx.gprs));
-    std::memcpy(ctx.fprs, fprs, sizeof(ctx.fprs));
+    std::memcpy(rCtx.gprs, gprs, sizeof(rCtx.gprs));
+    std::memcpy(rCtx.fprs, fprs, sizeof(rCtx.fprs));
 }
 
 /**
  * @brief Breakpoint callback
+ *
+ * @param error Error type
+ * @param pCtx Exception context
+ * @param _dsisr DSISR value
+ * @param _dar DAR value
  */
-void IDebugger::BreakCallback(u8 error, OSContext* ctx, u32 _dsisr, u32 _dar,
+void IDebugger::BreakCallback(u8 error, OSContext* pCtx, u32 _dsisr, u32 _dar,
                               ...) {
-    K_ASSERT(ctx != NULL);
+    K_ASSERT(pCtx != NULL);
     K_ASSERT(error == OS_ERR_IABR ||
              (error == OS_ERR_DSI && (_dsisr & DSISR_DABR)));
 
@@ -135,10 +140,15 @@ void IDebugger::BreakCallback(u8 error, OSContext* ctx, u32 _dsisr, u32 _dar,
 
 /**
  * @brief Step trace callback
+ *
+ * @param error Error type
+ * @param pCtx Exception context
+ * @param _dsisr DSISR value
+ * @param _dar DAR value
  */
-void IDebugger::StepCallback(u8 error, OSContext* ctx, u32 _dsisr, u32 _dar,
+void IDebugger::StepCallback(u8 error, OSContext* pCtx, u32 _dsisr, u32 _dar,
                              ...) {
-    K_ASSERT(ctx != NULL);
+    K_ASSERT(pCtx != NULL);
     K_ASSERT(error == OS_ERR_TRACE);
 
     K_ASSERT_EX(false, "Not yet implemented");
@@ -146,7 +156,6 @@ void IDebugger::StepCallback(u8 error, OSContext* ctx, u32 _dsisr, u32 _dar,
 
 /**
  * @brief Receives and processes the next debugger command
- *
  * @note Call this function when there is input pending
  */
 void IDebugger::Calculate() {
@@ -185,60 +194,60 @@ void IDebugger::Calculate() {
  * @brief Writes a 8-bit value to memory
  */
 void IDebugger::OnEvent_Write8() {
-    u8* dst = NULL;
+    u8* pDst = NULL;
     u32 value = 0;
 
-    if (!ReadObj(dst) || !ReadObj(value)) {
+    if (!ReadObj(pDst) || !ReadObj(value)) {
         return;
     }
 
-    K_ASSERT(dst != NULL);
-    *dst = static_cast<u8>(value);
+    K_ASSERT(pDst != NULL);
+    *pDst = static_cast<u8>(value);
 }
 
 /**
  * @brief Writes a 16-bit value to memory
  */
 void IDebugger::OnEvent_Write16() {
-    u16* dst = NULL;
+    u16* pDst = NULL;
     u32 value = 0;
 
-    if (!ReadObj(dst) || !ReadObj(value)) {
+    if (!ReadObj(pDst) || !ReadObj(value)) {
         return;
     }
 
-    K_ASSERT(dst != NULL);
-    *dst = static_cast<u16>(value);
+    K_ASSERT(pDst != NULL);
+    *pDst = static_cast<u16>(value);
 }
 
 /**
  * @brief Writes a 32-bit value to memory
  */
 void IDebugger::OnEvent_Write32() {
-    u32* dst = NULL;
+    u32* pDst = NULL;
     u32 value = 0;
 
-    if (!ReadObj(dst) || !ReadObj(value)) {
+    if (!ReadObj(pDst) || !ReadObj(value)) {
         return;
     }
 
-    K_ASSERT(dst != NULL);
-    *dst = value;
+    K_ASSERT(pDst != NULL);
+    *pDst = value;
 }
 
 /**
  * @brief Dumps a range of memory
  */
 void IDebugger::OnEvent_ReadN() {
-    const void* start = NULL;
-    const void* end = NULL;
+    const void* pDst = NULL;
+    const void* pEnd = NULL;
 
-    if (!ReadObj(end) || !ReadObj(start)) {
+    if (!ReadObj(pEnd) || !ReadObj(pDst)) {
         return;
     }
 
-    K_ASSERT(end > start);
-    Write(start, PtrDistance(start, end));
+    K_ASSERT(pEnd > pDst);
+    Write(pDst, PtrDistance(pDst, pEnd));
 }
 
 /**

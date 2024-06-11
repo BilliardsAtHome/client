@@ -16,28 +16,28 @@ public:
      * @brief Generic socket operation callback
      *
      * @param result Socket library result
-     * @param arg User callback argument
+     * @param pArg User callback argument
      */
-    typedef void (*Callback)(SOResult result, void* arg);
+    typedef void (*Callback)(SOResult result, void* pArg);
 
     /**
      * @brief Connection accept callback
      *
      * @param result Socket library result
-     * @param peer Peer socket object
-     * @param addr Peer address
-     * @param arg User callback argument
+     * @param pPeer Peer socket object
+     * @param rAddr Peer address
+     * @param pArg User callback argument
      */
-    typedef void (*AcceptCallback)(SOResult result, SocketBase* peer,
-                                   const SockAddrAny& addr, void* arg);
+    typedef void (*AcceptCallback)(SOResult result, SocketBase* pPeer,
+                                   const SockAddrAny& rAddr, void* pArg);
 
 public:
     /**
      * @brief Gets the console's IP address
      *
-     * @param addr[out] IPv4 address
+     * @param rAddr[out] IPv4 address
      */
-    static void GetHostAddr(SockAddr4& addr);
+    static void GetHostAddr(SockAddr4& rAddr);
 
     /**
      * @brief Constructor
@@ -62,32 +62,32 @@ public:
     /**
      * @brief Connects to a peer
      *
-     * @param addr Remote address
-     * @param callback Connection callback
-     * @param arg Callback user argument
+     * @param rAddr Remote address
+     * @param pCallback Connection callback
+     * @param pArg Callback user argument
      * @return Success
      */
-    virtual bool Connect(const SockAddrAny& addr, Callback callback = NULL,
-                         void* arg = NULL) = 0;
+    virtual bool Connect(const SockAddrAny& rAddr, Callback pCallback = NULL,
+                         void* pArg = NULL) = 0;
 
     /**
      * @brief Accepts a peer connection over a new socket
      *
-     * @param callback Acceptance callback
-     * @param arg Callback user argument
+     * @param pCallback Acceptance callback
+     * @param pArg Callback user argument
      * @return New socket
      */
-    virtual SocketBase* Accept(AcceptCallback callback = NULL,
-                               void* arg = NULL) = 0;
+    virtual SocketBase* Accept(AcceptCallback pCallback = NULL,
+                               void* pArg = NULL) = 0;
 
     /**
      * @brief Binds socket to local address
      * @note Bind to port zero for a random port (written out)
      *
-     * @param addr[in,out] Local address
+     * @param rAddr[in,out] Local address
      * @return Success
      */
-    bool Bind(SockAddrAny& addr = SockAddr4()) const;
+    bool Bind(SockAddrAny& rAddr = SockAddr4()) const;
 
     /**
      * @brief Listens for incoming connections
@@ -136,17 +136,17 @@ public:
     /**
      * @brief Gets endpoint of socket
      *
-     * @param[out] addr Socket address
+     * @param[out] rAddr Socket address
      * @return Success
      */
-    bool GetSocketAddr(SockAddrAny& addr) const;
+    bool GetSocketAddr(SockAddrAny& rAddr) const;
     /**
      * @brief Gets endpoint of peer
      *
-     * @param[out] addr Peer address
+     * @param[out] rAddr Peer address
      * @return Success
      */
-    bool GetPeerAddr(SockAddrAny& addr) const;
+    bool GetPeerAddr(SockAddrAny& rAddr) const;
 
     /**
      * @brief Tests whether socket can receive data
@@ -164,52 +164,52 @@ public:
     /**
      * @brief Receives bytes from bound connection
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param len Buffer size
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Number of bytes received
      */
-    Optional<u32> RecvBytes(void* dst, u32 len, Callback callback = NULL,
-                            void* arg = NULL);
+    Optional<u32> RecvBytes(void* pDst, u32 len, Callback pCallback = NULL,
+                            void* pArg = NULL);
     /**
      * @brief Receives bytes and records sender address
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param len Buffer size
-     * @param addr[out] Sender address
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param rAddr[out] Sender address
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Number of bytes received
      */
-    Optional<u32> RecvBytesFrom(void* dst, u32 len, SockAddrAny& addr,
-                                Callback callback = NULL, void* arg = NULL);
+    Optional<u32> RecvBytesFrom(void* pDst, u32 len, SockAddrAny& rAddr,
+                                Callback pCallback = NULL, void* pArg = NULL);
 
     /**
      * @brief Receives object from bound connection
      *
-     * @param dst Destination object
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param rDst Destination object
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Number of bytes received
      */
     template <typename T>
-    Optional<u32> Recv(T& dst, Callback callback = NULL, void* arg = NULL) {
-        return RecvBytes(&dst, sizeof(T), callback, arg);
+    Optional<u32> Recv(T& rDst, Callback pCallback = NULL, void* pArg = NULL) {
+        return RecvBytes(&rDst, sizeof(T), pCallback, pArg);
     }
     /**
      * @brief Receives object and records sender address
      *
-     * @param dst Destination object
-     * @param addr[out] Sender address
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param rDst Destination object
+     * @param rAddr[out] Sender address
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Number of bytes received
      */
     template <typename T>
-    Optional<u32> RecvFrom(T& dst, SockAddrAny& addr, Callback callback = NULL,
-                           void* arg = NULL) {
-        return RecvBytesFrom(&dst, sizeof(T), addr, callback, arg);
+    Optional<u32> RecvFrom(T& rDst, SockAddrAny& rAddr,
+                           Callback pCallback = NULL, void* pArg = NULL) {
+        return RecvBytesFrom(&rDst, sizeof(T), rAddr, pCallback, pArg);
     }
     /**@}*/
 
@@ -220,82 +220,84 @@ public:
     /**
      * @brief Sends bytes to bound connection
      *
-     * @param src Source buffer
+     * @param pSrc Source buffer
      * @param len Buffer size
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Number of bytes sent
      */
-    Optional<u32> SendBytes(const void* src, u32 len, Callback callback = NULL,
-                            void* arg = NULL);
+    Optional<u32> SendBytes(const void* pSrc, u32 len,
+                            Callback pCallback = NULL, void* pArg = NULL);
     /**
      * @brief Sends bytes to specified connection
      *
-     * @param src Source buffer
+     * @param pSrc Source buffer
      * @param len Buffer size
-     * @param addr Destination address
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param rAddr Destination address
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Number of bytes sent
      */
-    Optional<u32> SendBytesTo(const void* src, u32 len, const SockAddrAny& addr,
-                              Callback callback = NULL, void* arg = NULL);
+    Optional<u32> SendBytesTo(const void* pSrc, u32 len,
+                              const SockAddrAny& rAddr,
+                              Callback pCallback = NULL, void* pArg = NULL);
 
     /**
      * @brief Sends object to bound connection
      *
-     * @param src Source object
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param rSrc Source object
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Number of bytes sent
      */
     template <typename T>
-    Optional<u32> Send(const T& src, Callback callback = NULL,
-                       void* arg = NULL) {
-        return SendBytes(&src, sizeof(T), callback, arg);
+    Optional<u32> Send(const T& rSrc, Callback pCallback = NULL,
+                       void* pArg = NULL) {
+        return SendBytes(&rSrc, sizeof(T), pCallback, pArg);
     }
     /**
      * @brief Sends object to specified connection
      *
-     * @param src Source object
-     * @param addr Destination address
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param rSrc Source object
+     * @param rAddr Destination address
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Number of bytes sent
      */
     template <typename T>
-    Optional<u32> SendTo(const T& src, const SockAddrAny& addr,
-                         Callback callback = NULL, void* arg = NULL) {
-        return SendBytesTo(&src, sizeof(T), addr, callback, arg);
+    Optional<u32> SendTo(const T& rSrc, const SockAddrAny& rAddr,
+                         Callback pCallback = NULL, void* pArg = NULL) {
+        return SendBytesTo(&rSrc, sizeof(T), rAddr, pCallback, pArg);
     }
 
     /**
      * @brief Sends string to bound connection
      *
-     * @param src Source string
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param rSrc Source string
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Number of bytes sent
      */
     template <typename T>
-    Optional<u32> Send(const StringImpl<T>& src, Callback callback = NULL,
-                       void* arg = NULL) {
-        return SendBytes(src.CStr(), src.Length() * sizeof(T), callback, arg);
+    Optional<u32> Send(const StringImpl<T>& rSrc, Callback pCallback = NULL,
+                       void* pArg = NULL) {
+        return SendBytes(rSrc.CStr(), rSrc.Length() * sizeof(T), pCallback,
+                         pArg);
     }
     /**
      * @brief Sends string to specified connection
      *
-     * @param src Source string
-     * @param addr Destination address
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param rSrc Source string
+     * @param rAddr Destination address
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Number of bytes sent
      */
     template <typename T>
-    Optional<u32> SendTo(const StringImpl<T>& src, const SockAddrAny& addr,
-                         Callback callback = NULL, void* arg = NULL) {
-        return SendBytesTo(src.CStr(), src.Length() * sizeof(T), addr, callback,
-                           arg);
+    Optional<u32> SendTo(const StringImpl<T>& rSrc, const SockAddrAny& rAddr,
+                         Callback pCallback = NULL, void* pArg = NULL) {
+        return SendBytesTo(rSrc.CStr(), rSrc.Length() * sizeof(T), rAddr,
+                           pCallback, pArg);
     }
     /**@}*/
 
@@ -313,31 +315,32 @@ private:
     /**
      * @brief Receives data and records sender address (internal implementation)
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param len Buffer size
-     * @param[out] nrecv Number of bytes received
-     * @param[out] addr Sender address
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param[out] rRecv Number of bytes received
+     * @param[out] pAddr Sender address
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Socket library result
      */
-    virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SockAddrAny* addr,
-                              Callback callback, void* arg) = 0;
+    virtual SOResult RecvImpl(void* pDst, u32 len, u32& rRecv,
+                              SockAddrAny* pAddr, Callback pCallback,
+                              void* pArg) = 0;
 
     /**
      * @brief Sends data to specified connection (internal implementation)
      *
-     * @param src Source buffer
+     * @param pSrc Source buffer
      * @param len Buffer size
-     * @param[out] nsend Number of bytes sent
-     * @param addr Sender address
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param[out] rSend Number of bytes sent
+     * @param pAddr Sender address
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Socket library result
      */
-    virtual SOResult SendImpl(const void* src, u32 len, u32& nsend,
-                              const SockAddrAny* addr, Callback callback,
-                              void* arg) = 0;
+    virtual SOResult SendImpl(const void* pSrc, u32 len, u32& rSend,
+                              const SockAddrAny* pAddr, Callback pCallback,
+                              void* pArg) = 0;
 
 protected:
     SOSocket mHandle;      // File descriptor

@@ -24,26 +24,29 @@ public:
     /**
      * @brief Destructor
      */
-    virtual ~AsyncSocket();
+    virtual ~AsyncSocket() {
+        sSocketList.Remove(this);
+    }
 
     /**
      * @brief Connects to a peer
      *
-     * @param addr Remote address
-     * @param callback Connection callback
-     * @param arg Callback user argument
+     * @param rAddr Remote address
+     * @param pCallback Connection callback
+     * @param pArg Callback user argument
      * @return Success
      */
-    virtual bool Connect(const SockAddrAny& addr, Callback callback, void* arg);
+    virtual bool Connect(const SockAddrAny& rAddr, Callback pCallback,
+                         void* pArg);
 
     /**
      * @brief Accepts a peer connection over a new socket
      *
-     * @param callback Acceptance callback
-     * @param arg Callback user argument
+     * @param pCallback Acceptance callback
+     * @param pArg Callback user argument
      * @return New socket
      */
-    virtual AsyncSocket* Accept(AcceptCallback callback, void* arg);
+    virtual AsyncSocket* Accept(AcceptCallback pCallback, void* pArg);
 
 private:
     /**
@@ -51,20 +54,18 @@ private:
      */
     enum EState { EState_Thinking, EState_Connecting, EState_Accepting };
 
-    /**
-     * @brief Async receive operation
-     */
+    // Async receive operation
     class RecvJob;
-    /**
-     * @brief Async send operation
-     */
+    // Async send operation
     class SendJob;
 
 private:
     /**
      * @brief Socket thread function
+     *
+     * @param pArg Thread function argument
      */
-    static void* ThreadFunc(void* arg);
+    static void* ThreadFunc(void* pArg);
 
     /**
      * @brief Constructor
@@ -96,34 +97,35 @@ private:
     /**
      * @brief Receives data and records sender address (internal implementation)
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param len Buffer size
-     * @param[out] nrecv Number of bytes received
-     * @param[out] addr Sender address
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param[out] rRecv Number of bytes received
+     * @param[out] pAddr Sender address
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Socket library result
      */
-    virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SockAddrAny* addr,
-                              Callback callback, void* arg);
+    virtual SOResult RecvImpl(void* pDst, u32 len, u32& rRecv,
+                              SockAddrAny* pAddr, Callback pCallback,
+                              void* pArg);
 
     /**
      * @brief Sends data to specified connection (internal implementation)
      *
-     * @param src Source buffer
+     * @param pSrc Source buffer
      * @param len Buffer size
-     * @param[out] nsend Number of bytes sent
-     * @param addr Sender address
-     * @param callback Completion callback
-     * @param arg Callback user argument
+     * @param[out] rSend Number of bytes sent
+     * @param pAddr Sender address
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
      * @return Socket library result
      */
-    virtual SOResult SendImpl(const void* src, u32 len, u32& nsend,
-                              const SockAddrAny* addr, Callback callback,
-                              void* arg);
+    virtual SOResult SendImpl(const void* pSrc, u32 len, u32& rSend,
+                              const SockAddrAny* pAddr, Callback pCallback,
+                              void* pArg);
 
 private:
-    static const u32 THREAD_STACK_SIZE = 0x4000;
+    static const u32 scThreadStackSize = 0x4000;
 
     volatile EState mState; // Current async task
     SockAddrAny mPeer;      // Peer address
@@ -139,9 +141,8 @@ private:
 
     static OSThread sSocketThread;                   // Socket manager thread
     static bool sSocketThreadCreated;                // Thread guard
-    static u8 sSocketThreadStack[THREAD_STACK_SIZE]; // Thread stack
-
-    static TList<AsyncSocket> sSocketList; // Open async sockets
+    static u8 sSocketThreadStack[scThreadStackSize]; // Thread stack
+    static TList<AsyncSocket> sSocketList;           // Open async sockets
 };
 
 } // namespace kiwi

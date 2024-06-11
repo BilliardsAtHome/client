@@ -19,15 +19,15 @@ public:
      * @brief Constructor
      *
      * @param size Packet buffer size
-     * @param dest Packet recipient
+     * @param pAddr Packet recipient
      */
-    Packet(u32 size, const SockAddrAny* dest = NULL)
+    Packet(u32 size, const SockAddrAny* pAddr = NULL)
         : mpBuffer(NULL), mBufferSize(0), mReadOffset(0), mWriteOffset(0) {
         OSInitMutex(&mBufferMutex);
         Alloc(size);
 
-        if (dest != NULL) {
-            mAddress = *dest;
+        if (pAddr != NULL) {
+            mAddress = *pAddr;
         } else {
             mAddress = SockAddr4();
         }
@@ -130,21 +130,21 @@ public:
     /**
      * @brief Reads data from message buffer
      *
-     * @param dst Data destination
+     * @param pDst Data destination
      * @param n Data size
      *
      * @return Number of bytes read
      */
-    u32 Read(void* dst, u32 n);
+    u32 Read(void* pDst, u32 n);
     /**
      * @brief Writes data to message buffer
      *
-     * @param src Data source
+     * @param pSrc Data source
      * @param n Data size
      *
      * @return Number of bytes written
      */
-    u32 Write(const void* src, u32 n);
+    u32 Write(const void* pSrc, u32 n);
 
     /**
      * @brief Receives message data from socket

@@ -20,21 +20,24 @@ bool GeckoDebugger::Attach() {
  * @brief EXI input pending callback
  *
  * @param chan EXI channel
- * @param ctx Interrupt context
+ * @param pCtx Interrupt context
  */
-void GeckoDebugger::ExiCallback(EXIChannel chan, OSContext* ctx) {
+void GeckoDebugger::ExiCallback(EXIChannel chan, OSContext* pCtx) {
+#pragma unused(chan)
+#pragma unused(pCtx)
+
     GetInstance().Calculate();
 }
 
 /**
  * @brief Reads data sent to the debugger
  *
- * @param dst Destination buffer
+ * @param pDst Destination buffer
  * @param size Read length
  * @return Number of bytes read
  */
-Optional<u32> GeckoDebugger::Read(void* dst, u32 size) {
-    K_ASSERT(dst != NULL);
+Optional<u32> GeckoDebugger::Read(void* pDst, u32 size) {
+    K_ASSERT(pDst != NULL);
     K_ASSERT(size > 0);
 
     // Lock this device while we use it
@@ -56,7 +59,7 @@ Optional<u32> GeckoDebugger::Read(void* dst, u32 size) {
     success = success && EXISync(EXI_CHAN_0);
 
     // Read data
-    success = success && EXIImmEx(EXI_CHAN_0, dst, size, EXI_READ);
+    success = success && EXIImmEx(EXI_CHAN_0, pDst, size, EXI_READ);
     success = success && EXISync(EXI_CHAN_0);
 
     // Unlock this device when we are done
@@ -69,12 +72,12 @@ Optional<u32> GeckoDebugger::Read(void* dst, u32 size) {
 /**
  * @brief Writes data over the debugger
  *
- * @param src Source buffer
+ * @param pSrc Source buffer
  * @param size Write length
  * @return Number of bytes read
  */
-Optional<u32> GeckoDebugger::Write(const void* src, u32 size) {
-    K_ASSERT(src != NULL);
+Optional<u32> GeckoDebugger::Write(const void* pSrc, u32 size) {
+    K_ASSERT(pSrc != NULL);
     K_ASSERT(size > 0);
 
     // Lock this device while we use it
@@ -97,7 +100,7 @@ Optional<u32> GeckoDebugger::Write(const void* src, u32 size) {
 
     // Write data
     success = success &&
-              EXIImmEx(EXI_CHAN_0, const_cast<void*>(src), size, EXI_WRITE);
+              EXIImmEx(EXI_CHAN_0, const_cast<void*>(pSrc), size, EXI_WRITE);
     success = success && EXISync(EXI_CHAN_0);
 
     // Unlock this device when we are done

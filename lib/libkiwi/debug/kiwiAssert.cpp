@@ -7,15 +7,15 @@
 /**
  * @brief Logs a message to the console
  *
- * @param msg Message
+ * @param pMsg Message
  * @param ... Format string arguments
  */
-void kiwi_log(const char* msg, ...) {
+void kiwi_log(const char* pMsg, ...) {
     char msgbuf[1024];
     std::va_list list;
 
-    va_start(list, msg);
-    std::vsnprintf(msgbuf, sizeof(msgbuf), msg, list);
+    va_start(list, pMsg);
+    std::vsnprintf(msgbuf, sizeof(msgbuf), pMsg, list);
     va_end(list);
 
     OSReport(msgbuf);
@@ -24,20 +24,20 @@ void kiwi_log(const char* msg, ...) {
 /**
  * @brief Halts the program and displays an error message to the screen/console
  *
- * @param file Source file name where assertion failed
+ * @param pFile Source file name where assertion failed
  * @param line Source file line where assertion failed
- * @param msg Assertion message
+ * @param pMsg Assertion message
  * @param ... Format string arguments
  */
-void kiwi_fail_assert(const char* file, int line, const char* msg, ...) {
+void kiwi_fail_assert(const char* pFile, int line, const char* pMsg, ...) {
     char msgbuf[1024];
     std::va_list list;
 
-    va_start(list, msg);
-    std::vsnprintf(msgbuf, sizeof(msgbuf), msg, list);
+    va_start(list, pMsg);
+    std::vsnprintf(msgbuf, sizeof(msgbuf), pMsg, list);
     va_end(list);
 
-    kiwi::Nw4rException::GetInstance().FailAssert(file, line, msgbuf);
+    kiwi::Nw4rException::GetInstance().FailAssert(pFile, line, msgbuf);
 }
 // clang-format off
 // Catch EGG_ASSERT

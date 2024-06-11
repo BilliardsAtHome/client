@@ -29,11 +29,11 @@ public:
     /**
      * @brief Changes framebuffer information
      *
-     * @param buffer Framebuffer in memory
+     * @param pXfb Framebuffer in memory
      * @param w Framebuffer width
      * @param h Framebuffer height
      */
-    void ChangeXfb(void* buffer, u16 w, u16 h);
+    void ChangeXfb(void* pXfb, u16 w, u16 h);
 
     /**
      * @brief Erases framebuffer contents
@@ -55,10 +55,10 @@ public:
      *
      * @param x Text X position
      * @param y Text Y position
-     * @param fmt Format string
+     * @param pMsg Format string
      * @param ... Format arguments
      */
-    void DrawString(s32 x, s32 y, const char* fmt, ...) const;
+    void DrawString(s32 x, s32 y, const char* pMsg, ...) const;
 
     /**
      * @brief Sets framebuffer color
@@ -93,20 +93,21 @@ private:
      *
      * @param x Text X position
      * @param y Text Y position
-     * @param str Text string
+     * @param pMsg Text string
      */
-    void DrawStringImpl(s32 x, s32 y, const char* str) const;
+    void DrawStringImpl(s32 x, s32 y, const char* pMsg) const;
 
     /**
      * @brief Draws line of string to framebuffer
      *
      * @param x String X position
      * @param y String Y position
-     * @param str String
+     * @param pMsg Text string
      * @param maxlen Max line width
-     * @return char* String contents after what was drawn
+     * @return String contents after what was drawn
      */
-    const char* DrawStringLine(s32 x, s32 y, const char* str, s32 maxlen) const;
+    const char* DrawStringLine(s32 x, s32 y, const char* pMsg,
+                               s32 maxlen) const;
 
     /**
      * @brief Draws character to framebuffer

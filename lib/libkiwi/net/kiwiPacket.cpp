@@ -50,12 +50,12 @@ void Packet::Clear() {
 /**
  * @brief Reads data from message buffer
  *
- * @param dst Data destination
+ * @param pDst Data destination
  * @param n Data size
  *
  * @return Number of bytes read
  */
-u32 Packet::Read(void* dst, u32 n) {
+u32 Packet::Read(void* pDst, u32 n) {
     K_ASSERT(mpBuffer != NULL);
     K_ASSERT(n <= GetMaxContent());
 
@@ -65,7 +65,7 @@ u32 Packet::Read(void* dst, u32 n) {
     n = Min(n, ReadRemain());
 
     // Copy data from buffer
-    std::memcpy(dst, mpBuffer + mReadOffset, n);
+    std::memcpy(pDst, mpBuffer + mReadOffset, n);
     mReadOffset += n;
 
     return n;
@@ -74,12 +74,12 @@ u32 Packet::Read(void* dst, u32 n) {
 /**
  * @brief Writes data to message buffer
  *
- * @param src Data source
+ * @param pSrc Data source
  * @param n Data size
  *
  * @return Number of bytes written
  */
-u32 Packet::Write(const void* src, u32 n) {
+u32 Packet::Write(const void* pSrc, u32 n) {
     K_ASSERT(mpBuffer != NULL);
     K_ASSERT(n <= GetMaxContent());
 
@@ -89,7 +89,7 @@ u32 Packet::Write(const void* src, u32 n) {
     n = Min(n, WriteRemain());
 
     // Copy data to buffer
-    std::memcpy(mpBuffer + mWriteOffset, src, n);
+    std::memcpy(mpBuffer + mWriteOffset, pSrc, n);
     mWriteOffset += n;
 
     return n;

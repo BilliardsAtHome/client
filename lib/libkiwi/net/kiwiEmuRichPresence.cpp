@@ -19,9 +19,10 @@ enum {
 /**
  * @brief Constructor
  *
- * @param client Client app ID
+ * @param rClient Client app ID
  */
-EmuRichPresence::EmuRichPresence(const String& client) : IRichPresence(client) {
+EmuRichPresence::EmuRichPresence(const String& rClient)
+    : IRichPresence(rClient) {
     // Dolphin provides an emulated device
     mDevDolphin.Open("/dev/dolphin");
 }

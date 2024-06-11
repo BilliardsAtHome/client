@@ -62,13 +62,9 @@ private:
     OSThread* mpOSThread; // RVL thread
     u8* mpThreadStack;    // RVL thread stack
 
-    /**
-     * @brief Thread stack size
-     */
+    // Thread stack size
     static const u32 scStackSize = 0x4000;
-    /**
-     * @brief Thread priority
-     */
+    // Thread priority
     static const s32 scPriority = OS_PRIORITY_MAX / 2;
 };
 

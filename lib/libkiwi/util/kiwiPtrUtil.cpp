@@ -89,7 +89,7 @@ bool PtrUtil::IsFloat(const void* addr) {
     }
 
     // Close to zero may actually be some integer instead
-    if (fabs(value) <= FLT_EPSILON) {
+    if (Abs(value) <= FLT_EPSILON) {
         return false;
     }
 
@@ -158,7 +158,7 @@ bool PtrUtil::IsPtmf(const void* addr) {
 
         // Non-virtual function
         if (func->voff == -1) {
-            if (IsPointer(func->addr)) {
+            if (IsPointer(func->pAddr)) {
                 return true;
             }
 

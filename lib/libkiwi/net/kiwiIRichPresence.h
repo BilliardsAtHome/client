@@ -14,10 +14,10 @@ public:
     /**
      * @brief Constructor
      *
-     * @param client Client app ID
+     * @param rClient Client app ID
      */
-    explicit IRichPresence(const String& client)
-        : mClient(client),
+    explicit IRichPresence(const String& rClient)
+        : mClient(rClient),
           mStartTime(0),
           mEndTime(0),
           mPartyNum(0),
@@ -51,52 +51,52 @@ public:
     /**
      * @brief Sets the activity's details
      *
-     * @param details What the player is currently doing
+     * @param rDetails What the player is currently doing
      */
-    void SetDetails(const String& details) {
-        mDetails = details;
+    void SetDetails(const String& rDetails) {
+        mDetails = rDetails;
     }
     /**
      * @brief Sets the activity's state
      *
-     * @param state The user's current status
+     * @param rState The user's current status
      */
-    void SetState(const String& state) {
-        mState = state;
+    void SetState(const String& rState) {
+        mState = rState;
     }
 
     /**
      * @brief Sets the key of the large profile image
      *
-     * @param key Key of the uploaded large profile image
+     * @param rKey Key of the uploaded large profile image
      */
-    void SetLargeImageKey(const String& key) {
-        mLargeImageKey = key;
+    void SetLargeImageKey(const String& rKey) {
+        mLargeImageKey = rKey;
     }
     /**
      * @brief Sets the tooltip for the large profile image
      *
-     * @param text Tooltip for the large image
+     * @param rText Tooltip for the large image
      */
-    void SetLargeImageText(const String& text) {
-        mLargeImageText = text;
+    void SetLargeImageText(const String& rText) {
+        mLargeImageText = rText;
     }
 
     /**
      * @brief Sets the key of the small profile image
      *
-     * @param key Key of the uploaded small profile image
+     * @param rKey Key of the uploaded small profile image
      */
-    void SetSmallImageKey(const String& key) {
-        mSmallImageKey = key;
+    void SetSmallImageKey(const String& rKey) {
+        mSmallImageKey = rKey;
     }
     /**
      * @brief Sets the tooltip for the small profile image
      *
-     * @param text Tooltip for the small image
+     * @param rText Tooltip for the small image
      */
-    void SetSmallImageText(const String& text) {
-        mSmallImageText = text;
+    void SetSmallImageText(const String& rText) {
+        mSmallImageText = rText;
     }
 
     /**

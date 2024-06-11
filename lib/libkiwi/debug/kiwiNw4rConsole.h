@@ -7,7 +7,7 @@
 namespace kiwi {
 
 /**
-     * @brief Reimplementation of NW4R's debug console
+ * @brief Reimplementation of NW4R's debug console
  */
 class Nw4rConsole : public DynamicSingleton<Nw4rConsole> {
     friend class DynamicSingleton<Nw4rConsole>;
@@ -49,18 +49,18 @@ public:
     /**
      * @brief Prints text to console
      *
-     * @param fmt Format string
+     * @param pMsg Format string
      * @param ... Format args
      */
-    void Printf(const char* fmt, ...);
+    void Printf(const char* pMsg, ...);
 
     /**
      * @brief Prints text to console
      *
-     * @param fmt Format string
+     * @param pMsg Format string
      * @param args Format args
      */
-    void VPrintf(const char* fmt, std::va_list args);
+    void VPrintf(const char* pMsg, std::va_list args);
 
     /**
      * @brief Draws console using DirectPrint
@@ -110,19 +110,19 @@ private:
     /**
      * @brief Writes tab to text buffer
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @return Pointer to text after inserted characters
      */
-    char* PutTab(char* dst);
+    char* PutTab(char* pDst);
 
     /**
      * @brief Writes character to buffer (multi-byte supported)
      *
-     * @param str Character to write
-     * @param dst Destination buffer
+     * @param pCode Character to write
+     * @param pDst Destination buffer
      * @return Number of bytes written
      */
-    u32 PutChar(const char* str, char* dst);
+    u32 PutChar(const char* pCode, char* pDst);
 
     /**
      * @brief Terminates the current text buffer line
@@ -149,9 +149,9 @@ private:
     /**
      * @brief Prints string to console text buffer
      *
-     * @param str Text string
+     * @param pStr Text string
      */
-    void PrintToBuffer(const char* str);
+    void PrintToBuffer(const char* pStr);
 
     /**
      * @brief Draws console using DirectPrint (internal implementation)

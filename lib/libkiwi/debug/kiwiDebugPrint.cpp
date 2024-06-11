@@ -5,6 +5,11 @@
 namespace kiwi {
 
 /**
+ * @brief Text offset for shadow/outline
+ */
+const f32 DebugPrint::scEffectOffset = 0.0035f;
+
+/**
  * @brief Prints formatted text to the screen
  *
  * @param x X position
@@ -12,18 +17,18 @@ namespace kiwi {
  * @param scale Text scale
  * @param center Center-align text
  * @param color Text color
- * @param fmt Format string
+ * @param pMsg Format string
  * @param ... Format arguments
  */
 void DebugPrint::Printf(f32 x, f32 y, f32 scale, bool center, Color color,
-                        const char* fmt, ...) {
+                        const char* pMsg, ...) {
     if (!RPGrpRenderer::IsDrawLayout()) {
         return;
     }
 
     std::va_list list;
-    va_start(list, fmt);
-    String msg = VFormat(fmt, list);
+    va_start(list, pMsg);
+    String msg = VFormat(pMsg, list);
     va_end(list);
 
     PrintImpl(x, y, scale, center, color, msg);
@@ -38,22 +43,23 @@ void DebugPrint::Printf(f32 x, f32 y, f32 scale, bool center, Color color,
  * @param center Center-align text
  * @param text Text color
  * @param shadow Shadow color
- * @param fmt Format string
+ * @param pMsg Format string
  * @param ... Format arguments
  */
 void DebugPrint::PrintfShadow(f32 x, f32 y, f32 scale, bool center, Color text,
-                              Color shadow, const char* fmt, ...) {
+                              Color shadow, const char* pMsg, ...) {
     if (!RPGrpRenderer::IsDrawLayout()) {
         return;
     }
 
     std::va_list list;
-    va_start(list, fmt);
-    String msg = VFormat(fmt, list);
+    va_start(list, pMsg);
+    String msg = VFormat(pMsg, list);
     va_end(list);
 
     // Shadow
-    PrintImpl(x + 0.0035f, y + 0.0035f, scale, center, shadow, msg);
+    PrintImpl(x + scEffectOffset, y + scEffectOffset, scale, center, shadow,
+              msg);
     // Text
     PrintImpl(x, y, scale, center, text, msg);
 }
@@ -67,25 +73,25 @@ void DebugPrint::PrintfShadow(f32 x, f32 y, f32 scale, bool center, Color text,
  * @param center Center-align text
  * @param text Text color
  * @param outline Outline color
- * @param fmt Format string
+ * @param pMsg Format string
  * @param ... Format arguments
  */
 void DebugPrint::PrintfOutline(f32 x, f32 y, f32 scale, bool center, Color text,
-                               Color outline, const char* fmt, ...) {
+                               Color outline, const char* pMsg, ...) {
     if (!RPGrpRenderer::IsDrawLayout()) {
         return;
     }
 
     std::va_list list;
-    va_start(list, fmt);
-    String msg = VFormat(fmt, list);
+    va_start(list, pMsg);
+    String msg = VFormat(pMsg, list);
     va_end(list);
 
     // Outline
-    PrintImpl(x - 0.0035f, y, scale, center, outline, msg);
-    PrintImpl(x + 0.0035f, y, scale, center, outline, msg);
-    PrintImpl(x, y - 0.0035f, scale, center, outline, msg);
-    PrintImpl(x, y + 0.0035f, scale, center, outline, msg);
+    PrintImpl(x - scEffectOffset, y, scale, center, outline, msg);
+    PrintImpl(x + scEffectOffset, y, scale, center, outline, msg);
+    PrintImpl(x, y - scEffectOffset, scale, center, outline, msg);
+    PrintImpl(x, y + scEffectOffset, scale, center, outline, msg);
     // Text
     PrintImpl(x, y, scale, center, text, msg);
 }
@@ -98,10 +104,10 @@ void DebugPrint::PrintfOutline(f32 x, f32 y, f32 scale, bool center, Color text,
  * @param scale Text scale
  * @param center Center-align text
  * @param color Text color
- * @param msg Text message
+ * @param rMsg Text message
  */
 void DebugPrint::PrintImpl(f32 x, f32 y, f32 scale, bool center, Color color,
-                           const String& msg) {
+                           const String& rMsg) {
     RP_GET_INSTANCE(RPSysTextWriter)->Begin();
     {
         u32 flag = 0;
@@ -116,7 +122,7 @@ void DebugPrint::PrintImpl(f32 x, f32 y, f32 scale, bool center, Color color,
         RP_GET_INSTANCE(RPSysTextWriter)->SetDrawFlag(flag);
         RP_GET_INSTANCE(RPSysTextWriter)->SetTextColor(color);
         RP_GET_INSTANCE(RPSysTextWriter)->SetScale(scale, scale);
-        RP_GET_INSTANCE(RPSysTextWriter)->PrintfZeroCenter(x, y, msg);
+        RP_GET_INSTANCE(RPSysTextWriter)->PrintfZeroCenter(x, y, rMsg);
         RP_GET_INSTANCE(RPSysTextWriter)->SetDrawFlag(oldFlag);
     }
     RP_GET_INSTANCE(RPSysTextWriter)->End();

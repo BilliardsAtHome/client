@@ -105,40 +105,54 @@ public:
     /**
      * @brief Configure callback
      * @details Ran once on initial scene setup
+     *
+     * @param pScene Current scene
      */
     virtual void Configure(RPSysScene* pScene) {}
 
     /**
      * @brief LoadResource callback
      * @details Ran once on asset loading
+     *
+     * @param pScene Current scene
      */
     virtual void LoadResource(RPSysScene* pScene) {}
 
     /**
      * @brief Reset callback (before game logic)
      * @details Ran once on initial scene setup and on every restart
+     *
+     * @param pScene Current scene
      */
     virtual void BeforeReset(RPSysScene* pScene) {}
     /**
      * @brief Reset callback (after game logic)
      * @details Ran once on initial scene setup and on every restart
+     *
+     * @param pScene Current scene
      */
     virtual void AfterReset(RPSysScene* pScene) {}
 
     /**
      * @brief Calculate callback (before game logic)
      * @details Ran once per frame
+     *
+     * @param pScene Current scene
      */
     virtual void BeforeCalculate(RPSysScene* pScene) {}
     /**
      * @brief Calculate callback (after game logic)
      * @details Ran once per frame
+     *
+     * @param pScene Current scene
      */
     virtual void AfterCalculate(RPSysScene* pScene) {}
 
     /**
      * @brief Exit callback
      * @details Ran once on scene exit (including restarts)
+     *
+     * @param pScene Current scene
      */
     virtual void Exit(RPSysScene* pScene) {}
 
@@ -146,6 +160,7 @@ public:
      * @brief Pause callback
      * @details Ran on pause menu open/close
      *
+     * @param pScene Current scene
      * @param enter Whether the pause menu is opening
      */
     virtual void Pause(RPSysScene* pScene, bool enter) {}

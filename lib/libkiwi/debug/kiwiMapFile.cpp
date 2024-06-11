@@ -21,10 +21,10 @@ MapFile::~MapFile() {
 /**
  * @brief Opens a map file from the DVD
  *
- * @param path Map file path
+ * @param rPath Map file path
  * @param type Module linkage type
  */
-void MapFile::Open(const String& path, ELinkType type) {
+void MapFile::Open(const String& rPath, ELinkType type) {
     K_ASSERT(type != ELinkType_None);
 
     // Close existing map file
@@ -33,9 +33,9 @@ void MapFile::Open(const String& path, ELinkType type) {
     }
 
     // Try to open file on the DVD
-    mpMapBuffer = static_cast<char*>(FileRipper::Rip(path, EStorage_DVD));
+    mpMapBuffer = static_cast<char*>(FileRipper::Rip(rPath, EStorage_DVD));
     if (mpMapBuffer == NULL) {
-        K_LOG_EX("Map file (%s) could not be opened!\n", path.CStr());
+        K_LOG_EX("Map file (%s) could not be opened!\n", rPath.CStr());
         return;
     }
 
@@ -63,22 +63,23 @@ void MapFile::Close() {
 /**
  * @brief Queries text section symbol
  *
- * @param addr Symbol address
+ * @param pAddr Symbol address
  */
-const MapFile::Symbol* MapFile::QueryTextSymbol(const void* addr) {
+const MapFile::Symbol* MapFile::QueryTextSymbol(const void* pAddr) const {
     if (!IsAvailable()) {
         return NULL;
     }
 
-    TList<Symbol>::Iterator it = mSymbols.Begin();
+    TList<Symbol>::ConstIterator it = mSymbols.Begin();
     for (; it != mSymbols.End(); it++) {
         // Resolve the symbol's address
-        const void* symb = it->type == ELinkType_Static
-                               ? it->addr
-                               : AddToPtr(GetModuleTextStart(), it->offset);
+        const void* pResolved =
+            it->type == ELinkType_Static
+                ? it->pAddr
+                : AddToPtr(GetModuleTextStart(), it->offset);
 
         // Determine if the specified address falls within the symbol
-        if (PtrDistance(symb, addr) < it->size) {
+        if (PtrDistance(pResolved, pAddr) < it->size) {
             return &*it;
         }
     }
@@ -93,39 +94,40 @@ void MapFile::Unpack() {
     K_ASSERT(mpMapBuffer != NULL);
 
     // Skip map file header (2 lines)
-    char* map = mpMapBuffer;
+    char* pIt = mpMapBuffer;
     for (int i = 0; i < 2; i++) {
-        map = ksl::strchr(map, '\n') + 1;
+        pIt = ksl::strchr(pIt, '\n') + 1;
     }
 
     // Parse lines
-    for (char* next = map; (next = ksl::strchr(map, '\n')); map = next + 1) {
+    for (char* pEndl = pIt; (pEndl = ksl::strchr(pIt, '\n')); pIt = pEndl + 1) {
         Symbol* sym = new Symbol();
+        K_ASSERT(sym != NULL);
 
         // Location
         if (mLinkType == ELinkType_Static) {
-            sym->addr = reinterpret_cast<void*>(ksl::strtoul(map, &map, 16));
+            sym->pAddr = reinterpret_cast<void*>(ksl::strtoul(pIt, &pIt, 16));
         } else {
-            sym->offset = ksl::strtoul(map, &map, 16);
+            sym->offset = ksl::strtoul(pIt, &pIt, 16);
         }
 
         // Linkage
         sym->type = mLinkType;
 
         // Size
-        sym->size = ksl::strtoul(map, &map, 16);
+        sym->size = ksl::strtoul(pIt, &pIt, 16);
 
         // Trim whitespace from name
-        while (*map == ' ') {
-            map++;
+        while (*pIt == ' ') {
+            pIt++;
         }
-        sym->name = map;
+        sym->pName = pIt;
 
         // Terminate symbol string
-        *next = '\0';
+        *pEndl = '\0';
         // Remove carriage return
-        if (*(next - 1) == '\r') {
-            *(next - 1) = '\0';
+        if (*(pEndl - 1) == '\r') {
+            *(pEndl - 1) = '\0';
         }
 
         mSymbols.PushBack(sym);

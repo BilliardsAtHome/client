@@ -17,13 +17,13 @@ const char* HttpRequest::sProtocolVer = "1.1";
 /**
  * @brief Constructor
  *
- * @param host Server hostname
+ * @param rHost Server hostname
  */
-HttpRequest::HttpRequest(const String& host)
-    : mHostName(host),
+HttpRequest::HttpRequest(const String& rHost)
+    : mHostName(rHost),
       mURI("/"),
       mpSocket(NULL),
-      mTimeOut(OS_MSEC_TO_TICKS(DEFAULT_TIMEOUT)),
+      mTimeOut(OS_MSEC_TO_TICKS(scDefaultTimeOut)),
       mpResponseCallback(NULL),
       mpResponseCallbackArg(NULL) {
     mpSocket = new SyncSocket(SO_PF_INET, SO_SOCK_STREAM);
@@ -38,7 +38,7 @@ HttpRequest::HttpRequest(const String& host)
     K_ASSERT(success);
 
     // Hostname required by HTTP 1.1
-    mHeader["Host"] = host;
+    mHeader["Host"] = rHost;
     // Identify libkiwi requests by user agent
     mHeader["User-Agent"] = "libkiwi";
 }
@@ -65,19 +65,19 @@ const HttpResponse& HttpRequest::Send(EMethod method) {
 /**
  * @brief Sends request asynchronously
  *
- * @param callback Response callback
- * @param arg Callback user argument
+ * @param pCallback Response callback
+ * @param pArg Callback user argument
  * @param method Request method
  */
-void HttpRequest::SendAsync(ResponseCallback callback, void* arg,
+void HttpRequest::SendAsync(ResponseCallback pCallback, void* pArg,
                             EMethod method) {
-    K_ASSERT_EX(callback != NULL, "You will lose the reponse!");
+    K_ASSERT_EX(pCallback != NULL, "You will lose the reponse!");
     K_ASSERT(method < EMethod_Max);
     K_ASSERT(mpSocket != NULL);
 
     mMethod = method;
-    mpResponseCallback = callback;
-    mpResponseCallbackArg = arg;
+    mpResponseCallback = pCallback;
+    mpResponseCallbackArg = pArg;
 
     // Call on new thread
     Thread t(SendImpl, *this);

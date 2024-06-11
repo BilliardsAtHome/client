@@ -38,21 +38,25 @@ Nw4rException::Nw4rException()
 /**
  * @brief Sets user exception callback
  *
- * @param callback Exception callback function
- * @param arg Exception callback argument
+ * @param pCallback Exception callback function
+ * @param pArg Exception callback argument
  */
-void Nw4rException::SetUserCallback(UserCallback callback, void* arg) {
-    mpUserCallback = callback != NULL ? callback : DefaultCallback;
-    mpUserCallbackArg = arg;
+void Nw4rException::SetUserCallback(UserCallback pCallback, void* pArg) {
+    if (pCallback == NULL) {
+        pCallback = DefaultCallback;
+    }
+
+    mpUserCallback = pCallback;
+    mpUserCallbackArg = pArg;
 }
 
 /**
  * @brief Writes text to the exception details
  *
- * @param fmt Format string
+ * @param pMsg Format string
  * @param ... Format arguments
  */
-void Nw4rException::Printf(const char* fmt, ...) {
+void Nw4rException::Printf(const char* pMsg, ...) {
     if (mpRenderMode == NULL) {
         return;
     }
@@ -62,25 +66,25 @@ void Nw4rException::Printf(const char* fmt, ...) {
                                              mpRenderMode->xfbHeight);
 
     std::va_list list;
-    va_start(list, fmt);
-    Nw4rConsole::GetInstance().VPrintf(fmt, list);
+    va_start(list, pMsg);
+    Nw4rConsole::GetInstance().VPrintf(pMsg, list);
     va_end(list);
 }
 
 /**
  * @brief Triggers an assertion error
  *
- * @param file Name of source file where assertion occurred
+ * @param pFile Name of source file where assertion occurred
  * @param line Line in source file where assertion occurred
- * @param msg Assertion message/expression
+ * @param pMsg Assertion message/expression
  */
-void Nw4rException::FailAssert(const char* file, int line, const char* msg) {
-    mErrorInfo.assert.file = file;
+void Nw4rException::FailAssert(const char* pFile, int line, const char* pMsg) {
+    mErrorInfo.assert.pFile = pFile;
     mErrorInfo.assert.line = line;
-    mErrorInfo.assert.msg = msg;
+    mErrorInfo.assert.pMsg = pMsg;
 
     // Preserve stack pointer at time of assertion
-    mErrorInfo.assert.sp = OSGetStackPointer();
+    mErrorInfo.assert.pSP = OSGetStackPointer();
 
     // Invalid error type to signal assertion
     ErrorHandler(EError_AssertFail, OSGetCurrentContext(), Mfdsisr(), Mfdar());
@@ -88,9 +92,12 @@ void Nw4rException::FailAssert(const char* file, int line, const char* msg) {
 
 /**
  * @brief Exception thread main function
+ *
+ * @param pArg Thread function argument
  */
-void* Nw4rException::ThreadFunc(void* arg) {
-#pragma unused(arg)
+void* Nw4rException::ThreadFunc(void* pArg) {
+#pragma unused(pArg)
+
     Mtmsr(Mfmsr() & ~(MSR_FE0 | MSR_FE1));
 
     // Thread waits until error handler
@@ -110,27 +117,28 @@ void* Nw4rException::ThreadFunc(void* arg) {
 /**
  * @brief Handles errors (exception/assertion)
  *
- * @param error Exception type
- * @param ctx Exception context
- * @param dsisr Last DSISR value
- * @param dar Last DAR value
+ * @param error Error type
+ * @param pCtx Exception context
+ * @param _dsisr DSISR value
+ * @param _dar DAR value
  */
-void Nw4rException::ErrorHandler(u8 error, OSContext* ctx, u32 dsisr, u32 dar,
-                                 ...) {
-    Info& info = GetInstance().mErrorInfo;
-    info.error = static_cast<EError>(error);
-    info.ctx = ctx;
-    info.dsisr = dsisr;
-    info.dar = dar;
-    info.msr = Mfmsr();
+void Nw4rException::ErrorHandler(u8 error, OSContext* pCtx, u32 _dsisr,
+                                 u32 _dar, ...) {
+    Info& rInfo = GetInstance().mErrorInfo;
+    rInfo.error = static_cast<EError>(error);
+    rInfo.pCtx = pCtx;
+    rInfo.dsisr = _dsisr;
+    rInfo.dar = _dar;
+    rInfo.msr = Mfmsr();
 
     // Vector data breakpoints to the debugger
-    if (error == EError_DSI && (dsisr & DSISR_DABR)) {
-        GlobalInstance<IDebugger>::Get().BreakCallback(error, ctx, dsisr, dar);
+    if (error == EError_DSI && (_dsisr & DSISR_DABR)) {
+        GlobalInstance<IDebugger>::Get().BreakCallback(error, pCtx, _dsisr,
+                                                       _dar);
         return;
     }
 
-    LibOS::FillFPUContext(ctx);
+    LibOS::FillFPUContext(pCtx);
     OSSetErrorHandler(error, NULL);
 
     // Allow thread to continue
@@ -154,12 +162,12 @@ void Nw4rException::ErrorHandler(u8 error, OSContext* ctx, u32 dsisr, u32 dar,
 /**
  * @brief Allows controlling the console using the D-Pad
  *
- * @param info Exception info
- * @param arg Callback argument
+ * @param rInfo Exception info
+ * @param pArg Callback argument
  */
-void Nw4rException::DefaultCallback(const Info& info, void* arg) {
-#pragma unused(info)
-#pragma unused(arg)
+void Nw4rException::DefaultCallback(const Info& rInfo, void* pArg) {
+#pragma unused(rInfo)
+#pragma unused(pArg)
     Nw4rConsole::GetInstance().DrawDirect();
 
     while (true) {
@@ -245,9 +253,9 @@ void Nw4rException::DumpException() {
     // Basic information
     Printf("******** EXCEPTION OCCURRED! ********\n");
     Printf("Exception Type: %s\n", scExceptionNames[mErrorInfo.error]);
-    Printf("SRR0: %08X\n", mErrorInfo.ctx->srr0);
+    Printf("SRR0: %08X\n", mErrorInfo.pCtx->srr0);
     Printf("Symbol: ");
-    PrintSymbol(reinterpret_cast<void*>(mErrorInfo.ctx->srr0));
+    PrintSymbol(reinterpret_cast<void*>(mErrorInfo.pCtx->srr0));
     Printf("\n");
     Printf("\n");
 
@@ -272,8 +280,8 @@ void Nw4rException::DumpException() {
 void Nw4rException::DumpAssert() {
     // Basic information
     Printf("******** ASSERTION FAILED! ********\n");
-    Printf("%s\n", mErrorInfo.assert.msg);
-    Printf("Source: %s(%d)\n", mErrorInfo.assert.file, mErrorInfo.assert.line);
+    Printf("%s\n", mErrorInfo.assert.pMsg);
+    Printf("Source: %s(%d)\n", mErrorInfo.assert.pFile, mErrorInfo.assert.line);
     Printf("\n");
 
     // Memory status
@@ -329,13 +337,13 @@ void Nw4rException::PrintGPR() {
 
     for (int reg = 0; reg < 10; reg++) {
         Printf("R%02d:%08XH  R%02d:%08XH  R%02d:%08XH\n", reg,
-               mErrorInfo.ctx->gprs[reg], reg + 11,
-               mErrorInfo.ctx->gprs[reg + 11], reg + 22,
-               mErrorInfo.ctx->gprs[reg + 22]);
+               mErrorInfo.pCtx->gprs[reg], reg + 11,
+               mErrorInfo.pCtx->gprs[reg + 11], reg + 22,
+               mErrorInfo.pCtx->gprs[reg + 22]);
     }
 
-    Printf("R10:%08XH  R21:%08XH\n", mErrorInfo.ctx->gprs[10],
-           mErrorInfo.ctx->gprs[21]);
+    Printf("R10:%08XH  R21:%08XH\n", mErrorInfo.pCtx->gprs[10],
+           mErrorInfo.pCtx->gprs[21]);
 
     Printf("\n");
 }
@@ -355,29 +363,29 @@ void Nw4rException::PrintStack(u32 depth) {
     };
 
     // Get stack pointer
-    const StackFrame* frame = reinterpret_cast<const StackFrame*>(
-        mErrorInfo.error == 0xFF
-            ? mErrorInfo.assert.sp
-            : reinterpret_cast<void*>(mErrorInfo.ctx->gprs[1]));
+    const StackFrame* pFrame = reinterpret_cast<const StackFrame*>(
+        mErrorInfo.error == EError_AssertFail
+            ? mErrorInfo.assert.pSP
+            : reinterpret_cast<void*>(mErrorInfo.pCtx->gprs[1]));
 
     Printf("---Stack Trace---\n");
     Printf("-----------------------------------\n");
     Printf("Address:   BackChain   LR save\n");
 
-    for (int i = 0; i < depth; i++, frame = frame->next) {
+    for (int i = 0; i < depth; i++, pFrame = pFrame->next) {
         // Main thread root frame
-        if (reinterpret_cast<u32>(frame) == 0xFFFFFFFF) {
+        if (reinterpret_cast<u32>(pFrame) == 0xFFFFFFFF) {
             break;
         }
 
         // Sub thread root frame
-        if (reinterpret_cast<u32>(frame) == 0) {
+        if (reinterpret_cast<u32>(pFrame) == 0) {
             break;
         }
 
         // Print stack frame info
-        Printf("%08X:  %08X    ", frame, frame->next);
-        PrintSymbol(frame->lr);
+        Printf("%08X:  %08X    ", pFrame, pFrame->next);
+        PrintSymbol(pFrame->lr);
         Printf("\n");
     }
 
@@ -395,15 +403,17 @@ void Nw4rException::PrintThankYouMsg() {
 
 /**
  * @brief Prints symbol information using the map file
+ *
+ * @param pAddr Symbol address
  */
-void Nw4rException::PrintSymbol(const void* addr) {
+void Nw4rException::PrintSymbol(const void* pAddr) {
     // Symbol's offset from the start of game code
-    std::ptrdiff_t textOffset = PtrDistance(GetModuleTextStart(), addr);
+    ptrdiff_t textOffset = PtrDistance(GetModuleTextStart(), pAddr);
 
     // Symbol is from game (outside module)
     if (textOffset < 0 || textOffset >= GetModuleTextSize()) {
         // Print raw address
-        Printf("%08X (game)", addr);
+        Printf("%08X (game)", pAddr);
         return;
     }
 
@@ -423,7 +433,7 @@ void Nw4rException::PrintSymbol(const void* addr) {
     }
 
     // Map file is available, let's use it
-    const MapFile::Symbol* sym = MapFile::GetInstance().QueryTextSymbol(addr);
+    const MapFile::Symbol* sym = MapFile::GetInstance().QueryTextSymbol(pAddr);
 
     /**
      * At this point we know the symbol is in module code, so the map
@@ -437,18 +447,18 @@ void Nw4rException::PrintSymbol(const void* addr) {
     // Symbol doesn't exist in map file
     if (sym == NULL) {
         // Print raw address
-        Printf("%08X (MODULE)", addr);
+        Printf("%08X (MODULE)", pAddr);
         return;
     }
 
     // Offset into function where exception occurred
     u32 offset =
         sym->type == MapFile::ELinkType_Relocatable
-            ? PtrDistance(AddToPtr(GetModuleTextStart(), sym->offset), addr)
-            : PtrDistance(sym->addr, addr);
+            ? PtrDistance(AddToPtr(GetModuleTextStart(), sym->offset), pAddr)
+            : PtrDistance(sym->pAddr, pAddr);
 
     // Print function name and instruction offset
-    Printf("%s(+0x%04X)", sym->name, offset);
+    Printf("%s(+0x%04X)", sym->pName, offset);
 }
 
 /**

@@ -84,18 +84,18 @@ public:
     /**
      * @brief Request response callback
      *
-     * @param resp Request response
-     * @param arg Callback user argument
+     * @param rResp Request response
+     * @param pArg Callback user argument
      */
-    typedef void (*ResponseCallback)(const HttpResponse& resp, void* arg);
+    typedef void (*ResponseCallback)(const HttpResponse& rResp, void* pArg);
 
 public:
     /**
      * @brief Constructor
      *
-     * @param host Server hostname
+     * @param rHost Server hostname
      */
-    explicit HttpRequest(const String& host);
+    explicit HttpRequest(const String& rHost);
 
     /**
      * @brief Destructor
@@ -120,31 +120,31 @@ public:
     /**
      * @brief Adds/updates a request header field
      *
-     * @param name Field name
-     * @param value Field value
+     * @param rName Field name
+     * @param rValue Field value
      */
-    void SetHeaderField(const String& name, const String& value) {
-        mHeader.Insert(name, value);
+    void SetHeaderField(const String& rName, const String& rValue) {
+        mHeader.Insert(rName, rValue);
     }
 
     /**
      * @brief Adds/updates a URL parameter
      *
-     * @param name Parameter name
-     * @param value Parameter value
+     * @param rName Parameter name
+     * @param rValue Parameter value
      */
     template <typename T>
-    void SetParameter(const String& name, const T& value) {
-        SetParameter(name, kiwi::ToString(value));
+    void SetParameter(const String& rName, const T& rValue) {
+        SetParameter(rName, kiwi::ToString(rValue));
     }
 
     /**
      * @brief Changes the requested resource
      *
-     * @param uri URI value
+     * @param rURI URI value
      */
-    void SetURI(const String& uri) {
-        mURI = uri;
+    void SetURI(const String& rURI) {
+        mURI = rURI;
     }
 
     /**
@@ -158,11 +158,11 @@ public:
     /**
      * @brief Sends request asynchronously
      *
-     * @param callback Response callback
-     * @param arg Callback user argument
+     * @param pCallback Response callback
+     * @param pArg Callback user argument
      * @param method Request method
      */
-    void SendAsync(ResponseCallback callback, void* arg = NULL,
+    void SendAsync(ResponseCallback pCallback, void* pArg = NULL,
                    EMethod method = EMethod_GET);
 
 private:
@@ -185,19 +185,8 @@ private:
     bool Receive();
 
 private:
-    /**
-     * @brief Default connection timeout, in milliseconds
-     */
-    static const u32 DEFAULT_TIMEOUT = 2000;
-
-    /**
-     * @brief HTTP request method names
-     */
-    static const char* sMethodNames[EMethod_Max];
-    /**
-     * @brief HTTP protocol version
-     */
-    static const char* sProtocolVer;
+    // Default connection timeout, in milliseconds
+    static const u32 scDefaultTimeOut = 2000;
 
     EMethod mMethod;  // Request method
     String mHostName; // Server host name
@@ -212,6 +201,9 @@ private:
     HttpResponse mResponse;              // Server response
     ResponseCallback mpResponseCallback; // Response callback
     void* mpResponseCallbackArg;         // Callback user argument
+
+    static const char* sMethodNames[EMethod_Max]; // HTTP request method names
+    static const char* sProtocolVer;              // HTTP protocol version
 };
 
 } // namespace kiwi

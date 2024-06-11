@@ -76,57 +76,62 @@ private:
     };
 
     /**
-     * @brief GeckoDotNet packet size
-     */
-    static const u32 UPLOAD_PACKET_SIZE = 0xF80;
-
-    /**
      * @brief Breakpoint callback
+     *
+     * @param error Error type
+     * @param pCtx Exception context
+     * @param _dsisr DSISR value
+     * @param _dar DAR value
      */
-    static void BreakCallback(u8 error, OSContext* ctx, u32 _dsisr, u32 _dar,
+    static void BreakCallback(u8 error, OSContext* pCtx, u32 _dsisr, u32 _dar,
                               ...);
     /**
      * @brief Step trace callback
+     *
+     * @param error Error type
+     * @param pCtx Exception context
+     * @param _dsisr DSISR value
+     * @param _dar DAR value
      */
-    static void StepCallback(u8 error, OSContext* ctx, u32 _dsisr, u32 _dar,
+    static void StepCallback(u8 error, OSContext* pCtx, u32 _dsisr, u32 _dar,
                              ...);
 
     /**
      * @brief Reads data sent to the debugger
      *
-     * @param dst Destination buffer
+     * @param pDst Destination buffer
      * @param size Read length
      * @return Number of bytes read
      */
-    virtual Optional<u32> Read(void* dst, u32 size) = 0;
+    virtual Optional<u32> Read(void* pDst, u32 size) = 0;
 
     /**
      * @brief Writes data over the debugger
      *
-     * @param src Source buffer
+     * @param pSrc Source buffer
      * @param size Write length
      * @return Number of bytes read
      */
-    virtual Optional<u32> Write(const void* src, u32 size) = 0;
+    virtual Optional<u32> Write(const void* pSrc, u32 size) = 0;
 
     /**
      * @brief Reads data into an object
      *
-     * @param t Destination object
+     * @param rDst Destination object
      * @return Success
      */
-    template <typename T> bool ReadObj(T& t) {
-        return Read(&t, sizeof(T)).ValueOr(0) == sizeof(T);
+    template <typename T> bool ReadObj(T& rDst) {
+        return Read(&rDst, sizeof(T)).ValueOr(0) == sizeof(T);
     }
 
     /**
      * @brief Writes data from an object
      *
-     * @param t Source object
+     * @param rSrc Source object
      * @return Success
      */
-    template <typename T> bool WriteObj(const T& t) {
-        return Write(&t, sizeof(T)).ValueOr(0) == sizeof(T);
+    template <typename T> bool WriteObj(const T& rSrc) {
+        return Write(&rSrc, sizeof(T)).ValueOr(0) == sizeof(T);
     }
 
 /**
@@ -155,12 +160,9 @@ private:
 #undef DEFINE_CMD
 
 private:
-    // Program execution status
-    EExecState mExecState;
-    // Program execution context
-    OSContext mExecContext;
-    // Active breakpoint
-    BreakPoint mBreakPoint;
+    EExecState mExecState;  // Program execution status
+    OSContext mExecContext; // Program execution context
+    BreakPoint mBreakPoint; // Active breakpoint
 };
 
 } // namespace kiwi

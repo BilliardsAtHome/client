@@ -1,5 +1,6 @@
 #ifndef LIBKIWI_NET_SYNC_SOCKET_H
 #define LIBKIWI_NET_SYNC_SOCKET_H
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/net/kiwiSocketBase.h>
 
@@ -20,14 +21,25 @@ public:
         : SocketBase(family, type) {}
 
     /**
-     * @brief Destructor
+     * @brief Connects to a peer
+     *
+     * @param rAddr Remote address
+     * @param pCallback Connection callback
+     * @param pArg Callback user argument
+     * @return Success
      */
-    virtual ~SyncSocket() {}
+    virtual bool Connect(const SockAddrAny& rAddr, Callback pCallback = NULL,
+                         void* pArg = NULL);
 
-    virtual bool Connect(const SockAddrAny& addr, Callback callback = NULL,
-                         void* arg = NULL);
-    virtual SyncSocket* Accept(AcceptCallback callback = NULL,
-                               void* arg = NULL);
+    /**
+     * @brief Accepts a peer connection over a new socket
+     *
+     * @param pCallback Acceptance callback
+     * @param pArg Callback user argument
+     * @return New socket
+     */
+    virtual SyncSocket* Accept(AcceptCallback pCallback = NULL,
+                               void* pArg = NULL);
 
 private:
     /**
@@ -40,11 +52,35 @@ private:
     SyncSocket(SOSocket socket, SOProtoFamily family, SOSockType type)
         : SocketBase(socket, family, type) {}
 
-    virtual SOResult RecvImpl(void* dst, u32 len, u32& nrecv, SockAddrAny* addr,
-                              Callback callback, void* arg);
-    virtual SOResult SendImpl(const void* src, u32 len, u32& nsend,
-                              const SockAddrAny* addr, Callback callback,
-                              void* arg);
+    /**
+     * @brief Receives data and records sender address (internal implementation)
+     *
+     * @param pDst Destination buffer
+     * @param len Buffer size
+     * @param[out] rRecv Number of bytes received
+     * @param[out] pAddr Sender address
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
+     * @return Socket library result
+     */
+    virtual SOResult RecvImpl(void* pDst, u32 len, u32& rRecv,
+                              SockAddrAny* pAddr, Callback pCallback,
+                              void* pArg);
+
+    /**
+     * @brief Sends data to specified connection (internal implementation)
+     *
+     * @param pSrc Source buffer
+     * @param len Buffer size
+     * @param[out] rSend Number of bytes sent
+     * @param pAddr Sender address
+     * @param pCallback Completion callback
+     * @param pArg Callback user argument
+     * @return Socket library result
+     */
+    virtual SOResult SendImpl(const void* pSrc, u32 len, u32& rSend,
+                              const SockAddrAny* pAddr, Callback pCallback,
+                              void* pArg);
 };
 
 } // namespace kiwi

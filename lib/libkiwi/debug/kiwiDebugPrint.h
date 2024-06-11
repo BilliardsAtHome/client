@@ -20,11 +20,11 @@ public:
      * @param scale Text scale
      * @param center Center-align text
      * @param color Text color
-     * @param fmt Format string
+     * @param pMsg Format string
      * @param ... Format arguments
      */
     static void Printf(f32 x, f32 y, f32 scale, bool center, Color color,
-                       const char* fmt, ...);
+                       const char* pMsg, ...);
 
     /**
      * @brief Prints formatted text to the screen with an outline
@@ -35,11 +35,11 @@ public:
      * @param center Center-align text
      * @param text Text color
      * @param outline Outline color
-     * @param fmt Format string
+     * @param pMsg Format string
      * @param ... Format arguments
      */
     static void PrintfShadow(f32 x, f32 y, f32 scale, bool center, Color text,
-                             Color shadow, const char* fmt, ...);
+                             Color shadow, const char* pMsg, ...);
 
     /**
      * @brief Prints text to the screen
@@ -49,10 +49,10 @@ public:
      * @param scale Text scale
      * @param center Center-align text
      * @param color Text color
-     * @param msg Text message
+     * @param pMsg Text message
      */
     static void PrintfOutline(f32 x, f32 y, f32 scale, bool center, Color text,
-                              Color outline, const char* fmt, ...);
+                              Color outline, const char* pMsg, ...);
 
 private:
     /**
@@ -63,10 +63,14 @@ private:
      * @param scale Text scale
      * @param center Center-align text
      * @param color Text color
-     * @param msg Text message
+     * @param rMsg Text message
      */
     static void PrintImpl(f32 x, f32 y, f32 scale, bool center, Color color,
-                          const String& msg);
+                          const String& rMsg);
+
+private:
+    // Text offset for shadow/outline
+    static const f32 scEffectOffset;
 };
 
 } // namespace kiwi
