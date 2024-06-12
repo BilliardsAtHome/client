@@ -157,11 +157,9 @@ public:
         mHasValue = false;
     }
 
-    operator bool() const {
-        return HasValue();
-    }
-
     // clang-format off
+    operator bool() const { return HasValue(); }
+    
     T&       operator*()       { return Value(); }
     const T& operator*() const { return Value(); }
 
