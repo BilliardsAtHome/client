@@ -21,7 +21,7 @@ TMap<TKey, TValue>::ConstIterator::operator++() {
     }
 
     // Increment
-    mpIter = mpIter->chained;
+    mpIter = mpIter->pChained;
 
     // Find next non-empty chain
     while (true) {
@@ -41,7 +41,7 @@ TMap<TKey, TValue>::ConstIterator::operator++() {
         }
 
         // Keep searching
-        mpIter = mpIter->chained;
+        mpIter = mpIter->pChained;
     }
 
     return *this;
@@ -106,7 +106,7 @@ TMap<TKey, TValue>::Bucket* TMap<TKey, TValue>::Search(const TKey& rKey) const {
     u32 i = Hash(rKey) % mCapacity;
 
     // Iterate through chains
-    for (Bucket* pIt = &mpBuckets[i]; pIt != NULL; pIt = pIt->chained) {
+    for (Bucket* pIt = &mpBuckets[i]; pIt != NULL; pIt = pIt->pChained) {
         // Unused entry
         if (!pIt->used) {
             continue;
@@ -133,7 +133,7 @@ TMap<TKey, TValue>::Bucket& TMap<TKey, TValue>::Create(const TKey& rKey) {
 
     // Iterate through chains
     Bucket* pLast = NULL;
-    for (Bucket* it = &mpBuckets[i]; it != NULL; it = it->chained) {
+    for (Bucket* it = &mpBuckets[i]; it != NULL; it = it->pChained) {
         // Unused entry
         if (!it->used) {
             // Override this entry
@@ -154,14 +154,14 @@ TMap<TKey, TValue>::Bucket& TMap<TKey, TValue>::Create(const TKey& rKey) {
 
     // Chain new bucket
     K_ASSERT(pLast != NULL);
-    pLast->chained = new Bucket();
-    K_ASSERT(pLast->chained != NULL);
+    pLast->pChained = new Bucket();
+    K_ASSERT(pLast->pChained != NULL);
 
-    pLast->chained->key = rKey;
-    pLast->chained->value.Emplace();
-    pLast->chained->used = true;
+    pLast->pChained->key = rKey;
+    pLast->pChained->value.Emplace();
+    pLast->pChained->used = true;
     mSize++;
-    return *pLast->chained;
+    return *pLast->pChained;
 }
 
 } // namespace kiwi

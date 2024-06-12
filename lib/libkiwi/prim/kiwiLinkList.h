@@ -21,9 +21,10 @@ private:
     /**
      * @brief Constructor
      *
-     * @param elem Node element
+     * @param pElem Node element
      */
-    explicit TListNode(T* elem) : mpNext(NULL), mpPrev(NULL), mpElement(elem) {}
+    explicit TListNode(T* pElem)
+        : mpNext(NULL), mpPrev(NULL), mpElement(pElem) {}
 
     TListNode<T>* mpNext; // Next node in the linked-list
     TListNode<T>* mpPrev; // Previous node in the linked-list
@@ -46,9 +47,9 @@ public:
         /**
          * @brief Constructor
          *
-         * @param node Iterator node
+         * @param pNode Iterator node
          */
-        explicit Iterator(TListNode<T>* node) : mpNode(node) {
+        explicit Iterator(TListNode<T>* pNode) : mpNode(pNode) {
             K_ASSERT(mpNode);
         }
 
@@ -120,9 +121,9 @@ public:
         /**
          * @brief Constructor
          *
-         * @param node Iterator node
+         * @param pNode Iterator node
          */
-        explicit ConstIterator(TListNode<T>* node) : mpNode(node) {
+        explicit ConstIterator(TListNode<T>* pNode) : mpNode(pNode) {
             K_ASSERT(mpNode);
         }
 
@@ -192,14 +193,14 @@ public:
         TListNode<T>* mpNode;
     };
 
-    typedef void (*ForEachFunc)(T& elem);
-    typedef void (*ForEachFuncConst)(const T& elem);
+    typedef void (*ForEachFunc)(T& rElem);
+    typedef void (*ForEachFuncConst)(const T& rElem);
 
 public:
     /**
      * @brief Constructor
      */
-    explicit TList() : mSize(0), mEndNode(NULL) {
+    TList() : mSize(0), mEndNode(NULL) {
         mEndNode.mpNext = &mEndNode;
         mEndNode.mpPrev = &mEndNode;
     }
@@ -274,19 +275,19 @@ public:
     /**
      * @brief Prepends element to front of list
      *
-     * @param elem New element
+     * @param pElem New element
      */
-    void PushFront(T* elem) {
-        Insert(Begin(), new TListNode<T>(elem));
+    void PushFront(T* pElem) {
+        Insert(Begin(), new TListNode<T>(pElem));
     }
 
     /**
      * @brief Appends element to end of list
      *
-     * @param elem New element
+     * @param pElem New element
      */
-    void PushBack(T* elem) {
-        Insert(End(), new TListNode<T>(elem));
+    void PushBack(T* pElem) {
+        Insert(End(), new TListNode<T>(pElem));
     }
 
     /**
@@ -323,10 +324,10 @@ public:
      * @brief Inserts node at iterator
      *
      * @param iter Iterator at which to insert node
-     * @param node Node to insert
+     * @param pNode Node to insert
      * @return Iterator to new node
      */
-    Iterator Insert(Iterator iter, TListNode<T>* node);
+    Iterator Insert(Iterator iter, TListNode<T>* pNode);
 
     /**
      * @brief Erases node at iterator
@@ -342,10 +343,10 @@ public:
     /**
      * @brief Erases node from list
      *
-     * @param node Node to erase
+     * @param pNode Node to erase
      * @return Iterator to next node
      */
-    Iterator Erase(TListNode<T>* node);
+    Iterator Erase(TListNode<T>* pNode);
 
     /**
      * @brief Erases range of nodes
@@ -359,11 +360,11 @@ public:
     /**
      * @brief Removes first occurrence of element from list
      *
-     * @param elem
+     * @param pElem
      */
-    void Remove(const T* elem) {
+    void Remove(const T* pElem) {
         for (Iterator it = Begin(); it != End(); ++it) {
-            if (&*it == elem) {
+            if (&*it == pElem) {
                 Erase(it);
             }
         }
@@ -372,13 +373,13 @@ public:
     /**
      * @brief Applies the specified function to every element in the list
      *
-     * @param func For-each function
+     * @param pFunc For-each function
      */
-    void ForEach(ForEachFunc func) {
-        K_ASSERT(func != NULL);
+    void ForEach(ForEachFunc pFunc) {
+        K_ASSERT(pFunc != NULL);
 
         for (Iterator it = Begin(); it != End(); ++it) {
-            func(it);
+            pFunc(it);
         }
     }
 
@@ -386,13 +387,13 @@ public:
      * @brief Applies the specified function to every element in the list
      * (read-only)
      *
-     * @param func For-each function (const-view)
+     * @param pFunc For-each function (const-view)
      */
-    void ForEach(ForEachFuncConst func) {
-        K_ASSERT(func != NULL);
+    void ForEach(ForEachFuncConst pFunc) {
+        K_ASSERT(pFunc != NULL);
 
         for (Iterator it = Begin(); it != End(); ++it) {
-            func(it);
+            pFunc(it);
         }
     }
 
@@ -407,12 +408,12 @@ private:
  * @brief Applies code to each list element
  * @note The current iterator can be accessed through the variable 'it'.
  *
- * @param list List reference
+ * @param rList List reference
  * @param T List element type
  * @param stmt Code to run during each iteration
  */
-#define K_LIST_FOREACH(list, T, stmt)                                          \
-    for (TList<T>::Iterator it = list.Begin(); it != list.End(); ++it) {       \
+#define K_LIST_FOREACH(rList, T, stmt)                                         \
+    for (TList<T>::Iterator it = rList.Begin(); it != rList.End(); ++it) {     \
         stmt                                                                   \
     }
 
@@ -420,12 +421,13 @@ private:
  * @brief Applies code to each list element (const-view)
  * @note The current iterator can be accessed through the variable 'it'.
  *
- * @param list List reference (const-view)
+ * @param rList List reference (const-view)
  * @param T List element type
  * @param stmt Code to run during each iteration
  */
-#define K_LIST_FOREACH_CONST(list, T, stmt)                                    \
-    for (TList<T>::ConstIterator it = list.Begin(); it != list.End(); ++it) {  \
+#define K_LIST_FOREACH_CONST(rList, T, stmt)                                   \
+    for (TList<T>::ConstIterator it = rList.Begin(); it != rList.End();        \
+         ++it) {                                                               \
         stmt                                                                   \
     }
 
