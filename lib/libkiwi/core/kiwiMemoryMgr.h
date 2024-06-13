@@ -74,14 +74,7 @@ private:
      *
      * @param memory Target memory region
      */
-    EGG::Heap* GetHeap(EMemory memory) const {
-        K_ASSERT(memory < EMemory_Max);
-
-        EGG::Heap* pHeap = memory == EMemory_MEM1 ? mpHeapMEM1 : mpHeapMEM2;
-        K_ASSERT(pHeap != NULL);
-
-        return pHeap;
-    }
+    EGG::Heap* GetHeap(EMemory memory) const;
 
 private:
     EGG::Heap* mpHeapMEM1; // Heap in MEM1 region

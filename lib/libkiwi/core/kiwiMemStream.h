@@ -157,14 +157,12 @@ public:
      * @note String size limited to 0x400 (1024) bytes
      */
     String Read_string();
-
     /**
      * @brief Writes a C-style string to this stream
      *
      * @param rStr String
      */
     void Write_string(const String& rStr);
-
     /**
      * @brief Reads a C-style string from this stream without advancing the
      * stream's position

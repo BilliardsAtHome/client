@@ -16,11 +16,11 @@ public:
     /**
      * @brief Logs output to the console
      *
-     * @param rT Value (attempted to convert to string)
+     * @param rValue Value (attempted to convert to string)
      * @return ConsoleOut reference
      */
-    template <typename T> const ConsoleOut& operator<<(const T& rT) const {
-        K_LOG(ToString(rT));
+    template <typename T> const ConsoleOut& operator<<(const T& rValue) const {
+        K_LOG(ToString(rValue));
         return *this;
     }
 };

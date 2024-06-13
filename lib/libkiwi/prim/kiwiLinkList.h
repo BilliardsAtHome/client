@@ -85,27 +85,13 @@ public:
             return clone;
         }
 
-        /**
-         * @brief Gets pointer to element
-         */
-        T* operator->() const {
-            return mpNode->mpElement;
-        }
+        // clang-format off
+        T* operator->() const { return mpNode->mpElement; }
+        T& operator*()  const { K_ASSERT(mpNode->mpElement != NULL); return *mpNode->mpElement; }
 
-        /**
-         * @brief Gets reference to element
-         */
-        T& operator*() const {
-            K_ASSERT(mpNode->mpElement != NULL);
-            return *mpNode->mpElement;
-        }
-
-        bool operator==(Iterator rhs) const {
-            return mpNode == rhs.mpNode;
-        }
-        bool operator!=(Iterator rhs) const {
-            return mpNode != rhs.mpNode;
-        }
+        bool operator==(Iterator rhs) const { return mpNode == rhs.mpNode; }
+        bool operator!=(Iterator rhs) const { return mpNode != rhs.mpNode; }
+        // clang-format on
 
     private:
         TListNode<T>* mpNode;
@@ -168,26 +154,13 @@ public:
             return clone;
         }
 
-        /**
-         * @brief Gets pointer to element
-         */
-        const T* operator->() const {
-            return mpNode->mpElement;
-        }
+        // clang-format off
+        const T* operator->() const { return mpNode->mpElement; }
+        const T& operator*()  const { K_ASSERT(mpNode->mpElement != NULL); return *mpNode->mpElement; }
 
-        /**
-         * @brief Gets reference to element
-         */
-        const T& operator*() const {
-            return *mpNode->mpElement;
-        }
-
-        bool operator==(ConstIterator rhs) const {
-            return mpNode == rhs.mpNode;
-        }
-        bool operator!=(ConstIterator rhs) const {
-            return mpNode != rhs.mpNode;
-        }
+        bool operator==(ConstIterator rhs) const { return mpNode == rhs.mpNode; }
+        bool operator!=(ConstIterator rhs) const { return mpNode != rhs.mpNode; }
+        // clang-format on
 
     private:
         TListNode<T>* mpNode;

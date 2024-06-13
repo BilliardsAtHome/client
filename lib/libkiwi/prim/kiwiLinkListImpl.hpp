@@ -20,15 +20,15 @@ template <typename T>
 TList<T>::Iterator TList<T>::Insert(Iterator iter, TListNode<T>* pNode) {
     K_ASSERT(pNode != NULL);
 
-    TListNode<T>* next = iter.mpNode;
-    TListNode<T>* prev = next->mpPrev;
+    TListNode<T>* pNext = iter.mpNode;
+    TListNode<T>* pPrev = pNext->mpPrev;
 
-    // prev <- pNode -> next
-    pNode->mpNext = next;
-    pNode->mpPrev = prev;
-    // prev <-> pNode <-> next
-    next->mpPrev = pNode;
-    prev->mpNext = pNode;
+    // pPrev <- pNode -> pNext
+    pNode->mpNext = pNext;
+    pNode->mpPrev = pPrev;
+    // pPrev <-> pNode <-> pNext
+    pNext->mpPrev = pNode;
+    pPrev->mpNext = pNode;
 
     mSize++;
 
@@ -44,12 +44,12 @@ TList<T>::Iterator TList<T>::Insert(Iterator iter, TListNode<T>* pNode) {
 template <typename T> TList<T>::Iterator TList<T>::Erase(TListNode<T>* pNode) {
     K_ASSERT(pNode != NULL);
 
-    TListNode<T>* next = pNode->mpNext;
-    TListNode<T>* prev = pNode->mpPrev;
+    TListNode<T>* pNext = pNode->mpNext;
+    TListNode<T>* pPrev = pNode->mpPrev;
 
     // Remove connections to node
-    next->mpPrev = prev;
-    prev->mpNext = next;
+    pNext->mpPrev = pPrev;
+    pPrev->mpNext = pNext;
     // Isolate node
     pNode->mpNext = NULL;
     pNode->mpPrev = NULL;
@@ -58,7 +58,7 @@ template <typename T> TList<T>::Iterator TList<T>::Erase(TListNode<T>* pNode) {
 
     mSize--;
 
-    return Iterator(next);
+    return Iterator(pNext);
 }
 
 /**

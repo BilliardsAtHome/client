@@ -1,6 +1,7 @@
 #ifndef LIBKIWI_PRIM_OPTIONAL_H
 #define LIBKIWI_PRIM_OPTIONAL_H
 #include <algorithm>
+#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace kiwi {

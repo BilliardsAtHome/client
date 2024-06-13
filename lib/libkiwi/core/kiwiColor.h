@@ -11,23 +11,33 @@ namespace kiwi {
  */
 class Color {
 public:
+    /**
+     * @brief Constructor
+     */
     Color() {
         *this = WHITE;
     }
+
+    /**
+     * @brief Constructor
+     *
+     * @param r Red component
+     * @param g Green component
+     * @param b Blue component
+     * @param a Alpha component
+     */
     Color(u8 r, u8 g, u8 b, u8 a) : r(r), g(g), b(b), a(a) {}
+
+    /**
+     * @brief Constructor
+     *
+     * @param color RGBA32 color
+     */
     Color(u32 color)
         : r(color >> 24 & 0xFF),
           g(color >> 16 & 0xFF),
           b(color >> 8 & 0xFF),
           a(color >> 0 & 0xFF) {}
-
-    operator u32() const {
-        return rgba32();
-    }
-
-    operator nw4r::ut::Color() const {
-        return nw4r::ut::Color(rgba32());
-    }
 
     /**
      * @brief Converts color to u32 (RGBA order)
@@ -35,7 +45,6 @@ public:
     u32 rgba32() const {
         return r << 24 | g << 16 | b << 8 | a;
     }
-
     /**
      * @brief Converts color to u32 (ARGB order)
      */
@@ -52,6 +61,11 @@ public:
         u8 v = (0.439f * r - 0.368f * g - 0.071f * b + 128.0f);
         return Color(y, u, v, a);
     }
+
+    // clang-format off
+    operator             u32() const { return rgba32(); }
+    operator nw4r::ut::Color() const { return nw4r::ut::Color(rgba32()); }
+    // clang-format on
 
 public:
     // Color components

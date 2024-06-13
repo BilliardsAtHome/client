@@ -142,7 +142,10 @@ void BreakInfo::Log() const {
  */
 void BreakInfo::Save(const char* name) const {
     // Work buffer (byte-aligned for NAND requirements)
-    kiwi::WorkBuffer buffer(sizeof(BreakInfo));
+    kiwi::WorkBufferArg arg;
+    arg.size = sizeof(BreakInfo);
+    arg.sizeAlign = arg.memAlign = 32;
+    kiwi::WorkBuffer buffer(arg);
 
     // Write break info to buffer
     {

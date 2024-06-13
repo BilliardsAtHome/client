@@ -45,7 +45,6 @@
 #include <libkiwi/prim/kiwiHashMap.h>
 #include <libkiwi/prim/kiwiLinkList.h>
 #include <libkiwi/prim/kiwiOptional.h>
-#include <libkiwi/prim/kiwiPair.h>
 #include <libkiwi/prim/kiwiSTL.h>
 #include <libkiwi/prim/kiwiSmartPtr.h>
 #include <libkiwi/prim/kiwiString.h>

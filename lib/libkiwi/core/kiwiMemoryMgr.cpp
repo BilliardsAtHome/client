@@ -78,6 +78,20 @@ MemoryMgr::~MemoryMgr() {
 }
 
 /**
+ * @brief Gets the heap corresponding to the specified memory region
+ *
+ * @param memory Target memory region
+ */
+EGG::Heap* MemoryMgr::GetHeap(EMemory memory) const {
+    K_ASSERT(memory < EMemory_Max);
+
+    EGG::Heap* pHeap = memory == EMemory_MEM1 ? mpHeapMEM1 : mpHeapMEM2;
+    K_ASSERT(pHeap != NULL);
+
+    return pHeap;
+}
+
+/**
  * @brief Allocates a block of memory
  *
  * @param size Block size

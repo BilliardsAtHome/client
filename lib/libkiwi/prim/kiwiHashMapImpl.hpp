@@ -133,23 +133,23 @@ TMap<TKey, TValue>::Bucket& TMap<TKey, TValue>::Create(const TKey& rKey) {
 
     // Iterate through chains
     Bucket* pLast = NULL;
-    for (Bucket* it = &mpBuckets[i]; it != NULL; it = it->pChained) {
+    for (Bucket* pIt = &mpBuckets[i]; pIt != NULL; pIt = pIt->pChained) {
         // Unused entry
-        if (!it->used) {
+        if (!pIt->used) {
             // Override this entry
-            it->key = rKey;
-            it->value.Emplace();
-            it->used = true;
+            pIt->key = rKey;
+            pIt->value.Emplace();
+            pIt->used = true;
             mSize++;
-            return *it;
+            return *pIt;
         }
 
         // Matches key
-        if (*it->key == rKey) {
-            return *it;
+        if (*pIt->key == rKey) {
+            return *pIt;
         }
 
-        pLast = it;
+        pLast = pIt;
     }
 
     // Chain new bucket
