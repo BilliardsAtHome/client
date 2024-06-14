@@ -47,8 +47,8 @@ bool islower(char c) {
  * @param c Character to search for
  */
 char* strchr(const char* pStr, char c) {
-    if (pStr == NULL) {
-        return NULL;
+    if (pStr == nullptr) {
+        return nullptr;
     }
 
     for (; *pStr != '\0'; pStr++) {
@@ -57,7 +57,7 @@ char* strchr(const char* pStr, char c) {
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -70,7 +70,7 @@ char* strchr(const char* pStr, char c) {
 size_t strnlen(const char* pStr, size_t maxlen) {
     size_t len = 0;
 
-    if (pStr == NULL) {
+    if (pStr == nullptr) {
         return 0;
     }
 
@@ -91,7 +91,7 @@ size_t strnlen(const char* pStr, size_t maxlen) {
  * @param base Number base (specify 0 to auto-detect)
  */
 s32 strtol(const char* pStr, char** pEndPtr, int base) {
-    K_ASSERT(pStr != NULL);
+    K_ASSERT(pStr != nullptr);
 
     // Trim leading whitespace
     while (*pStr == ' ') {
@@ -164,7 +164,7 @@ s32 strtol(const char* pStr, char** pEndPtr, int base) {
         }
         // Conversion end
         else {
-            if (pEndPtr != NULL) {
+            if (pEndPtr != nullptr) {
                 *pEndPtr = const_cast<char*>(pStr);
             }
             break;
@@ -191,7 +191,7 @@ u32 strtoul(const char* pStr, char** pEndPtr, int base) {
  * @param pStr String to convert
  */
 f64 atof(const char* pStr) {
-    K_ASSERT(pStr != NULL);
+    K_ASSERT(pStr != nullptr);
 
     // Skip whitespace
     while (*pStr == ' ') {
@@ -219,8 +219,8 @@ f64 atof(const char* pStr) {
  * @param maxlen Maximum number of characters to concatenate
  */
 wchar_t* wcsncat(wchar_t* pwDst, const wchar_t* pwSrc, size_t maxlen) {
-    K_ASSERT(pwDst != NULL);
-    K_ASSERT(pwSrc != NULL);
+    K_ASSERT(pwDst != nullptr);
+    K_ASSERT(pwSrc != nullptr);
 
     // Backup original argument
     wchar_t* pBackup = pwDst;
@@ -254,8 +254,8 @@ wchar_t* wcsncat(wchar_t* pwDst, const wchar_t* pwSrc, size_t maxlen) {
  * @param maxlen Maximum number of characters to compare
  */
 int wcsncmp(const wchar_t* pwStr1, const wchar_t* pwStr2, size_t maxlen) {
-    K_ASSERT(pwStr1 != NULL);
-    K_ASSERT(pwStr2 != NULL);
+    K_ASSERT(pwStr1 != nullptr);
+    K_ASSERT(pwStr2 != nullptr);
 
     for (int i = 0; i < maxlen; i++) {
         if (*pwStr1 != *pwStr2) {
@@ -280,10 +280,10 @@ int wcsncmp(const wchar_t* pwStr1, const wchar_t* pwStr2, size_t maxlen) {
  * @param pwSeq Sequence to search for
  */
 const wchar_t* wcsstr(const wchar_t* pwStr, const wchar_t* pwSeq) {
-    K_ASSERT(pwStr != NULL);
+    K_ASSERT(pwStr != nullptr);
 
     // No sequence/empty sequence
-    if (pwSeq == NULL || *pwSeq == L'\0') {
+    if (pwSeq == nullptr || *pwSeq == L'\0') {
         return pwStr;
     }
 
@@ -313,7 +313,7 @@ const wchar_t* wcsstr(const wchar_t* pwStr, const wchar_t* pwSeq) {
         pwStr++;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 } // namespace ksl

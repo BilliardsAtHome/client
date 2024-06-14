@@ -12,7 +12,7 @@ void Packet::Alloc(u32 size) {
     K_ASSERT_EX(size < GetMaxContent(), "Must be fragmented!");
 
     // Free existing message
-    if (mpBuffer != NULL) {
+    if (mpBuffer != nullptr) {
         Free();
     }
 
@@ -20,7 +20,7 @@ void Packet::Alloc(u32 size) {
     mBufferSize = size + GetOverhead();
 
     mpBuffer = new u8[mBufferSize];
-    K_ASSERT(mpBuffer != NULL);
+    K_ASSERT(mpBuffer != nullptr);
 
     Clear();
 }
@@ -32,7 +32,7 @@ void Packet::Free() {
     AutoMutexLock lock(mBufferMutex);
 
     delete mpBuffer;
-    mpBuffer = NULL;
+    mpBuffer = nullptr;
 
     Clear();
 }
@@ -56,7 +56,7 @@ void Packet::Clear() {
  * @return Number of bytes read
  */
 u32 Packet::Read(void* pDst, u32 n) {
-    K_ASSERT(mpBuffer != NULL);
+    K_ASSERT(mpBuffer != nullptr);
     K_ASSERT(n <= GetMaxContent());
 
     AutoMutexLock lock(mBufferMutex);
@@ -80,7 +80,7 @@ u32 Packet::Read(void* pDst, u32 n) {
  * @return Number of bytes written
  */
 u32 Packet::Write(const void* pSrc, u32 n) {
-    K_ASSERT(mpBuffer != NULL);
+    K_ASSERT(mpBuffer != nullptr);
     K_ASSERT(n <= GetMaxContent());
 
     AutoMutexLock lock(mBufferMutex);
@@ -104,7 +104,7 @@ u32 Packet::Write(const void* pSrc, u32 n) {
  */
 Optional<u32> Packet::Recv(SOSocket socket) {
     K_ASSERT(socket >= 0);
-    K_ASSERT(mpBuffer != NULL);
+    K_ASSERT(mpBuffer != nullptr);
 
     AutoMutexLock lock(mBufferMutex);
 
@@ -135,7 +135,7 @@ Optional<u32> Packet::Recv(SOSocket socket) {
  */
 Optional<u32> Packet::Send(SOSocket socket) {
     K_ASSERT(socket >= 0);
-    K_ASSERT(mpBuffer != NULL);
+    K_ASSERT(mpBuffer != nullptr);
 
     AutoMutexLock lock(mBufferMutex);
 

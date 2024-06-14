@@ -2,7 +2,6 @@
 #define LIBKIWI_PRIM_VECTOR_H
 #include <algorithm>
 #include <libkiwi/debug/kiwiAssert.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
@@ -15,14 +14,14 @@ public:
     /**
      * @brief Constructor
      */
-    TVector() : mpData(NULL), mCapacity(0), mSize(0) {}
+    TVector() : mpData(nullptr), mCapacity(0), mSize(0) {}
 
     /**
      * @brief Constructor
      *
      * @param capacity Buffer capacity
      */
-    explicit TVector(u32 capacity) : mpData(NULL), mCapacity(0), mSize(0) {
+    explicit TVector(u32 capacity) : mpData(nullptr), mCapacity(0), mSize(0) {
         Reserve(capacity);
     }
 
@@ -32,7 +31,7 @@ public:
      *
      * @param rOther Vector to copy
      */
-    TVector(const TVector& rOther) : mpData(NULL), mCapacity(0), mSize(0) {
+    TVector(const TVector& rOther) : mpData(nullptr), mCapacity(0), mSize(0) {
         CopyFrom(rOther);
     }
 
@@ -43,7 +42,7 @@ public:
      *
      * @param rOther Vector to move
      */
-    TVector(TVector&& rOther) : mpData(NULL), mCapacity(0), mSize(0) {
+    TVector(TVector&& rOther) : mpData(nullptr), mCapacity(0), mSize(0) {
         MoveFrom(std::move(rOther));
     }
 #endif
@@ -66,6 +65,7 @@ public:
      */
     TVector& operator=(const TVector& rOther) {
         CopyFrom(rOther);
+        return *this;
     }
 
 #ifdef LIBKIWI_CPP1X
@@ -76,6 +76,7 @@ public:
      */
     TVector& operator=(TVector&& rOther) {
         MoveFrom(std::move(rOther));
+        return *this;
     }
 #endif
 
@@ -101,7 +102,7 @@ public:
      */
     T& operator[](u32 i) {
         K_ASSERT(i < mSize);
-        K_ASSERT(mpData != NULL);
+        K_ASSERT(mpData != nullptr);
         return Buffer()[i];
     }
     /**
@@ -112,7 +113,7 @@ public:
      */
     const T& operator[](u32 i) const {
         K_ASSERT(i < mSize);
-        K_ASSERT(mpData != NULL);
+        K_ASSERT(mpData != nullptr);
         return Buffer()[i];
     }
 

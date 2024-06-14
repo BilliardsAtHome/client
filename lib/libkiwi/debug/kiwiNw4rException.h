@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_DEBUG_NW4R_EXCEPTION_H
 #define LIBKIWI_DEBUG_NW4R_EXCEPTION_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 #include <revolution/OS.h>
@@ -78,7 +77,7 @@ public:
         /**
          * @brief Constructor
          */
-        Assert() : pFile(""), line(0), pMsg(""), pSP(NULL) {}
+        Assert() : pFile(""), line(0), pMsg(""), pSP(nullptr) {}
     };
 
     /**
@@ -96,7 +95,7 @@ public:
         /**
          * @brief Constructor
          */
-        Info() : error(EError_None), pCtx(NULL), dsisr(0), dar(0), msr(0) {}
+        Info() : error(EError_None), pCtx(nullptr), dsisr(0), dar(0), msr(0) {}
     };
 
     /**
@@ -114,7 +113,7 @@ public:
      * @param pCallback Exception callback function
      * @param pArg Exception callback argument
      */
-    void SetUserCallback(UserCallback pCallback, void* pArg = NULL);
+    void SetUserCallback(UserCallback pCallback, void* pArg = nullptr);
 
     /**
      * @brief Writes text to the exception details

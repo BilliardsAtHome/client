@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_DEBUG_I_DEBUGGER_H
 #define LIBKIWI_DEBUG_I_DEBUGGER_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiOptional.h>
 #include <libkiwi/util/kiwiGlobalInstance.h>

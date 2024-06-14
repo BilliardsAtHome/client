@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_CORE_CONTROLLER_H
 #define LIBKIWI_CORE_CONTROLLER_H
 #include <egg/core.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiExtView.h>
 

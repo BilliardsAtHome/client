@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_PRIM_LINKLIST_H
 #define LIBKIWI_PRIM_LINKLIST_H
 #include <libkiwi/debug/kiwiAssert.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiNonCopyable.h>
 
@@ -24,7 +23,7 @@ private:
      * @param pElem Node element
      */
     explicit TListNode(T* pElem)
-        : mpNext(NULL), mpPrev(NULL), mpElement(pElem) {}
+        : mpNext(nullptr), mpPrev(nullptr), mpElement(pElem) {}
 
     TListNode<T>* mpNext; // Next node in the linked-list
     TListNode<T>* mpPrev; // Previous node in the linked-list
@@ -87,7 +86,7 @@ public:
 
         // clang-format off
         T* operator->() const { return mpNode->mpElement; }
-        T& operator*()  const { K_ASSERT(mpNode->mpElement != NULL); return *mpNode->mpElement; }
+        T& operator*()  const { K_ASSERT(mpNode->mpElement != nullptr); return *mpNode->mpElement; }
 
         bool operator==(Iterator rhs) const { return mpNode == rhs.mpNode; }
         bool operator!=(Iterator rhs) const { return mpNode != rhs.mpNode; }
@@ -156,7 +155,7 @@ public:
 
         // clang-format off
         const T* operator->() const { return mpNode->mpElement; }
-        const T& operator*()  const { K_ASSERT(mpNode->mpElement != NULL); return *mpNode->mpElement; }
+        const T& operator*()  const { K_ASSERT(mpNode->mpElement != nullptr); return *mpNode->mpElement; }
 
         bool operator==(ConstIterator rhs) const { return mpNode == rhs.mpNode; }
         bool operator!=(ConstIterator rhs) const { return mpNode != rhs.mpNode; }
@@ -173,7 +172,7 @@ public:
     /**
      * @brief Constructor
      */
-    TList() : mSize(0), mEndNode(NULL) {
+    TList() : mSize(0), mEndNode(nullptr) {
         mEndNode.mpNext = &mEndNode;
         mEndNode.mpPrev = &mEndNode;
     }
@@ -349,7 +348,7 @@ public:
      * @param pFunc For-each function
      */
     void ForEach(ForEachFunc pFunc) {
-        K_ASSERT(pFunc != NULL);
+        K_ASSERT(pFunc != nullptr);
 
         for (Iterator it = Begin(); it != End(); ++it) {
             pFunc(it);
@@ -363,7 +362,7 @@ public:
      * @param pFunc For-each function (const-view)
      */
     void ForEach(ForEachFuncConst pFunc) {
-        K_ASSERT(pFunc != NULL);
+        K_ASSERT(pFunc != nullptr);
 
         for (Iterator it = Begin(); it != End(); ++it) {
             pFunc(it);

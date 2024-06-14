@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_UTIL_IOS_DEVICE_H
 #define LIBKIWI_UTIL_IOS_DEVICE_H
 #include <libkiwi/core/kiwiMemoryMgr.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiOptional.h>
 #include <libkiwi/prim/kiwiString.h>

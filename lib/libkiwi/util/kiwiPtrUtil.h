@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_UTIL_PTR_UTIL_H
 #define LIBKIWI_UTIL_PTR_UTIL_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace kiwi {

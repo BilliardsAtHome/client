@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_DEBUG_NW4R_CONSOLE_H
 #define LIBKIWI_DEBUG_NW4R_CONSOLE_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 

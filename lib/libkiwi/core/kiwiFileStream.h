@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_CORE_FILE_STREAM_H
 #define LIBKIWI_CORE_FILE_STREAM_H
 #include <libkiwi/core/kiwiIStream.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace kiwi {

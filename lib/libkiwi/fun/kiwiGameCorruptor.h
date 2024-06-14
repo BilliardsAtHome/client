@@ -2,7 +2,6 @@
 #define LIBKIWI_FUN_GAME_CORRUPTOR_H
 #include <Pack/RPSystem.h>
 #include <egg/core.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 #include <revolution/OS.h>

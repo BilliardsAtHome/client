@@ -38,7 +38,7 @@ CFLAGS_COMMON = " ".join([
     "-RTTI off",                  # Disable RTTI to save module size
     "-sdata 0",                   # We can't use small data sections in relocatable code
     "-sdata2 0",                  # We can't use small data sections in relocatable code
-    "-pragma \"rvalue_refs on\"",  # Enable move semantics
+    "-pragma \"cpp1x on\"",       # Enable C++11 features
 ])
 
 # Flags applied only to the module

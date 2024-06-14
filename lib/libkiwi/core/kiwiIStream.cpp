@@ -27,7 +27,7 @@ void IStream::Seek(ESeekDir dir, s32 offset) {
  * @return Number of bytes read, or DVD error code
  */
 s32 IStream::Read(void* pDst, u32 size) {
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
     K_ASSERT_EX(IsOpen(), "Stream is not available");
     K_ASSERT_EX(CanRead(), "Stream does not support reading");
 
@@ -54,7 +54,7 @@ s32 IStream::Read(void* pDst, u32 size) {
  * @return Number of bytes written, or DVD error code
  */
 s32 IStream::Write(const void* pSrc, u32 size) {
-    K_ASSERT(pSrc != NULL);
+    K_ASSERT(pSrc != nullptr);
     K_ASSERT_EX(IsOpen(), "Stream is not available");
     K_ASSERT_EX(CanWrite(), "Stream does not support writing");
 
@@ -82,7 +82,7 @@ s32 IStream::Write(const void* pSrc, u32 size) {
  * @return Number of bytes read, or DVD error code
  */
 s32 IStream::Peek(void* pDst, u32 size) {
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
     K_ASSERT_EX(IsOpen(), "Stream is not available");
     K_ASSERT_EX(CanRead() && CanSeek(), "Stream does not support peeking");
 

@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_PRIM_STRING_H
 #define LIBKIWI_PRIM_STRING_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiBitCast.h>
 #include <libkiwi/prim/kiwiHashMap.h>
@@ -16,7 +15,7 @@ public:
     /**
      * @brief Constructor
      */
-    StringImpl() : mpBuffer(NULL), mCapacity(0), mLength(0) {
+    StringImpl() : mpBuffer(nullptr), mCapacity(0), mLength(0) {
         Clear();
     }
 
@@ -27,7 +26,7 @@ public:
      * @param rOther String to copy
      */
     StringImpl(const StringImpl& rOther)
-        : mpBuffer(NULL), mCapacity(0), mLength(0) {
+        : mpBuffer(nullptr), mCapacity(0), mLength(0) {
         Assign(rOther);
     }
 
@@ -40,7 +39,7 @@ public:
      * @param len Substring length
      */
     StringImpl(const StringImpl& rOther, u32 pos, u32 len = npos)
-        : mpBuffer(NULL), mCapacity(0), mLength(0) {
+        : mpBuffer(nullptr), mCapacity(0), mLength(0) {
         Assign(rOther.SubStr(pos, len));
     }
 
@@ -50,7 +49,7 @@ public:
      *
      * @param pStr C-style string
      */
-    StringImpl(const T* pStr) : mpBuffer(NULL), mCapacity(0), mLength(0) {
+    StringImpl(const T* pStr) : mpBuffer(nullptr), mCapacity(0), mLength(0) {
         Assign(pStr);
     }
 
@@ -62,7 +61,7 @@ public:
      * @param n Number of characters to copy
      */
     StringImpl(const T* pStr, u32 n)
-        : mpBuffer(NULL), mCapacity(0), mLength(0) {
+        : mpBuffer(nullptr), mCapacity(0), mLength(0) {
         Assign(pStr, n);
     }
 
@@ -72,7 +71,7 @@ public:
      *
      * @param c Character
      */
-    StringImpl(char c) : mpBuffer(NULL), mCapacity(0), mLength(0) {
+    StringImpl(char c) : mpBuffer(nullptr), mCapacity(0), mLength(0) {
         Assign(c);
     }
 
@@ -82,7 +81,7 @@ public:
      *
      * @param n Number of characters to reserve
      */
-    explicit StringImpl(u32 n) : mpBuffer(NULL), mCapacity(0), mLength(0) {
+    explicit StringImpl(u32 n) : mpBuffer(nullptr), mCapacity(0), mLength(0) {
         Reserve(n);
     }
 
@@ -96,7 +95,7 @@ public:
         }
 
         delete[] mpBuffer;
-        mpBuffer = NULL;
+        mpBuffer = nullptr;
     }
 
     /**
@@ -222,11 +221,11 @@ public:
 
     // clang-format off
     StringImpl& operator=(const StringImpl& rStr) { Assign(rStr); return *this; }
-    StringImpl& operator=(const T* pStr)          { K_ASSERT(pStr != NULL); Assign(pStr); return *this; }
+    StringImpl& operator=(const T* pStr)          { K_ASSERT(pStr != nullptr); Assign(pStr); return *this; }
     StringImpl& operator=(T c)                    { Assign(c); return *this; }
 
     StringImpl& operator+=(const StringImpl& rStr) { Append(rStr); return *this; }
-    StringImpl& operator+=(const T* pStr)          { K_ASSERT(pStr != NULL); Append(pStr); return *this; }
+    StringImpl& operator+=(const T* pStr)          { K_ASSERT(pStr != nullptr); Append(pStr); return *this; }
     StringImpl& operator+=(T c)                    { Append(c); return *this; }
 
     bool operator==(const StringImpl& rStr) const;

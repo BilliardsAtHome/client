@@ -52,7 +52,7 @@ bool IosDevice::Close() {
 s32 IosDevice::Ioctl(s32 id) const {
     K_ASSERT_EX(IsOpen(), "Please open this device");
 
-    return IOS_Ioctl(mHandle, id, NULL, 0, NULL, 0);
+    return IOS_Ioctl(mHandle, id, nullptr, 0, nullptr, 0);
 }
 
 /**

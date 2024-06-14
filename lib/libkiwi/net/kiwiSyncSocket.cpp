@@ -17,7 +17,7 @@ bool SyncSocket::Connect(const SockAddrAny& rAddr, Callback pCallback,
     s32 result = LibSO::Connect(mHandle, rAddr);
     bool success = result == SO_SUCCESS || result == SO_EISCONN;
 
-    if (pCallback != NULL) {
+    if (pCallback != nullptr) {
         pCallback(LibSO::GetLastError(), pArg);
     }
 
@@ -34,7 +34,7 @@ bool SyncSocket::Connect(const SockAddrAny& rAddr, Callback pCallback,
 SyncSocket* SyncSocket::Accept(AcceptCallback pCallback, void* pArg) {
     K_ASSERT(IsOpen());
 
-    SyncSocket* pPeer = NULL;
+    SyncSocket* pPeer = nullptr;
     SockAddr4 addr; // TODO: Will forcing ipv4 cause problems?
 
     s32 fd = LibSO::Accept(mHandle, addr);
@@ -42,10 +42,10 @@ SyncSocket* SyncSocket::Accept(AcceptCallback pCallback, void* pArg) {
     // Result code is the peer descriptor
     if (fd > 0) {
         pPeer = new SyncSocket(fd, mFamily, mType);
-        K_ASSERT(pPeer != NULL);
+        K_ASSERT(pPeer != nullptr);
     }
 
-    if (pCallback != NULL) {
+    if (pCallback != nullptr) {
         pCallback(LibSO::GetLastError(), pPeer, addr, pArg);
     }
 
@@ -67,7 +67,7 @@ SOResult SyncSocket::RecvImpl(void* pDst, u32 len, u32& rRecv,
                               SockAddrAny* pAddr, Callback pCallback,
                               void* pArg) {
     K_ASSERT(IsOpen());
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
     K_ASSERT(len > 0);
 
     s32 result;
@@ -87,11 +87,11 @@ SOResult SyncSocket::RecvImpl(void* pDst, u32 len, u32& rRecv,
     K_ASSERT_EX(rRecv <= len, "Overflow???");
 
 _exit:
-    if (pAddr != NULL) {
+    if (pAddr != nullptr) {
         *pAddr = addr;
     }
 
-    if (pCallback != NULL) {
+    if (pCallback != nullptr) {
         pCallback(LibSO::GetLastError(), pArg);
     }
 
@@ -114,14 +114,14 @@ SOResult SyncSocket::SendImpl(const void* pSrc, u32 len, u32& rSend,
                               const SockAddrAny* pAddr, Callback pCallback,
                               void* pArg) {
     K_ASSERT(IsOpen());
-    K_ASSERT(pSrc != NULL);
+    K_ASSERT(pSrc != nullptr);
     K_ASSERT(len > 0);
 
     s32 result;
 
     rSend = 0;
     while (rSend < len) {
-        if (pAddr != NULL) {
+        if (pAddr != nullptr) {
             result = LibSO::SendTo(mHandle, pSrc, len - rSend, 0, *pAddr);
         } else {
             result = LibSO::Send(mHandle, pSrc, len - rSend, 0);
@@ -137,7 +137,7 @@ SOResult SyncSocket::SendImpl(const void* pSrc, u32 len, u32& rSend,
     K_ASSERT_EX(rSend <= len, "Overflow???");
 
 _exit:
-    if (pCallback != NULL) {
+    if (pCallback != nullptr) {
         pCallback(LibSO::GetLastError(), pArg);
     }
 

@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_NET_HTTP_REQUEST_H
 #define LIBKIWI_NET_HTTP_REQUEST_H
 #include <libkiwi/debug/kiwiAssert.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiHashMap.h>
 #include <libkiwi/prim/kiwiString.h>
@@ -102,7 +101,7 @@ public:
      */
     ~HttpRequest() {
         K_ASSERT_EX(
-            mpResponseCallback == NULL,
+            mpResponseCallback == nullptr,
             "Don't destroy this object while async request is pending.");
 
         delete mpSocket;
@@ -162,7 +161,7 @@ public:
      * @param pArg Callback user argument
      * @param method Request method
      */
-    void SendAsync(ResponseCallback pCallback, void* pArg = NULL,
+    void SendAsync(ResponseCallback pCallback, void* pArg = nullptr,
                    EMethod method = EMethod_GET);
 
 private:

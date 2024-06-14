@@ -3,7 +3,6 @@
 #include <cstring>
 #include <libkiwi/core/kiwiMemoryMgr.h>
 #include <libkiwi/debug/kiwiAssert.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
 #include <libkiwi/util/kiwiIosVector.h>
@@ -24,7 +23,7 @@ public:
         K_ASSERT(size > 0);
 
         u8* buffer = new (32, EMemory_MEM2) u8[size * sizeof(T)];
-        K_ASSERT(buffer != NULL);
+        K_ASSERT(buffer != nullptr);
 
         Set(buffer, size);
     }
@@ -90,7 +89,7 @@ public:
      * @brief Access underlying object (pointer)
      */
     T* Ptr() const {
-        K_ASSERT(Base() != NULL);
+        K_ASSERT(Base() != nullptr);
         return reinterpret_cast<T*>(Base());
     }
 

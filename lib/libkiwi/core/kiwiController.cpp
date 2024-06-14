@@ -45,7 +45,7 @@ const WiiCtrl& CtrlMgr::GetWiiCtrl(EPlayer i) {
     K_ASSERT(i < EPlayer_Max);
 
     EGG::CoreController* pBase = getNthController(i);
-    K_ASSERT(pBase != NULL);
+    K_ASSERT(pBase != nullptr);
 
     return *reinterpret_cast<WiiCtrl*>(pBase);
 }

@@ -8,7 +8,7 @@ namespace kiwi {
  * @param ctx OS context
  */
 void LibOS::FillFPUContext(register OSContext* ctx) {
-    K_ASSERT(ctx != NULL);
+    K_ASSERT(ctx != nullptr);
 
     // clang-format off
     K_ASM_BEGIN {

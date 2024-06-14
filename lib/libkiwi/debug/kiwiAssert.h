@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_DEBUG_ASSERT_H
 #define LIBKIWI_DEBUG_ASSERT_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 /**

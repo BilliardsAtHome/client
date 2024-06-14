@@ -115,7 +115,7 @@ void NandStream::SeekImpl(ESeekDir dir, s32 offset) {
  * @return Number of bytes read, or NAND error code
  */
 s32 NandStream::ReadImpl(void* pDst, u32 size) {
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
     return NANDRead(&mFileInfo, pDst, size);
 }
 
@@ -127,7 +127,7 @@ s32 NandStream::ReadImpl(void* pDst, u32 size) {
  * @return Number of bytes written, or NAND error code
  */
 s32 NandStream::WriteImpl(const void* pSrc, u32 size) {
-    K_ASSERT(pSrc != NULL);
+    K_ASSERT(pSrc != nullptr);
     return NANDWrite(&mFileInfo, pSrc, size);
 }
 
@@ -140,7 +140,7 @@ s32 NandStream::WriteImpl(const void* pSrc, u32 size) {
  * @return Number of bytes read, or NAND error code
  */
 s32 NandStream::PeekImpl(void* pDst, u32 size) {
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
 
     s32 n = ReadImpl(pDst, size);
     if (n > 0) {

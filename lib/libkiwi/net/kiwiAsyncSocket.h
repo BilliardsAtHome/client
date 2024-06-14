@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_NET_ASYNC_SOCKET_H
 #define LIBKIWI_NET_ASYNC_SOCKET_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/net/kiwiSocketBase.h>
 #include <libkiwi/prim/kiwiLinkList.h>

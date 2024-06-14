@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_CORE_MEMORY_MGR_H
 #define LIBKIWI_CORE_MEMORY_MGR_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiStaticSingleton.h>
 

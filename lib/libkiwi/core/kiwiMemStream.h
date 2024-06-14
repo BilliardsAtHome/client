@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_CORE_MEM_STREAM_H
 #define LIBKIWI_CORE_MEM_STREAM_H
 #include <libkiwi/core/kiwiFileStream.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiWorkBuffer.h>
 
@@ -16,7 +15,7 @@ public:
      * @brief Constructor
      */
     MemStream() : FileStream(EOpenMode_RW) {
-        Open(NULL, 0);
+        Open(nullptr, 0);
     }
 
     /**

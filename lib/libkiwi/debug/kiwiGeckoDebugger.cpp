@@ -37,11 +37,11 @@ void GeckoDebugger::ExiCallback(EXIChannel chan, OSContext* pCtx) {
  * @return Number of bytes read
  */
 Optional<u32> GeckoDebugger::Read(void* pDst, u32 size) {
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
     K_ASSERT(size > 0);
 
     // Lock this device while we use it
-    if (!EXILock(EXI_CHAN_0, EXI_DEV_EXT, NULL)) {
+    if (!EXILock(EXI_CHAN_0, EXI_DEV_EXT, nullptr)) {
         return kiwi::nullopt;
     }
 
@@ -55,7 +55,8 @@ Optional<u32> GeckoDebugger::Read(void* pDst, u32 size) {
 
     // Prepare DMA
     u32 imm = 0xA0000000; // Read command
-    success = success && EXIImm(EXI_CHAN_0, &imm, sizeof(u32), EXI_WRITE, NULL);
+    success =
+        success && EXIImm(EXI_CHAN_0, &imm, sizeof(u32), EXI_WRITE, nullptr);
     success = success && EXISync(EXI_CHAN_0);
 
     // Read data
@@ -77,11 +78,11 @@ Optional<u32> GeckoDebugger::Read(void* pDst, u32 size) {
  * @return Number of bytes read
  */
 Optional<u32> GeckoDebugger::Write(const void* pSrc, u32 size) {
-    K_ASSERT(pSrc != NULL);
+    K_ASSERT(pSrc != nullptr);
     K_ASSERT(size > 0);
 
     // Lock this device while we use it
-    if (!EXILock(EXI_CHAN_0, EXI_DEV_EXT, NULL)) {
+    if (!EXILock(EXI_CHAN_0, EXI_DEV_EXT, nullptr)) {
         return kiwi::nullopt;
     }
 
@@ -95,7 +96,8 @@ Optional<u32> GeckoDebugger::Write(const void* pSrc, u32 size) {
 
     // Prepare DMA
     u32 imm = 0xB0000000; // Write command
-    success = success && EXIImm(EXI_CHAN_0, &imm, sizeof(u32), EXI_WRITE, NULL);
+    success =
+        success && EXIImm(EXI_CHAN_0, &imm, sizeof(u32), EXI_WRITE, nullptr);
     success = success && EXISync(EXI_CHAN_0);
 
     // Write data

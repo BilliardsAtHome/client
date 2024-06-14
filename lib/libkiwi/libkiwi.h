@@ -71,6 +71,5 @@
 
 // Order important from here
 
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #endif

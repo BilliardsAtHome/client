@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_DEBUG_NW4R_DIRECT_PRINT_H
 #define LIBKIWI_DEBUG_NW4R_DIRECT_PRINT_H
 #include <libkiwi/core/kiwiColor.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 
@@ -18,7 +17,7 @@ public:
      * @brief Tests whether direct print is currently possible
      */
     bool IsActive() const {
-        return mpBuffer != NULL;
+        return mpBuffer != nullptr;
     }
 
     /**

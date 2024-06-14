@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_CORE_FILE_RIPPER_H
 #define LIBKIWI_CORE_FILE_RIPPER_H
 #include <libkiwi/core/kiwiMemoryMgr.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
@@ -23,7 +22,7 @@ enum EStorage {
  */
 struct FileRipperArg {
     // Where the file contents are stored.
-    // Leave this as NULL to have the ripper allocate memory
+    // Leave this as nullptr to have the ripper allocate memory
     void* pDst;
 
     // Where the file size is stored
@@ -36,7 +35,7 @@ struct FileRipperArg {
     /**
      * @brief Constructor
      */
-    FileRipperArg() : pDst(NULL), pSize(NULL), region(EMemory_MEM2) {}
+    FileRipperArg() : pDst(nullptr), pSize(nullptr), region(EMemory_MEM2) {}
 };
 
 /**

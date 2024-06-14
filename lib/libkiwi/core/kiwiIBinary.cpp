@@ -9,7 +9,7 @@ namespace kiwi {
  * @param pBin Binary contents
  */
 void IBinary::Deserialize(const void* pBin) {
-    K_ASSERT(pBin != NULL);
+    K_ASSERT(pBin != nullptr);
     const Header& rHeader = *static_cast<const Header*>(pBin);
 
     // Check header kind
@@ -31,7 +31,7 @@ void IBinary::Deserialize(const void* pBin) {
  * @param pBin Binary contents
  */
 void IBinary::Serialize(void* pBin) const {
-    K_ASSERT(pBin != NULL);
+    K_ASSERT(pBin != nullptr);
     Header& rHeader = *static_cast<Header*>(pBin);
 
     rHeader.version = GetVersion();

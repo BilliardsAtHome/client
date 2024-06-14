@@ -230,12 +230,12 @@ bool SocketBase::CanSend() const {
 Optional<u32> SocketBase::RecvBytes(void* pDst, u32 len, Callback pCallback,
                                     void* pArg) {
     K_ASSERT(IsOpen());
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
     K_ASSERT(len > 0);
 
     // Implementation version is responsible for using the callback
     u32 nrecv = 0;
-    SOResult result = RecvImpl(pDst, len, nrecv, NULL, pCallback, pArg);
+    SOResult result = RecvImpl(pDst, len, nrecv, nullptr, pCallback, pArg);
 
     // Success, return bytes read
     if (result == SO_SUCCESS) {
@@ -264,7 +264,7 @@ Optional<u32> SocketBase::RecvBytes(void* pDst, u32 len, Callback pCallback,
 Optional<u32> SocketBase::RecvBytesFrom(void* pDst, u32 len, SockAddrAny& rAddr,
                                         Callback pCallback, void* pArg) {
     K_ASSERT(IsOpen());
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
     K_ASSERT(len > 0);
 
     // Implementation version is responsible for using the callback
@@ -297,12 +297,12 @@ Optional<u32> SocketBase::RecvBytesFrom(void* pDst, u32 len, SockAddrAny& rAddr,
 Optional<u32> SocketBase::SendBytes(const void* pSrc, u32 len,
                                     Callback pCallback, void* pArg) {
     K_ASSERT(IsOpen());
-    K_ASSERT(pSrc != NULL);
+    K_ASSERT(pSrc != nullptr);
     K_ASSERT(len > 0);
 
     // Implementation version is responsible for using the callback
     u32 nsend = 0;
-    SOResult result = SendImpl(pSrc, len, nsend, NULL, pCallback, pArg);
+    SOResult result = SendImpl(pSrc, len, nsend, nullptr, pCallback, pArg);
 
     // Success, return bytes read
     if (result == SO_SUCCESS) {
@@ -332,7 +332,7 @@ Optional<u32> SocketBase::SendBytesTo(const void* pSrc, u32 len,
                                       const SockAddrAny& rAddr,
                                       Callback pCallback, void* pArg) {
     K_ASSERT(IsOpen());
-    K_ASSERT(pSrc != NULL);
+    K_ASSERT(pSrc != nullptr);
     K_ASSERT(len > 0);
 
     // Implementation version is responsible for using the callback

@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_CORE_RUNTIME_H
 #define LIBKIWI_CORE_RUNTIME_H
 #include <kokeshi.hpp>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/math/kiwiAlgorithm.h>
 #include <revolution/OS.h>

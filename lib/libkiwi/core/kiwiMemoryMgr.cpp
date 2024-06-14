@@ -11,8 +11,8 @@ namespace {
  * @param pHeap Heap object
  */
 void LogHeap(const char* pName, EGG::Heap* pHeap) {
-    if (pHeap == NULL) {
-        K_LOG_EX("[%s] NULL ->\n", pName);
+    if (pHeap == nullptr) {
+        K_LOG_EX("[%s] nullptr ->\n", pName);
         return;
     }
 
@@ -27,8 +27,8 @@ void LogHeap(const char* pName, EGG::Heap* pHeap) {
  */
 void CheckDoubleFree(const void* pBlock) {
 #ifndef NDEBUG
-    // NULL delete is OK
-    if (pBlock == NULL) {
+    // nullptr delete is OK
+    if (pBlock == nullptr) {
         return;
     }
 
@@ -37,7 +37,7 @@ void CheckDoubleFree(const void* pBlock) {
 
     // Sanity check, should always be ExpHeap
     MEMiHeapHead* pHandle = MEMFindContainHeap(pBlock);
-    K_ASSERT(pHandle != NULL);
+    K_ASSERT(pHandle != nullptr);
     K_ASSERT(pHandle->magic == 'EXPH');
 
     // Check that the block is still marked as used
@@ -63,8 +63,8 @@ MemoryMgr::MemoryMgr() {
     LogHeap("libkiwi:MEM2",         mpHeapMEM2);
     // clang-format on
 
-    K_ASSERT(mpHeapMEM1 != NULL);
-    K_ASSERT(mpHeapMEM2 != NULL);
+    K_ASSERT(mpHeapMEM1 != nullptr);
+    K_ASSERT(mpHeapMEM2 != nullptr);
     K_ASSERT(OSIsMEM1Region(mpHeapMEM1));
     K_ASSERT(OSIsMEM2Region(mpHeapMEM2));
 }
@@ -86,7 +86,7 @@ EGG::Heap* MemoryMgr::GetHeap(EMemory memory) const {
     K_ASSERT(memory < EMemory_Max);
 
     EGG::Heap* pHeap = memory == EMemory_MEM1 ? mpHeapMEM1 : mpHeapMEM2;
-    K_ASSERT(pHeap != NULL);
+    K_ASSERT(pHeap != nullptr);
 
     return pHeap;
 }
@@ -101,7 +101,7 @@ EGG::Heap* MemoryMgr::GetHeap(EMemory memory) const {
  */
 void* MemoryMgr::Alloc(u32 size, s32 align, EMemory memory) const {
     void* pBlock = GetHeap(memory)->alloc(size, align);
-    K_ASSERT_EX(pBlock != NULL, "Out of memory (alloc %d)", size);
+    K_ASSERT_EX(pBlock != nullptr, "Out of memory (alloc %d)", size);
 
     K_ASSERT(memory == EMemory_MEM1 ? OSIsMEM1Region(pBlock)
                                     : OSIsMEM2Region(pBlock));
@@ -116,7 +116,7 @@ void* MemoryMgr::Alloc(u32 size, s32 align, EMemory memory) const {
  */
 void MemoryMgr::Free(void* pBlock) const {
     CheckDoubleFree(pBlock);
-    EGG::Heap::free(pBlock, NULL);
+    EGG::Heap::free(pBlock, nullptr);
 }
 
 /**
@@ -134,7 +134,7 @@ u32 MemoryMgr::GetFreeSize(EMemory memory) const {
  * @param pAddr Memory address
  */
 bool MemoryMgr::IsHeapMemory(const void* pAddr) const {
-    K_ASSERT(mpHeapMEM1 != NULL && mpHeapMEM2 != NULL);
+    K_ASSERT(mpHeapMEM1 != nullptr && mpHeapMEM2 != nullptr);
 
     // Check MEM1 heap
     if (pAddr >= mpHeapMEM1->getStartAddress() &&

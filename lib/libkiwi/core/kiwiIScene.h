@@ -2,7 +2,6 @@
 #define LIBKIWI_CORE_I_SCENE_H
 #include <Pack/RPSystem.h>
 #include <libkiwi/core/kiwiSceneCreator.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
 
@@ -237,13 +236,13 @@ public:
         // Devirtualize calls
         const SceneCreator::Info info = {
             &IScene::Create<T>,
-            static_cast<T*>(NULL)->T::GetName(),
-            static_cast<T*>(NULL)->T::GetDirectory(),
-            static_cast<T*>(NULL)->T::GetID(),
-            static_cast<T*>(NULL)->T::GetPack(),
-            static_cast<T*>(NULL)->T::GetCreateType(),
-            static_cast<T*>(NULL)->T::GetExitType(),
-            static_cast<T*>(NULL)->T::GetCommonSound(),
+            static_cast<T*>(nullptr)->T::GetName(),
+            static_cast<T*>(nullptr)->T::GetDirectory(),
+            static_cast<T*>(nullptr)->T::GetID(),
+            static_cast<T*>(nullptr)->T::GetPack(),
+            static_cast<T*>(nullptr)->T::GetCreateType(),
+            static_cast<T*>(nullptr)->T::GetExitType(),
+            static_cast<T*>(nullptr)->T::GetCommonSound(),
         };
 
         SceneCreator::GetInstance().RegistScene(info);

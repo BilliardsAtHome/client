@@ -22,7 +22,7 @@ public:
      * @param size Size of data
      */
     void Process(const void* data, u32 size) {
-        K_ASSERT(data != NULL);
+        K_ASSERT(data != nullptr);
 
         const u8* p = static_cast<const u8*>(data);
 

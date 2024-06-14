@@ -2,7 +2,6 @@
 #define LIBKIWI_PRIM_SMART_PTR_H
 #include <algorithm>
 #include <libkiwi/debug/kiwiAssert.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiNonCopyable.h>
 
@@ -18,7 +17,7 @@ public:
      *
      * @details Empty pointer
      */
-    SmartPtr() : mpData(NULL) {}
+    SmartPtr() : mpData(nullptr) {}
 
     /**
      * @brief Constructor
@@ -34,7 +33,7 @@ public:
      *
      * @param rOther Smart pointer
      */
-    SmartPtr(SmartPtr& rOther) : mpData(NULL) {
+    SmartPtr(SmartPtr& rOther) : mpData(nullptr) {
         *this = rOther;
     }
 
@@ -45,7 +44,7 @@ public:
      *
      * @param rOther Smart pointer
      */
-    SmartPtr(SmartPtr&& rOther) : mpData(NULL) {
+    SmartPtr(SmartPtr&& rOther) : mpData(nullptr) {
         *this = std::move(rOther);
     }
 #endif
@@ -107,7 +106,7 @@ public:
      */
     void Destroy() {
         delete mpData;
-        mpData = NULL;
+        mpData = nullptr;
     }
 
     /**
@@ -117,18 +116,18 @@ public:
      */
     T* Release() const {
         T* old = mpData;
-        mpData = NULL;
+        mpData = nullptr;
         return old;
     }
 
     // clang-format off
-    operator bool() const { return Get() != NULL; }
+    operator bool() const { return Get() != nullptr; }
 
     T*       operator->()       { return Get(); }
     const T* operator->() const { return Get(); }
 
-    T& operator*()             { K_ASSERT(mpData != NULL); return *Get(); }
-    const T& operator*() const { K_ASSERT(mpData != NULL); return *Get(); }
+    T& operator*()             { K_ASSERT(mpData != nullptr); return *Get(); }
+    const T& operator*() const { K_ASSERT(mpData != nullptr); return *Get(); }
     // clang-format on
 
 private:
@@ -153,7 +152,7 @@ private:
         // Release memory for old object
         Destroy();
 
-        mpData = NULL;
+        mpData = nullptr;
         std::swap(mpData, rOther.mpData);
     }
 
@@ -167,7 +166,7 @@ private:
         // Release memory for old object
         Destroy();
 
-        mpData = NULL;
+        mpData = nullptr;
         std::swap(mpData, rOther.mpData);
     }
 #endif

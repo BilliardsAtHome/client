@@ -21,7 +21,7 @@ void* FileRipper::Rip(const String& rPath, EStorage where,
         NandStream strm(rPath, EOpenMode_Read);
         return Rip(strm, rArg);
     }
-    default: K_ASSERT_EX(false, "Invalid storage type"); return NULL;
+    default: K_ASSERT_EX(false, "Invalid storage type"); return nullptr;
     }
 }
 
@@ -35,7 +35,7 @@ void* FileRipper::Rip(const String& rPath, EStorage where,
 void* FileRipper::Rip(FileStream& rStrm, const FileRipperArg& rArg) {
     // Bad stream
     if (!rStrm.IsOpen()) {
-        return NULL;
+        return nullptr;
     }
 
     // Storage device may require byte-aligned size
@@ -46,11 +46,11 @@ void* FileRipper::Rip(FileStream& rStrm, const FileRipperArg& rArg) {
     u8* pBuffer = static_cast<u8*>(rArg.pDst);
 
     // Ripper is responsible for allocating read buffer
-    if (pBuffer == NULL) {
+    if (pBuffer == nullptr) {
         pBuffer = new (rStrm.GetBufferAlign(), rArg.region) u8[bufferSize];
     }
 
-    K_ASSERT(pBuffer != NULL);
+    K_ASSERT(pBuffer != nullptr);
     K_ASSERT_EX(rStrm.IsBufferAlign(pBuffer),
                 "Stream requires buffer aligned to %d bytes",
                 rStrm.GetBufferAlign());
@@ -60,7 +60,7 @@ void* FileRipper::Rip(FileStream& rStrm, const FileRipperArg& rArg) {
     K_ASSERT(n == fileSize || n == bufferSize);
 
     // Report file size
-    if (rArg.pSize != NULL) {
+    if (rArg.pSize != nullptr) {
         *rArg.pSize = fileSize;
     }
 
@@ -84,7 +84,7 @@ MemStream FileRipper::Open(const String& rPath, EStorage where) {
     void* pFile = Rip(rPath, where, arg);
 
     // Couldn't find file
-    if (pFile == NULL) {
+    if (pFile == nullptr) {
         return MemStream();
     }
 

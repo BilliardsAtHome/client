@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_DEBUG_MAP_FILE_H
 #define LIBKIWI_DEBUG_MAP_FILE_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiLinkList.h>
 #include <libkiwi/util/kiwiDynamicSingleton.h>
@@ -41,7 +40,7 @@ public:
      * @brief Tests whether a map file has been loaded and unpacked
      */
     bool IsAvailable() const {
-        return mpMapBuffer != NULL && mIsUnpacked;
+        return mpMapBuffer != nullptr && mIsUnpacked;
     }
 
     /**

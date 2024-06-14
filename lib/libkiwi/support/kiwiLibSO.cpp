@@ -358,7 +358,7 @@ SOResult LibSO::GetPeerName(SOSocket socket, SockAddrAny& addr) {
  */
 s32 LibSO::Read(SOSocket socket, void* dst, u32 len) {
     K_ASSERT_EX(sDevNetIpTop.IsOpen(), "Please call LibSO::Initialize");
-    K_ASSERT(dst != NULL);
+    K_ASSERT(dst != nullptr);
 
     return Recv(socket, dst, len, 0);
 }
@@ -374,9 +374,9 @@ s32 LibSO::Read(SOSocket socket, void* dst, u32 len) {
  */
 s32 LibSO::Recv(SOSocket socket, void* dst, u32 len, u32 flags) {
     K_ASSERT_EX(sDevNetIpTop.IsOpen(), "Please call LibSO::Initialize");
-    K_ASSERT(dst != NULL);
+    K_ASSERT(dst != nullptr);
 
-    return RecvImpl(socket, dst, len, flags, NULL);
+    return RecvImpl(socket, dst, len, flags, nullptr);
 }
 
 /**
@@ -392,7 +392,7 @@ s32 LibSO::Recv(SOSocket socket, void* dst, u32 len, u32 flags) {
 s32 LibSO::RecvFrom(SOSocket socket, void* dst, u32 len, u32 flags,
                     SockAddrAny& addr) {
     K_ASSERT_EX(sDevNetIpTop.IsOpen(), "Please call LibSO::Initialize");
-    K_ASSERT(dst != NULL);
+    K_ASSERT(dst != nullptr);
 
     K_ASSERT_EX(addr.len == sizeof(SockAddr4) || addr.len == sizeof(SockAddr6),
                 "Invalid address length (%d)", addr.len);
@@ -410,7 +410,7 @@ s32 LibSO::RecvFrom(SOSocket socket, void* dst, u32 len, u32 flags,
  */
 s32 LibSO::Write(SOSocket socket, const void* src, u32 len) {
     K_ASSERT_EX(sDevNetIpTop.IsOpen(), "Please call LibSO::Initialize");
-    K_ASSERT(src != NULL);
+    K_ASSERT(src != nullptr);
 
     return Send(socket, src, len, 0);
 }
@@ -426,9 +426,9 @@ s32 LibSO::Write(SOSocket socket, const void* src, u32 len) {
  */
 s32 LibSO::Send(SOSocket socket, const void* src, u32 len, u32 flags) {
     K_ASSERT_EX(sDevNetIpTop.IsOpen(), "Please call LibSO::Initialize");
-    K_ASSERT(src != NULL);
+    K_ASSERT(src != nullptr);
 
-    return SendImpl(socket, src, len, flags, NULL);
+    return SendImpl(socket, src, len, flags, nullptr);
 }
 
 /**
@@ -444,7 +444,7 @@ s32 LibSO::Send(SOSocket socket, const void* src, u32 len, u32 flags) {
 s32 LibSO::SendTo(SOSocket socket, const void* src, u32 len, u32 flags,
                   const SockAddrAny& addr) {
     K_ASSERT_EX(sDevNetIpTop.IsOpen(), "Please call LibSO::Initialize");
-    K_ASSERT(src != NULL);
+    K_ASSERT(src != nullptr);
 
     K_ASSERT_EX(addr.len == sizeof(SockAddr4) || addr.len == sizeof(SockAddr6),
                 "Invalid address length (%d)", addr.len);
@@ -469,9 +469,9 @@ struct SORecvArgs {
 s32 LibSO::RecvImpl(SOSocket socket, void* dst, u32 len, u32 flags,
                     SockAddrAny* addr) {
     K_ASSERT_EX(sDevNetIpTop.IsOpen(), "Please call LibSO::Initialize");
-    K_ASSERT(dst != NULL);
+    K_ASSERT(dst != nullptr);
 
-    K_ASSERT_EX(addr == NULL || addr->len == sizeof(SockAddr4) ||
+    K_ASSERT_EX(addr == nullptr || addr->len == sizeof(SockAddr4) ||
                     addr->len == sizeof(SockAddr6),
                 "Invalid address length (%d)", addr->len);
 
@@ -492,7 +492,7 @@ s32 LibSO::RecvImpl(SOSocket socket, void* dst, u32 len, u32 flags,
     // Output vector 2: Source address
     IosObject<SockAddrAny> from;
     IosVector dummy;
-    if (addr != NULL) {
+    if (addr != nullptr) {
         *from = *addr;
         output.PushBack(from);
     } else {
@@ -524,9 +524,9 @@ struct SOSendArgs {
 s32 LibSO::SendImpl(SOSocket socket, const void* src, u32 len, u32 flags,
                     const SockAddrAny* addr) {
     K_ASSERT_EX(sDevNetIpTop.IsOpen(), "Please call LibSO::Initialize");
-    K_ASSERT(src != NULL);
+    K_ASSERT(src != nullptr);
 
-    K_ASSERT_EX(addr == NULL || addr->len == sizeof(SockAddr4) ||
+    K_ASSERT_EX(addr == nullptr || addr->len == sizeof(SockAddr4) ||
                     addr->len == sizeof(SockAddr6),
                 "Invalid address length (%d)", addr->len);
 
@@ -545,7 +545,7 @@ s32 LibSO::SendImpl(SOSocket socket, const void* src, u32 len, u32 flags,
     input.PushBack(args);
 
     // Copy in destination address
-    if (addr != NULL) {
+    if (addr != nullptr) {
         args->hasDest = TRUE;
         args->dest = *addr;
     } else {
@@ -629,7 +629,7 @@ SOResult LibSO::Shutdown(SOSocket socket, SOShutdownType how) {
  */
 s32 LibSO::Poll(SOPollFD fds[], u32 numfds, s64 timeout) {
     K_ASSERT_EX(sDevNetIpTop.IsOpen(), "Please call LibSO::Initialize");
-    K_ASSERT(fds != NULL);
+    K_ASSERT(fds != nullptr);
     K_ASSERT(numfds > 0);
 
     IosObject<s64> msec(OS_TICKS_TO_MSEC(timeout));
@@ -793,7 +793,7 @@ SOResult LibSO::SetSockOpt(SOSocket socket, SOSockOptLevel level, SOSockOpt opt,
                            const void* val, u32 len) {
     K_ASSERT_EX(sDevNetIpTop.IsOpen(), "Please call LibSO::Initialize");
     K_ASSERT(socket >= 0);
-    K_ASSERT(val != NULL);
+    K_ASSERT(val != nullptr);
     K_ASSERT(len > 0);
 
     IosObject<SOSetSockOptArgs> args;

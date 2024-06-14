@@ -131,7 +131,7 @@ void GeckoContext::Save(OSContext& rCtx) const {
  */
 void IDebugger::BreakCallback(u8 error, OSContext* pCtx, u32 _dsisr, u32 _dar,
                               ...) {
-    K_ASSERT(pCtx != NULL);
+    K_ASSERT(pCtx != nullptr);
     K_ASSERT(error == OS_ERR_IABR ||
              (error == OS_ERR_DSI && (_dsisr & DSISR_DABR)));
 
@@ -148,7 +148,7 @@ void IDebugger::BreakCallback(u8 error, OSContext* pCtx, u32 _dsisr, u32 _dar,
  */
 void IDebugger::StepCallback(u8 error, OSContext* pCtx, u32 _dsisr, u32 _dar,
                              ...) {
-    K_ASSERT(pCtx != NULL);
+    K_ASSERT(pCtx != nullptr);
     K_ASSERT(error == OS_ERR_TRACE);
 
     K_ASSERT_EX(false, "Not yet implemented");
@@ -194,14 +194,14 @@ void IDebugger::Calculate() {
  * @brief Writes a 8-bit value to memory
  */
 void IDebugger::OnEvent_Write8() {
-    u8* pDst = NULL;
+    u8* pDst = nullptr;
     u32 value = 0;
 
     if (!ReadObj(pDst) || !ReadObj(value)) {
         return;
     }
 
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
     *pDst = static_cast<u8>(value);
 }
 
@@ -209,14 +209,14 @@ void IDebugger::OnEvent_Write8() {
  * @brief Writes a 16-bit value to memory
  */
 void IDebugger::OnEvent_Write16() {
-    u16* pDst = NULL;
+    u16* pDst = nullptr;
     u32 value = 0;
 
     if (!ReadObj(pDst) || !ReadObj(value)) {
         return;
     }
 
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
     *pDst = static_cast<u16>(value);
 }
 
@@ -224,14 +224,14 @@ void IDebugger::OnEvent_Write16() {
  * @brief Writes a 32-bit value to memory
  */
 void IDebugger::OnEvent_Write32() {
-    u32* pDst = NULL;
+    u32* pDst = nullptr;
     u32 value = 0;
 
     if (!ReadObj(pDst) || !ReadObj(value)) {
         return;
     }
 
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
     *pDst = value;
 }
 
@@ -239,8 +239,8 @@ void IDebugger::OnEvent_Write32() {
  * @brief Dumps a range of memory
  */
 void IDebugger::OnEvent_ReadN() {
-    const void* pDst = NULL;
-    const void* pEnd = NULL;
+    const void* pDst = nullptr;
+    const void* pEnd = nullptr;
 
     if (!ReadObj(pEnd) || !ReadObj(pDst)) {
         return;

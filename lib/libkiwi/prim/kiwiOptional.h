@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_PRIM_OPTIONAL_H
 #define LIBKIWI_PRIM_OPTIONAL_H
 #include <algorithm>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
@@ -187,7 +186,7 @@ template <typename T> Optional<T> MakeOptional(const T& rValue) {
 /**
  * @brief Optional construction helper
  *
- * @param pValue Value (may be NULL)
+ * @param pValue Value (may be nullptr)
  */
 template <typename T> Optional<T> MakeOptional(const T* pValue) {
     return pValue ? Optional<T>(*pValue) : kiwi::nullopt;

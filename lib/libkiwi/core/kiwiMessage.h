@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_CORE_MESSAGE_H
 #define LIBKIWI_CORE_MESSAGE_H
 #include <libkiwi/core/kiwiIBinary.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
@@ -54,8 +53,8 @@ public:
      * @brief Gets the serialized size of this object
      */
     virtual u32 GetBinarySize() const {
-        K_ASSERT(mpDescBlock != NULL);
-        K_ASSERT(mpDataBlock != NULL);
+        K_ASSERT(mpDescBlock != nullptr);
+        K_ASSERT(mpDataBlock != nullptr);
 
         return (sizeof(DESCBlock) + mpDescBlock->numMsg * sizeof(u32)) +
                (sizeof(DATABlock) + mpDataBlock->poolSize);

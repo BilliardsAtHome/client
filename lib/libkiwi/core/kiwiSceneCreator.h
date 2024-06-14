@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_CORE_SCENE_CREATOR_H
 #define LIBKIWI_CORE_SCENE_CREATOR_H
 #include <RPSystem/RPSysSceneCreator.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiExtView.h>
 

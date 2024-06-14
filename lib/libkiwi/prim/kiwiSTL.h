@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_PRIM_STL_H
 #define LIBKIWI_PRIM_STL_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace ksl {
@@ -55,7 +54,7 @@ size_t strnlen(const char* pStr, size_t maxlen);
  * @param[out] pEndPtr Pointer to string data after the converted number
  * @param base Number base
  */
-s32 strtol(const char* pStr, char** pEndPtr = NULL, int base = 0);
+s32 strtol(const char* pStr, char** pEndPtr = nullptr, int base = 0);
 
 /**
  * @brief Converts string to unsigned long
@@ -65,7 +64,7 @@ s32 strtol(const char* pStr, char** pEndPtr = NULL, int base = 0);
  * @param[out] pEndPtr Pointer to string data after the converted number
  * @param base Number base
  */
-u32 strtoul(const char* pStr, char** pEndPtr = NULL, int base = 0);
+u32 strtoul(const char* pStr, char** pEndPtr = nullptr, int base = 0);
 
 /**
  * @brief Converts string to double value

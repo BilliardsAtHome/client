@@ -9,7 +9,7 @@ K_DYNAMIC_SINGLETON_IMPL(MapFile);
  * @brief Constructor
  */
 MapFile::MapFile()
-    : mLinkType(ELinkType_None), mpMapBuffer(NULL), mIsUnpacked(false) {}
+    : mLinkType(ELinkType_None), mpMapBuffer(nullptr), mIsUnpacked(false) {}
 
 /**
  * @brief Destructor
@@ -28,13 +28,13 @@ void MapFile::Open(const String& rPath, ELinkType type) {
     K_ASSERT(type != ELinkType_None);
 
     // Close existing map file
-    if (mpMapBuffer != NULL) {
+    if (mpMapBuffer != nullptr) {
         Close();
     }
 
     // Try to open file on the DVD
     mpMapBuffer = static_cast<char*>(FileRipper::Rip(rPath, EStorage_DVD));
-    if (mpMapBuffer == NULL) {
+    if (mpMapBuffer == nullptr) {
         K_LOG_EX("Map file (%s) could not be opened!\n", rPath.CStr());
         return;
     }
@@ -55,7 +55,7 @@ void MapFile::Close() {
     }
 
     delete mpMapBuffer;
-    mpMapBuffer = NULL;
+    mpMapBuffer = nullptr;
 
     mIsUnpacked = false;
 }
@@ -67,7 +67,7 @@ void MapFile::Close() {
  */
 const MapFile::Symbol* MapFile::QueryTextSymbol(const void* pAddr) const {
     if (!IsAvailable()) {
-        return NULL;
+        return nullptr;
     }
 
     TList<Symbol>::ConstIterator it = mSymbols.Begin();
@@ -84,14 +84,14 @@ const MapFile::Symbol* MapFile::QueryTextSymbol(const void* pAddr) const {
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /**
  * @brief Unpacks loaded map file
  */
 void MapFile::Unpack() {
-    K_ASSERT(mpMapBuffer != NULL);
+    K_ASSERT(mpMapBuffer != nullptr);
 
     // Skip map file header (2 lines)
     char* pIt = mpMapBuffer;
@@ -102,7 +102,7 @@ void MapFile::Unpack() {
     // Parse lines
     for (char* pEndl = pIt; (pEndl = ksl::strchr(pIt, '\n')); pIt = pEndl + 1) {
         Symbol* sym = new Symbol();
-        K_ASSERT(sym != NULL);
+        K_ASSERT(sym != nullptr);
 
         // Location
         if (mLinkType == ELinkType_Static) {

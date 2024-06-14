@@ -2,7 +2,6 @@
 #define LIBKIWI_UTIL_WORK_BUFFER_H
 #include <libkiwi/core/kiwiMemoryMgr.h>
 #include <libkiwi/debug/kiwiAssert.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
@@ -34,14 +33,14 @@ public:
      * @param arg Buffer parameters
      */
     WorkBuffer(const WorkBufferArg& arg)
-        : mpBuffer(NULL),
+        : mpBuffer(nullptr),
           mBufferSize(arg.size),
           mBufferAlignSize(0),
           mSizeAlign(arg.sizeAlign),
           mMemAlign(arg.memAlign) {
         mBufferAlignSize = ROUND_UP(mBufferSize, mSizeAlign);
         mpBuffer = new (mMemAlign) u8[mBufferAlignSize];
-        K_ASSERT(mpBuffer != NULL);
+        K_ASSERT(mpBuffer != nullptr);
     }
 
     /**

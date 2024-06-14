@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_NET_SYNC_SOCKET_H
 #define LIBKIWI_NET_SYNC_SOCKET_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/net/kiwiSocketBase.h>
 
@@ -28,8 +27,8 @@ public:
      * @param pArg Callback user argument
      * @return Success
      */
-    virtual bool Connect(const SockAddrAny& rAddr, Callback pCallback = NULL,
-                         void* pArg = NULL);
+    virtual bool Connect(const SockAddrAny& rAddr, Callback pCallback = nullptr,
+                         void* pArg = nullptr);
 
     /**
      * @brief Accepts a peer connection over a new socket
@@ -38,8 +37,8 @@ public:
      * @param pArg Callback user argument
      * @return New socket
      */
-    virtual SyncSocket* Accept(AcceptCallback pCallback = NULL,
-                               void* pArg = NULL);
+    virtual SyncSocket* Accept(AcceptCallback pCallback = nullptr,
+                               void* pArg = nullptr);
 
 private:
     /**

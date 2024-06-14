@@ -12,7 +12,7 @@ const GXRenderModeObj* LibGX::GetDefaultRenderMode() {
     case VI_TV_FMT_PAL:     return &GXPal528IntDf;
     case VI_TV_FMT_EURGB60: return &GXEurgb60Hz480IntDf;
     case VI_TV_FMT_MPAL:    return &GXMpal480IntDf;
-    default:                return NULL;
+    default:                return nullptr;
     }
 }
 

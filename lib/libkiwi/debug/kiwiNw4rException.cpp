@@ -12,12 +12,12 @@ K_DYNAMIC_SINGLETON_IMPL(Nw4rException);
  */
 Nw4rException::Nw4rException()
     : mpUserCallback(DefaultCallback),
-      mpUserCallbackArg(NULL),
-      mpRenderMode(NULL) {
+      mpUserCallbackArg(nullptr),
+      mpRenderMode(nullptr) {
     Nw4rConsole::CreateInstance();
 
     // Create exception thread
-    OSCreateThread(&mThread, ThreadFunc, NULL,
+    OSCreateThread(&mThread, ThreadFunc, nullptr,
                    mThreadStack + sizeof(mThreadStack), sizeof(mThreadStack),
                    OS_PRIORITY_MIN, OS_THREAD_DETACHED);
     OSInitMessageQueue(&mMessageQueue, &mMessageBuffer, 1);
@@ -28,11 +28,11 @@ Nw4rException::Nw4rException()
     OSSetErrorHandler(OS_ERR_ISI, ErrorHandler);
     OSSetErrorHandler(OS_ERR_ALIGNMENT, ErrorHandler);
     OSSetErrorHandler(OS_ERR_PROTECTION, ErrorHandler);
-    OSSetErrorHandler(OS_ERR_FP_EXCEPTION, NULL);
+    OSSetErrorHandler(OS_ERR_FP_EXCEPTION, nullptr);
 
     // Auto-detect render mode
     mpRenderMode = LibGX::GetDefaultRenderMode();
-    K_WARN_EX(mpRenderMode == NULL, "No render mode!\n");
+    K_WARN_EX(mpRenderMode == nullptr, "No render mode!\n");
 }
 
 /**
@@ -42,7 +42,7 @@ Nw4rException::Nw4rException()
  * @param pArg Exception callback argument
  */
 void Nw4rException::SetUserCallback(UserCallback pCallback, void* pArg) {
-    if (pCallback == NULL) {
+    if (pCallback == nullptr) {
         pCallback = DefaultCallback;
     }
 
@@ -57,7 +57,7 @@ void Nw4rException::SetUserCallback(UserCallback pCallback, void* pArg) {
  * @param ... Format arguments
  */
 void Nw4rException::Printf(const char* pMsg, ...) {
-    if (mpRenderMode == NULL) {
+    if (mpRenderMode == nullptr) {
         return;
     }
 
@@ -105,13 +105,13 @@ void* Nw4rException::ThreadFunc(void* pArg) {
     OSReceiveMessage(&GetInstance().mMessageQueue, &msg, OS_MSG_PERSISTENT);
 
     OSDisableInterrupts();
-    VISetPreRetraceCallback(NULL);
-    VISetPostRetraceCallback(NULL);
+    VISetPreRetraceCallback(nullptr);
+    VISetPostRetraceCallback(nullptr);
     VISetBlack(FALSE);
     VIFlush();
 
     GetInstance().DumpError();
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -139,14 +139,14 @@ void Nw4rException::ErrorHandler(u8 error, OSContext* pCtx, u32 _dsisr,
     }
 
     LibOS::FillFPUContext(pCtx);
-    OSSetErrorHandler(error, NULL);
+    OSSetErrorHandler(error, nullptr);
 
     // Allow thread to continue
     OSSendMessage(&GetInstance().mMessageQueue, 0, OS_MSG_PERSISTENT);
 
-    if (OSGetCurrentThread() == NULL) {
-        VISetPreRetraceCallback(NULL);
-        VISetPostRetraceCallback(NULL);
+    if (OSGetCurrentThread() == nullptr) {
+        VISetPreRetraceCallback(nullptr);
+        VISetPostRetraceCallback(nullptr);
         Mtmsr(Mfmsr() | MSR_RI);
         GetInstance().DumpError();
     }
@@ -234,7 +234,7 @@ void Nw4rException::DumpError() {
     while (true) {
         Nw4rConsole::GetInstance().DrawDirect();
 
-        if (mpUserCallback != NULL) {
+        if (mpUserCallback != nullptr) {
             mpUserCallback(mErrorInfo, mpUserCallbackArg);
         }
     }
@@ -440,12 +440,12 @@ void Nw4rException::PrintSymbol(const void* pAddr) {
      * file should always return a result. However, to prevent the exception
      * handler from itself throwing an exception we do not assert this.
      */
-    K_WARN_EX(sym == NULL,
+    K_WARN_EX(sym == nullptr,
               "Symbol missing(?) from module link map: reloc %08X\n",
               textOffset);
 
     // Symbol doesn't exist in map file
-    if (sym == NULL) {
+    if (sym == nullptr) {
         // Print raw address
         Printf("%08X (MODULE)", pAddr);
         return;

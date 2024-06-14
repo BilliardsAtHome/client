@@ -16,7 +16,7 @@ template <typename TKey, typename TValue>
 TMap<TKey, TValue>::ConstIterator&
 TMap<TKey, TValue>::ConstIterator::operator++() {
     // Can't iterate
-    if (mpIter == NULL) {
+    if (mpIter == nullptr) {
         return *this;
     }
 
@@ -26,7 +26,7 @@ TMap<TKey, TValue>::ConstIterator::operator++() {
     // Find next non-empty chain
     while (true) {
         // End of chain, advance to next bucket
-        if (mpIter == NULL) {
+        if (mpIter == nullptr) {
             if (++mIndex >= mCapacity) {
                 break;
             }
@@ -35,7 +35,7 @@ TMap<TKey, TValue>::ConstIterator::operator++() {
         }
 
         // Did we find an item?
-        K_ASSERT(mpIter != NULL);
+        K_ASSERT(mpIter != nullptr);
         if (mpIter->used) {
             break;
         }
@@ -60,7 +60,7 @@ TMap<TKey, TValue>::TMap(const TMap& rOther) : mCapacity(rOther.mCapacity) {
 
     // Create buckets for copy
     mpBuckets = new Bucket[mCapacity];
-    K_ASSERT(mpBuckets != NULL);
+    K_ASSERT(mpBuckets != nullptr);
 
     // Re-insert all members
     for (ConstIterator it = rOther.Begin(); it != rOther.End(); ++it) {
@@ -80,12 +80,12 @@ bool TMap<TKey, TValue>::Remove(const TKey& rKey, TValue* pRemoved) {
     Bucket* pBucket = Search(rKey);
 
     // Can't remove, doesn't exist
-    if (pBucket == NULL) {
+    if (pBucket == nullptr) {
         return false;
     }
 
     // Write out value about to be removed
-    if (pRemoved != NULL) {
+    if (pRemoved != nullptr) {
         *pRemoved = *pBucket->value;
     }
 
@@ -106,7 +106,7 @@ TMap<TKey, TValue>::Bucket* TMap<TKey, TValue>::Search(const TKey& rKey) const {
     u32 i = Hash(rKey) % mCapacity;
 
     // Iterate through chains
-    for (Bucket* pIt = &mpBuckets[i]; pIt != NULL; pIt = pIt->pChained) {
+    for (Bucket* pIt = &mpBuckets[i]; pIt != nullptr; pIt = pIt->pChained) {
         // Unused entry
         if (!pIt->used) {
             continue;
@@ -118,7 +118,7 @@ TMap<TKey, TValue>::Bucket* TMap<TKey, TValue>::Search(const TKey& rKey) const {
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /**
@@ -132,8 +132,8 @@ TMap<TKey, TValue>::Bucket& TMap<TKey, TValue>::Create(const TKey& rKey) {
     u32 i = Hash(rKey) % mCapacity;
 
     // Iterate through chains
-    Bucket* pLast = NULL;
-    for (Bucket* pIt = &mpBuckets[i]; pIt != NULL; pIt = pIt->pChained) {
+    Bucket* pLast = nullptr;
+    for (Bucket* pIt = &mpBuckets[i]; pIt != nullptr; pIt = pIt->pChained) {
         // Unused entry
         if (!pIt->used) {
             // Override this entry
@@ -153,9 +153,9 @@ TMap<TKey, TValue>::Bucket& TMap<TKey, TValue>::Create(const TKey& rKey) {
     }
 
     // Chain new bucket
-    K_ASSERT(pLast != NULL);
+    K_ASSERT(pLast != nullptr);
     pLast->pChained = new Bucket();
-    K_ASSERT(pLast->pChained != NULL);
+    K_ASSERT(pLast->pChained != nullptr);
 
     pLast->pChained->key = rKey;
     pLast->pChained->value.Emplace();

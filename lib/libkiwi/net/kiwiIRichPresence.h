@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_NET_I_RICH_PRESENCE_H
 #define LIBKIWI_NET_I_RICH_PRESENCE_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
 

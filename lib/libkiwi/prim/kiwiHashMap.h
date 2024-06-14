@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_PRIM_HASHMAP_H
 #define LIBKIWI_PRIM_HASHMAP_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiLinkList.h>
 #include <libkiwi/prim/kiwiOptional.h>
@@ -48,7 +47,7 @@ private:
         /**
          * @brief Constructor
          */
-        Bucket() : used(false), pChained(NULL) {}
+        Bucket() : used(false), pChained(nullptr) {}
 
         /**
          * @brief Destructor
@@ -82,7 +81,7 @@ public:
               mpBuckets(pBuckets),
               mpIter(mpBuckets) {
             // Find first non-empty value
-            if (mpIter != NULL && !mpIter->used) {
+            if (mpIter != nullptr && !mpIter->used) {
                 ++*this;
             }
         }
@@ -105,14 +104,14 @@ public:
          * @brief Get key from this element
          */
         const TKey& Key() const {
-            K_ASSERT(mpIter != NULL);
+            K_ASSERT(mpIter != nullptr);
             return *mpIter->key;
         }
         /**
          * @brief Get value from this element
          */
         const TValue& Value() const {
-            K_ASSERT(mpIter != NULL);
+            K_ASSERT(mpIter != nullptr);
             return *mpIter->value;
         }
 
@@ -151,12 +150,12 @@ public:
      * @param capacity Starting number of buckets
      */
     TMap(u32 capacity = scDefaultCapacity)
-        : mSize(0), mCapacity(capacity), mpBuckets(NULL) {
+        : mSize(0), mCapacity(capacity), mpBuckets(nullptr) {
         K_ASSERT(mCapacity > 0);
         K_ASSERT(mCapacity < HASH_MAX);
 
         mpBuckets = new Bucket[mCapacity];
-        K_ASSERT(mpBuckets != NULL);
+        K_ASSERT(mpBuckets != nullptr);
     }
 
     /**
@@ -202,7 +201,7 @@ public:
      * @param[out] pRemoved Removed value
      * @return Success
      */
-    bool Remove(const TKey& rKey, TValue* pRemoved = NULL);
+    bool Remove(const TKey& rKey, TValue* pRemoved = nullptr);
 
     /**
      * @brief Look for the value corresponding to a key
@@ -212,7 +211,12 @@ public:
      */
     TValue* Find(const TKey& rKey) const {
         Bucket* pBucket = Search(rKey);
-        return pBucket != NULL ? &*pBucket->value : NULL;
+
+        if (pBucket != nullptr) {
+            return &*pBucket->value;
+        }
+
+        return nullptr;
     }
 
     /**
@@ -221,7 +225,7 @@ public:
      * @param rKey Key
      */
     bool Contains(const TKey& rKey) const {
-        return Find(rKey) != NULL;
+        return Find(rKey) != nullptr;
     }
 
     /**
@@ -275,7 +279,7 @@ public:
      * @brief Gets iterator to end of map (const-view)
      */
     ConstIterator End() const {
-        return ConstIterator(0, NULL);
+        return ConstIterator(0, nullptr);
     }
 
 private:

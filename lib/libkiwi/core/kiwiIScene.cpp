@@ -10,11 +10,12 @@ namespace kiwi {
 void IScene::Configure() {
     // Setup model scene
     RP_GET_INSTANCE(RPGrpModelResManager)->CreateResourceList(0x400);
-    RP_GET_INSTANCE(RPGrpModelManager)->CreateModelScene(0, 0, 1, NULL, NULL);
+    RP_GET_INSTANCE(RPGrpModelManager)
+        ->CreateModelScene(0, 0, 1, nullptr, nullptr);
 
     // Setup renderer view
     RPGrpScreen* pScreen = new RPGrpScreen();
-    K_ASSERT(pScreen != NULL);
+    K_ASSERT(pScreen != nullptr);
     pScreen->SetCanvasMode(RPGrpScreen::CANVASMODE_0);
     RP_GET_INSTANCE(RPGrpRenderer)->CreateView2D(1, pScreen);
     RP_GET_INSTANCE(RPGrpRenderer)->CorrectView();

@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_CORE_I_BINARY_H
 #define LIBKIWI_CORE_I_BINARY_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
 

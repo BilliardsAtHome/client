@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_NET_RELIABLE_PACKET_H
 #define LIBKIWI_NET_RELIABLE_PACKET_H
 #include <libkiwi/debug/kiwiAssert.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/net/kiwiPacket.h>
 
@@ -57,21 +56,21 @@ public:
      * @param size Packet buffer size
      * @param pAddr Packet recipient
      */
-    ReliablePacket(u32 size, const SockAddrAny* pAddr = NULL)
+    ReliablePacket(u32 size, const SockAddrAny* pAddr = nullptr)
         : Packet(size, pAddr) {}
 
     /**
      * @brief Accesses KUDP protocol header
      */
     KUDPHeader& GetHeader() {
-        K_ASSERT(mpBuffer != NULL);
+        K_ASSERT(mpBuffer != nullptr);
         return *reinterpret_cast<KUDPHeader*>(mpBuffer);
     }
     /**
      * @brief Accesses KUDP protocol header (read-only)
      */
     const KUDPHeader& GetHeader() const {
-        K_ASSERT(mpBuffer != NULL);
+        K_ASSERT(mpBuffer != nullptr);
         return *reinterpret_cast<KUDPHeader*>(mpBuffer);
     }
 

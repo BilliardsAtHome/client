@@ -78,7 +78,7 @@ void DvdStream::SeekImpl(ESeekDir dir, s32 offset) {
  * @return Number of bytes read, or DVD error code
  */
 s32 DvdStream::ReadImpl(void* pDst, u32 size) {
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
     return DVDReadPrio(&mFileInfo, pDst, size, mPosition, DVD_PRIO_MEDIUM);
 }
 
@@ -90,7 +90,7 @@ s32 DvdStream::ReadImpl(void* pDst, u32 size) {
  * @return Number of bytes written, or DVD error code
  */
 s32 DvdStream::WriteImpl(const void* pSrc, u32 size) {
-    K_ASSERT(pSrc != NULL);
+    K_ASSERT(pSrc != nullptr);
     K_ASSERT_EX(false, "Can't write to the DVD");
     return DVD_RESULT_FATAL;
 }
@@ -104,7 +104,7 @@ s32 DvdStream::WriteImpl(const void* pSrc, u32 size) {
  * @return Number of bytes read, or DVD error code
  */
 s32 DvdStream::PeekImpl(void* pDst, u32 size) {
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
     return ReadImpl(pDst, size);
 }
 

@@ -8,7 +8,7 @@ namespace kiwi {
  * @param pBin Binary file (KMSG)
  */
 Message::Message(const void* pBin) {
-    K_ASSERT(pBin != NULL);
+    K_ASSERT(pBin != nullptr);
     Deserialize(pBin);
 }
 

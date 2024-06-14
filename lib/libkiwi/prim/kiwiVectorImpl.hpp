@@ -15,7 +15,7 @@ namespace kiwi {
  * @brief Clears vector contents
  */
 template <typename T> void TVector<T>::Clear() {
-    K_ASSERT(mSize == 0 || mpData != NULL);
+    K_ASSERT(mSize == 0 || mpData != nullptr);
 
     for (u32 i = 0; i < mSize; i++) {
         Buffer()[i].~T();
@@ -36,7 +36,7 @@ template <typename T> void TVector<T>::Insert(const T& rElem, u32 pos) {
     // Make space for one extra element
     Reserve(mSize + 1);
 
-    K_ASSERT(mpData != NULL);
+    K_ASSERT(mpData != nullptr);
 
     // Inserted in the middle, copy forward
     if (pos < mSize) {
@@ -56,7 +56,7 @@ template <typename T> void TVector<T>::Insert(const T& rElem, u32 pos) {
  * @return Whether the element existed and was removed
  */
 template <typename T> bool TVector<T>::Remove(const T& rElem) {
-    K_ASSERT(mSize == 0 || mpData != NULL);
+    K_ASSERT(mSize == 0 || mpData != nullptr);
 
     // Linear search for the target
     for (u32 i = 0; i < mSize; i++) {
@@ -77,7 +77,7 @@ template <typename T> bool TVector<T>::Remove(const T& rElem) {
  */
 template <typename T> void TVector<T>::RemoveAt(u32 pos) {
     K_ASSERT(pos < mSize);
-    K_ASSERT(mpData != NULL);
+    K_ASSERT(mpData != nullptr);
 
     // Destroy element
     Buffer()[pos].~T();
@@ -121,10 +121,10 @@ template <typename T> void TVector<T>::Reserve(u32 capacity) {
 
     // Need to reallocate
     u8* pBuffer = new u8[capacity * sizeof(T)];
-    K_ASSERT(pBuffer != NULL);
+    K_ASSERT(pBuffer != nullptr);
 
     // Copy in old data
-    if (mpData != NULL) {
+    if (mpData != nullptr) {
         std::memcpy(pBuffer, mpData, mSize * sizeof(T));
         delete mpData;
     }
@@ -162,7 +162,7 @@ template <typename T> void TVector<T>::MoveFrom(TVector&& rOther) {
     mCapacity = rOther.mCapacity;
     mSize = rOther.mSize;
 
-    rOther.mpData = NULL;
+    rOther.mpData = nullptr;
     rOther.mCapacity = 0;
     rOther.mSize = 0;
 }

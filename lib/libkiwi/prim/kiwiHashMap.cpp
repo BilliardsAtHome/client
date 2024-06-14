@@ -44,7 +44,7 @@ u32 fmix32(u32 h) {
  * @param len Key length
  */
 hash_t HashImpl(const void* pKey, s32 len) {
-    K_ASSERT(pKey != NULL);
+    K_ASSERT(pKey != nullptr);
     K_ASSERT(len > 0);
 
     const u8* pData = static_cast<const u8*>(pKey);

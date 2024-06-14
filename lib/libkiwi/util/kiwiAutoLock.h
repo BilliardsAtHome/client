@@ -29,12 +29,12 @@ private:
  * @brief OSMutex specializations
  */
 template <> K_INLINE void AutoLock<OSMutex>::Lock() {
-    if (OSGetCurrentThread() != NULL) {
+    if (OSGetCurrentThread() != nullptr) {
         OSLockMutex(&mObject);
     }
 }
 template <> K_INLINE void AutoLock<OSMutex>::Unlock() {
-    if (OSGetCurrentThread() != NULL) {
+    if (OSGetCurrentThread() != nullptr) {
         OSUnlockMutex(&mObject);
     }
 }

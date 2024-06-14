@@ -6,7 +6,7 @@
 #include <revolution/OS.h>
 
 #define K_DYNAMIC_SINGLETON_IMPL(T)                                            \
-    T* kiwi::DynamicSingleton<T>::sInstance = NULL;                            \
+    T* kiwi::DynamicSingleton<T>::sInstance = nullptr;                         \
     OSMutex kiwi::DynamicSingleton<T>::sMutex;
 
 namespace kiwi {
@@ -21,7 +21,7 @@ public:
      */
     static T& GetInstance() {
         AutoLock<OSMutex> lock(sMutex);
-        K_ASSERT(sInstance != NULL);
+        K_ASSERT(sInstance != nullptr);
         return *sInstance;
     }
 
@@ -30,8 +30,8 @@ public:
      */
     static void CreateInstance() {
         AutoLock<OSMutex> lock(sMutex);
-        K_ASSERT_EX(sInstance == NULL, "Created singleton twice");
-        if (sInstance == NULL) {
+        K_ASSERT_EX(sInstance == nullptr, "Created singleton twice");
+        if (sInstance == nullptr) {
             sInstance = new T();
         }
     }

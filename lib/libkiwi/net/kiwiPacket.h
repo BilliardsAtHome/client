@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_NET_PACKET_H
 #define LIBKIWI_NET_PACKET_H
 #include <climits>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/math/kiwiAlgorithm.h>
 #include <libkiwi/prim/kiwiOptional.h>
@@ -21,12 +20,12 @@ public:
      * @param size Packet buffer size
      * @param pAddr Packet recipient
      */
-    Packet(u32 size, const SockAddrAny* pAddr = NULL)
-        : mpBuffer(NULL), mBufferSize(0), mReadOffset(0), mWriteOffset(0) {
+    Packet(u32 size, const SockAddrAny* pAddr = nullptr)
+        : mpBuffer(nullptr), mBufferSize(0), mReadOffset(0), mWriteOffset(0) {
         OSInitMutex(&mBufferMutex);
         Alloc(size);
 
-        if (pAddr != NULL) {
+        if (pAddr != nullptr) {
             mAddress = *pAddr;
         } else {
             mAddress = SockAddr4();
@@ -83,7 +82,7 @@ public:
      * @brief Tests whether the packet contains no data
      */
     bool IsEmpty() const {
-        return mpBuffer == NULL || GetContentSize() == 0;
+        return mpBuffer == nullptr || GetContentSize() == 0;
     }
 
     /**

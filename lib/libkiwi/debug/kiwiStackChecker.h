@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_DEBUG_STACK_CHECKER_H
 #define LIBKIWI_DEBUG_STACK_CHECKER_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace kiwi {

@@ -35,7 +35,7 @@ template <typename T> void StringImpl<T>::Clear() {
 
     // Delete string buffer
     delete[] mpBuffer;
-    mpBuffer = NULL;
+    mpBuffer = nullptr;
 
     // Update size/length
     mCapacity = 0;
@@ -105,7 +105,7 @@ u32 StringImpl<T>::Find(const StringImpl<T>& rStr, u32 pos) const {
  * @return Match position if found, otherwise npos
  */
 template <typename T> u32 StringImpl<T>::Find(const T* pStr, u32 pos) const {
-    K_ASSERT(pStr != NULL);
+    K_ASSERT(pStr != nullptr);
 
     // Cannot match past end of string
     if (pos >= mLength) {
@@ -116,7 +116,7 @@ template <typename T> u32 StringImpl<T>::Find(const T* pStr, u32 pos) const {
     const T* pResult = StrStr(mpBuffer + pos, pStr);
 
     // Not found
-    if (pResult == NULL) {
+    if (pResult == nullptr) {
         return npos;
     }
 
@@ -141,7 +141,7 @@ template <typename T> u32 StringImpl<T>::Find(T c, u32 pos) const {
     const T* pResult = StrChr(mpBuffer + pos, c);
 
     // Not found
-    if (pResult == NULL) {
+    if (pResult == nullptr) {
         return npos;
     }
 
@@ -165,7 +165,7 @@ bool StringImpl<T>::StartsWith(const StringImpl<T>& rStr) const {
  * @param pStr Prefix sequence
  */
 template <typename T> bool StringImpl<T>::StartsWith(const T* pStr) const {
-    K_ASSERT(pStr != NULL);
+    K_ASSERT(pStr != nullptr);
     return Find(pStr) == 0;
 }
 
@@ -186,7 +186,7 @@ bool StringImpl<T>::EndsWith(const StringImpl<T>& rStr) const {
  * @param pStr Suffix sequence
  */
 template <typename T> bool StringImpl<T>::EndsWith(const T* pStr) const {
-    K_ASSERT(pStr != NULL);
+    K_ASSERT(pStr != nullptr);
 
     size_t pos = mLength - StrLen(pStr);
     return Find(pStr, pos) == pos;
@@ -249,7 +249,7 @@ bool StringImpl<T>::operator==(const StringImpl<T>& rStr) const {
  * @param pStr C-style string to compare against
  */
 template <typename T> bool StringImpl<T>::operator==(const T* pStr) const {
-    K_ASSERT(pStr != NULL);
+    K_ASSERT(pStr != nullptr);
 
     // Compare string data
     return StrNCmp(mpBuffer, pStr, mLength) == 0;
@@ -317,7 +317,7 @@ template <typename T> void StringImpl<T>::Assign(const StringImpl<T>& rStr) {
  * @param n Number of characters to copy
  */
 template <typename T> void StringImpl<T>::Assign(const T* pStr, u32 n) {
-    K_ASSERT(pStr != NULL);
+    K_ASSERT(pStr != nullptr);
 
     // Reserve string buffer
     u32 len = n != npos ? n : StrLen(pStr);

@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_CORE_THREAD_H
 #define LIBKIWI_CORE_THREAD_H
 #include <libkiwi/debug/kiwiAssert.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiBitCast.h>
 #include <revolution/OS.h>
@@ -90,7 +89,7 @@ public:
      * @param pFunc Static, no-parameter function
      */
     template <typename TRet> Thread(TRet (*pFunc)()) {
-        K_ASSERT(pFunc != NULL);
+        K_ASSERT(pFunc != nullptr);
 
         SetFunction(pFunc);
         Start();
@@ -103,7 +102,7 @@ public:
      * @param pArg Function argument
      */
     template <typename TRet> Thread(TRet (*pFunc)(Param), Param pArg) {
-        K_ASSERT(pFunc != NULL);
+        K_ASSERT(pFunc != nullptr);
 
         SetFunction(pFunc);
         SetGPR(3, BitCast<u32>(pArg));
@@ -122,7 +121,7 @@ public:
      */
     template <typename TRet, typename TClass>
     Thread(TRet (TClass::*pFunc)(), TClass& rObj) {
-        K_ASSERT(pFunc != NULL);
+        K_ASSERT(pFunc);
 
         SetMemberFunction(pFunc, rObj);
         Start();
@@ -137,7 +136,7 @@ public:
      */
     template <typename TRet, typename TClass>
     Thread(TRet (TClass::*pFunc)(Param), TClass& rObj, Param pArg) {
-        K_ASSERT(pFunc != NULL);
+        K_ASSERT(pFunc);
 
         SetMemberFunction(pFunc, rObj);
         SetGPR(4, BitCast<u32>(pArg));
@@ -156,7 +155,7 @@ public:
      */
     template <typename TRet, typename TClass>
     Thread(TRet (TClass::*pFunc)() const, const TClass& rObj) {
-        K_ASSERT(pFunc != NULL);
+        K_ASSERT(pFunc);
 
         SetMemberFunction(pFunc, rObj);
         Start();
@@ -171,7 +170,7 @@ public:
      */
     template <typename TRet, typename TClass>
     Thread(TRet (TClass::*pFunc)(Param) const, const TClass& rObj, Param pArg) {
-        K_ASSERT(pFunc != NULL);
+        K_ASSERT(pFunc);
 
         SetMemberFunction(pFunc, rObj);
         SetGPR(4, BitCast<u32>(pArg));
@@ -213,11 +212,11 @@ K_DONT_INLINE void ThreadImpl::SetMemberFunction(TFunc pFunc,
         mr pPtmf, r4 // pFunc -> pPtmf
         mr self, r5 // rObj   -> self
     }
-    K_ASSERT(pPtmf != NULL);
-    K_ASSERT(self != NULL);
+    K_ASSERT(pPtmf != nullptr);
+    K_ASSERT(self != 0);
     // clang-format on
 
-    K_ASSERT(mpOSThread != NULL);
+    K_ASSERT(mpOSThread != nullptr);
     K_ASSERT(mpOSThread->state == OS_THREAD_STATE_READY);
 
     // Adjust this pointer

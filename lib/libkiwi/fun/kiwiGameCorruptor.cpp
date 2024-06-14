@@ -12,8 +12,8 @@ namespace {
  * @param pEnd End of range
  */
 void** GetRandomAddr(const void* pBegin, const void* pEnd) {
-    K_ASSERT(pBegin != NULL);
-    K_ASSERT(pEnd != NULL);
+    K_ASSERT(pBegin != nullptr);
+    K_ASSERT(pEnd != nullptr);
     K_ASSERT(pEnd > pBegin);
 
     u32 size = GetOffsetFromPtr(pBegin, pEnd);
@@ -165,7 +165,7 @@ void GameCorruptor::CorruptData(const void* pBegin, const void* pEnd) const {
  * @param pHeap Heap to corrupt
  */
 void GameCorruptor::CorruptData(EGG::Heap* pHeap) const {
-    K_ASSERT(pHeap != NULL);
+    K_ASSERT(pHeap != nullptr);
     CorruptData(pHeap->getStartAddress(), pHeap->getEndAddress());
 }
 

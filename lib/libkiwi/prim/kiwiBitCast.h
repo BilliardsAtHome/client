@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_PRIM_BITCAST_H
 #define LIBKIWI_PRIM_BITCAST_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 namespace kiwi {

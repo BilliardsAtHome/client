@@ -32,13 +32,13 @@ void* CreateFB(const GXRenderModeObj* pRmo) {
     u32 size = ROUND_UP(pRmo->fbWidth, 16) * pRmo->xfbHeight * sizeof(u16);
 
     // Try using heap, but be careful to not throw a nested exception
-    void* pXfb = NULL;
+    void* pXfb = nullptr;
     if (MemoryMgr::GetInstance().GetFreeSize(EMemory_MEM1) != 0) {
         pXfb = new (32) u8[size];
     }
 
     // Force allocation from OS arena
-    if (pXfb == NULL) {
+    if (pXfb == nullptr) {
         K_LOG("Can't get framebuffer from heap\n");
         pXfb = static_cast<u8*>(OSGetArenaHi()) - size;
         OSSetArenaHi(pXfb);
@@ -56,7 +56,7 @@ void* CreateFB(const GXRenderModeObj* pRmo) {
  */
 Nw4rDirectPrint::Nw4rDirectPrint() {
     SetColor(Color::WHITE);
-    ChangeXfb(NULL, scBufferWidthDefault, scBufferHeightDefault);
+    ChangeXfb(nullptr, scBufferWidthDefault, scBufferHeightDefault);
 }
 
 /**
@@ -70,7 +70,7 @@ Nw4rDirectPrint::~Nw4rDirectPrint() {
  * @brief Sets up XFB for printing
  */
 void Nw4rDirectPrint::SetupXfb() {
-    const GXRenderModeObj* pRmo = NULL;
+    const GXRenderModeObj* pRmo = nullptr;
 
     // Initialize direct print
     SetColor(Color::WHITE);
@@ -79,7 +79,7 @@ void Nw4rDirectPrint::SetupXfb() {
     void* pXfb = VIGetCurrentFrameBuffer();
 
     // Create new framebuffer if one doesn't exist
-    if (pXfb == NULL) {
+    if (pXfb == nullptr) {
         // Auto-detect render mode
         pRmo = LibGX::GetDefaultRenderMode();
         pXfb = CreateFB(pRmo);
@@ -89,7 +89,7 @@ void Nw4rDirectPrint::SetupXfb() {
     VIFlush();
     WaitVIRetrace();
 
-    if (pRmo != NULL) {
+    if (pRmo != nullptr) {
         ChangeXfb(pXfb, pRmo->fbWidth, pRmo->xfbHeight);
     } else {
         ChangeXfb(pXfb, scBufferWidthDefault, scBufferHeightDefault);
@@ -121,7 +121,7 @@ void Nw4rDirectPrint::ChangeXfb(void* pXfb, u16 w, u16 h) {
  * @param h Height
  */
 void Nw4rDirectPrint::EraseXfb(s32 x, s32 y, s32 w, s32 h) const {
-    if (mpBuffer == NULL) {
+    if (mpBuffer == nullptr) {
         return;
     }
 
@@ -173,7 +173,7 @@ void Nw4rDirectPrint::StoreCache() const {
  * @param ... Format arguments
  */
 void Nw4rDirectPrint::DrawString(s32 x, s32 y, const char* pMsg, ...) const {
-    if (mpBuffer == NULL) {
+    if (mpBuffer == nullptr) {
         return;
     }
 
@@ -221,7 +221,7 @@ s32 Nw4rDirectPrint::GetDotHeight() const {
  * @param pMsg Text string
  */
 void Nw4rDirectPrint::DrawStringImpl(s32 x, s32 y, const char* pMsg) const {
-    if (mpBuffer == NULL) {
+    if (mpBuffer == nullptr) {
         return;
     }
 
@@ -249,7 +249,7 @@ void Nw4rDirectPrint::DrawStringImpl(s32 x, s32 y, const char* pMsg) const {
             pMsg = std::strchr(pMsg, '\n');
 
             // No next line
-            if (pMsg == NULL) {
+            if (pMsg == nullptr) {
                 return;
             }
 
@@ -271,8 +271,8 @@ void Nw4rDirectPrint::DrawStringImpl(s32 x, s32 y, const char* pMsg) const {
  */
 const char* Nw4rDirectPrint::DrawStringLine(s32 x, s32 y, const char* pMsg,
                                             s32 maxlen) const {
-    if (mpBuffer == NULL || maxlen <= 0) {
-        return NULL;
+    if (mpBuffer == nullptr || maxlen <= 0) {
+        return nullptr;
     }
 
     s32 count = 0;
@@ -330,7 +330,7 @@ const char* Nw4rDirectPrint::DrawStringLine(s32 x, s32 y, const char* pMsg,
  * @param code Character code
  */
 void Nw4rDirectPrint::DrawStringChar(s32 x, s32 y, s32 code) const {
-    if (mpBuffer == NULL) {
+    if (mpBuffer == nullptr) {
         return;
     }
 

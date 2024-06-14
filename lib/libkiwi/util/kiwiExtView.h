@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_UTIL_EXT_VIEW_H
 #define LIBKIWI_UTIL_EXT_VIEW_H
 #include <libkiwi/debug/kiwiAssert.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 
 /**
@@ -9,7 +8,7 @@
  */
 #define K_EXTVIEW_GET_INSTANCE(TSelf, baseFunc)                                \
     static TSelf& GetInstance() {                                              \
-        K_ASSERT(baseFunc() != NULL);                                          \
+        K_ASSERT(baseFunc() != nullptr);                                       \
         return *reinterpret_cast<TSelf*>(baseFunc());                          \
     }
 
@@ -31,6 +30,7 @@ private: // Do not allow object construction/destruction
     }
     ExtView& operator=(const ExtView&) {
         K_ASSERT(false);
+        return *this;
     }
 };
 

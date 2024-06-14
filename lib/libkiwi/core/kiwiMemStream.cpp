@@ -62,7 +62,7 @@ void MemStream::Open(void* pBuffer, u32 size, bool owns) {
     mBufferSize = size;
     mOwnsBuffer = owns;
 
-    mIsOpen = mpBuffer != NULL;
+    mIsOpen = mpBuffer != nullptr;
 }
 
 /**
@@ -93,7 +93,7 @@ void MemStream::SeekImpl(ESeekDir dir, s32 offset) {
  * @return Number of bytes read, or error code
  */
 s32 MemStream::ReadImpl(void* pDst, u32 size) {
-    K_ASSERT(pDst != NULL);
+    K_ASSERT(pDst != nullptr);
 
     std::memcpy(pDst, mpBuffer + mPosition, size);
     return size;
@@ -107,7 +107,7 @@ s32 MemStream::ReadImpl(void* pDst, u32 size) {
  * @return Number of bytes written, or error code
  */
 s32 MemStream::WriteImpl(const void* pSrc, u32 size) {
-    K_ASSERT(pSrc != NULL);
+    K_ASSERT(pSrc != nullptr);
 
     std::memcpy(mpBuffer + mPosition, pSrc, size);
     return size;

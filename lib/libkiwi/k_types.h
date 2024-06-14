@@ -1,6 +1,8 @@
 #ifndef LIBKIWI_TYPES_H
 #define LIBKIWI_TYPES_H
 
+#include <libkiwi/k_config.h>
+
 /**
  * Include important headers
  */

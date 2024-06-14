@@ -1,6 +1,5 @@
 #ifndef LIBKIWI_CORE_COLOR_H
 #define LIBKIWI_CORE_COLOR_H
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <nw4r/ut.h>
 

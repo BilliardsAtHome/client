@@ -22,12 +22,12 @@ const char* HttpRequest::sProtocolVer = "1.1";
 HttpRequest::HttpRequest(const String& rHost)
     : mHostName(rHost),
       mURI("/"),
-      mpSocket(NULL),
+      mpSocket(nullptr),
       mTimeOut(OS_MSEC_TO_TICKS(scDefaultTimeOut)),
-      mpResponseCallback(NULL),
-      mpResponseCallbackArg(NULL) {
+      mpResponseCallback(nullptr),
+      mpResponseCallbackArg(nullptr) {
     mpSocket = new SyncSocket(SO_PF_INET, SO_SOCK_STREAM);
-    K_ASSERT(mpSocket != NULL);
+    K_ASSERT(mpSocket != nullptr);
 
     // Need non-blocking so timeout can be enforced
     bool success = mpSocket->SetBlocking(false);
@@ -51,11 +51,11 @@ HttpRequest::HttpRequest(const String& rHost)
  */
 const HttpResponse& HttpRequest::Send(EMethod method) {
     K_ASSERT(method < EMethod_Max);
-    K_ASSERT(mpSocket != NULL);
+    K_ASSERT(mpSocket != nullptr);
 
     mMethod = method;
-    mpResponseCallback = NULL;
-    mpResponseCallbackArg = NULL;
+    mpResponseCallback = nullptr;
+    mpResponseCallbackArg = nullptr;
 
     // Call on this thread
     SendImpl();
@@ -71,9 +71,9 @@ const HttpResponse& HttpRequest::Send(EMethod method) {
  */
 void HttpRequest::SendAsync(ResponseCallback pCallback, void* pArg,
                             EMethod method) {
-    K_ASSERT_EX(pCallback != NULL, "You will lose the reponse!");
+    K_ASSERT_EX(pCallback != nullptr, "You will lose the reponse!");
     K_ASSERT(method < EMethod_Max);
-    K_ASSERT(mpSocket != NULL);
+    K_ASSERT(mpSocket != nullptr);
 
     mMethod = method;
     mpResponseCallback = pCallback;
@@ -88,7 +88,7 @@ void HttpRequest::SendAsync(ResponseCallback pCallback, void* pArg,
  */
 void HttpRequest::SendImpl() {
     K_ASSERT(mMethod < EMethod_Max);
-    K_ASSERT(mpSocket != NULL);
+    K_ASSERT(mpSocket != nullptr);
 
     // HTTP connections use port 80
     SockAddr4 addr(mHostName, 80);
@@ -113,13 +113,13 @@ void HttpRequest::SendImpl() {
     }
 
     // User callback
-    if (mpResponseCallback != NULL) {
+    if (mpResponseCallback != nullptr) {
         mpResponseCallback(mResponse, mpResponseCallbackArg);
     }
 
 #ifndef NDEBUG
     // Signal to destructor
-    mpResponseCallback = NULL;
+    mpResponseCallback = nullptr;
 #endif
 }
 
@@ -130,7 +130,7 @@ void HttpRequest::SendImpl() {
  */
 bool HttpRequest::Request() {
     K_ASSERT(mMethod < EMethod_Max);
-    K_ASSERT(mpSocket != NULL);
+    K_ASSERT(mpSocket != nullptr);
 
     // Build URI & URL parameter string
     String request = mURI;
@@ -164,7 +164,7 @@ bool HttpRequest::Request() {
  */
 bool HttpRequest::Receive() {
     K_ASSERT(mMethod < EMethod_Max);
-    K_ASSERT(mpSocket != NULL);
+    K_ASSERT(mpSocket != nullptr);
 
     // Beginning timestamp
     Watch w;
