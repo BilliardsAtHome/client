@@ -4,6 +4,8 @@
 #include <libkiwi/net/kiwiSocketBase.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_net
+//! @{
 
 /**
  * @brief Synchronous (blocking) socket
@@ -82,6 +84,7 @@ private:
                               void* pArg);
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

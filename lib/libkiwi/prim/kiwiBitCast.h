@@ -3,6 +3,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_prim
+//! @{
 namespace {
 
 /**
@@ -19,6 +21,7 @@ K_INLINE TTo BitCast(const TFrom& rValue) {
 }
 
 } // namespace
+//! @}
 } // namespace kiwi
 
 #endif

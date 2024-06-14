@@ -11,6 +11,8 @@
 #define K_SCENE_DECL(T) static kiwi::SceneDecl<T> SceneDecl_##T;
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 /**
  * @brief User scene interface
@@ -249,6 +251,7 @@ public:
     }
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

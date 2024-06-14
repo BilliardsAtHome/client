@@ -4,6 +4,8 @@
 #include <libkiwi/util/kiwiNonCopyable.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief Thread safe, statically allocated singleton
@@ -19,6 +21,7 @@ public:
     }
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

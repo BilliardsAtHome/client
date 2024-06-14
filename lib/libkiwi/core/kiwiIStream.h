@@ -5,6 +5,8 @@
 #include <libkiwi/util/kiwiPtrUtil.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 /**
  * @brief Stream seek origin
@@ -186,6 +188,7 @@ protected:
     u32 mPosition; // Position in data
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

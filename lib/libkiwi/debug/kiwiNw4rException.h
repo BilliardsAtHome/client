@@ -5,6 +5,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_debug
+//! @{
 
 /**
  * @brief Reimplementation of NW4R's exception
@@ -227,6 +229,7 @@ private:
     static const s32 scAssertTraceDepth = 20;    // Assertion stack trace depth
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

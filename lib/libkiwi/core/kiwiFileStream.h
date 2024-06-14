@@ -4,6 +4,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 /**
  * @brief File access type
@@ -35,9 +37,10 @@ public:
     }
 
 protected:
-    EOpenMode mOpenMode; // File access type
+    EOpenMode mOpenMode; //!< File access type
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

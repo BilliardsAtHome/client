@@ -5,6 +5,8 @@
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_debug
+//! @{
 
 /**
  * @brief Kamek symbol map utility
@@ -84,6 +86,7 @@ private:
     TList<Symbol> mSymbols; // Map symbols
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

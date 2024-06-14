@@ -3,6 +3,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief Bit utilities
@@ -24,6 +26,7 @@ public:
     static u32 RandomBit(u32 bits);
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

@@ -9,6 +9,8 @@
     OSMutex kiwi::GlobalInstance<T>::sMutex;
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief Global instance holder
@@ -77,6 +79,7 @@ private:
     static OSMutex sMutex; // Mutex lock for safe access
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

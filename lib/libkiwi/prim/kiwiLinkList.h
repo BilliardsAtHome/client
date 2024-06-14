@@ -5,6 +5,8 @@
 #include <libkiwi/util/kiwiNonCopyable.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_prim
+//! @{
 
 /**
  * @brief Templated linked-list node
@@ -374,6 +376,7 @@ private:
     TListNode<T> mEndNode; // List end node
 };
 
+//! @}
 } // namespace kiwi
 
 /**

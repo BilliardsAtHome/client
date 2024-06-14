@@ -4,6 +4,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_support
+//! @{
 
 /**
  * @brief OS library wrapper/extension
@@ -13,6 +15,7 @@ public:
     static void FillFPUContext(OSContext* ctx);
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

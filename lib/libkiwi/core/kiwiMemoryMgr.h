@@ -9,6 +9,8 @@ class Heap;
 }
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 /**
  * @brief Memory region
@@ -83,6 +85,7 @@ private:
     static const u32 scHeapSize = OS_MEM_KB_TO_B(1024);
 };
 
+//! @}
 } // namespace kiwi
 
 /**

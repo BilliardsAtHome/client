@@ -4,6 +4,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_prim
+//! @{
 
 /**
  * @brief Helper for Optional with no value
@@ -193,6 +195,7 @@ template <typename T> Optional<T> MakeOptional(const T* pValue) {
 }
 
 } // namespace
+//! @}
 } // namespace kiwi
 
 #endif

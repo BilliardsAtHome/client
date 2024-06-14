@@ -7,6 +7,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_fun
+//! @{
 
 /**
  * @brief Corruption domain
@@ -124,6 +126,7 @@ private:
     OSAlarm mAlarm;  // Alarm to trigger corruption
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

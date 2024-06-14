@@ -8,6 +8,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_net
+//! @{
 
 /**
  * @brief Network packet wrapper
@@ -184,6 +186,7 @@ protected:
     SockAddrAny mAddress; // Sender (recv) or recipient (send)
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

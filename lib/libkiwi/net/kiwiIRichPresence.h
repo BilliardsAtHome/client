@@ -4,6 +4,8 @@
 #include <libkiwi/prim/kiwiString.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_net
+//! @{
 
 /**
  * @brief Rich presence interface
@@ -162,6 +164,7 @@ protected:
     s32 mPartyMax; // Maximum party size
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

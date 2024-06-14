@@ -5,6 +5,8 @@
 #include <libkiwi/prim/kiwiString.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_debug
+//! @{
 
 /**
  * @brief Screen text writer shortcut
@@ -26,6 +28,21 @@ public:
                        const char* pMsg, ...);
 
     /**
+     * @brief Prints formatted text to the screen with a shadow
+     *
+     * @param x X position
+     * @param y Y position
+     * @param scale Text scale
+     * @param center Center-align text
+     * @param text Text color
+     * @param shadow Shadow color
+     * @param pMsg Format string
+     * @param ... Format arguments
+     */
+    static void PrintfShadow(f32 x, f32 y, f32 scale, bool center, Color text,
+                             Color shadow, const char* pMsg, ...);
+
+    /**
      * @brief Prints formatted text to the screen with an outline
      *
      * @param x X position
@@ -36,19 +53,6 @@ public:
      * @param outline Outline color
      * @param pMsg Format string
      * @param ... Format arguments
-     */
-    static void PrintfShadow(f32 x, f32 y, f32 scale, bool center, Color text,
-                             Color shadow, const char* pMsg, ...);
-
-    /**
-     * @brief Prints text to the screen
-     *
-     * @param x X position
-     * @param y Y position
-     * @param scale Text scale
-     * @param center Center-align text
-     * @param color Text color
-     * @param pMsg Text message
      */
     static void PrintfOutline(f32 x, f32 y, f32 scale, bool center, Color text,
                               Color outline, const char* pMsg, ...);
@@ -72,6 +76,7 @@ private:
     static const f32 scEffectOffset;
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

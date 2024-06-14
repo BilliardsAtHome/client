@@ -5,6 +5,8 @@
 #include <libkiwi/support/kiwiLibSO.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_net
+//! @{
 
 /**
  * @brief IOS Berkeley socket wrapper
@@ -350,6 +352,7 @@ protected:
     SOSockType mType;      // Socket type
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

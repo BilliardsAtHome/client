@@ -5,18 +5,24 @@
 #include <libkiwi/util/kiwiNonCopyable.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
+
 namespace detail {
+//! @addtogroup libkiwi_core
+//! @{
 
 /**
- * @brief Console output stream
+ * @brief Console text output stream
+ * @note This class cannot be instantiated. Please use the global kiwi::cout
+ * instance.
  */
 class ConsoleOut : private NonCopyable {
 public:
     /**
      * @brief Logs output to the console
      *
-     * @param rValue Value (attempted to convert to string)
-     * @return ConsoleOut reference
+     * @param rValue Value (converted to string)
      */
     template <typename T> const ConsoleOut& operator<<(const T& rValue) const {
         K_LOG(ToString(rValue));
@@ -24,18 +30,15 @@ public:
     }
 };
 
+//! @}
 } // namespace detail
 
-/**
- * @brief Global console handle
- */
+//! Global console handle
 extern const detail::ConsoleOut cout;
+//! Newline character
+static const char endl = '\n';
 
-/**
- * @brief Newline character
- */
-const char endl = '\n';
-
+//! @}
 } // namespace kiwi
 
 #endif

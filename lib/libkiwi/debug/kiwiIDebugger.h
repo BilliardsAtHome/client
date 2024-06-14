@@ -6,6 +6,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_debug
+//! @{
 
 /**
  * @brief Debugger (GeckoDotNet) interface
@@ -164,6 +166,7 @@ private:
     BreakPoint mBreakPoint; // Active breakpoint
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

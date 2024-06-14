@@ -5,6 +5,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief Work buffer parameters
@@ -85,6 +87,7 @@ private:
     u32 mMemAlign;  // Requested address alignment
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

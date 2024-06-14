@@ -59,9 +59,7 @@ void LibSO::Initialize() {
         return;
     }
 
-    /**
-     * 1. Check network config link status
-     */
+    // 1. Check network config link status
     {
         IosDevice ncd_manage;
         ncd_manage.Open("/dev/net/ncd/manage", 1000);
@@ -79,9 +77,7 @@ void LibSO::Initialize() {
         K_ASSERT(linkStatus->linkState >= 0);
     }
 
-    /**
-     * 2. NWC24 socket startup
-     */
+    // 2. NWC24 socket startup
     {
         IosDevice kd_request;
         kd_request.Open("/dev/net/kd/request", 1000);
@@ -98,9 +94,7 @@ void LibSO::Initialize() {
         K_ASSERT(commonResult->exResult >= 0);
     }
 
-    /**
-     * 3. SO startup
-     */
+    // 3. SO startup
     {
         sDevNetIpTop.Open("/dev/net/ip/top", IPC_OPEN_NONE);
         K_ASSERT_EX(sDevNetIpTop.IsOpen(), "Couldn't open /dev/net/ip/top");
@@ -109,6 +103,7 @@ void LibSO::Initialize() {
         K_ASSERT_EX(result >= 0, "SOStartup failed (%d)", result);
     }
 
+    // 4. Wait to obtain console IP address
     WaitForDHCP();
 }
 

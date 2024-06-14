@@ -6,6 +6,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 namespace detail {
 
 /**
@@ -238,6 +240,7 @@ K_DONT_INLINE void ThreadImpl::SetMemberFunction(TFunc pFunc,
 }
 
 } // namespace detail
+//! @}
 } // namespace kiwi
 
 #endif

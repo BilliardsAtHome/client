@@ -3,6 +3,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief Memory utilities
@@ -83,6 +85,7 @@ public:
     /**@}*/
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

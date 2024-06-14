@@ -4,6 +4,8 @@
 #include <revolution/GX.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_support
+//! @{
 
 /**
  * @brief GX library wrapper/extension
@@ -13,6 +15,7 @@ public:
     static const GXRenderModeObj* GetDefaultRenderMode();
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

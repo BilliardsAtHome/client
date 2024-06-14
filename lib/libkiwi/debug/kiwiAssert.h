@@ -2,6 +2,9 @@
 #define LIBKIWI_DEBUG_ASSERT_H
 #include <libkiwi/k_types.h>
 
+//! @addtogroup libkiwi_debug
+//! @{
+
 /**
  * @name External usage
  * @brief Removes K_ prefix for user code
@@ -87,5 +90,7 @@ void kiwi_fail_assert(const char* pFile, int line, const char* pMsg, ...);
 #ifdef __cplusplus
 }
 #endif
+
+//! @}
 
 #endif

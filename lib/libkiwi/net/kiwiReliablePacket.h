@@ -5,6 +5,8 @@
 #include <libkiwi/net/kiwiPacket.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_net
+//! @{
 
 /**
  * @brief Reliable packet header
@@ -102,6 +104,7 @@ public:
     }
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

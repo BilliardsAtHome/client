@@ -8,6 +8,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_debug
+//! @{
 
 /**
  * @brief USB Gecko debugger support
@@ -54,6 +56,7 @@ private:
     virtual Optional<u32> Write(const void* pSrc, u32 size);
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

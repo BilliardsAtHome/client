@@ -3,12 +3,12 @@
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
 
-/**
- * @brief Helper for creating version numbers
- */
+//! Helper for creating version numbers
 #define K_VERSION(major, minor) ((major << 8) | minor)
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 /**
  * @brief Interface for binary file serialization/deserialization
@@ -26,17 +26,17 @@ public:
             return String(reinterpret_cast<char*>(kind), sizeof(u32));
         }
 
-        /* 0x00 */ u32 kind;
-        /* 0x04 */ u32 size;
+        /* 0x00 */ u32 kind; //!< Block magic/signature
+        /* 0x04 */ u32 size; //!< Block size (header + content)
     };
 
     /**
      * @brief Generic header block for libkiwi file formats
      */
     struct Header {
-        /* 0x00 */ Block block;
-        /* 0x08 */ u16 version;
-        /* 0x0A */ u16 numBlocks;
+        /* 0x00 */ Block block;   //!< Block information
+        /* 0x08 */ u16 version;   //!< Format version
+        /* 0x0A */ u16 numBlocks; //!< Number of child blocks
     };
 
 public:
@@ -87,6 +87,7 @@ private:
     virtual void SerializeImpl(Header& rHeader) const = 0;
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

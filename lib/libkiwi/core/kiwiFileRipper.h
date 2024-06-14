@@ -4,6 +4,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 // Forward declarations
 class FileStream;
@@ -21,15 +23,14 @@ enum EStorage {
  * @brief File ripping parameters
  */
 struct FileRipperArg {
-    // Where the file contents are stored.
-    // Leave this as nullptr to have the ripper allocate memory
+    //! @brief Where the file contents are stored
+    //! @note Leave this as nullptr to have the ripper allocate memory
     void* pDst;
 
-    // Where the file size is stored
+    //! Where the file size is stored
     u32* pSize;
 
-    // Memory region to use if the ripper must allocate its own destination
-    // buffer
+    //! Memory region to use for ripper memory allocation
     EMemory region;
 
     /**
@@ -74,6 +75,7 @@ public:
     static MemStream Open(const String& rPath, EStorage where);
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

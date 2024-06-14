@@ -5,6 +5,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_prim
+//! @{
 
 /**
  * @brief Dynamically-sized, contiguous array (std::vector)
@@ -192,6 +194,7 @@ private:
     u32 mSize;     // Number of elements
 };
 
+//! @}
 } // namespace kiwi
 
 // Implementation header

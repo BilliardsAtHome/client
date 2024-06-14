@@ -8,6 +8,8 @@
 #include <libkiwi/util/kiwiStaticSingleton.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 // Forward declarations
 class ISceneHook;
@@ -168,6 +170,7 @@ private:
     s32 mSceneID; // Scene to which this hook belongs
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

@@ -4,6 +4,8 @@
 #include <nw4r/math.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_math
+//! @{
 namespace {
 
 /**
@@ -122,6 +124,7 @@ K_INLINE const T* AddToPtr(const void* pAddr, ptrdiff_t ofs) {
 }
 
 } // namespace
+//! @}
 } // namespace kiwi
 
 #endif

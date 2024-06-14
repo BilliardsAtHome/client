@@ -6,6 +6,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 #ifdef __cplusplus
 extern "C" {
@@ -403,6 +405,7 @@ u32 GetDolDataSize() {
     }
 /**@}*/
 
+//! @}
 } // namespace kiwi
 
 #endif

@@ -3,6 +3,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_debug
+//! @{
 
 /**
  * @brief Buffer overflow checker
@@ -36,10 +38,11 @@ private:
     // Initial guard value
     static u32 sStackCheckGuard;
 
-    // Guard value on the stack
+    //! Guard value on the stack
     volatile u32 mGuard;
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

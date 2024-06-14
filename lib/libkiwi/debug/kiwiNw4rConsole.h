@@ -4,6 +4,8 @@
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_debug
+//! @{
 
 /**
  * @brief Reimplementation of NW4R's debug console
@@ -199,6 +201,7 @@ private:
     static const u32 scScrollSpeedY = 1;
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

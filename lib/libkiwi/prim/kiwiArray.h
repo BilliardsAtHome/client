@@ -4,6 +4,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_prim
+//! @{
 
 /**
  * @brief 1D array of fixed size
@@ -122,6 +124,7 @@ private:
     TArray<T, N> mData[M]; // Internal array
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

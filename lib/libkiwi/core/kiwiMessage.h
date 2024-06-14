@@ -4,6 +4,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 /**
  * @brief Binary message file
@@ -95,6 +97,7 @@ private:
     const DATABlock* mpDataBlock; // Message data pool block
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

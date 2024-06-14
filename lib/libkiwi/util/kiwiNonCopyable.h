@@ -4,6 +4,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief Non-copyable mix-in
@@ -23,6 +25,7 @@ private:
     }
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

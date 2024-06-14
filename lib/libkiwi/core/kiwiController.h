@@ -5,6 +5,8 @@
 #include <libkiwi/util/kiwiExtView.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 /**
  * @brief Player IDs
@@ -19,7 +21,7 @@ enum EPlayer {
 };
 
 /**
- * @brief Controller buttons
+ * @brief Controller buttons (type agnostic)
  */
 enum EButton {
     EButton_Up = (1 << 0),
@@ -37,6 +39,7 @@ enum EButton {
 
 /**
  * @brief Wii Remote controller
+ * @extview{EGG::CoreController}
  */
 class WiiCtrl : public ExtView<EGG::CoreController> {
 public:
@@ -94,6 +97,7 @@ private:
 
 /**
  * @brief Controller manager
+ * @extview{EGG::CoreControllerMgr}
  */
 class CtrlMgr : public ExtView<EGG::CoreControllerMgr> {
 public:
@@ -107,6 +111,7 @@ public:
     const WiiCtrl& GetWiiCtrl(EPlayer i);
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

@@ -5,6 +5,8 @@
 #include <revolution/DVD.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 /**
  * @brief DVD file stream
@@ -27,7 +29,7 @@ public:
 
     /**
      * @brief Destructor
-     * @details Automatically closes stream
+     * @note The stream is automatically closed.
      */
     virtual ~DvdStream() {
         Close();
@@ -126,9 +128,10 @@ private:
     virtual s32 PeekImpl(void* pDst, u32 size);
 
 private:
-    DVDFileInfo mFileInfo; // DVD handle
+    DVDFileInfo mFileInfo; //!< DVD file handle
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

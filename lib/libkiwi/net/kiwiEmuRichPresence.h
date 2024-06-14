@@ -5,6 +5,8 @@
 #include <libkiwi/util/kiwiIosDevice.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_net
+//! @{
 
 /**
  * @brief Rich presence implementation for Dolphin Emulator
@@ -44,6 +46,7 @@ private:
     IosDevice mDevDolphin; // Handle to Dolphin device
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

@@ -5,6 +5,8 @@ namespace kiwi {
 
 K_GLOBAL_INSTANCE_IMPL(IDebugger);
 
+namespace {
+
 /**
  * @brief Debugger version (GeckoDotNet)
  */
@@ -120,6 +122,8 @@ void GeckoContext::Save(OSContext& rCtx) const {
     std::memcpy(rCtx.gprs, gprs, sizeof(rCtx.gprs));
     std::memcpy(rCtx.fprs, fprs, sizeof(rCtx.fprs));
 }
+
+} // namespace
 
 /**
  * @brief Breakpoint callback

@@ -5,6 +5,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief Random number generator
@@ -148,6 +150,7 @@ private:
  */
 extern Random RNG;
 
+//! @}
 } // namespace kiwi
 
 #endif

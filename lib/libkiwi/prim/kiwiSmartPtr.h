@@ -6,6 +6,8 @@
 #include <libkiwi/util/kiwiNonCopyable.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_prim
+//! @{
 
 /**
  * @brief "Smart" / scoped pointer (equivalent to std::unique_ptr)
@@ -186,6 +188,7 @@ template <typename T> SmartPtr<T> MakeSmartPtr() {
 }
 
 } // namespace
+//! @}
 } // namespace kiwi
 
 #endif

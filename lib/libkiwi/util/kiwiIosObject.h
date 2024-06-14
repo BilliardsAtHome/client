@@ -8,6 +8,8 @@
 #include <libkiwi/util/kiwiIosVector.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief Memory buffer for IOS I/O
@@ -191,6 +193,7 @@ K_INLINE IosString<wchar_t>::IosString(const StringImpl<wchar_t>& value)
     Ptr()[value.Length()] = 0;
 }
 
+//! @}
 } // namespace kiwi
 
 #endif

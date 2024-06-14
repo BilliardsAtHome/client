@@ -4,6 +4,8 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief Running 32-bit checksum
@@ -64,6 +66,7 @@ private:
     u32 mSumInv; // Inverse sum
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

@@ -4,6 +4,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief Generic scoped lock
@@ -56,6 +58,7 @@ private:
     BOOL mEnabled; // Interrupt status
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

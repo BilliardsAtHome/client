@@ -5,6 +5,8 @@
 #include <libkiwi/util/kiwiDynamicSingleton.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_debug
+//! @{
 
 /**
  * @brief Reimplementation of NW4R's direct print system
@@ -151,6 +153,7 @@ private:
     static const u8 scAscii2Font[128];
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

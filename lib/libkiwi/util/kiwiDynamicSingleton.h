@@ -10,6 +10,8 @@
     OSMutex kiwi::DynamicSingleton<T>::sMutex;
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief Thread safe, dynamically allocated singleton
@@ -49,6 +51,7 @@ private:
     static OSMutex sMutex; // Mutex lock for safe access
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

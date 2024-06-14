@@ -5,6 +5,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief IOS I/O vector
@@ -56,6 +58,7 @@ private:
     using IPCIOVector::length;
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

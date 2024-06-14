@@ -5,6 +5,8 @@
 #include <libkiwi/prim/kiwiOptional.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_prim
+//! @{
 
 // Hash value type
 typedef u32 hash_t;
@@ -292,6 +294,7 @@ private:
     Bucket* mpBuckets; // Element buckets
 };
 
+//! @}
 } // namespace kiwi
 
 // Implementation header

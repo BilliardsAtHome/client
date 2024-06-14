@@ -5,6 +5,8 @@
 #include <libkiwi/util/kiwiWorkBuffer.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 /**
  * @brief Memory buffer stream
@@ -212,6 +214,7 @@ private:
     bool mOwnsBuffer; // Whether the stream owns the buffer
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

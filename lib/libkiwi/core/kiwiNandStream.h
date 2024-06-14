@@ -5,6 +5,8 @@
 #include <revolution/NAND.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 /**
  * @brief NAND file stream
@@ -132,6 +134,7 @@ private:
     NANDFileInfo mFileInfo; // NAND handle
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

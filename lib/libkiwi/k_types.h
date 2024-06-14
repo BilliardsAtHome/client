@@ -64,7 +64,7 @@ typedef void (*funcptr_t)(void);
 #endif
 
 #define RP_GET_INSTANCE(T)                                                     \
-    (K_ASSERT(T::GetInstance() != NULL), T::GetInstance())
+    (K_ASSERT(T::GetInstance() != nullptr), T::GetInstance())
 
 #endif
 

@@ -10,6 +10,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief IOS device handle
@@ -85,6 +87,7 @@ private:
     s32 mHandle;  // Virtual file descriptor
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

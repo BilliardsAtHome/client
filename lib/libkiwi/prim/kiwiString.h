@@ -6,6 +6,8 @@
 #include <libkiwi/prim/kiwiVector.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_prim
+//! @{
 
 /**
  * @brief String wrapper
@@ -472,6 +474,7 @@ template <typename T> K_INLINE String ToString(const T& x) {
 #undef TO_STRING_PRIM
 #undef TO_HEX_STRING_PRIM
 
+//! @}
 } // namespace kiwi
 
 #endif

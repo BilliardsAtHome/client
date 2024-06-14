@@ -13,6 +13,8 @@
     }
 
 namespace kiwi {
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief Extend class using only pre-existing instances
@@ -34,6 +36,7 @@ private: // Do not allow object construction/destruction
     }
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

@@ -5,6 +5,8 @@
 #include <libkiwi/util/kiwiExtView.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_core
+//! @{
 
 /**
  * @brief Game scene ID
@@ -243,6 +245,7 @@ private:
     static const Info scPackScenes[];
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

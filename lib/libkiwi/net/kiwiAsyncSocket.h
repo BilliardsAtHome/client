@@ -6,6 +6,8 @@
 #include <revolution/OS.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_net
+//! @{
 
 /**
  * @brief Asynchronous (non-blocking) socket
@@ -144,6 +146,7 @@ private:
     static TList<AsyncSocket> sSocketList;           // Open async sockets
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

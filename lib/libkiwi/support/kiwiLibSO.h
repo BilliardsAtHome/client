@@ -8,6 +8,8 @@
 #include <revolution/SO.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_support
+//! @{
 
 // Forward declarations
 class SockAddrAny;
@@ -272,6 +274,7 @@ K_STATIC_ASSERT(sizeof(SockAddrAny) == sizeof(SOSockAddr));
 K_STATIC_ASSERT(sizeof(SockAddr4) == sizeof(SOSockAddrIn));
 K_STATIC_ASSERT(sizeof(SockAddr6) == sizeof(SOSockAddrIn6));
 
+//! @}
 } // namespace kiwi
 
 #endif

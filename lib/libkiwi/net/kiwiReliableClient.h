@@ -3,9 +3,12 @@
 #include <libkiwi/k_types.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_net
+//! @{
 
 class ReliableClient {};
 
+//! @}
 } // namespace kiwi
 
 #endif

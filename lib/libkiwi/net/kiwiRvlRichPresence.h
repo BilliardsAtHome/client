@@ -4,6 +4,8 @@
 #include <libkiwi/net/kiwiIRichPresence.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_net
+//! @{
 
 /**
  * @brief Rich presence implementation for Wii console
@@ -38,6 +40,7 @@ public:
     virtual void UpdatePresence() const;
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

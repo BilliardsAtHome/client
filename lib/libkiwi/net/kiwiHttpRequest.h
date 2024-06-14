@@ -6,6 +6,8 @@
 #include <libkiwi/prim/kiwiString.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_net
+//! @{
 
 // Forward declarations
 class SyncSocket;
@@ -205,6 +207,7 @@ private:
     static const char* sProtocolVer;              // HTTP protocol version
 };
 
+//! @}
 } // namespace kiwi
 
 #endif
