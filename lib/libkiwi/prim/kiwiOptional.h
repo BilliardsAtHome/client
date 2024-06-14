@@ -50,7 +50,7 @@ public:
         new (mBuffer) T(rValue);
     }
 
-#ifdef LIBKIWI_RVALUE_REFS
+#ifdef LIBKIWI_CPP1X
     /**
      * @brief Constructor
      * @details Move constructor
@@ -92,7 +92,7 @@ public:
         return *this;
     }
 
-#ifdef LIBKIWI_RVALUE_REFS
+#ifdef LIBKIWI_CPP1X
     /**
      * @brief Value assignment
      *

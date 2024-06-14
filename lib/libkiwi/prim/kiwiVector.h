@@ -36,7 +36,7 @@ public:
         CopyFrom(rOther);
     }
 
-#ifdef LIBKIWI_RVALUE_REFS
+#ifdef LIBKIWI_CPP1X
     /**
      * @brief Constructor
      * @details Move constructor
@@ -68,7 +68,7 @@ public:
         CopyFrom(rOther);
     }
 
-#ifdef LIBKIWI_RVALUE_REFS
+#ifdef LIBKIWI_CPP1X
     /**
      * @brief Vector move assignment
      *

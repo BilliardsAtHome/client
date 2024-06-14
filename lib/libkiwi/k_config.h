@@ -25,11 +25,15 @@
 // C++ exclusive options
 #ifdef __cplusplus
 
-// Some versions of CW allow rvalue references (for move semantics)
-#if defined(__MWERKS__) && __option(rvalue_refs)
-#define LIBKIWI_RVALUE_REFS
+// Some versions of CW allow C++11
+#if defined(__MWERKS__) && __option(cpp1x)
+#define LIBKIWI_CPP1X
 #elif __cplusplus >= 199711L
-#define LIBKIWI_RVALUE_REFS
+#define LIBKIWI_CPP1X
+#endif
+
+#ifndef LIBKIWI_CPP1X
+#define nullptr NULL
 #endif
 
 #endif // __cplusplus

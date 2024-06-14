@@ -38,7 +38,7 @@ public:
         *this = rOther;
     }
 
-#ifdef LIBKIWI_RVALUE_REFS
+#ifdef LIBKIWI_CPP1X
     /**
      * @brief Constructor
      * @details Move constructor
@@ -77,7 +77,7 @@ public:
         return *this;
     }
 
-#ifdef LIBKIWI_RVALUE_REFS
+#ifdef LIBKIWI_CPP1X
     /**
      * @brief Move assignment
      *
@@ -157,7 +157,7 @@ private:
         std::swap(mpData, rOther.mpData);
     }
 
-#ifdef LIBKIWI_RVALUE_REFS
+#ifdef LIBKIWI_CPP1X
     /**
      * @brief Move value from other smart pointer
      *
