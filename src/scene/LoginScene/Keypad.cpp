@@ -49,10 +49,10 @@ void Keypad::Reset() {
  * @brief Update logic
  */
 void Keypad::Calculate() {
-    kiwi::WiiCtrl& ctrl =
+    const kiwi::WiiCtrl& ctrl =
         kiwi::CtrlMgr::GetInstance().GetWiiCtrl(kiwi::EPlayer_1);
 
-    if (!ctrl.Connected()) {
+    if (!ctrl.IsConnected()) {
         return;
     }
 
@@ -60,17 +60,17 @@ void Keypad::Calculate() {
     mKeys[mSelectedKey].hover = false;
 
     // Move right/left (column change)
-    if (ctrl.Trig() & kiwi::WiiCtrl::EButton_Left) {
+    if (ctrl.IsTrig(kiwi::EButton_Left)) {
         mSelectedKey = kiwi::Max<s32>(0, mSelectedKey - 1);
 
-    } else if (ctrl.Trig() & kiwi::WiiCtrl::EButton_Right) {
+    } else if (ctrl.IsTrig(kiwi::EButton_Right)) {
         mSelectedKey = kiwi::Min<s32>(mKeys.Length() - 1, mSelectedKey + 1);
     }
 
     // Move up/down (row change)
-    if (ctrl.Trig() & kiwi::WiiCtrl::EButton_Up) {
+    if (ctrl.IsTrig(kiwi::EButton_Up)) {
         mSelectedKey = kiwi::Max<s32>(0, mSelectedKey - 3);
-    } else if (ctrl.Trig() & kiwi::WiiCtrl::EButton_Down) {
+    } else if (ctrl.IsTrig(kiwi::EButton_Down)) {
         mSelectedKey = kiwi::Min<s32>(mKeys.Length() - 1, mSelectedKey + 3);
     }
 
@@ -78,7 +78,7 @@ void Keypad::Calculate() {
     mKeys[mSelectedKey].hover = true;
 
     // A button to press key
-    if (ctrl.Trig() & kiwi::WiiCtrl::EButton_A) {
+    if (ctrl.IsTrig(kiwi::EButton_A)) {
         Key& k = mKeys[mSelectedKey];
 
         if (k.callback != NULL) {

@@ -53,14 +53,18 @@ void LoginScene::OnUserDraw() {
  * @brief Keypad OK keypress callback
  *
  * @param result Keypad result
- * @param arg Parent scene
+ * @param pArg Parent scene
  */
-void LoginScene::KeypadOkCallback(const kiwi::String& result, void* arg) {
-    LoginScene* self = static_cast<LoginScene*>(arg);
+void LoginScene::KeypadOkCallback(const kiwi::String& result, void* pArg) {
+    LoginScene* self = static_cast<LoginScene*>(pArg);
     ASSERT(self != NULL);
 
     // Work buffer (byte-aligned for NAND requirements)
-    kiwi::WorkBuffer buffer(sizeof(u32));
+    kiwi::WorkBufferArg arg;
+    arg.size = sizeof(u32);
+    arg.sizeAlign = arg.memAlign = 32;
+    kiwi::WorkBuffer buffer(arg);
+
     u32 uid = ksl::strtoul(result);
 
     // Write unique ID to buffer

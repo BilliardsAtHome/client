@@ -1,18 +1,17 @@
 #ifndef LIBKIWI_UTIL_IOS_DEVICE_H
 #define LIBKIWI_UTIL_IOS_DEVICE_H
 #include <libkiwi/core/kiwiMemoryMgr.h>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiOptional.h>
 #include <libkiwi/prim/kiwiString.h>
+#include <libkiwi/prim/kiwiVector.h>
 #include <libkiwi/util/kiwiIosObject.h>
 #include <revolution/IPC.h>
 #include <revolution/OS.h>
 
 namespace kiwi {
-
-// Forward declarations
-class IosVectors;
+//! @addtogroup libkiwi_util
+//! @{
 
 /**
  * @brief IOS device handle
@@ -51,19 +50,26 @@ public:
      * @brief Tests whether this device is still open
      */
     bool IsOpen() const {
-        return mHandle > 0;
+        return mHandle >= 0;
     }
+
+    /**
+     * @brief Perform I/O control (no parameters) on this device
+     *
+     * @param id Ioctl ID
+     * @return IOS result code
+     */
+    s32 Ioctl(s32 id) const;
 
     /**
      * @brief Perform I/O control (single vectors) on this device
      *
      * @param id Ioctl ID
-     * @param in Input data
-     * @param out Output data
+     * @param in Input vector
+     * @param out Output vector
      * @return IOS result code
      */
-    s32 Ioctl(s32 id, const IosVectors* in = NULL,
-              IosVectors* out = NULL) const;
+    s32 Ioctl(s32 id, const IosVector& in, IosVector& out) const;
 
     /**
      * @brief Perform I/O control (multiple vectors) on this device
@@ -73,14 +79,15 @@ public:
      * @param out Output vectors
      * @return IOS result code
      */
-    s32 IoctlV(s32 id, const IosVectors* in = NULL,
-               IosVectors* out = NULL) const;
+    s32 IoctlV(s32 id, const TVector<IosVector>& in,
+               const TVector<IosVector>& out) const;
 
 private:
     String mName; // Virtual file path
     s32 mHandle;  // Virtual file descriptor
 };
 
+//! @}
 } // namespace kiwi
 
 #endif

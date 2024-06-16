@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_SUPPORT_LIBSO_H
 #define LIBKIWI_SUPPORT_LIBSO_H
 #include <cstring>
-#include <libkiwi/k_config.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
 #include <libkiwi/util/kiwiIosDevice.h>
@@ -9,6 +8,8 @@
 #include <revolution/SO.h>
 
 namespace kiwi {
+//! @addtogroup libkiwi_support
+//! @{
 
 // Forward declarations
 class SockAddrAny;
@@ -16,7 +17,7 @@ class SockAddr4;
 class SockAddr6;
 
 /**
- * SO library wrapper/extension
+ * @brief SO library wrapper/extension
  */
 class LibSO {
 public:
@@ -68,8 +69,8 @@ private:
                         const SockAddrAny* addr);
 
 private:
-    static IosDevice sIosDevice; // IOS IP device handle
-    static SOResult sLastError;  // Last IOS error code
+    static IosDevice sDevNetIpTop; // IOS IP device handle
+    static SOResult sLastError;    // Last IOS error code
 };
 
 /**
@@ -191,7 +192,7 @@ struct SockAddr4 : public SOSockAddrIn {
 };
 
 /**
- * SO IPv6 address wrapper to simplify upcasting
+ * @brief SO IPv6 address wrapper to simplify upcasting
  */
 struct SockAddr6 : public SOSockAddrIn6 {
     operator SockAddrAny&() {
@@ -265,21 +266,15 @@ struct SockAddr6 : public SOSockAddrIn6 {
 /**
  * @brief Convert socket address to string
  */
-inline String ToString(const SockAddrAny& t) {
+K_INLINE String ToString(const SockAddrAny& t) {
     return Format("%s:%d", LibSO::INetNtoP(t).CStr(), t.port);
-}
-
-/**
- * @brief IOS expects object length to be the address length
- */
-template <> u32 IosObject<SockAddrAny>::Size() const {
-    return Ref().len;
 }
 
 K_STATIC_ASSERT(sizeof(SockAddrAny) == sizeof(SOSockAddr));
 K_STATIC_ASSERT(sizeof(SockAddr4) == sizeof(SOSockAddrIn));
 K_STATIC_ASSERT(sizeof(SockAddr6) == sizeof(SOSockAddrIn6));
 
+//! @}
 } // namespace kiwi
 
 #endif
