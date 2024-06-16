@@ -2,7 +2,6 @@
 
 #include <Pack/RPGraphics.h>
 #include <Pack/RPSystem.h>
-#include <kokeshi.hpp>
 #include <libkiwi.h>
 
 namespace kiwi {

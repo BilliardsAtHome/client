@@ -1,6 +1,5 @@
 #include <cstdio>
 #include <cstring>
-#include <kokeshi.hpp>
 #include <libkiwi.h>
 #include <revolution/OS.h>
 

@@ -506,8 +506,13 @@ namespace detail {}
 
 
 /**
+ * @example CodeHook.cpp
+ * This is an example of how to hook code that exists in the game DOL:
+ */
+
+/**
  * @example CustomScene.cpp
- * This is an example of how to create a custom scene:
+ * This is an example of how to create your own scenes within the game:
  */
 
 // clang-format on

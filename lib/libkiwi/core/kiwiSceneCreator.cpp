@@ -1,6 +1,5 @@
 #define LIBKIWI_INTERNAL
 
-#include <kokeshi.hpp>
 #include <libkiwi.h>
 
 namespace kiwi {

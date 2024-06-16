@@ -17,8 +17,9 @@
 #include <stdint.h> // Common integer typedefs (intXX_t, etc.)
 #endif
 
-#include <kamek.hpp> // Kamek hooks
-#include <macros.h>  // Useful macros
+#include <kamek.hpp>   // Kamek hooks
+#include <kokeshi.hpp> // Kokeshi macros
+#include <macros.h>    // Useful macros
 
 /**
  * Features where C++ is optional

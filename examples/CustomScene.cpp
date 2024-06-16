@@ -1,11 +1,9 @@
-//
-// This is an example of how to create your own scenes within the game.
-//
+// Includes ALL of libkiwi
+#include <libkiwi.h>
 
-#include <libkiwi.h> // Includes ALL of libkiwi
-
-//
+//=============================================================================
 // Scene IDs
+//=============================================================================
 //
 // Your scene IDs must begin after the Pack Project scene IDs.
 // The easiest way to do this is to begin at kiwi::ESceneID_Max.
@@ -17,8 +15,9 @@ enum EMySceneID {
     // And so on ...
 };
 
-//
+//=============================================================================
 // Scene class
+//=============================================================================
 //
 // Your class must inherit from the scene interface, IScene.
 //
@@ -72,8 +71,9 @@ class CustomScene : public kiwi::IScene {
     }
 };
 
-//
+//=============================================================================
 // Scene declaration
+//=============================================================================
 //
 // To make the scene creator aware of your custom scene, you need to construct a
 // scene declaration, or SceneDecl object.
@@ -81,15 +81,29 @@ class CustomScene : public kiwi::IScene {
 // To simplify construction, libkiwi provides the K_SCENE_DECL macro.
 // Its argument must be the scene's class name.
 //
+// This macro creates a static object, so it must be placed within the .cpp
+// file, not the header file.
+//
 K_SCENE_DECL(CustomScene);
 
-//
+//=============================================================================
 // Scene change
+//=============================================================================
 //
 // To enter your custom scene, simply use the ChangeSceneAfterFade method of the
-// scene creator, kiwi::SceneCreator.
+// scene creator elsewhere in your code. Below is an example of a callsite:
 //
 void dummy() {
     kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(
         EMySceneID_UserScene0);
 }
+
+//=============================================================================
+// More Information
+//=============================================================================
+//
+// For more information, please see libkiwi/core/kiwiIScene.h.
+//
+// The important functionality is covered in this example, but the scene
+// interface allows for much more!
+//
