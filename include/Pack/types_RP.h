@@ -4,7 +4,7 @@
 #include <types.h>
 
 #ifndef RP_GET_INSTANCE
-#define RP_GET_INSTANCE(T) T::GetInstance()
+#define RP_GET_INSTANCE(T) T::getInstance()
 #endif
 
 // Provides year, month, month day

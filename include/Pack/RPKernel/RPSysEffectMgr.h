@@ -4,14 +4,14 @@
 
 class RPSysEffectMgr {
 public:
-    static RPSysEffectMgr* GetInstance() {
-        return sInstance;
+    static RPSysEffectMgr* getInstance() {
+        return spInstance;
     }
 
     void LoadResource();
 
 private:
-    static RPSysEffectMgr* sInstance;
+    static RPSysEffectMgr* spInstance;
 };
 
 #endif

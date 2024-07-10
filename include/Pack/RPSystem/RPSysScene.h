@@ -99,7 +99,7 @@ public:
     // @address 80184e90
     int getCreatorSceneID() const;
     // @address 80184e98
-    void setCreatorSceneID(int scene);
+    void setCreatorSceneID(s32 scene);
 
     /**
      * @brief Initialize base RP scene members
@@ -223,6 +223,8 @@ public:
      */
     void printTimeStamp(nw4r::ut::Color color) const;
     /**@}*/
+
+    void setEnterFast();
 
 private:
 #ifdef PACK_RESORT

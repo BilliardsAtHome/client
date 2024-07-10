@@ -14,8 +14,8 @@
  */
 class RPSysGameConfig : public RPSysTagParameters {
 public:
-    static RPSysGameConfig* GetInstance() {
-        return sInstance;
+    static RPSysGameConfig* getInstance() {
+        return spInstance;
     }
     // @address 801866e0
     static RPSysGameConfig* CreateInstance(EGG::Heap* heap);
@@ -80,7 +80,7 @@ private:
      * @brief Static instance
      * @address 804bf4e8
      */
-    static RPSysGameConfig* sInstance;
+    static RPSysGameConfig* spInstance;
 };
 
 #endif

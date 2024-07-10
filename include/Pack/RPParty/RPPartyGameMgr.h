@@ -4,8 +4,8 @@
 
 class RPPartyGameMgr {
 public:
-    static RPPartyGameMgr* GetInstance() {
-        return sInstance;
+    static RPPartyGameMgr* getInstance() {
+        return spInstance;
     }
 
     static void CreateInstance();
@@ -14,7 +14,7 @@ public:
     void Reset();
 
 private:
-    static RPPartyGameMgr* sInstance;
+    static RPPartyGameMgr* spInstance;
 };
 
 #endif

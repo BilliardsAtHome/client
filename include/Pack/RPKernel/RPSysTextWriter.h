@@ -17,8 +17,8 @@ class RPSysTextWriter : public nw4r::ut::TextWriterBase<char> {
 public:
     // @address 80190cc4
     static RPSysTextWriter* CreateInstance();
-    static RPSysTextWriter* GetInstance() {
-        return sInstance;
+    static RPSysTextWriter* getInstance() {
+        return spInstance;
     }
 
     /**
@@ -53,7 +53,7 @@ public:
 
 private:
     RPSysTextWriter() {
-        // SetFont(RPSysFontManager::GetInstance()->GetRomFont());
+        // SetFont(RPSysFontManager::getInstance()->GetRomFont());
         // mIsRendering = FALSE;
     }
 
@@ -68,7 +68,7 @@ private:
      * @brief Static instance
      * @address 804bf538
      */
-    static RPSysTextWriter* sInstance;
+    static RPSysTextWriter* spInstance;
 };
 
 #endif

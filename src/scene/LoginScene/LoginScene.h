@@ -44,7 +44,7 @@ public:
      * @brief Get the scene's exit type
      */
     virtual kiwi::EExitType GetExitType() const {
-        return kiwi::EExitType_1;
+        return kiwi::EExitType_Sibling;
     }
 
     /**

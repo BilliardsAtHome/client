@@ -12,16 +12,7 @@
 //! @addtogroup kokeshi
 //! @{
 
-#ifdef __DOXYGEN
-/**
- * @brief Conditional compilation
- *
- * @param sports Code to compile under PACK_SPORTS
- * @param play Code to compile under PACK_PLAY
- * @param resort Code to compile under PACK_RESORT
- */
-#define KOKESHI_BY_PACK(sports, play, resort)
-#elif PACK_SPORTS
+#ifdef PACK_SPORTS
 #define KOKESHI_BY_PACK(sports, play, resort) sports
 #elif PACK_PLAY
 #define KOKESHI_BY_PACK(sports, play, resort) play
@@ -59,12 +50,12 @@ struct ModuleInfo {
 };
 
 //! Information about the currently loaded Kamek module
-ModuleInfo sModuleInfo : 0x80003200;
+ModuleInfo CURRENT_MODULE : 0x80003200;
 
 //! Path to the module's code binary
-static const char* scModulePath = KOKESHI_MODULE_PATH ".bin";
+static const char* BINARY_PATH = KOKESHI_MODULE_PATH ".bin";
 //! Path to the module's mapfile
-static const char* scMapfilePath = KOKESHI_MODULE_PATH ".map";
+static const char* MAPFILE_PATH = KOKESHI_MODULE_PATH ".map";
 
 /**
  * @brief Allocates memory

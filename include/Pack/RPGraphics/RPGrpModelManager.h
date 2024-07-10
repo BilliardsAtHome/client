@@ -4,14 +4,14 @@
 
 class RPGrpModelManager {
 public:
-    static RPGrpModelManager* GetInstance() {
-        return sInstance;
+    static RPGrpModelManager* getInstance() {
+        return spInstance;
     }
 
     void CreateModelScene(u32, u8, u32, RPGrpLightManager*, RPGrpFogManager*);
 
 private:
-    static RPGrpModelManager* sInstance;
+    static RPGrpModelManager* spInstance;
 };
 
 #endif

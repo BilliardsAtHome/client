@@ -48,8 +48,8 @@ public:
 public:
     // @address 801863a4
     static RPSysProjectLocal* CreateInstance(EGG::Heap* heap);
-    static RPSysProjectLocal* GetInstance() {
-        return sInstance;
+    static RPSysProjectLocal* getInstance() {
+        return spInstance;
     }
 
     s32 getPackID() const {
@@ -99,7 +99,7 @@ private:
      * Static instance
      * @address 804bf4e0
      */
-    static RPSysProjectLocal* sInstance;
+    static RPSysProjectLocal* spInstance;
 };
 
 #endif

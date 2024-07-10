@@ -146,8 +146,8 @@ public:
 public:
     // @address 80184e10
     static RPSysSceneCreator* CreateInstance(EGG::Heap* heap);
-    static RPSysSceneCreator* GetInstance() {
-        return sInstance;
+    static RPSysSceneCreator* getInstance() {
+        return spInstance;
     }
 
     s32 getLastSceneID() const {
@@ -211,7 +211,7 @@ private:
     // @address 80183f68
     virtual ~RPSysSceneCreator() {}
 
-private:
+protected:
     // @brief Heap in which this object was allocated
     EGG::Heap* mParentHeap; // at 0x4
     // @brief Last created scene's ID
@@ -227,7 +227,7 @@ private:
      * @brief Static instance
      * @address 804bf4f8
      */
-    static RPSysSceneCreator* sInstance;
+    static RPSysSceneCreator* spInstance;
 };
 
 #endif

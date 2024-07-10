@@ -40,8 +40,8 @@ enum EGndAttr {
 
 class RPGolCollisionModel : RPSysUnknownBase {
 public:
-    static RPGolCollisionModel* GetInstance() {
-        return sInstance;
+    static RPGolCollisionModel* getInstance() {
+        return spInstance;
     }
 
     static const char* GetCollisionDesc(EGndAttr col) {
@@ -80,7 +80,7 @@ private:
     u32 mNumRPTris;    // at 0x5C
     UNKTYPE* PTR_0x60; // at 0x60
 
-    static RPGolCollisionModel* sInstance;
+    static RPGolCollisionModel* spInstance;
     static const char* sCollisionDesc[EGndAttr_Max];
     static nw4r::ut::Color sCollisionColors[EGndAttr_Max];
 };

@@ -6,8 +6,8 @@
 
 class RPBilBallManager {
 public:
-    static RPBilBallManager* GetInstance() {
-        return sInstance;
+    static RPBilBallManager* getInstance() {
+        return spInstance;
     }
 
     RPBilBall* GetBall(int i) {
@@ -21,7 +21,7 @@ private:
     char _00[0x7C];
     RPBilBall* mBalls[BALL_MAX]; // at 0x7C
 
-    static RPBilBallManager* sInstance;
+    static RPBilBallManager* spInstance;
 };
 
 #endif

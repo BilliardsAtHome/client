@@ -4,14 +4,14 @@
 
 class RPSysHomeMenuMgr {
 public:
-    static RPSysHomeMenuMgr* GetInstance() {
-        return sInstance;
+    static RPSysHomeMenuMgr* getInstance() {
+        return spInstance;
     }
 
     void LoadResource();
 
 private:
-    static RPSysHomeMenuMgr* sInstance;
+    static RPSysHomeMenuMgr* spInstance;
 };
 
 #endif

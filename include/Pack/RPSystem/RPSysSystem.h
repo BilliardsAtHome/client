@@ -25,8 +25,8 @@
  */
 class RPSysSystem {
 public:
-    static RPSysSystem* GetInstance() {
-        return sInstance;
+    static RPSysSystem* getInstance() {
+        return spInstance;
     }
 
     static EGG::Heap* getRootHeapMem1() {
@@ -111,7 +111,7 @@ private:
     u32 mLoadCount;         // at 0x54 (incremented by mTicksPerFrame)
     char* mTimeStampString; // at 0x58
 
-    static RPSysSystem* sInstance;      // 804bf4b8
+    static RPSysSystem* spInstance;     // 804bf4b8
     static RPSysConfigData sConfigData; // 804a3d50
 };
 

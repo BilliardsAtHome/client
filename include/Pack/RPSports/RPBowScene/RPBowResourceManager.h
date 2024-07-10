@@ -13,8 +13,8 @@ public:
     static void CreateInstance();
     // @address 80320e60
     static void DestroyInstance();
-    static RPBowResourceManager* GetInstance() {
-        return sInstance;
+    static RPBowResourceManager* getInstance() {
+        return spInstance;
     }
 
     RPBowResourceManager() : mExcelGlobal(NULL) {}
@@ -45,7 +45,7 @@ private:
      * @brief Static instance
      * @address 804bf9a8
      */
-    static RPBowResourceManager* sInstance;
+    static RPBowResourceManager* spInstance;
 };
 
 #endif

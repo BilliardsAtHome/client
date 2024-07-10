@@ -43,8 +43,8 @@ public:
     // @address 80293fc4
     static void DestroyInstance();
 
-    static RPGolFieldManager* GetInstance() {
-        return sInstance;
+    static RPGolFieldManager* getInstance() {
+        return spInstance;
     }
 
     RPGolMapObjBase* GetCourseObj() const {
@@ -168,7 +168,7 @@ private:
      * @brief Static instance
      * @address 804bf868
      */
-    static RPGolFieldManager* sInstance;
+    static RPGolFieldManager* spInstance;
 };
 
 #endif

@@ -12,8 +12,8 @@ class RPSndAudioMgr : public EGG::ExpAudioMgr {
 public:
     // @address 801b82dc
     static RPSndAudioMgr* CreateInstance(EGG::Heap* heap);
-    static RPSndAudioMgr* GetInstance() {
-        return sInstance;
+    static RPSndAudioMgr* getInstance() {
+        return spInstance;
     }
 
     /* virtual */ bool loadGroup(UNKWORD, nw4r::snd::SoundHeap*, UNKWORD);
@@ -40,7 +40,7 @@ private:
     char UNK_0x0[0x928];
     nw4r::snd::SoundHandle mSndHandle; // at 0x928
 
-    static RPSndAudioMgr* sInstance;
+    static RPSndAudioMgr* spInstance;
 };
 
 #endif

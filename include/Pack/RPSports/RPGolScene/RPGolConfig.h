@@ -274,7 +274,7 @@ private:
      * @brief Static instance
      * @address 804bf8c4
      */
-    static RPGolConfig* sInstance;
+    static RPGolConfig* spInstance;
 };
 
 RPGolConfig::HoleInfo sHoleInfo[] = {

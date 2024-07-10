@@ -26,8 +26,8 @@ public:
     static void Begin();
     static void End();
 
-    static RPGrpRenderer* GetInstance() {
-        return sInstance;
+    static RPGrpRenderer* getInstance() {
+        return spInstance;
     }
 
     void AppendDrawObject(IRPGrpDrawObject*);
@@ -58,7 +58,7 @@ private:
 
     static EDrawPass sDrawPass;
     static u8 sCurrentViewID;
-    static RPGrpRenderer* sInstance;
+    static RPGrpRenderer* spInstance;
     static RPGrpScreen* sActiveScreen;
 };
 

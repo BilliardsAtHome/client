@@ -4,14 +4,14 @@
 
 class RPSysPauseMgr {
 public:
-    static RPSysPauseMgr* GetInstance() {
-        return sInstance;
+    static RPSysPauseMgr* getInstance() {
+        return spInstance;
     }
 
     void LoadResource();
 
 private:
-    static RPSysPauseMgr* sInstance;
+    static RPSysPauseMgr* spInstance;
 };
 
 #endif

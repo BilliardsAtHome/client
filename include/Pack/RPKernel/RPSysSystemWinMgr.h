@@ -12,8 +12,8 @@ public:
     enum E_RESULT { RESULT_NONE, RESULT_WAIT, RESULT_YES, RESULT_NO };
 
 public:
-    static RPSysSystemWinMgr* GetInstance() {
-        return sInstance;
+    static RPSysSystemWinMgr* getInstance() {
+        return spInstance;
     }
 
     void createSystemWindow();
@@ -33,7 +33,7 @@ private:
     s32 mResult;
     char UNK_0x94[0xE0 - 0x94];
 
-    static RPSysSystemWinMgr* sInstance;
+    static RPSysSystemWinMgr* spInstance;
 };
 
 #endif

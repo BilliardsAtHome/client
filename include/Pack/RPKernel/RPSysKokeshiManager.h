@@ -9,14 +9,14 @@ public:
     };
 
 public:
-    static RPSysKokeshiManager* GetInstance() {
-        return sInstance;
+    static RPSysKokeshiManager* getInstance() {
+        return spInstance;
     }
 
     void LoadStaticResource();
 
 private:
-    static RPSysKokeshiManager* sInstance;
+    static RPSysKokeshiManager* spInstance;
 };
 
 #endif

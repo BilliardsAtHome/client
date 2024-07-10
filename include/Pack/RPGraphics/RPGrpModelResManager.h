@@ -4,14 +4,14 @@
 
 class RPGrpModelResManager {
 public:
-    static RPGrpModelResManager* GetInstance() {
-        return sInstance;
+    static RPGrpModelResManager* getInstance() {
+        return spInstance;
     }
 
     void CreateResourceList(u16);
 
 private:
-    static RPGrpModelResManager* sInstance;
+    static RPGrpModelResManager* spInstance;
 };
 
 #endif

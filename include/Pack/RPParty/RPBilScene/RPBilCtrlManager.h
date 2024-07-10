@@ -16,8 +16,8 @@ struct RPBilCtrl {
 
 class RPBilCtrlManager {
 public:
-    static RPBilCtrlManager* GetInstance() {
-        return sInstance;
+    static RPBilCtrlManager* getInstance() {
+        return spInstance;
     }
 
     RPBilCtrl* GetCtrl() const {
@@ -28,7 +28,7 @@ private:
     char _00[0x4];
     RPBilCtrl* PTR_0x4;
 
-    static RPBilCtrlManager* sInstance;
+    static RPBilCtrlManager* spInstance;
 };
 
 #endif

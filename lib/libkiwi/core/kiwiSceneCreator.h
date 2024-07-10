@@ -1,5 +1,6 @@
 #ifndef LIBKIWI_CORE_SCENE_CREATOR_H
 #define LIBKIWI_CORE_SCENE_CREATOR_H
+
 #include <RPSystem/RPSysSceneCreator.h>
 #include <libkiwi/k_types.h>
 #include <libkiwi/util/kiwiExtView.h>
@@ -31,8 +32,9 @@ enum ESceneID {
     ESceneID_RPSportsPhysicalPreviewScene,
     ESceneID_RPSportsPhysicalResultScene,
     ESceneID_RPGolSelectScene,
+#endif
 
-#ifdef PACK_SPORTS
+#if defined(PACK_SPORTS)
     ESceneID_Max,
 #endif
 
@@ -51,11 +53,11 @@ enum ESceneID {
     ESceneID_RPPartyMiiLoadScene,
     ESceneID_RPPartyMenuScene,
 
-#ifdef PACK_PLAY
+#if defined(PACK_PLAY)
     ESceneID_Max,
 #endif
 
-#else
+#ifdef PACK_RESORT
     // System
     ESceneID_Sp2StrapScene,
     ESceneID_Sp2SaveDataLoadScene,
@@ -98,33 +100,33 @@ enum ESceneID {
  * @brief Pack Project ID
  */
 enum EPackID {
-    EPackID_SportsPack,
-    EPackID_PartyPack,
-    EPackID_HealthPack,
-    EPackID_MusicPack,
-    EPackID_AllPack,
+    EPackID_SportsPack, //!< Wii Sports
+    EPackID_PartyPack,  //!< Wii Play
+    EPackID_HealthPack, //!< Wii Fit
+    EPackID_MusicPack,  //!< Wii Music
+    EPackID_AllPack,    //!< Pack Project
+
+    EPackID_Max
 };
 
 /**
  * @brief Scene create type
  */
 enum ECreateType {
-    ECreateType_0,
-    ECreateType_1,
-    ECreateType_2,
+    ECreateType_Standard, //!< Overwrite outgoing scene
+    ECreateType_Sibling,  //!< Become sibling of outgoing scene
+    ECreateType_Child,    //!< Become child of outgoing scene
 };
 
 /**
  * @brief Scene exit type
  */
 enum EExitType {
-    EExitType_0,
-    EExitType_1,
+    EExitType_Standard, //!< Incoming scene overwrites this scene
+    EExitType_Sibling,  //!< Incoming scene becomes a sibling of this scene
     EExitType_2,
     EExitType_3,
-    EExitType_4,
-    EExitType_5,
-    EExitType_6,
+    EExitType_Child, //!< Incoming scene becomes a child of this scene
 };
 
 /**
@@ -136,18 +138,18 @@ public:
      * @brief Scene information
      */
     struct Info {
-        RPSysScene* (*pCt)();     // Scene create function (for user scenes)
-        String name;              // Scene name
-        String dir;               // Resource directory
-        s32 id;                   // Scene ID (for RP scenes)
-        kiwi::EPackID pack;       // Pack ID
-        kiwi::ECreateType create; // How to create the scene
-        kiwi::EExitType exit;     // How to exit the scene
-        bool common;              // Use the RP common sound archive
+        RPSysScene* (*pCt)();     //!< Scene create function (for user scenes)
+        String name;              //!< Scene name
+        String dir;               //!< Resource directory
+        s32 id;                   //!< Scene ID (for RP scenes)
+        kiwi::EPackID pack;       //!< Pack ID
+        kiwi::ECreateType create; //!< How to create the scene
+        kiwi::EExitType exit;     //!< How to exit the scene
+        bool common;              //!< Use the RP common sound archive
     };
 
 public:
-    K_EXTVIEW_GET_INSTANCE(SceneCreator, RPSysSceneCreator::GetInstance);
+    K_EXTVIEW_GET_INSTANCE(SceneCreator, RPSysSceneCreator::getInstance);
 
     /**
      * @brief Registers user scene class
@@ -160,9 +162,9 @@ public:
      * @brief Fades out into a new scene
      *
      * @param id Scene ID
-     * @param arg1 Unknown
+     * @param reload Reload the current scene
      */
-    bool ChangeSceneAfterFade(s32 id, bool arg1 = false);
+    bool ChangeSceneAfterFade(s32 id, bool reload = false);
 
     /**
      * @brief Gets the specified scene's name
@@ -234,15 +236,10 @@ private:
     static const Info* GetSceneInfo(s32 id);
 
 private:
-    /**
-     * @brief User-registered scenes
-     */
-    static TMap<s32, Info> sUserScenes;
-
-    /**
-     * @brief Pack Project scenes
-     */
+    //! Pack Project scenes
     static const Info scPackScenes[];
+    //! User-registered scenes
+    static TMap<s32, Info> sUserScenes;
 };
 
 //! @}

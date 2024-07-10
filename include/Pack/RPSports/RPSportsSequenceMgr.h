@@ -29,8 +29,8 @@ public:
 public:
     // @address 801e74b0
     static void CreateInstance();
-    static RPSportsSequenceMgr* GetInstance() {
-        return sInstance;
+    static RPSportsSequenceMgr* getInstance() {
+        return spInstance;
     }
 
     u32 GetSport() const {
@@ -166,7 +166,7 @@ private:
      * @brief Static instance
      * @address 804bf708
      */
-    static RPSportsSequenceMgr* sInstance;
+    static RPSportsSequenceMgr* spInstance;
 };
 
 #endif

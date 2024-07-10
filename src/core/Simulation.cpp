@@ -187,7 +187,7 @@ void Simulation::UserDraw() {
 
     kiwi::DebugPrint::PrintfOutline(-0.5f, -0.9f, 0.8f, true, kiwi::Color::RED,
                                     kiwi::Color::BLACK, "Unique ID: %06d",
-                                    mUniqueId.Value());
+                                    *mUniqueId);
 }
 
 /**

@@ -8,8 +8,8 @@ class RPBilMain {
 public:
     static void CreateInstance();
     static void DestroyInstance();
-    static RPBilMain* GetInstance() {
-        return sInstance;
+    static RPBilMain* getInstance() {
+        return spInstance;
     }
 
     RP_UTL_FSM_STATE_DECL(AFTERSHOT);
@@ -25,7 +25,7 @@ private:
 private:
     RPUtlBaseFsm<RPBilMain>* mpStateMachine; // at 0x4
 
-    static RPBilMain* sInstance;
+    static RPBilMain* spInstance;
 };
 
 #endif

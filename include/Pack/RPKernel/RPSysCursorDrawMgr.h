@@ -32,8 +32,8 @@ public:
     // @address 801a0230
     static RPSysCursorDrawMgr* CreateInstance(EGG::Heap* heap);
 
-    static RPSysCursorDrawMgr* GetInstance() {
-        return sInstance;
+    static RPSysCursorDrawMgr* getInstance() {
+        return spInstance;
     }
 
     // @address 8019ede8
@@ -86,7 +86,7 @@ private:
      * @brief Static instance
      * @address 804bf598
      */
-    static RPSysCursorDrawMgr* sInstance;
+    static RPSysCursorDrawMgr* spInstance;
 };
 
 #endif

@@ -4,8 +4,8 @@
 
 class RPSysPlayerMgr {
 public:
-    static RPSysPlayerMgr* GetInstance() {
-        return sInstance;
+    static RPSysPlayerMgr* getInstance() {
+        return spInstance;
     }
 
     void resetData();
@@ -13,7 +13,7 @@ public:
     void setControllerNum(int num);
 
 private:
-    static RPSysPlayerMgr* sInstance;
+    static RPSysPlayerMgr* spInstance;
 };
 
 #endif

@@ -17,8 +17,8 @@ class RPSysResourceManager {
 public:
     // @address 80187ae8
     static RPSysResourceManager* CreateInstance();
-    static RPSysResourceManager* GetInstance() {
-        return sInstance;
+    static RPSysResourceManager* getInstance() {
+        return spInstance;
     }
 
     /**
@@ -167,7 +167,7 @@ private:
      * @brief Static instance
      * @address 804bf4f0
      */
-    static RPSysResourceManager* sInstance;
+    static RPSysResourceManager* spInstance;
 };
 
 #endif

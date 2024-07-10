@@ -29,8 +29,8 @@ public:
 public:
     // @address 8018bea4
     static RPSysFontManager* CreateInstance();
-    static RPSysFontManager* GetInstance() {
-        return sInstance;
+    static RPSysFontManager* getInstance() {
+        return spInstance;
     }
 
     /**
@@ -93,7 +93,7 @@ private:
      * @brief Static instance
      * @address 804bf510
      */
-    static RPSysFontManager* sInstance;
+    static RPSysFontManager* spInstance;
 };
 
 #endif

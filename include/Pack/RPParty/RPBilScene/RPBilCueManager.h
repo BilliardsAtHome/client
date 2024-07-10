@@ -7,8 +7,8 @@
 
 class RPBilCueManager {
 public:
-    static RPBilCueManager* GetInstance() {
-        return sInstance;
+    static RPBilCueManager* getInstance() {
+        return spInstance;
     }
 
     RPBilCue* GetCue(int i) {
@@ -26,7 +26,7 @@ private:
     char _08[0x10 - 0x8];
     RPBilCue* mCues[scCueNum]; // at 0x10
 
-    static RPBilCueManager* sInstance;
+    static RPBilCueManager* spInstance;
 };
 
 #endif

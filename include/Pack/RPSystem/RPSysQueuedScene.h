@@ -14,8 +14,8 @@ class RPSysQueuedScene {
 public:
     // @address 80187ba0
     static RPSysQueuedScene* CreateInstance(EGG::Heap* heap);
-    static RPSysQueuedScene* GetInstance() {
-        return sInstance;
+    static RPSysQueuedScene* getInstance() {
+        return spInstance;
     }
 
     s32 GetSceneID() const {
@@ -47,7 +47,7 @@ private:
      * @brief Static instance
      * @address 804bf4f8
      */
-    static RPSysQueuedScene* sInstance;
+    static RPSysQueuedScene* spInstance;
 };
 
 #endif

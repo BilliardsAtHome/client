@@ -4,14 +4,14 @@
 
 class RPSysTutorialWinMgr {
 public:
-    static RPSysTutorialWinMgr* GetInstance() {
-        return sInstance;
+    static RPSysTutorialWinMgr* getInstance() {
+        return spInstance;
     }
 
     void LoadResource();
 
 private:
-    static RPSysTutorialWinMgr* sInstance;
+    static RPSysTutorialWinMgr* spInstance;
 };
 
 #endif

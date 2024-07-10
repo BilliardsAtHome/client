@@ -25,8 +25,8 @@ public:
 public:
     // @address 80188280
     static RPSysDvdStatus* CreateInstance(EGG::Heap* heap);
-    static RPSysDvdStatus* GetInstance() {
-        return sInstance;
+    static RPSysDvdStatus* getInstance() {
+        return spInstance;
     }
 
     /**
@@ -78,7 +78,7 @@ private:
      * @brief Static instance
      * @address 804bf500
      */
-    static RPSysDvdStatus* sInstance;
+    static RPSysDvdStatus* spInstance;
 };
 
 #endif

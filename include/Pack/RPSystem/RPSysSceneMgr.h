@@ -24,8 +24,8 @@ public:
     };
 
 public:
-    static RPSysSceneMgr* GetInstance() {
-        return sInstance;
+    static RPSysSceneMgr* getInstance() {
+        return spInstance;
     }
 
     /**
@@ -104,7 +104,7 @@ public:
     // @address 80185ce0
     void setFadeFrame(u16 frame);
     // @address 80185d28
-    u16 getFadeFrame();
+    u16 getSceneFadeFrame();
     /**
      * @brief Reset both faders' frame to 20
      * @address 80185d34
@@ -117,7 +117,7 @@ public:
      * @param scene Scene ID
      * @param reload Optionally reload current scene
      */
-    bool changeNextSceneAfterFade(int scene, bool reload);
+    bool changeNextSceneAfterFade(s32 scene, bool reload);
 
     // State check functions
     // ? FUN_80185f04()
@@ -162,7 +162,7 @@ private:
     // @brief Fader for the current scene
     EGG::ColorFader* mSceneFader; // at 0x34
 
-    static RPSysSceneMgr* sInstance;
+    static RPSysSceneMgr* spInstance;
 };
 
 #endif

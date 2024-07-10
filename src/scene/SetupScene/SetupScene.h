@@ -43,13 +43,13 @@ public:
      * @brief Get the scene's create type
      */
     virtual kiwi::ECreateType GetCreateType() const {
-        return kiwi::ECreateType_0;
+        return kiwi::ECreateType_Standard;
     }
     /**
      * @brief Get the scene's exit type
      */
     virtual kiwi::EExitType GetExitType() const {
-        return kiwi::EExitType_4;
+        return kiwi::EExitType_Child;
     }
 
     /**
