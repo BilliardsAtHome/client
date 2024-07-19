@@ -1,295 +1,633 @@
 #ifndef RP_SPORTS_PLAYER_DATA_H
 #define RP_SPORTS_PLAYER_DATA_H
-#include "types_rp.h"
+#include <Pack/RPTypes.h>
+#include <RVLFaceLib.h>
+#include <egg/core.h>
 
-#include <types_egg.h>
+//! @addtogroup rp_sports
+//! @{
 
 /**
- * @brief Wii Sports save file player list entry
- *
- * NOTE: Not a packed structure, this is an abstraction of the binary format
- *
- * (Custom name, derived from some Wii Fit U symbols)
+ * @brief Wii Sports save file player data
+ * @details The save file holds 100 of these (known collectively as the "player
+ * list").
  */
 class RPSportsPlayerData {
 public:
     /**
-     * @brief For mFlags
-     */
-    enum EPlayerFlag { FLAG_ON_PLAYER_LIST = (1 << 1) };
-
-    /**
-     * @brief Used to index arrays in the sport data.
-     *
-     * With regards to the Iwata Asks interview, this enum likely represents
-     * the order in which the sports were added to the game.
+     * @brief Sport
+     * @note Unique from RPSysSceneCreator::ESportID, as this list swaps
+     * the order of Boxing and Bowling.
      */
     enum ESportID {
-        SPORT_BASEBALL,
-        SPORT_TENNIS,
-        SPORT_GOLF,
-        SPORT_BOWLING,
-        SPORT_BOXING,
+        ESportID_Bsb, //!< Baseball
+        ESportID_Tns, //!< Tennis
+        ESportID_Gol, //!< Golf
+        ESportID_Bow, //!< Bowling
+        ESportID_Box, //!< Boxing
 
-        SPORT_MAX
+        ESportID_Max
     };
 
     /**
-     * @brief Training mode medals
-     * For setTrainingMedal
+     * @brief Training game ID
      */
-    enum ETrainingMedal {
-        MEDAL_NONE,
-        MEDAL_BRONZE,
-        MEDAL_SILVER,
-        MEDAL_GOLD,
-        MEDAL_PLATINUM,
+    enum EGameID {
+        EGameID_1st, //!< 1st of the three training games
+        EGameID_2nd, //!< 2nd of the three training games
+        EGameID_3rd, //!< 3rd of the three training games
+
+        EGameID_Max
     };
 
     /**
-     * @brief Golf difficulties
-     * For indexing the best score array
+     * @brief Training game medal
      */
-    enum EGolDifficulty {
-        DIFF_NINEHOLE,
-        DIFF_BEGINNER,
-        DIFF_INTERMEDIATE,
-        DIFF_EXPERT,
-
-        DIFF_MAX
+    enum EMedalID {
+        EMedalID_None,
+        EMedalID_Bronze,
+        EMedalID_Silver,
+        EMedalID_Gold,
+        EMedalID_Platinum,
     };
 
     /**
-     * @brief Used to index fitness data by statistics.
+     * @brief Golf course
+     */
+    enum ECourseID {
+        ECourseID_NineHole, //!< Nine-hole
+        ECourseID_Beginner, //!< Beginner (1-3)
+        ECourseID_Intermed, //!< Intermediate (4-6)
+        ECourseID_Expert,   //!< Expert (7-9)
+
+        ECourseID_Max
+    };
+
+    /**
+     * @brief Fitness test statistic
      */
     enum EStatID {
-        STAT_STAMINA,
-        STAT_SPEED,
-        STAT_BALANCE,
+        EStatID_Stamina,
+        EStatID_Speed,
+        EStatID_Balance,
 
-        STAT_MAX
+        EStatID_Max
+    };
+
+    /**
+     * @brief Handedness
+     */
+    enum EHandType {
+        EHandType_Right, //!< Right-handed
+        EHandType_Left,  //!< Left-handed
     };
 
 public:
-    RPSportsPlayerData(); // 8018ad34
+    /**
+     * @brief Constructor
+     */
+    RPSportsPlayerData();
 
-    // For serialization (From WFU)
-    void write(EGG::RamStream* stream) const; // 8018ad70
-    void read(EGG::RamStream* stream);        // 8018b0e4
+    /**
+     * @brief Clears all data
+     */
+    void reset();
 
-    // Player list debut time
-    void setDebutTime(RPTime32 time); // 8018b44c
-    RPTime32 getDebutTime() const;    // 8018b454
+    /**
+     * @name Common
+     */
+    /**@{*/
+    /**
+     * @brief Gets the hand type used for the specified sport's primary control
+     *
+     * @param sport Sport ID
+     */
+    EHandType getHandPrimary(ESportID sport) const;
+    /**
+     * @brief Gets the hand type used for the specified sport's secondary
+     * control
+     *
+     * @param sport Sport ID
+     */
+    EHandType getHandSecondary(ESportID sport) const;
 
-    // Mii unique ID
-    void setUniqueID(const u8* id);    // 8018b45c
-    void getUniqueID(u8* idOut) const; // 8018b4a0
+    /**
+     * @brief Sets the hand type used for the specified sport's primary control
+     *
+     * @param sport Sport ID
+     * @param hand Hand type
+     */
+    void setHandPrimary(ESportID sport, EHandType hand);
+    /**
+     * @brief Gets the hand type used for the specified sport's secondary
+     * control
+     *
+     * @param sport Sport ID
+     * @param hand Hand type
+     */
+    void setHandSecondary(ESportID sport, EHandType hand);
 
-    // Player list flag
-    void setOnPlayerList(bool onList); // 8018b4e4
-    bool isOnPlayerList() const;       // 8018b50c
+    /**
+     * @brief Gets the skill level associated with this sport
+     *
+     * @param sport Sport ID
+     */
+    f32 getSkillLevel(ESportID sport) const;
+    /**
+     * @brief Sets the skill level associated with this sport
+     *
+     * @param sport Sport ID
+     * @param skill Skill level
+     */
+    void setSkillLevel(ESportID sport, f32 skill);
 
-    // Last test start date
-    void setLastFitTestStartDate(RPTime16 date); // 8018b518
-    RPTime16 getLastFitTestStartDate() const;    // 8018b520
+    /**
+     * @brief Gets the specified point from the specified sport's skill graph
+     *
+     * @param sport Sport ID
+     * @param point Point
+     */
+    s16 getSkillGraphPoint(ESportID sport, u32 point) const;
+    /**
+     * @brief Sets the specified point from the specified sport's skill graph
+     *
+     * @param value Point value
+     * @param sport Sport ID
+     * @param point Point
+     */
+    void setSkillGraphPoint(s16 value, ESportID sport, u32 point);
 
-    // TO-DO: SHORTS_0x2D0/SHORTS_0x386 getters/setters
+    /**
+     * @brief Gets the first date when the standard mode of the specified sport
+     * was played
+     *
+     * @param sport Sport ID
+     */
+    RPTime16 getStandardFirstDate(ESportID sport) const;
+    /**
+     * @brief Sets the first date when the standard mode of the specified sport
+     * was played
+     *
+     * @param date First play date
+     * @param sport Sport ID
+     */
+    void setStandardFirstDate(RPTime16 date, ESportID sport);
 
-    // Last test end date
-    void setLastFitTestEndDate(RPTime16 date); // 8018b568
-    RPTime16 getLastFitTestEndDate() const;    // 8018b570
+    /**
+     * @brief Gets the first date when the specified training game was played
+     *
+     * @param sport Sport ID
+     * @param game Training game
+     */
+    RPTime16 getTrainingFirstDate(ESportID sport, EGameID game) const;
+    /**
+     * @brief Sets the first date when the specified training game was played
+     *
+     * @param date First play date
+     * @param sport Sport ID
+     * @param game Training game
+     */
+    void setTrainingFirstDate(RPTime16 date, ESportID sport, EGameID game);
 
-    // TO-DO: SHORTS_0x2B0/SHORTS_0x2AC getters/setters
+    /**
+     * @brief Gets the number of times the standard mode of the specified sport
+     * was played
+     *
+     * @param sport Sport ID
+     */
+    u16 getStandardPlayCount(ESportID sport) const;
+    /**
+     * @brief Sets the number of times the standard mode of the specified sport
+     * was played
+     *
+     * @param count Play count
+     * @param sport Sport ID
+     */
+    void setStandardPlayCount(u16 count, ESportID sport);
 
-    // Fitness stats (Stamina, Speed, Balance)
-    void setFitnessStatValue(u16 value, u32 stat); // 8018b5c0
-    u16 getFitnessStatValue(u32 stat) const;       // 8018b5d0
+    /**
+     * @brief Gets the number of times the specified training game was played
+     *
+     * @param sport Sport ID
+     * @param game Training game
+     */
+    u16 getTrainingPlayCount(ESportID sport, EGameID game) const;
+    /**
+     * @brief Sets the number of times the specified training game was played
+     *
+     * @param count Play count
+     * @param sport Sport ID
+     * @param game Training game
+     */
+    void setTrainingPlayCount(u16 count, ESportID sport, EGameID game);
 
-    // Total count of completed fitness tests
-    void setTotalFitnessTests(int num); // 8018b5e0
-    u16 getTotalFitnessTests() const;   // 8018b5e8
+    /**
+     * @brief Gets the medal earned in the specified training game
+     *
+     * @param sport Sport ID
+     * @param game Training game
+     * @return @ref EMedalID
+     */
+    u8 getTrainingMedal(ESportID sport, EGameID game) const;
+    /**
+     * @brief Sets the medal earned in the specified training game
+     *
+     * @param medal Medal type (@ref EMedalID)
+     * @param sport Sport ID
+     * @param game Training game
+     */
+    void setTrainingMedal(u8 medal, ESportID sport, EGameID game);
 
-    // Date of first completed fitness test
-    void setFirstFitTestEndDate(RPTime16 date);           // 8018b5f0
-    RPTime16 getFirstFitTestEndDate(RPTime16 date) const; // 8018b5f8
+    /**
+     * @brief Tests whether this player has played any sport
+     */
+    bool isFirstPlay() const;
+    /**
+     * @brief Marks that this player has played a sport
+     */
+    void setFirstPlay();
 
-    // Boxing training records
-    void setBoxTrainingRecord(u32 game, u16 record); // 8018b600
-    u16 getBoxTrainingRecord(u32 game) const;        // 8018b610
+    /**
+     * @brief Tests whether this player has defeated the specified sport's
+     * champion
+     *
+     * @param sport Sport ID
+     */
+    bool isDefeatChampion(ESportID sport) const;
+    /**
+     * @brief Marks that this player has defeated the specified sport's champion
+     *
+     * @param sport Sport ID
+     */
+    bool setDefeatChampion(ESportID sport);
+    /**@}*/
 
-    // Golf training records
-    void setGolTrainingRecord(u32 game, u16 record); // 8018b600
-    u16 getGolTrainingRecord(u32 game) const;        // 8018b610
+    /**
+     * @name Tennis
+     */
+    /**@{*/
+    /**
+     * @brief Gets the difficulty of the Tennis CPU players
+     */
+    f32 getTnsDifficulty() const;
+    /**
+     * @brief Sets the difficulty of the Tennis CPU players
+     *
+     * @param difficulty CPU difficulty
+     */
+    void setTnsDifficulty(f32 difficulty);
 
-    // Golf hole-in-one count (for Wii Message Board)
-    void setGolNumHoleInOnes(u8 num); // 8018b640
-    u8 getGolNumHoleInOnes() const;   // 8018b648
+    /**
+     * @brief Gets the Tennis success factor
+     */
+    f32 getTnsSuccess() const;
+    /**
+     * @brief Sets the Tennis success factor
+     *
+     * @param success Success factor
+     */
+    void setTnsSuccess(f32 success);
 
-    // Golf high scores
-    void setBowHighScore(s8 score, u32 difficulty); // 8018b650
-    u16 getBowHighScore(u32 difficulty) const;      // 8018b65c
+    /**
+     * @brief Gets the best score in the specified Tennis training game
+     *
+     * @param game Training game
+     */
+    u8 getTnsTrainingBest(EGameID game) const;
+    /**
+     * @brief Sets the best score in the specified Tennis training game
+     *
+     * @param score Best score
+     * @param game Training game
+     */
+    void setTnsTrainingBest(u8 score, EGameID game);
+    /**@}*/
 
-    // Bowling training records
-    void setBowTrainingRecord(u32 game, u16 record); // 8018b66c
-    u16 getBowTrainingRecord(u32 game) const;        // 8018b67c
+    /**
+     * @name Baseball
+     */
+    /**@{*/
+    /**
+     * @brief Gets the best home run count record in Hitting Home Runs
+     */
+    u8 getBsbHomerunRunsBest() const;
+    /**
+     * @brief Sets the best home run count record in Hitting Home Runs
+     *
+     * @param runs Best home run count
+     */
+    void setBsbHomerunRunsBest(u8 runs);
 
-    // Bowling perfect game count (for Wii Message Board)
-    void setBowNumPerfectGames(u8 num); // 8018b68c
-    u8 getBowNumPerfectGames() const;   // 8018b694
+    /**
+     * @brief Gets the best total distance record in Hitting Home Runs
+     */
+    u16 getBsbHomerunDistBest() const;
+    /**
+     * @brief Sets the best total distance record in Hitting Home Runs
+     *
+     * @param dist Best total distance
+     */
+    void setBsbHomerunDistBest(u16 dist);
 
-    // Standard Bowling high score
-    void setBowHighScore(u16 score); // 8018b69c
-    u16 getBowHighScore() const;     // 8018b6a4
+    /**
+     * @brief Gets the best score in Swing Control
+     */
+    u8 getBsbUchiwakeBest() const;
+    /**
+     * @brief Sets the best score in Swing Control
+     *
+     * @param score Best score
+     */
+    void setBsbUchiwakeBest(u8 score);
 
-    // Tennis training records
-    void setTnsTrainingRecord(u16 record, u32 game); // 8018b6ec
-    u16 getTnsTrainingRecord(u32 game) const;        // 8018b6f8
+    /**
+     * @brief Gets the best score in Batting Practice
+     */
+    u8 getBsbRenzokuBest() const;
+    /**
+     * @brief Sets the best score in Batting Practice
+     *
+     * @param score Best score
+     */
+    void setBsbRenzokuBest(u8 score);
+    /**@}*/
 
-    // TO-DO: FLOAT_0x278/FLOAT_0x274 getter/setter
+    /**
+     * @name Bowling
+     */
+    /**@{*/
+    /**
+     * @brief Gets the best score in Bowling
+     */
+    u16 getBowStandardBest() const;
+    /**
+     * @brief Sets the best score in Bowling
+     *
+     * @param score Best score
+     */
+    void setBowStandardBest(u16 score);
 
-    // TO-DO: Unlockable(?) flag getter/setter
+    /**
+     * @brief Gets the number of perfect games bowled
+     */
+    u8 getBowPerfectCount() const;
+    /**
+     * @brief Sets the number of perfect games bowled
+     *
+     * @param count Perfect game count
+     */
+    void setBowPerfectCount(u8 count);
 
-    // TO-DO: Flag 0x4 getter/setter
+    /**
+     * @brief Gets the best score in the specified Bowling training game
+     *
+     * @param game Training game
+     */
+    u16 getBowTrainingBest(EGameID game) const;
+    /**
+     * @brief Sets the best score in the specified Bowling training game
+     *
+     * @param score Best score
+     * @param game Training game
+     */
+    void setBowTrainingBest(u16 score, EGameID game);
+    /**@}*/
 
-    // Training mode medals
-    void setTrainingMedal(u8 medal, u32 sport, u32 game); // 8018b788
-    u8 getTrainingMedal(u32 sport, u32 game) const;       // 8018b7a0
+    /**
+     * @name Golf
+     */
+    /**@{*/
+    /**
+     * @brief Gets the best Golf score on the specified course
+     *
+     * @param course Golf course
+     */
+    s8 getGolStandardBest(ECourseID course) const;
+    /**
+     * @brief Sets the best Golf score on the specified course
+     *
+     * @param score Best score
+     * @param course Golf course
+     */
+    void setGolStandardBest(s8 score, ECourseID course);
 
-    // Training mode play counts
-    void setTrainingPlayCount(u16 count, u32 sport, u32 game); // 8018b7b8
-    u16 getTrainingPlayCount(u32 sport, u32 game) const;       // 8018b7d0
+    /**
+     * @brief Gets the amount of hole-in-ones hit
+     */
+    u8 getGolAceCount() const;
+    /**
+     * @brief Sets the amount of hole-in-ones hit
+     *
+     * @param count Hole-in-one count
+     */
+    void setGolAceCount(u8 count);
 
-    // General sport play counts
-    void setPlayCount(u16 count, u32 sport); // 8018b7e8
-    u16 getPlayCount(u32 sport) const;       // 8018b7f8
+    /**
+     * @brief Gets the best score in the specified Golf training game
+     *
+     * @param game Training game
+     */
+    u16 getGolTrainingBest(EGameID game) const;
+    /**
+     * @brief Set the best score in the specified Golf training game
+     *
+     * @param score Best score
+     * @param game Training game
+     */
+    void setGolTrainingBest(u16 score, EGameID game);
+    /**@}*/
 
-    // Training mode first play dates
-    void setTrainingFirstPlayDate(RPTime16 date, u32 sport,
-                                  u32 game);                      // 8018b808
-    RPTime16 getTrainingFirstPlayDate(u32 sport, u32 game) const; // 8018b820
+    /**
+     * @name Boxing
+     */
+    /**@{*/
+    /**
+     * @brief Gets the best score in the specified Boxing training game
+     *
+     * @param game Training game
+     */
+    u16 getBoxTrainingBest(EGameID game) const;
+    /**
+     * @brief Set the best score in the specified Boxing training game
+     *
+     * @param score Best score
+     * @param game Training game
+     */
+    void setBoxTrainingBest(u16 score, EGameID game);
+    /**@}*/
 
-    // Standard first play dates
-    void setStandardFirstPlayDate(RPTime16 date, u32 sport); // 8018b838
-    RPTime16 getStandardFirstPlayDate(u32 sport) const;      // 8018b848
-
-    // Skill level graphs
-    void setSkillGraphNode(u16 delta, u32 sport, u32 n); // 8018b858
-    u16 getSkillGraphNode(u32 sport, u32 n) const;       // 8018b858
-
-    // Skill levels
-    void setSkillLevel(f32 skill, u32 sport); // 8018b888
-    f32 getSkillLevel(u32 sport) const;       // 8018b898
-
-    // TO-DO: BYTE_0x10 getters/setters
-
-    // Reset all data (From WFU)
-    void reset(); // 8018b994
+    /**
+     * @name Wii Fitness
+     */
+    /**@{*/
+    /**@}*/
 
 private:
-    static const u32 TRAINING_MAX = 3;
-    static const u32 GRAPH_LENGTH = 49;
+    /**
+     * @brief Player flag bit indices
+     * @see mPlayerFlag
+     */
+    enum EPlayerFlag {
+        EPlayerFlag_0,
+        EPlayerFlag_Registered, //!< Registered on the player list
+        EPlayerFlag_FirstPlay,  //!< Completed first round of any sport
+
+        EPlayerFlag_Champion = 27, //!< Defeated the sport champion (+ ESportID)
+    };
+
+private:
+    //! @brief Skill graph holds the previous 49 points
+    //! @remark Considering the current point on the graph, that makes 50
+    //! points in total.
+    static const u32 scSkillGraphLength = 50 - 1;
+
+    //! Fitness tests include three games
+    static const u32 scPhysicalNumEvent = 3;
+    //! Fitness test history includes the most recent test and the previous 90
+    static const u32 scPhysicalHistoryLength = 90 + 1;
 
     /**
-     * General player data
+     * @name Common data
      */
-    // Player list entry flags
-    u32 mFlags; // at 0x0
-    // Mii unique ID
-    u8 mUniqueID[8]; // at 0x4
-    // @brief Time player was added to the player list
-    // (referred to as their debut on the message board)
+    /**@{*/
+    //! Player flags
+    EGG::TBitFlag<u32> mPlayerFlags; // at 0x0
+    //! Mii unique ID
+    RFLCreateID mCreateID; // at 0x4
+    //! Time player was added to the player list
     RPTime32 mDebutTime; // at 0xC
-    // Another set of flags
-    u8 BYTE_0x10;
-    // Player skill levels
-    f32 mSkillLevels[SPORT_MAX]; // at 0x14
-    // @brief Nodes on the Skill Level graph.
-    // Nodes are stored from most recent,
-    // and represent vertical displacement from the previous node.
-    // Rightmost node is displacement from top of graph
-    s16 mSkillGraphs[SPORT_MAX][GRAPH_LENGTH]; // at 0x28
-    // First time playing the standard gamemode of any sport
-    RPTime16 mStandardFirstPlayDates[SPORT_MAX]; // at 0x212
-    // First time playing the training games of any sport
-    RPTime16 mTrainingFirstPlayDates[SPORT_MAX][TRAINING_MAX]; // at 0x21C
-    // @brief Sport-specific counter
-    // Most sports' count matches played, but golf's counts holes played
-    u16 mPlayCounts[SPORT_MAX]; // at 0x23A
-    // Play count of all training games
-    u16 mTrainingPlayCounts[SPORT_MAX][TRAINING_MAX]; // at 0x244
-    // Medals in all training games
-    u8 mTrainingMedals[SPORT_MAX][TRAINING_MAX]; // at 0x262
+
+    //! @brief Handedness flags
+    //! @note First five bits are for each sport's "primary" control, and the
+    //! second five bits are for each sport's "secondary" control.
+    EGG::TBitFlag<u8> mHandFlags; // at 0x10
+
+    //! Player skill levels
+    f32 mSkillLevels[ESportID_Max]; // at 0x14
+
+    //! @brief Nodes on the skill level graph
+    //! @note The last point in the array is the newest point on the graph.
+    //! @note Points are stored as vertical displacement from the previous
+    //! point. If there is no previous point, the displacement is measured from
+    //! the top of the graph.
+    s16 mSkillGraphPoints[ESportID_Max][scSkillGraphLength]; // at 0x28
+
+    //! First date playing the standard mode of any sport
+    RPTime16 mStandardFirstDates[ESportID_Max]; // at 0x212
+    //! First date playing the training games of any sport
+    RPTime16 mTrainingFirstDates[ESportID_Max][EGameID_Max]; // at 0x21C
+
+    //! @brief Play count of all sports
+    //! @note For Golf, this counts the number of holes played
+    u16 mPlayCounts[ESportID_Max]; // at 0x23A
+    //! Play count of all training games
+    u16 mTrainingPlayCounts[ESportID_Max][EGameID_Max]; // at 0x244
+
+    //! Medals in all training games
+    u8 mTrainingMedals[ESportID_Max][EGameID_Max]; // at 0x262
+    /**@}*/
 
     /**
-     * Tennis player data
+     * @name Tennis data
      */
+    /**@{*/
+    //! @unused
     u16 SHORT_0x272;
-    f32 FLOAT_0x274;
-    f32 FLOAT_0x278;
-    // Tennis training high scores
-    u8 mTnsTrainingRecords[TRAINING_MAX]; // at 0x27C
+
+    //! CPU difficulty
+    f32 mTnsDifficulty; // at 0x274
+
+    //! @brief Player success coefficient
+    //! @details Increases more with convincing victories, and allows CPU
+    //! difficulty to scale faster.
+    f32 mTnsSuccess; // at 0x278
+
+    //! Tennis training best scores
+    u8 mTnsTrainingBests[EGameID_Max]; // at 0x27C
+    /**@}*/
 
     /**
-     * Baseball player data
+     * @name Baseball data
      */
-    // @brief Hitting Home Runs best runs
-    // Highest home run count
-    u8 mBsbHomerunBestRuns; // at 0x27F
-    // @brief Hitting Home Runs high score
-    // Best total run distance
-    u16 mBsbHomerunBestDistance; // at 0x280
-    // Swing Control high score
-    u8 mBsbUchiwakeHighScore; // at 0x282
-    // Batting Practice high score
-    u8 mBsbRenzokuHighScore; // at 0x283
+    /**@{*/
+    //! Best home run count in Hitting Home Runs
+    u8 mBsbHomerunRunsBest; // at 0x27F
+    //! Best total distance in Hitting Home Runs
+    u16 mBsbHomerunDistBest; // at 0x280
+
+    //! Swing Control best score
+    u8 mBsbUchiwakeBest; // at 0x282
+    //! Batting Practice best score
+    u8 mBsbRenzokuBest; // at 0x283
+    /**@}*/
 
     /**
-     * Bowling player data
+     * @name Bowling data
      */
+    /**@{*/
+    //! @unused
     u16 SHORT_0x284;
-    // Best score in standard Bowling
-    u16 mBowHighScore; // at 0x286
-    // Perfect game counter (for message board)
-    u8 mBowNumPerfectGames; // at 0x288
-    // Bowling training high scores
-    u16 mBowTrainingRecords[TRAINING_MAX]; // at 0x28A
+
+    //! Bowling best score
+    u16 mBowStandardBest; // at 0x286
+    //! Number of perfect games bowled
+    u8 mBowPerfectCount; // at 0x288
+    //! Best scores in Bowling training games
+    u16 mBowTrainingBests[EGameID_Max]; // at 0x28A
+    /**@}*/
 
     /**
-     * Golf player data
+     * @name Golf data
      */
-    // High scores on each course
-    s8 mGolHighScores[DIFF_MAX]; // at 0x290
-    // For message board
-    u8 mGolNumHoleInOnes;                  // at 0x294
-    u16 mGolTrainingRecords[TRAINING_MAX]; // at 0x296
+    /**@{*/
+    //! Best scores on each difficulty
+    s8 mGolStandardBests[ECourseID_Max]; // at 0x290
+    //! Number of aces hit
+    u8 mGolAceCount; // at 0x294
+    //! Best scores in Golf training games
+    u16 mGolTrainingRecords[EGameID_Max]; // at 0x296
+    /**@}*/
 
     /**
-     * Boxing player data
+     * @name Boxing data
      */
-    // Boxing training high scores
-    u16 mBoxTrainingRecords[TRAINING_MAX]; // at 0x29C
+    /**@{*/
+    //! Best scores in Boxing training games
+    u16 mBoxTrainingBests[EGameID_Max]; // at 0x29C
+    /**@}*/
 
     /**
-     * Wii Fitness player data
+     * @name Wii Fitness data
      */
-    // Date of first completed test
-    RPTime16 mFirstFitTestEndDate; // at 0x2A2
-    // Only counts completed tests
-    u16 mTotalFitnessTests; // at 0x2A4
-    // Fitness stat rating (triangle graphic)
-    u16 mFitnessStatRating[STAT_MAX]; // at 0x2A6
-    // Something coupled with the stat rating
-    u8 BYTES_0x2AC[STAT_MAX];
-    // [SPORT_MAX][STAT_MAX]?
-    u16 SHORTS_0x2B0[5][3];
-    // Date last test was completed
-    RPTime16 mLastFitTestEndDate; // at 0x2CE
-    // Age/date for last 90 days?
-    u16 SHORTS_0x2D0[91];
-    RPTime16 SHORTS_0x386[91];
-    // Date last test was started (to stop early exits)
-    RPTime16 mLastFitTestStartDate; // at 0x43C
+    /**@{*/
+    //! Date of the first completed fitness test
+    RPTime16 mPhysicalEndFirstDate; // at 0x2A2
+    //! Number of completed fitness tests
+    u16 mPhysicalEndCount; // at 0x2A4
+
+    //! Last fitness test stat ratings
+    u16 mPhysicalLastStats[EStatID_Max]; // at 0x2A6
+    //! Last fitness test games
+    u8 mPhysicalLastEvents[scPhysicalNumEvent]; // at 0x2AC
+
+    //! Best fitness stat sum in all training games
+    u16 mPhysicalStatSumBests[ESportID_Max][EGameID_Max]; // at 0x2B0
+
+    //! Date of the last completed fitness test
+    RPTime16 mPhysicalEndLastDate; // at 0x2CE
+    //! Fitness stat sums of the most recent fitness test, and the previous 90
+    u16 mPhysicalStatSumHistory[scPhysicalHistoryLength];
+    //! Dates of the most recent fitness test, and the previous 90
+    RPTime16 mPhysicalDateHistory[scPhysicalHistoryLength];
+
+    //! Date of the last started fitness test
+    RPTime16 mPhysicalBeginLastDate; // at 0x43C
+
+    //! @unused
     u16 SHORTS_0x43E[15];
+    /**@}*/
 };
+
+//! @}
 
 #endif

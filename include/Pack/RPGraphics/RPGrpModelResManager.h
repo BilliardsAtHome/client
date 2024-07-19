@@ -1,17 +1,12 @@
 #ifndef RP_GRAPHICS_MODEL_RES_MANAGER_H
 #define RP_GRAPHICS_MODEL_RES_MANAGER_H
-#include <types_RP.h>
+#include <RPTypes.h>
 
 class RPGrpModelResManager {
+    RP_SINGLETON_DECL(RPGrpModelResManager);
+
 public:
-    static RPGrpModelResManager* getInstance() {
-        return spInstance;
-    }
-
     void CreateResourceList(u16);
-
-private:
-    static RPGrpModelResManager* spInstance;
 };
 
 #endif

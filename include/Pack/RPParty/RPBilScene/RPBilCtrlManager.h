@@ -1,6 +1,6 @@
 #ifndef RP_PARTY_BIL_CTRL_MANAGER_H
 #define RP_PARTY_BIL_CTRL_MANAGER_H
-#include "types_RP.h"
+#include "RPTypes.h"
 
 struct RPBilCtrl {
     void TurnX(f32 amount);
@@ -15,20 +15,15 @@ struct RPBilCtrl {
 };
 
 class RPBilCtrlManager {
-public:
-    static RPBilCtrlManager* getInstance() {
-        return spInstance;
-    }
+    RP_SINGLETON_DECL(RPBilCtrlManager);
 
+public:
     RPBilCtrl* GetCtrl() const {
         return PTR_0x4;
     }
 
 private:
-    char _00[0x4];
     RPBilCtrl* PTR_0x4;
-
-    static RPBilCtrlManager* spInstance;
 };
 
 #endif

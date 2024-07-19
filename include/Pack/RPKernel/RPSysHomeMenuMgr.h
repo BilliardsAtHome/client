@@ -3,15 +3,10 @@
 #include "types.h"
 
 class RPSysHomeMenuMgr {
+    RP_SINGLETON_DECL(RPSysHomeMenuMgr);
+
 public:
-    static RPSysHomeMenuMgr* getInstance() {
-        return spInstance;
-    }
-
     void LoadResource();
-
-private:
-    static RPSysHomeMenuMgr* spInstance;
 };
 
 #endif

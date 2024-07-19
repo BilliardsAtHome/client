@@ -121,7 +121,7 @@ Simulation::~Simulation() {
 void Simulation::Configure(RPSysScene* scene) {
 #pragma unused(scene)
 
-    RP_GET_INSTANCE(RPGrpRenderer)->AppendDrawObject(this);
+    RPGrpRenderer::GetCurrent()->AppendDrawObject(this);
 }
 
 /**

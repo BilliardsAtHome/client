@@ -3,15 +3,10 @@
 #include "types.h"
 
 class RPSysPauseMgr {
+    RP_SINGLETON_DECL(RPSysPauseMgr);
+
 public:
-    static RPSysPauseMgr* getInstance() {
-        return spInstance;
-    }
-
     void LoadResource();
-
-private:
-    static RPSysPauseMgr* spInstance;
 };
 
 #endif

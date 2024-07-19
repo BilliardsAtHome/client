@@ -1,22 +1,17 @@
 #ifndef RP_KERNEL_KOKESHI_MANAGER_H
 #define RP_KERNEL_KOKESHI_MANAGER_H
-#include "types_RP.h"
+#include "RPTypes.h"
 
 class RPSysKokeshiManager {
+    RP_SINGLETON_DECL(RPSysKokeshiManager);
+
 public:
     enum GenType {
 
     };
 
 public:
-    static RPSysKokeshiManager* getInstance() {
-        return spInstance;
-    }
-
     void LoadStaticResource();
-
-private:
-    static RPSysKokeshiManager* spInstance;
 };
 
 #endif

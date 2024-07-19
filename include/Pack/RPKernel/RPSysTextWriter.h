@@ -1,7 +1,7 @@
 #ifndef RP_KERNEL_TEXT_WRITER_H
 #define RP_KERNEL_TEXT_WRITER_H
 #include "RPSysFontManager.h"
-#include "types_RP.h"
+#include "RPTypes.h"
 
 #include <nw4r/ut/ut_RomFont.h>
 #include <nw4r/ut/ut_TextWriterBase.h>
@@ -14,13 +14,9 @@
  * @wfuname
  */
 class RPSysTextWriter : public nw4r::ut::TextWriterBase<char> {
-public:
-    // @address 80190cc4
-    static RPSysTextWriter* CreateInstance();
-    static RPSysTextWriter* getInstance() {
-        return spInstance;
-    }
+    RP_SINGLETON_DECL(RPSysTextWriter);
 
+public:
     /**
      * @brief Reset all settings
      * @address 80190b9c
@@ -52,23 +48,8 @@ public:
     void End();
 
 private:
-    RPSysTextWriter() {
-        // SetFont(RPSysFontManager::getInstance()->GetRomFont());
-        // mIsRendering = FALSE;
-    }
-
-    // @address 80190c6c
-    virtual ~RPSysTextWriter();
-
-private:
     // @brief Render status (Begin/End)
     BOOL mIsRendering; // at 0x68
-
-    /**
-     * @brief Static instance
-     * @address 804bf538
-     */
-    static RPSysTextWriter* spInstance;
 };
 
 #endif

@@ -1,6 +1,14 @@
 #ifndef RP_AUDIO_RP_HKY_SOUND_H
 #define RP_AUDIO_RP_HKY_SOUND_H
 
+//! @addtogroup rp_audio
+//! @{
+
+//! @file
+//! @brief Sound IDs for the RPHkyScene sound archive
+
+//! @}
+
 namespace rp_Hky_sound {
 
 enum ESoundID {
@@ -85,5 +93,3 @@ enum ESoundID {
 } // namespace rp_Hky_sound
 
 #endif
-
-

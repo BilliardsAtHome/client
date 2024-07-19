@@ -1,15 +1,20 @@
 #ifndef RP_KERNEL_CURSOR_DRAW_MGR_H
 #define RP_KERNEL_CURSOR_DRAW_MGR_H
 #include "IRPSysHostIOSocket.h"
-#include "types_RP.h"
+#include "RPTypes.h"
 
 #include <egg/math/eggVector.h>
 #include <egg/types_egg.h>
+
+// Class declarations
+class RPSysEffect;
 
 /**
  * @brief Cursor manager and renderer
  */
 class RPSysCursorDrawMgr : public IRPSysHostIOSocket {
+    RP_SINGLETON_DECL_EX(RPSysCursorDrawMgr);
+
 public:
     /**
      * @brief Player ID
@@ -29,18 +34,6 @@ public:
     enum ECursorType { CURSOR_DISABLED, CURSOR_1, CURSOR_ACTIVE };
 
 public:
-    // @address 801a0230
-    static RPSysCursorDrawMgr* CreateInstance(EGG::Heap* heap);
-
-    static RPSysCursorDrawMgr* getInstance() {
-        return spInstance;
-    }
-
-    // @address 8019ede8
-    RPSysCursorDrawMgr(EGG::Heap* heap);
-    // @address 8019ed74
-    virtual ~RPSysCursorDrawMgr(); // at 0x8
-
     void startDpdCheck();
     void createActiveCursor();
 
@@ -48,9 +41,7 @@ public:
     s32 getActivePlayer();
 
 private:
-    // @brief Parent heap
-    EGG::Heap* mHeap; // at 0x4
-    u32 mFlags;       // at 0x8
+    u32 mFlags; // at 0x8
 
     u32 WORD_0xC;
     u32 WORDS_0x10[PLAYER_MAX];
@@ -86,7 +77,7 @@ private:
      * @brief Static instance
      * @address 804bf598
      */
-    static RPSysCursorDrawMgr* spInstance;
+    static RPSysCursorDrawMgr* sInstance;
 };
 
 #endif

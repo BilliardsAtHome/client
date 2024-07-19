@@ -1,7 +1,7 @@
 #ifndef RP_SPORTS_GOL_FIELD_MANAGER_H
 #define RP_SPORTS_GOL_FIELD_MANAGER_H
 #include "RPSysUnknownBase.h"
-#include "types_RP.h"
+#include "RPTypes.h"
 
 #include <RPGolScene/RPGolMapObjPin.h>
 #include <nw4r/math/math_types.h>
@@ -12,6 +12,8 @@
  * @todo Document all of the functions
  */
 class RPGolFieldManager : RPSysUnknownBase {
+    RP_SINGLETON_DECL(RPGolFieldManager);
+
 public:
     enum EMapObj {
         MAP_OBJ_PLAYER = 0x00010000, // Player start
@@ -38,15 +40,6 @@ public:
     };
 
 public:
-    // @address 80294008
-    static void CreateInstance();
-    // @address 80293fc4
-    static void DestroyInstance();
-
-    static RPGolFieldManager* getInstance() {
-        return spInstance;
-    }
-
     RPGolMapObjBase* GetCourseObj() const {
         return mCourseObj;
     }
@@ -60,12 +53,6 @@ public:
     RPGolMapObjPin* GetPinObj(int i) const {
         return &mPinObjs[i];
     }
-
-private:
-    // @address 80293d74
-    RPGolFieldManager();
-    // @address 80293d18
-    virtual ~RPGolFieldManager();
 
 private:
     // @brief Player Mii shadow
@@ -163,12 +150,6 @@ private:
     // @brief Set to kill the target effect emitters
     // @note Used to achieve the blinking effect
     bool mKillTargetEffEmitter; // at 0xA4
-
-    /**
-     * @brief Static instance
-     * @address 804bf868
-     */
-    static RPGolFieldManager* spInstance;
 };
 
 #endif

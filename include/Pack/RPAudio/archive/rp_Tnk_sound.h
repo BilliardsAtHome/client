@@ -1,6 +1,14 @@
 #ifndef RP_AUDIO_RP_TNK_SOUND_H
 #define RP_AUDIO_RP_TNK_SOUND_H
 
+//! @addtogroup rp_audio
+//! @{
+
+//! @file
+//! @brief Sound IDs for the RPTnkScene sound archive
+
+//! @}
+
 namespace rp_Tnk_sound {
 
 enum ESoundID {
@@ -125,5 +133,3 @@ enum ESoundID {
 } // namespace rp_Tnk_sound
 
 #endif
-
-

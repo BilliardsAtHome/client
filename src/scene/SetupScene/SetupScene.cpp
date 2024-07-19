@@ -51,8 +51,8 @@ void SetupScene::OnExit() {
  */
 void SetupScene::LoadAssets() {
     // Global archives
+    RP_GET_INSTANCE(RPSysResourceManager)->LoadStaticArchives();
     RP_GET_INSTANCE(RPSysResourceManager)->LoadCacheArchives();
-    RP_GET_INSTANCE(RPSysResourceManager)->LoadSharedCommonArchive();
 
     // Global layouts
     RP_GET_INSTANCE(RPSysSystemWinMgr)->createSystemWindow();
@@ -71,8 +71,6 @@ void SetupScene::LoadAssets() {
  * @brief Setup game globals
  */
 void SetupScene::SetupGame() {
-    // If there is no prior save we at least want the banner
-    RP_GET_INSTANCE(RPSysSaveDataMgr)->createBannerFile();
     // Stop potential save data corruption
     RP_GET_INSTANCE(RPSysSaveDataMgr)->setSaveDisable(true);
 

@@ -1,12 +1,14 @@
 #ifndef RP_SPORTS_SEQUENCE_MGR_H
 #define RP_SPORTS_SEQUENCE_MGR_H
-#include "types_RP.h"
+#include "RPTypes.h"
 
 /**
  * @brief Manages sequences, submodes of sports, and their interactions
  * @wfuname
  */
 class RPSportsSequenceMgr {
+    RP_SINGLETON_DECL(RPSportsSequenceMgr);
+
 public:
     /**
      * @brief Sport ID
@@ -27,12 +29,6 @@ public:
     enum EGolfMode { GOLF_NINEHOLE, GOLF_BEGINNER, GOLF_INTERMED, GOLF_EXPERT };
 
 public:
-    // @address 801e74b0
-    static void CreateInstance();
-    static RPSportsSequenceMgr* getInstance() {
-        return spInstance;
-    }
-
     u32 GetSport() const {
         return (u32)mSport;
     }
@@ -117,13 +113,6 @@ public:
     void SetGolfScore(u32 stroke, u32 hole, u32 player);
 
 private:
-    RPSportsSequenceMgr() {
-        Reset();
-    }
-    // @address 801e7290
-    virtual ~RPSportsSequenceMgr(); // at 0x8
-
-private:
     // @brief Max player count
     static const u32 PLAYER_MAX = 4;
     // @brief Golf course length
@@ -161,12 +150,6 @@ private:
     // @brief Player has finished a training game
     // @note Seems to be unused
     bool mHasFinishedTraining; // at 0xCC
-
-    /**
-     * @brief Static instance
-     * @address 804bf708
-     */
-    static RPSportsSequenceMgr* spInstance;
 };
 
 #endif

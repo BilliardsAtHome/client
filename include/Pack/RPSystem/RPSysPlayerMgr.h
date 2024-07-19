@@ -3,17 +3,12 @@
 #include "types.h"
 
 class RPSysPlayerMgr {
-public:
-    static RPSysPlayerMgr* getInstance() {
-        return spInstance;
-    }
+    RP_SINGLETON_DECL(RPSysPlayerMgr);
 
+public:
     void resetData();
     void setPlayerNum(int num);
     void setControllerNum(int num);
-
-private:
-    static RPSysPlayerMgr* spInstance;
 };
 
 #endif

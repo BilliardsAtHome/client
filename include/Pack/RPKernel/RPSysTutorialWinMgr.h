@@ -3,15 +3,10 @@
 #include "types.h"
 
 class RPSysTutorialWinMgr {
+    RP_SINGLETON_DECL(RPSysTutorialWinMgr);
+
 public:
-    static RPSysTutorialWinMgr* getInstance() {
-        return spInstance;
-    }
-
     void LoadResource();
-
-private:
-    static RPSysTutorialWinMgr* spInstance;
 };
 
 #endif

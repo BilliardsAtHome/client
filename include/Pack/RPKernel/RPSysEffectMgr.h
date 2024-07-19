@@ -3,15 +3,10 @@
 #include "types.h"
 
 class RPSysEffectMgr {
+    RP_SINGLETON_DECL(RPSysEffectMgr);
+
 public:
-    static RPSysEffectMgr* getInstance() {
-        return spInstance;
-    }
-
     void LoadResource();
-
-private:
-    static RPSysEffectMgr* spInstance;
 };
 
 #endif

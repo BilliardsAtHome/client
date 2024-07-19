@@ -1,8 +1,10 @@
 #ifndef RP_GRAPHICS_RENDERER_H
 #define RP_GRAPHICS_RENDERER_H
-#include "types_RP.h"
+#include "RPTypes.h"
 
-// TODO
+// Forward declarations
+class RPGrpScreen;
+
 class RPGrpRenderer {
 public:
     enum EDrawPass {
@@ -26,10 +28,6 @@ public:
     static void Begin();
     static void End();
 
-    static RPGrpRenderer* getInstance() {
-        return spInstance;
-    }
-
     void AppendDrawObject(IRPGrpDrawObject*);
 
     void CreateView2D(u8, RPGrpScreen*);
@@ -44,6 +42,9 @@ public:
         sDrawPass = pass;
     }
 
+    static RPGrpRenderer* GetCurrent() {
+        return spCurrent;
+    }
     static RPGrpScreen* GetActiveScreen() {
         return sActiveScreen;
     }
@@ -58,7 +59,7 @@ private:
 
     static EDrawPass sDrawPass;
     static u8 sCurrentViewID;
-    static RPGrpRenderer* spInstance;
+    static RPGrpRenderer* spCurrent;
     static RPGrpScreen* sActiveScreen;
 };
 

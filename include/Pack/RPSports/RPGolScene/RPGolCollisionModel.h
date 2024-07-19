@@ -1,7 +1,7 @@
 #ifndef RP_SPORTS_GOL_COLLISION_MODEL_H
 #define RP_SPORTS_GOL_COLLISION_MODEL_H
 #include "RPSysUnknownBase.h"
-#include "types_RP.h"
+#include "RPTypes.h"
 
 #include <nw4r/math.h>
 #include <nw4r/ut.h>
@@ -39,11 +39,9 @@ enum EGndAttr {
 };
 
 class RPGolCollisionModel : RPSysUnknownBase {
-public:
-    static RPGolCollisionModel* getInstance() {
-        return spInstance;
-    }
+    RP_SINGLETON_DECL(RPGolCollisionModel);
 
+public:
     static const char* GetCollisionDesc(EGndAttr col) {
         return sCollisionDesc[col];
     }
@@ -57,10 +55,6 @@ public:
     u32 GetNumTris() const {
         return mNumRPTris;
     }
-
-private:
-    RPGolCollisionModel();
-    virtual ~RPGolCollisionModel();
 
 private:
     nw4r::math::VEC3* mVertices;        // at 0x4
@@ -80,7 +74,6 @@ private:
     u32 mNumRPTris;    // at 0x5C
     UNKTYPE* PTR_0x60; // at 0x60
 
-    static RPGolCollisionModel* spInstance;
     static const char* sCollisionDesc[EGndAttr_Max];
     static nw4r::ut::Color sCollisionColors[EGndAttr_Max];
 };

@@ -1,27 +1,16 @@
 #ifndef RP_SPORTS_BOW_RESOURCE_MANAGER_H
 #define RP_SPORTS_BOW_RESOURCE_MANAGER_H
 #include "IRPSysHostIOSocket.h"
-#include "types_RP.h"
+#include "RPTypes.h"
 
 /**
  * @brief Bowling scene resource manager
  * @customname
  */
 class RPBowResourceManager : public IRPSysHostIOSocket {
+    RP_SINGLETON_DECL(RPBowResourceManager);
+
 public:
-    // @address 80320ea4
-    static void CreateInstance();
-    // @address 80320e60
-    static void DestroyInstance();
-    static RPBowResourceManager* getInstance() {
-        return spInstance;
-    }
-
-    RPBowResourceManager() : mExcelGlobal(NULL) {}
-
-    // @address 80320da8
-    virtual ~RPBowResourceManager();
-
     /**
      * @brief Sets up all bowling resources
      * @address 80320e00
@@ -40,12 +29,6 @@ private:
     void* mCmnArchive; // at 0x4
     // @brief Scene local archive
     void* mLocalArchive; // at 0x8
-
-    /**
-     * @brief Static instance
-     * @address 804bf9a8
-     */
-    static RPBowResourceManager* spInstance;
 };
 
 #endif

@@ -1,6 +1,6 @@
 #ifndef RP_SYSTEM_FONT_MANAGER_H
 #define RP_SYSTEM_FONT_MANAGER_H
-#include "types_RP.h"
+#include "RPTypes.h"
 
 #include <nw4r/ut/ut_ResFont.h>
 #include <nw4r/ut/ut_RomFont.h>
@@ -12,6 +12,8 @@
  * @wfuname
  */
 class RPSysFontManager {
+    RP_SINGLETON_DECL(RPSysFontManager);
+
 public:
     // @brief Pack Project res fonts
     enum EResFont {
@@ -27,12 +29,6 @@ public:
     };
 
 public:
-    // @address 8018bea4
-    static RPSysFontManager* CreateInstance();
-    static RPSysFontManager* getInstance() {
-        return spInstance;
-    }
-
     /**
      * @brief Set up rom font
      * @address 8018be10
@@ -57,20 +53,6 @@ public:
     }
 
 private:
-    RPSysFontManager() {
-        // Initialize rom font
-        mRomFont = new nw4r::ut::RomFont();
-        // Initialize res fonts
-        for (int i = 0; i < FONT_MAX; i++) {
-            mResFonts[i] = new nw4r::ut::ResFont();
-            mResFontData[i] = NULL;
-        }
-    }
-
-    // @address 8018be64
-    virtual ~RPSysFontManager();
-
-private:
     // @brief Deserialized rom font
     nw4r::ut::RomFont* mRomFont; // at 0x4
     // @brief Deserialized res fonts
@@ -88,12 +70,6 @@ private:
      * @address 803b9950
      */
     static const char* sPackResFonts[FONT_MAX];
-
-    /**
-     * @brief Static instance
-     * @address 804bf510
-     */
-    static RPSysFontManager* spInstance;
 };
 
 #endif
