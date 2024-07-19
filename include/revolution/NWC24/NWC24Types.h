@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_nwc24
+//! @{
+
 typedef enum {
     NWC24_ERR_OTHER_REGION = -52,
     NWC24_ERR_GIVE_UP,
@@ -101,6 +104,8 @@ typedef enum {
     NWC24_ENC_QUOTED_PRINTABLE,
     NWC24_MAX_ENCODINGS
 } NWC24Encoding;
+
+//! @}
 
 #ifdef __cplusplus
 }

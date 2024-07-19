@@ -6,6 +6,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_os
+//! @{
+
 typedef struct OSMutex {
     OSThreadQueue queue;  // at 0x0
     OSThread* thread;     // at 0x8
@@ -19,6 +22,8 @@ void OSLockMutex(OSMutex* mutex);
 void OSUnlockMutex(OSMutex* mutex);
 void __OSUnlockAllMutex(OSThread* thread);
 BOOL OSTryLockMutex(OSMutex* mutex);
+
+//! @}
 
 #ifdef __cplusplus
 }

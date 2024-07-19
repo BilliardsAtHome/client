@@ -13,6 +13,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rfl_impl
+//! @{
+
 typedef struct RFLiManager {
     void* workBuffer;                      // at 0x0
     MEMiHeapHead* rootHeap;                // at 0x4
@@ -53,6 +56,8 @@ void RFLiSetFileBroken(RFLiFileBrokenType type);
 BOOL RFLiNotFoundError(void);
 BOOL RFLiNeedRepairError(void);
 BOOL RFLiCriticalError(void);
+
+//! @}
 
 #ifdef __cplusplus
 }

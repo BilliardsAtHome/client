@@ -6,7 +6,12 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_os
+//! @{
+
 void OSFatal(GXColor textColor, GXColor bgColor, const char* msg);
+
+//! @}
 
 #ifdef __cplusplus
 }

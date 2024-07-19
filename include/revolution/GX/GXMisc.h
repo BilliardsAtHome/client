@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_gx
+//! @{
+
 typedef void (*GXDrawDoneCallback)(void);
 
 void GXSetMisc(UNKWORD token, UNKWORD val);
@@ -17,6 +20,8 @@ void GXDrawDone(void);
 void GXPixModeSync(void);
 
 GXDrawDoneCallback GXSetDrawDoneCallback(GXDrawDoneCallback);
+
+//! @}
 
 #ifdef __cplusplus
 }

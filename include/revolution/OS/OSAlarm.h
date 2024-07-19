@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_os
+//! @{
+
 // Forward declarations
 typedef struct OSAlarm;
 typedef struct OSContext;
@@ -36,6 +39,8 @@ void OSCancelAlarm(OSAlarm* alarm);
 void OSSetAlarmTag(OSAlarm* alarm, u32 tag);
 void OSSetAlarmUserData(OSAlarm* alarm, void* userData);
 void* OSGetAlarmUserData(const OSAlarm* alarm);
+
+//! @}
 
 #ifdef __cplusplus
 }

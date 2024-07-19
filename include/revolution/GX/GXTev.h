@@ -6,6 +6,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_gx
+//! @{
+
 void GXSetTevOp(GXTevStageID, GXTevMode);
 void GXSetTevColorIn(GXTevStageID, GXTevColorArg, GXTevColorArg, GXTevColorArg,
                      GXTevColorArg);
@@ -29,6 +32,8 @@ void GXSetAlphaCompare(GXCompare, u8, GXAlphaOp, GXCompare, u8);
 void GXSetZTexture(GXZTexOp, GXTexFmt, u32);
 void GXSetTevOrder(GXTevStageID, GXTexCoordID, GXTexMapID, GXChannelID);
 void GXSetNumTevStages(u8);
+
+//! @}
 
 #ifdef __cplusplus
 }

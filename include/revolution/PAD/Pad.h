@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_pad
+//! @{
+
 typedef struct PADStatus {
     u8 dummy;
 } PADStatus;
@@ -16,6 +19,8 @@ typedef enum {
 } PADFlag;
 
 BOOL __PADDisableRecalibration(BOOL disable);
+
+//! @}
 
 #ifdef __cplusplus
 }

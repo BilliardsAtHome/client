@@ -6,6 +6,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_nwc24
+//! @{
+
 typedef enum {
     NWC24_IDCS_INITIAL,
     NWC24_IDCS_GENERATED,
@@ -40,6 +43,8 @@ const char* NWC24GetAccountDomain(void);
 const char* NWC24GetMBoxDir(void);
 u32 NWC24GetAppId(void);
 u16 NWC24GetGroupId(void);
+
+//! @}
 
 #ifdef __cplusplus
 }

@@ -9,6 +9,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rfl_impl
+//! @{
+
 typedef struct RFLiCallbackTag {
     RFLiAsyncTag tag;  // at 0x0
     RFLiFileType type; // at 0x4
@@ -74,6 +77,8 @@ RFLErrcode RFLiGetLengthAsync(RFLiFileType type, u32* out,
                               RFLiCallback callback);
 RFLErrcode RFLiDeleteAsync(RFLiFileType type, RFLiCallback callback);
 RFLErrcode RFLiCreateSaveDirAsync(RFLiCallback callback);
+
+//! @}
 
 #ifdef __cplusplus
 }

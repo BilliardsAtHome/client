@@ -4,7 +4,15 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_so
+//! @{
+
+//! @file
+//! @brief Includes all header files of the SO library
+
 #include <revolution/SO/SOCommon.h>
+
+//! @}
 
 #ifdef __cplusplus
 }

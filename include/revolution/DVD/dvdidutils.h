@@ -6,7 +6,12 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_dvd
+//! @{
+
 BOOL DVDCompareDiskID(const DVDDiskID* id1, const DVDDiskID* id2);
+
+//! @}
 
 #ifdef __cplusplus
 }

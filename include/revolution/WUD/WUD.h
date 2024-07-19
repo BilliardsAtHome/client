@@ -5,8 +5,13 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_wud
+//! @{
+
 void* App_MEMalloc(u32 size);
 void App_MEMfree(void* block);
+
+//! @}
 
 #ifdef __cplusplus
 }

@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_vf
+//! @{
+
 typedef void* VFFile;
 
 typedef enum {
@@ -31,6 +34,8 @@ s32 VFGetLastError(void);
 s32 VFGetDriveFreeSize(const char* i_drive);
 s32 VFGetLastDeviceError(const char* i_drive);
 s32 VFSetSyncMode(const char* i_drive, u32 i_mode);
+
+//! @}
 
 #ifdef __cplusplus
 }

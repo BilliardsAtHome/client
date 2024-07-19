@@ -7,6 +7,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_gx
+//! @{
+
 typedef struct _GXFogAdjTable {
     u16 r[10]; // at 0x0
 } GXFogAdjTable;
@@ -26,6 +29,8 @@ void GXSetDither(GXBool enable);
 void GXSetDstAlpha(GXBool enable, u8 alpha);
 void GXSetFieldMask(GXBool enableEven, GXBool enableOdd);
 void GXSetFieldMode(GXBool texLOD, GXBool adjustAR);
+
+//! @}
 
 #ifdef __cplusplus
 }

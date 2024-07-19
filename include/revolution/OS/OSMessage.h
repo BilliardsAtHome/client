@@ -6,6 +6,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_os
+//! @{
+
 // General-purpose typedef
 typedef void* OSMessage;
 
@@ -24,6 +27,8 @@ void OSInitMessageQueue(OSMessageQueue* queue, OSMessage* buffer, s32 capacity);
 BOOL OSSendMessage(OSMessageQueue* queue, OSMessage mesg, u32 flags);
 BOOL OSReceiveMessage(OSMessageQueue* queue, OSMessage* mesg, u32 flags);
 BOOL OSJamMessage(OSMessageQueue* queue, OSMessage mesg, u32 flags);
+
+//! @}
 
 #ifdef __cplusplus
 }

@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_ax
+//! @{
+
 #pragma pack(push, 1)
 typedef struct _AXSTUDIO {
     s32 L;
@@ -75,6 +78,8 @@ void __AXDepopFadeRmt(s32* all, s32* value, s16* depop) DECOMP_DONT_INLINE;
 void __AXPrintStudio(void);
 void __AXSPBInit(void);
 void __AXDepopVoice(AXPB* pb);
+
+//! @}
 
 #ifdef __cplusplus
 }

@@ -5,8 +5,13 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_ax
+//! @{
+
 void AXInit(void);
 void AXInitEx(u32 mode);
+
+//! @}
 
 #ifdef __cplusplus
 }

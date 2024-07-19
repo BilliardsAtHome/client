@@ -6,7 +6,12 @@
 extern "C" {
 #endif
 
+//! @addtogroup rfl
+//! @{
+
 void RFLSetIconDrawDoneCallback(RFLCallback callback);
+
+//! @}
 
 #ifdef __cplusplus
 }

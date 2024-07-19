@@ -5,7 +5,12 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_ax
+//! @{
+
 extern u16 __AXCompressorTable[];
+
+//! @}
 
 #ifdef __cplusplus
 }

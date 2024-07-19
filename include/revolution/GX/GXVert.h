@@ -6,6 +6,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_gx
+//! @{
+
 static inline void GXCmd1u8(u8 uc) {
     WGPIPE.c = uc;
 }
@@ -188,6 +191,8 @@ static inline void GXTexCoord1x16(u16 us) {
 static inline void GXTexCoord1x8(u8 uc) {
     WGPIPE.c = uc;
 }
+
+//! @}
 
 #ifdef __cplusplus
 }

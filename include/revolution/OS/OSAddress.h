@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_os
+//! @{
+
 static inline void* OSPhysicalToCached(u32 ofs) {
     return (void*)(ofs + 0x80000000);
 }
@@ -16,6 +19,8 @@ static inline void* OSPhysicalToUncached(u32 ofs) {
 static inline void* OSCachedToPhysical(const void* ofs) {
     return (u8*)ofs - 0x80000000;
 }
+
+//! @}
 
 #ifdef __cplusplus
 }

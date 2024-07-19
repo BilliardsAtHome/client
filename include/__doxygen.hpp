@@ -26,14 +26,14 @@
 //
 // BEGIN MetroTRK
 //! @defgroup trk MetroTRK
-//! @brief Metrowerks Target Resident Kernel Debugger
+//! @brief Metrowerks Target Resident Kernel (TRK) Debugger
 // END MetroTRK
 //
 
 //
 // BEGIN RVL SDK
 //! @defgroup rvl RVL SDK
-//! @brief Revolution SDK
+//! @brief Revolution (RVL) SDK
 
 //! @ingroup rvl
 //! @defgroup rvl_ai AI
@@ -95,6 +95,10 @@
 //! @defgroup rvl_gx GX
 //! @brief Graphics FIFO
 
+//! @ingroup rvl_gx
+//! @defgroup rvl_gx_hw GX Hardware
+//! @brief Hardware registers
+
 //! @ingroup rvl
 //! @defgroup rvl_ipc IPC
 //! @brief Communication with IOS
@@ -126,6 +130,10 @@
 //! @ingroup rvl
 //! @defgroup rvl_os OS
 //! @brief Revolution OS
+
+//! @ingroup rvl_os
+//! @defgroup rvl_os_global OS Globals
+//! @brief Operating system globals
 
 //! @ingroup rvl
 //! @defgroup rvl_pad PAD
@@ -177,14 +185,18 @@
 //
 // BEGIN RVLFaceLib
 //! @defgroup rfl RVLFaceLib
-//! @brief Revolution Face Library
+//! @brief Revolution Face Library (RFL)
+
+//! @ingroup rfl
+//! @defgroup rfl_impl RFLi
+//! @brief RFL internal implementation
 // END RVLFaceLib
 //
 
 //
 // BEGIN NW4R
 //! @defgroup nw4r NW4R
-//! @brief NintendoWare for Revolution
+//! @brief NintendoWare for Revolution (NW4R)
 
 //! @ingroup nw4r
 //! @defgroup nw4r_ut ut

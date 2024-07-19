@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_os
+//! @{
+
 #define OS_CACHE_BASE 0xE0000000
 
 // Forward declarations
@@ -37,6 +40,8 @@ void L2GlobalInvalidate(void);
 void DMAErrorHandler(u8 error, OSContext* ctx, u32 dsisr, u32 dar, ...);
 
 void __OSCacheInit(void);
+
+//! @}
 
 #ifdef __cplusplus
 }

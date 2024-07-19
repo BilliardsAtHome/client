@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_os
+//! @{
+
 // Forward declarations
 typedef struct OSContext;
 
@@ -48,6 +51,8 @@ DECL_WEAK void OSPanic(const char* file, int line, const char* msg, ...);
 OSErrorHandler OSSetErrorHandler(u16 error, OSErrorHandler handler);
 void __OSUnhandledException(u8 error, struct OSContext* ctx, u32 dsisr,
                             u32 dar);
+
+//! @}
 
 #ifdef __cplusplus
 }

@@ -6,7 +6,12 @@
 extern "C" {
 #endif
 
+//! @addtogroup rfl_impl
+//! @{
+
 void RFLiGetDefaultData(RFLiCharInfo* info, u16 index);
+
+//! @}
 
 #ifdef __cplusplus
 }

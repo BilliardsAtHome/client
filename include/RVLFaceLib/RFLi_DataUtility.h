@@ -6,6 +6,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rfl_impl
+//! @{
+
 // Forward declarations
 typedef struct RFLMiddleDB;
 
@@ -15,6 +18,8 @@ BOOL RFLiIsSameFaceCore(const RFLiCharInfo* lhs, const RFLiCharInfo* rhs);
 RFLErrcode RFLiPickupCharInfo(RFLiCharInfo* info, RFLDataSource source,
                               struct RFLMiddleDB* db, u16 index);
 BOOL RFLiCheckBirthday(u8 month, u8 day);
+
+//! @}
 
 #ifdef __cplusplus
 }

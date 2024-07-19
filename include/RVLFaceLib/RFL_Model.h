@@ -8,6 +8,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rfl
+//! @{
+
 // Forward declarations
 typedef struct RFLMiddleDB;
 
@@ -68,6 +71,8 @@ void RFLDrawOpaCore(const RFLCharModel* model,
 void RFLDrawXluCore(const RFLCharModel* model,
                     const RFLDrawCoreSetting* setting);
 void RFLDrawShape(const RFLCharModel* model);
+
+//! @}
 
 #ifdef __cplusplus
 }

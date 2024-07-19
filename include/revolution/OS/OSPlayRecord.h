@@ -5,8 +5,13 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_os
+//! @{
+
 void __OSStartPlayRecord(void);
 void __OSStopPlayRecord(void);
+
+//! @}
 
 #ifdef __cplusplus
 }

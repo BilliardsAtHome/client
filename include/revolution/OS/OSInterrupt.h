@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_os
+//! @{
+
 // Forward declarations
 typedef struct OSContext;
 
@@ -70,6 +73,8 @@ void __OSDispatchInterrupt(u8 intr, struct OSContext* ctx);
 
 void __RAS_OSDisableInterrupts_begin(void);
 void __RAS_OSDisableInterrupts_end(void);
+
+//! @}
 
 #ifdef __cplusplus
 }

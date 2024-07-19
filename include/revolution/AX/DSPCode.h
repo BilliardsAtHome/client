@@ -5,11 +5,16 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_ax
+//! @{
+
 extern u16 axDspInitVector;
 extern u16 axDspResumeVector;
 
 extern u8 axDspSlave[];
 extern u16 axDspSlaveLength;
+
+//! @}
 
 #ifdef __cplusplus
 }

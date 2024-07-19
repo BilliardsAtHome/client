@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_sc
+//! @{
+
 #define SC_PRDINFO_SIZE 0x100
 
 typedef enum {
@@ -29,6 +32,8 @@ typedef struct SCRegion {
 BOOL __SCF1(const char* type, char* buf, u32 sz);
 BOOL SCGetProductAreaString(char* buf, u32 sz);
 s8 SCGetProductArea(void);
+
+//! @}
 
 #ifdef __cplusplus
 }

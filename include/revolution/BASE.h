@@ -4,7 +4,15 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_base
+//! @{
+
+//! @file
+//! @brief Includes all header files of the BASE library
+
 #include <revolution/BASE/PPCArch.h>
+
+//! @}
 
 #ifdef __cplusplus
 }

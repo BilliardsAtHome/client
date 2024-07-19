@@ -7,6 +7,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_gx
+//! @{
+
 GX_DECL_PUBLIC_STRUCT(GXTexObj, 32);
 GX_DECL_PUBLIC_STRUCT(GXTlutObj, 32);
 
@@ -28,9 +31,10 @@ void GXInitTlutObj(GXTlutObj*, void*, GXTlutFmt, u16);
 
 void GXInvalidateTexAll(void);
 
-// TODO
 UNKTYPE GXSetTexCoordScaleManually(UNKWORD, UNKWORD, UNKWORD, UNKWORD);
 UNKTYPE GXSetTexCoordCylWrap(UNKWORD, UNKWORD, UNKWORD);
+
+//! @}
 
 #ifdef __cplusplus
 }

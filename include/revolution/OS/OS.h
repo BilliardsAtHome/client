@@ -7,6 +7,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_os
+//! @{
+
 typedef enum {
     OS_CONSOLE_MASK = 0xF0000000,
     OS_CONSOLE_MASK_RVL = 0x00000000,
@@ -82,6 +85,8 @@ u32 __OSGetDIConfig(void);
 void OSRegisterVersion(const char* ver);
 const char* OSGetAppGamename(void);
 u8 OSGetAppType(void);
+
+//! @}
 
 #ifdef __cplusplus
 }

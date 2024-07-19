@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_so
+//! @{
+
 #define SO_O_NONBLOCK 0x4
 
 #define SO_INADDR_ANY 0
@@ -141,6 +144,8 @@ typedef struct SOPollFD {
     s32 events;  // at 0x4
     s32 revents; // at 0x8
 } SOPollFD;
+
+//! @}
 
 #ifdef __cplusplus
 }

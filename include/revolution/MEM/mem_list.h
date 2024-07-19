@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_mem
+//! @{
+
 typedef struct MEMList {
     void* head; // at 0x0
     void* tail; // at 0x4
@@ -21,6 +24,8 @@ void MEMInitList(MEMList* list, u16 offset);
 void MEMAppendListObject(MEMList* list, void* object);
 void MEMRemoveListObject(MEMList* list, void* object);
 void* MEMGetNextListObject(MEMList* list, void* object);
+
+//! @}
 
 #ifdef __cplusplus
 }

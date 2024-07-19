@@ -7,6 +7,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rfl_impl
+//! @{
+
 typedef struct RFLiMiddleDB {
     RFLMiddleDBType type;     // at 0x0
     RFLiCallback callback;    // at 0x4
@@ -22,6 +25,8 @@ RFLErrcode RFLiUpdateMiddleDBAsync(RFLMiddleDB* db, RFLiCallback cb,
 BOOL RFLiGetCharInfoMiddleDB(RFLiCharInfo* info, const RFLMiddleDB* db,
                              u16 index);
 RFLErrcode RFLiAddMiddleDBUserData(RFLMiddleDB* db, RFLiCharData* raw);
+
+//! @}
 
 #ifdef __cplusplus
 }

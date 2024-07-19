@@ -10,6 +10,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_nwc24
+//! @{
+
 #define NWC24_IO_BUFFER_SIZE 512
 
 #define WORK_SIZE(x) (ROUND_UP(sizeof(x), 0x100))
@@ -45,6 +48,8 @@ BOOL NWC24IsMsgLibOpenBlocking(void);
 NWC24Err NWC24BlockOpenMsgLib(BOOL block);
 NWC24Err NWC24iSetNewMsgArrived(u32 flags);
 void NWC24iSetErrorCode(u32 code);
+
+//! @}
 
 #ifdef __cplusplus
 }

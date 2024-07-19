@@ -6,6 +6,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_kpad
+//! @{
+
 typedef enum {
     KPAD_RESULT_OK = 0,
 } KPADResult;
@@ -95,6 +98,8 @@ typedef struct KPADStatus {
 } KPADStatus;
 
 s32 KPADRead(s32 chan, KPADStatus* status, u32 num);
+
+//! @}
 
 #ifdef __cplusplus
 }

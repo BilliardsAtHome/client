@@ -26,8 +26,10 @@ LOADER_ADDR = 0x80001900
 
 # Flags applied to all source files
 CFLAGS_COMMON = " ".join([
+    # For Kokeshi-specific code (separate from decomp)
+    "-D__KOKESHI__",
+
     "-proc gekko",                # Gekko processor
-    "-i .",                       # Root include directory
     "-I-",
     "-Cpp_exceptions off",        # Disable C++ exceptions
     "-enum int",                  # Force 4-byte enumerations
@@ -90,10 +92,12 @@ GOOD_HASHES = {
     "sports": [
         "8bb422971b88b5551a37de98db69557df7b46637"  # Wii Sports (US, Rev 1)
     ],
-
     "play": [
         "0da5e7e51135219f580ad011d1b635bc83569bb9"  # Wii Play (US, Rev 1)
     ],
+    "sports2": [
+        "e3e22a9de62f6e11ded52e9a7e6933892963b219"  # Wii Sports Resort (US)
+    ]
 }
 
 #
@@ -119,34 +123,43 @@ def main() -> None:
     parser.add_argument("--define", action='append',
                         required=False, help="Register a custom preprocessor definition of the form \"KEY,VALUE\"")
 
+    parser.add_argument("--ci", type=int, required=False, default=0,
+                        help="Use for GitHub CI to only compile code and avoid the ROM.")
+
     args = parser.parse_args()
-    build(args)
+    success = build(args)
+
+    if not success:
+        exit(1)
 
 
-def build(args) -> None:
+def build(args) -> bool:
     """Attempt to build the mod
 
     Args:
         args: Parsed command-line arguments
     """
 
-    print("[INFO] Checking baserom...")
-    if not baserom_ok(args):
-        return
+    if not args.ci:
+        print("[INFO] Checking baserom...")
+        if not baserom_ok(args):
+            return False
 
     print("[INFO] Building Kamek loader...")
     if not build_loader(args):
-        return
+        return False
 
     print(f"[INFO] Building module...")
     if not build_module(args):
-        return
+        return False
 
-    print(f"[INFO] Installing to romfs...")
-    if not install_romfs(args):
-        return
+    if not args.ci:
+        print(f"[INFO] Installing to romfs...")
+        if not install_romfs(args):
+            return False
 
     print(f"[INFO] Success!")
+    return True
 
 
 def search_files(root: str, extensions: list[str]) -> list[str]:
@@ -330,10 +343,11 @@ def build_loader(args) -> bool:
     srcs = search_files(LOADER_DIR, SRC_EXTENSIONS)
     objs = [src_to_obj(f) for f in srcs]
 
-    inc_dirs = search_dirs(SRC_DIR, recursive=False) + \
+    inc_dirs = ["include/MSL"] + \
+        search_dirs(SRC_DIR, recursive=False) + \
         search_dirs(INCLUDE_DIR, recursive=False) + \
-        search_dirs(LIBRARY_DIR, recursive=False)
-    inc_dirs.append(LOADER_DIR)
+        search_dirs(LIBRARY_DIR, recursive=False) + \
+        [LOADER_DIR]
 
     # Loader compiler flags
     cflags = ' '.join([
@@ -370,19 +384,20 @@ def build_loader(args) -> bool:
     # Link step
     #
 
-    # Kamek loader flags
-    ldflags = " ".join([
-        f"-static={hex(LOADER_ADDR)}",
-        f"-input-dol={BASE_DIR}/baserom_{args.game}.dol",
-        f"-output-dol={BUILD_DIR}/main_{args.game}.dol",
-        f"-output-kamek={BUILD_DIR}/{LOADER_DIR}/Loader_{args.game}.bin",
-        f"-output-map={BUILD_DIR}/{LOADER_DIR}/Loader_{args.game}.map",
-        f"-externals={BASE_DIR}/symbols_{args.game}.txt"
-    ])
+    if not args.ci:
+        # Kamek loader flags
+        ldflags = " ".join([
+            f"-static={hex(LOADER_ADDR)}",
+            f"-input-dol={BASE_DIR}/baserom_{args.game}.dol",
+            f"-output-dol={BUILD_DIR}/main_{args.game}.dol",
+            f"-output-kamek={BUILD_DIR}/{LOADER_DIR}/Loader_{args.game}.bin",
+            f"-output-map={BUILD_DIR}/{LOADER_DIR}/Loader_{args.game}.map",
+            f"-externals={BASE_DIR}/symbols_{args.game}.txt"
+        ])
 
-    if not link(objs, ldflags):
-        print("[FATAL] Error while linking Kamek loader.")
-        return False
+        if not link(objs, ldflags):
+            print("[FATAL] Error while linking Kamek loader.")
+            return False
 
     return True
 
@@ -407,9 +422,11 @@ def build_module(args) -> bool:
         search_files(SRC_DIR, SRC_EXTENSIONS)
     objs = [src_to_obj(f) for f in srcs]
 
-    inc_dirs = search_dirs(SRC_DIR, recursive=False) + search_dirs(
-        INCLUDE_DIR, recursive=False) + search_dirs(LIBRARY_DIR, recursive=False)
-    inc_dirs.append(LOADER_DIR)
+    inc_dirs = ["include/MSL"] + \
+        search_dirs(SRC_DIR, recursive=False) + \
+        search_dirs(INCLUDE_DIR, recursive=False) + \
+        search_dirs(LIBRARY_DIR, recursive=False) + \
+        [LOADER_DIR]
 
     # Module compiler flags
     cflags = ' '.join([

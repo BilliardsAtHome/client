@@ -6,6 +6,9 @@
 extern "C" {
 #endif
 
+//! @addtogroup rvl_gx
+//! @{
+
 GX_DECL_PUBLIC_STRUCT(GXFifoObj, 128);
 
 void GXGetGPStatus(u8*, u8*, u8*, u8*, u8*);
@@ -15,6 +18,8 @@ BOOL GXGetCPUFifo(GXFifoObj*);
 
 u32 GXGetFifoCount(GXFifoObj*);
 u8 GXGetFifoWrap(GXFifoObj*);
+
+//! @}
 
 #ifdef __cplusplus
 }
