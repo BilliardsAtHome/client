@@ -25,6 +25,7 @@ enum {
     Ioctl_SOCreate = 15,
     Ioctl_SOGetHostID = 16,
     Ioctl_SOINetAtoN = 21,
+    Ioctl_SOGetAddrInfo = 24,
     Ioctl_SOStartup = 31,
 
     // dev/net/ncd/manage
@@ -746,6 +747,95 @@ void LibSO::GetHostID(SockAddr4& addr) {
     addr.port = 0;
 
     sLastError = SO_SUCCESS;
+}
+
+struct SOGetAddrInfoResult {
+    /* 0x000 */ SOAddrInfo info[35];
+    /* 0x460 */ SOSockAddr addr[35];
+};
+/**
+ * @brief Resolves the given hostname and service to an IP address
+ *
+ * @param[out] addr Resulting address
+ * @param name Hostname
+ * @param service Port/service
+ * @param type Requested type
+ * @return Success
+ */
+bool LibSO::ResolveHostName(SockAddrAny& addr, const String& name,
+                            const String& service, SOSockType type) {
+    K_ASSERT_EX(sDevNetIpTop.IsOpen(), "Please call LibSO::Initialize");
+
+    K_ASSERT_EX(type == SO_SOCK_STREAM || type == SO_SOCK_DGRAM,
+                "Invalid socket type (%d)", type);
+
+    TVector<IosVector> input;
+    TVector<IosVector> output;
+
+    IosString<char> iName(name);
+    input.PushBack(iName);
+
+    IosString<char> iService(service);
+    input.PushBack(iService);
+
+    // TODO: Would other hints be useful?
+    IosObject<SOAddrInfo> iHints;
+    std::memset(iHints.Base(), 0, iHints.Length());
+    iHints->type = type;
+    input.PushBack(iHints);
+
+    IosObject<SOGetAddrInfoResult> oResult;
+    output.PushBack(oResult);
+
+    s32 result = sDevNetIpTop.IoctlV(Ioctl_SOGetAddrInfo, input, output);
+    sLastError = static_cast<SOResult>(result);
+
+    if (result != SO_SUCCESS) {
+        std::memset(&addr, 0, sizeof(SockAddrAny));
+        return false;
+    }
+
+    // We just take the first good result
+    const SOSockAddr* pFoundAddr = nullptr;
+
+    for (int i = 0; i < LENGTHOF(oResult->info); i++) {
+        const SOAddrInfo& rInfo = oResult->info[i];
+
+        // No more results
+        if (rInfo.len == 0) {
+            break;
+        }
+
+        // Address family doesn't match
+        if (addr.family != 0 && rInfo.family != addr.family) {
+            continue;
+        }
+
+        // Socket type doesn't match
+        if (rInfo.type != type) {
+            continue;
+        }
+
+        // TODO: Why does Dolphin IOS provide bad length values?
+        // // IP version doesn't match
+        // if (addr.len != 0 && rInfo.len != addr.len) {
+        //     continue;
+        // }
+
+        pFoundAddr = &oResult->addr[i];
+        break;
+    }
+
+    if (pFoundAddr == nullptr) {
+        return false;
+    }
+
+    // Dolphin's IOS seems to give bad length so we fix it after the copy
+    u32 len = addr.len;
+    addr = *pFoundAddr;
+    addr.len = len;
+
+    return true;
 }
 
 /**

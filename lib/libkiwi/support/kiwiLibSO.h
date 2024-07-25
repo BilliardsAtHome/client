@@ -53,7 +53,9 @@ public:
     static String INetNtoP(const SockAddrAny& addr);
 
     static void GetHostID(SockAddr4& addr);
-    static bool GetHostByName(const String& str, SockAddrAny& addr);
+    static bool ResolveHostName(SockAddrAny& info, const String& name,
+                                const String& service = "",
+                                SOSockType type = SO_SOCK_STREAM);
 
     static SOResult GetSockOpt(SOSocket socket, SOSockOptLevel level,
                                SOSockOpt opt, void* val, u32 len);
@@ -145,7 +147,11 @@ struct SockAddr4 : public SOSockAddrIn {
         family = SO_AF_INET;
         port = _port;
 
-        bool success = LibSO::INetAtoN(host, *this);
+        // Need to resolve if hostname isn't provided in dotted notation
+        bool success =
+            LibSO::INetAtoN(host, *this) ||
+            LibSO::ResolveHostName(*this, host, kiwi::ToString(port));
+
         K_ASSERT_EX(success, "Could not resolve hostname: %s", host.CStr());
     }
 
@@ -226,8 +232,12 @@ struct SockAddr6 : public SOSockAddrIn6 {
         port = _port;
         flowinfo = 0;
 
-        bool success = LibSO::INetPtoN(_addr, *this);
-        K_ASSERT(success);
+        // Need to resolve if hostname isn't provided in dotted notation
+        bool success =
+            LibSO::INetPtoN(_addr, *this) ||
+            LibSO::ResolveHostName(*this, _addr, kiwi::ToString(port));
+
+        K_ASSERT_EX(success, "Could not resolve hostname: %s", _addr.CStr());
 
         scope = 0;
     }

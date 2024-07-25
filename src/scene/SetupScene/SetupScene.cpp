@@ -30,13 +30,9 @@ void SetupScene::OnReset() {
     RPGrpRenderer::SetEfbClearColor(0, 0, 0);
 
     // Skip login if UID existed as a file
-    if (Simulation::GetInstance().GetUniqueId()) {
-        kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(
-            kiwi::ESceneID_RPBilScene);
-    } else {
-        kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(
-            ESceneID_LoginScene);
-    }
+    kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(
+        Simulation::GetInstance().GetUniqueId() ? kiwi::ESceneID_RPBilScene
+                                                : ESceneID_LoginScene);
 }
 
 /**

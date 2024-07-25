@@ -402,16 +402,20 @@ template <typename T> K_INLINE hash_t Hash(const StringImpl<T>& rKey) {
  */
 /**@{*/
 TO_STRING_PRIM(int, "%d", x);
+TO_STRING_PRIM(s16, "%d", x);
 TO_STRING_PRIM(s32, "%ld", x);
 TO_STRING_PRIM(s64, "%lld", x);
 TO_HEX_STRING_PRIM(int, "0x%08X", x);
+TO_HEX_STRING_PRIM(s16, "0x%04X", x);
 TO_HEX_STRING_PRIM(s32, "0x%08X", x);
 TO_HEX_STRING_PRIM(s64, "0x%016X", x);
 
 TO_STRING_PRIM(unsigned int, "%u", x);
+TO_STRING_PRIM(u16, "%u", x);
 TO_STRING_PRIM(u32, "%lu", x);
 TO_STRING_PRIM(u64, "%llu", x);
 TO_HEX_STRING_PRIM(unsigned int, "0x%08X", x);
+TO_HEX_STRING_PRIM(u16, "0x%04X", x);
 TO_HEX_STRING_PRIM(u32, "0x%08X", x);
 TO_HEX_STRING_PRIM(u64, "0x%016X", x);
 /**@}*/
@@ -460,16 +464,6 @@ K_INLINE String ToHexString(const char* x) {
     return String(x);
 }
 /**@}*/
-
-/**
- * @brief Placeholder string conversion for unsupported types
- * @note Specialize this for your own types
- *
- * @param x Value to convert
- */
-template <typename T> K_INLINE String ToString(const T& x) {
-    return Format("<object at %p>", &x);
-}
 
 #undef TO_STRING_PRIM
 #undef TO_HEX_STRING_PRIM
