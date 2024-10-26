@@ -18,7 +18,7 @@ struct BreakInfo {
     bool IsBetterThan(const BreakInfo& other) const;
     void Log() const;
     void Save(const char* name) const;
-    void Upload() const;
+    bool Upload(kiwi::EHttpErr& err, kiwi::EHttpStatus& stat) const;
 
     u32 seed;
     u32 kseed;

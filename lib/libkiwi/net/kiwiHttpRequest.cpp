@@ -2,44 +2,64 @@
 
 namespace kiwi {
 
-typedef TMap<String, String>::ConstIterator ParamIterator;
-typedef TMap<String, String>::ConstIterator HeaderIterator;
-
 /**
  * @brief HTTP request method names
  */
-const char* HttpRequest::sMethodNames[EMethod_Max] = {"GET", "POST"};
+const String HttpRequest::METHOD_NAMES[EMethod_Max] = {"GET", "POST"};
+
 /**
  * @brief HTTP protocol version
  */
-const char* HttpRequest::sProtocolVer = "1.1";
+const String HttpRequest::PROTOCOL_VERSION = "HTTP/1.1";
 
 /**
  * @brief Constructor
  *
  * @param rHost Server hostname
  */
-HttpRequest::HttpRequest(const String& rHost)
-    : mHostName(rHost),
-      mURI("/"),
-      mpSocket(nullptr),
-      mTimeOut(OS_MSEC_TO_TICKS(scDefaultTimeOut)),
-      mpResponseCallback(nullptr),
-      mpResponseCallbackArg(nullptr) {
+HttpRequest::HttpRequest(const String& rHost) {
+    mIsUserSocket = false;
     mpSocket = new SyncSocket(SO_PF_INET, SO_SOCK_STREAM);
     K_ASSERT(mpSocket != nullptr);
 
-    // Need non-blocking so timeout can be enforced
+    // Timeout requires non-blocking
     bool success = mpSocket->SetBlocking(false);
     K_ASSERT(success);
 
-    // Bind to any local port
+    // Any local port is fine
     success = mpSocket->Bind();
     K_ASSERT(success);
 
-    // Hostname required by HTTP 1.1
-    mHeader["Host"] = rHost;
-    // Identify libkiwi requests by user agent
+    mHostName = rHost;
+
+    Init();
+}
+
+/**
+ * @brief Destructor
+ */
+HttpRequest::~HttpRequest() {
+    K_ASSERT_EX(mpCallback == nullptr,
+                "Don't destroy this object while async request is pending.");
+
+    // User-provided socket will outlive this request
+    if (!mIsUserSocket) {
+        delete mpSocket;
+    }
+}
+
+/**
+ * @brief Performs common initialization
+ */
+void HttpRequest::Init() {
+    mMethod = EMethod_Max;
+    mResource = "/";
+    mTimeOut = OS_MSEC_TO_TICKS(DEFAULT_TIMEOUT);
+
+    mpCallback = nullptr;
+    mpCallbackArg = nullptr;
+
+    mHeader["Host"] = mHostName;
     mHeader["User-Agent"] = "libkiwi";
 }
 
@@ -52,12 +72,12 @@ HttpRequest::HttpRequest(const String& rHost)
 const HttpResponse& HttpRequest::Send(EMethod method) {
     K_ASSERT(method < EMethod_Max);
     K_ASSERT(mpSocket != nullptr);
+    K_ASSERT(mpSocket->IsOpen());
 
     mMethod = method;
-    mpResponseCallback = nullptr;
-    mpResponseCallbackArg = nullptr;
+    mpCallback = nullptr;
+    mpCallbackArg = nullptr;
 
-    // Call on this thread
     SendImpl();
     return mResponse;
 }
@@ -69,17 +89,16 @@ const HttpResponse& HttpRequest::Send(EMethod method) {
  * @param pArg Callback user argument
  * @param method Request method
  */
-void HttpRequest::SendAsync(ResponseCallback pCallback, void* pArg,
-                            EMethod method) {
+void HttpRequest::SendAsync(Callback pCallback, void* pArg, EMethod method) {
     K_ASSERT_EX(pCallback != nullptr, "You will lose the reponse!");
     K_ASSERT(method < EMethod_Max);
     K_ASSERT(mpSocket != nullptr);
+    K_ASSERT(mpSocket->IsOpen());
 
     mMethod = method;
-    mpResponseCallback = pCallback;
-    mpResponseCallbackArg = pArg;
+    mpCallback = pCallback;
+    mpCallbackArg = pArg;
 
-    // Call on new thread
     Thread t(SendImpl, *this);
 }
 
@@ -89,17 +108,22 @@ void HttpRequest::SendAsync(ResponseCallback pCallback, void* pArg,
 void HttpRequest::SendImpl() {
     K_ASSERT(mMethod < EMethod_Max);
     K_ASSERT(mpSocket != nullptr);
-
-    // HTTP connections use port 80
-    SockAddr4 addr(mHostName, 80);
+    K_ASSERT(mpSocket->IsOpen());
 
     Watch w;
     w.Start();
 
     // Establish connection with server
     while (true) {
-        // Successful connection
-        if (mpSocket->Connect(addr)) {
+        bool connected = true;
+
+        // Need to establish our own connection
+        if (!mIsUserSocket) {
+            SockAddr4 addr(mHostName, PORT);
+            connected = mpSocket->Connect(addr);
+        }
+
+        if (connected) {
             (void)Request();
             (void)Receive();
             break;
@@ -112,15 +136,12 @@ void HttpRequest::SendImpl() {
         }
     }
 
-    // User callback
-    if (mpResponseCallback != nullptr) {
-        mpResponseCallback(mResponse, mpResponseCallbackArg);
+    if (mpCallback != nullptr) {
+        mpCallback(mResponse, mpCallbackArg);
     }
 
-#ifndef NDEBUG
     // Signal to destructor
-    mpResponseCallback = nullptr;
-#endif
+    mpCallback = nullptr;
 }
 
 /**
@@ -131,30 +152,39 @@ void HttpRequest::SendImpl() {
 bool HttpRequest::Request() {
     K_ASSERT(mMethod < EMethod_Max);
     K_ASSERT(mpSocket != nullptr);
+    K_ASSERT(mpSocket->IsOpen());
 
-    // Build URI & URL parameter string
-    String request = mURI;
-    for (ParamIterator it = mParams.Begin(); it != mParams.End(); ++it) {
+    // Request line begins with the resource
+    String request = mResource;
+
+    // URL parameter string
+    K_FOREACH(mParams) {
         // Parameters delimited by ampersand
         String fmt = it == mParams.Begin() ? "?%s=%s" : "&%s=%s";
         request += Format(fmt, it.Key().CStr(), it.Value().CStr());
     }
 
-    // Build request line
-    request = Format("%s %s HTTP/%s\n", sMethodNames[mMethod], request.CStr(),
-                     sProtocolVer);
+    // Finish request line
+    request = Format("%s %s %s\n", METHOD_NAMES[mMethod].CStr(), request.CStr(),
+                     PROTOCOL_VERSION.CStr());
 
     // Build header fields
-    for (HeaderIterator it = mHeader.Begin(); it != mHeader.End(); ++it) {
+    K_FOREACH(mHeader) {
         request += Format("%s: %s\n", it.Key().CStr(), it.Value().CStr());
     }
 
-    // Request ends with double-line
+    // Request ends with extra newline
     request += "\n";
 
     // Send request data
     Optional<u32> sent = mpSocket->Send(request);
-    return sent && *sent == request.Length();
+    bool success = sent && *sent == request.Length();
+
+    if (!success) {
+        mResponse.error = EHttpErr_Socket;
+    }
+
+    return success;
 }
 
 /**
@@ -165,37 +195,32 @@ bool HttpRequest::Request() {
 bool HttpRequest::Receive() {
     K_ASSERT(mMethod < EMethod_Max);
     K_ASSERT(mpSocket != nullptr);
+    K_ASSERT(mpSocket->IsOpen());
 
     // Beginning timestamp
     Watch w;
     w.Start();
 
     /**
-     *
      * Receive response headers
-     *
      */
-
-    // Need non-blocking because we greedily receive data
-    bool success = mpSocket->SetBlocking(false);
-    K_ASSERT(success);
-
-    // Read header string (ends in double newline)
     String work = "";
     size_t end = String::npos;
-    while (end == String::npos) {
-        char buffer[512 + 1] = "";
-        Optional<u32> nrecv = mpSocket->RecvBytes(buffer, sizeof(buffer) - 1);
 
-        // Check for error
+    while (end == String::npos) {
+        char buffer[TEMP_BUFFER_SIZE] = "";
+        Optional<u32> nrecv = mpSocket->RecvBytes(buffer, TEMP_BUFFER_SIZE - 1);
+
         if (!nrecv) {
             mResponse.error = EHttpErr_Socket;
             return false;
         }
 
-        // Continue to append data
         if (nrecv) {
+            // Continue to build string
             work += buffer;
+
+            // Response header ends in double newline
             end = work.Find("\r\n\r\n");
 
             // Server has terminated the connection
@@ -205,16 +230,10 @@ bool HttpRequest::Receive() {
             }
         }
 
-        // Timeout check
         if (w.Elapsed() >= mTimeOut) {
             mResponse.error = EHttpErr_TimedOut;
             return false;
         }
-    }
-
-    if (end == String::npos) {
-        mResponse.error = EHttpErr_BadResponse;
-        return false;
     }
 
     // Point index at end of sequence instead of start
@@ -222,36 +241,33 @@ bool HttpRequest::Receive() {
     String headers = work.SubStr(0, end);
 
     /**
-     *
      * Build header dictionary
-     *
      */
-
-    // Must at least have one line (status code)
     TVector<String> lines = headers.Split("\r\n");
-    if (lines.Size() < 1) {
+    if (lines.Empty()) {
+        // Needs at least one line (for status code)
         mResponse.error = EHttpErr_BadResponse;
         return false;
     }
 
     // Extract status code
-    K_ASSERT(lines[0].StartsWith("HTTP/1.1"));
-    int num = std::sscanf(lines[0], "HTTP/1.1 %d", &mResponse.status);
+    int num =
+        std::sscanf(lines[0], PROTOCOL_VERSION + " %d", &mResponse.status);
     if (num != 1) {
         mResponse.error = EHttpErr_BadResponse;
         return false;
     }
 
     // Other lines contain key/value pairs
-    for (int i = 1; i < lines.Size(); i++) {
-        // Use Find over Split in case the value also contains a colon
+    for (u32 i = 1; i < lines.Size(); i++) {
+        // NOTE: Use Find over Split in case the value also contains a colon
         u32 pos = lines[i].Find(": ");
         u32 after = pos + sizeof(": ") - 1;
 
         // Malformed line (or part of \r\n\r\n ending)
         if (pos == String::npos) {
             // If this isn't one of the trailing newlines, we have a problem
-            if (lines[i] != "") {
+            if (lines[i] != "\r\n") {
                 mResponse.error = EHttpErr_BadResponse;
                 return false;
             }
@@ -266,35 +282,31 @@ bool HttpRequest::Receive() {
     }
 
     /**
-     *
      * Receive response body
-     *
      */
-
-    // If we were given the length, we can be 100% sure
     Optional<u32> len;
     if (mResponse.header.Contains("Content-Length")) {
+        // If we were given the length, we can be 100% sure
         len = ksl::strtoul(*mResponse.header.Find("Content-Length"));
     }
 
-    // We may have read *some* of it earlier
+    // We may have read some of the body earlier
     if (end != work.Length()) {
         mResponse.body = work.SubStr(end);
     }
 
     // Receive the rest of the body
     while (true) {
-        char buffer[512 + 1] = "";
-        Optional<u32> nrecv = mpSocket->RecvBytes(buffer, sizeof(buffer) - 1);
+        char buffer[TEMP_BUFFER_SIZE] = "";
+        Optional<u32> nrecv = mpSocket->RecvBytes(buffer, TEMP_BUFFER_SIZE - 1);
 
-        // Check for error
         if (!nrecv) {
             mResponse.error = EHttpErr_Socket;
             return false;
         }
 
-        // Continue appending data
         if (nrecv) {
+            // Continue building string
             mResponse.body += buffer;
 
             // Server is likely done and has terminated the connection
@@ -309,7 +321,6 @@ bool HttpRequest::Receive() {
             }
         }
 
-        // Timeout check
         if (w.Elapsed() >= mTimeOut) {
             // May be the only way to end the body, so not a failure
             break;

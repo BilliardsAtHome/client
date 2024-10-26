@@ -113,6 +113,14 @@ struct SockAddrAny : public SOSockAddr {
         std::memcpy(this, &addr, addr.len);
         return *this;
     }
+
+    /**
+     * @brief Tests whether the address is valid
+     */
+    bool IsValid() const {
+        return (len == sizeof(SOSockAddrIn) && family == SO_AF_INET) ||
+               (len == sizeof(SOSockAddrIn6) && family == SO_AF_INET6);
+    }
 };
 
 /**
@@ -129,71 +137,46 @@ struct SockAddr4 : public SOSockAddrIn {
     /**
      * @brief Constructor
      */
-    SockAddr4() {
-        len = sizeof(SOSockAddrIn);
-        family = SO_AF_INET;
-        port = 0;
-        addr.raw = 0;
-    }
-
+    SockAddr4();
     /**
      * @brief Constructor
      *
      * @param host IPv4 address OR hostname
      * @param _port Port
      */
-    SockAddr4(const String& host, u16 _port = 0) {
-        len = sizeof(SOSockAddrIn);
-        family = SO_AF_INET;
-        port = _port;
-
-        // Need to resolve if hostname isn't provided in dotted notation
-        bool success =
-            LibSO::INetAtoN(host, *this) ||
-            LibSO::ResolveHostName(*this, host, kiwi::ToString(port));
-
-        K_ASSERT_EX(success, "Could not resolve hostname: %s", host.CStr());
-    }
-
+    SockAddr4(const String& host, u16 _port = 0);
     /**
      * @brief Constructor
      *
      * @param _addr IPv4 address
      * @param _port Port
      */
-    SockAddr4(u32 _addr, u16 _port) {
-        len = sizeof(SOSockAddrIn);
-        family = SO_AF_INET;
-        port = _port;
-        addr.raw = _addr;
-    }
-
+    SockAddr4(u32 _addr, u16 _port);
     /**
      * @brief Constructor
      *
      * @param _port Port
      */
-    explicit SockAddr4(u16 _port) {
-        len = sizeof(SOSockAddrIn);
-        family = SO_AF_INET;
-        port = _port;
-        addr.raw = 0;
-    }
-
+    explicit SockAddr4(u16 _port);
     /**
      * @brief Constructor
      *
      * @param addr Socket address
      */
-    SockAddr4(const SockAddrAny& addr) {
-        K_ASSERT_EX(addr.len == sizeof(SockAddr4), "Not for this class");
-        std::memcpy(this, &addr, addr.len);
-    }
+    SockAddr4(const SockAddrAny& addr);
 
-    SockAddr4& operator=(const SockAddrAny& addr) {
-        K_ASSERT_EX(addr.len == sizeof(SockAddr4), "Not for this class");
-        std::memcpy(this, &addr, addr.len);
-        return *this;
+    /**
+     * @brief Assignment operator
+     *
+     * @param addr Other address
+     */
+    SockAddr4& operator=(const SockAddrAny& addr);
+
+    /**
+     * @brief Tests whether the address is valid
+     */
+    bool IsValid() const {
+        return len == sizeof(SOSockAddrIn) && family == SO_AF_INET;
     }
 };
 
@@ -211,65 +194,39 @@ struct SockAddr6 : public SOSockAddrIn6 {
     /**
      * @brief Constructor
      */
-    SockAddr6() {
-        len = sizeof(SOSockAddrIn6);
-        family = SO_AF_INET6;
-        port = 0;
-        flowinfo = 0;
-        std::memset(&addr, 0, sizeof(SOInAddr6));
-        scope = 0;
-    }
-
+    SockAddr6();
     /**
      * @brief Constructor
      *
      * @param _addr IPv6 address (string)
      * @param _port Port
      */
-    SockAddr6(const String& _addr, u16 _port = 0) {
-        len = sizeof(SOSockAddrIn6);
-        family = SO_AF_INET6;
-        port = _port;
-        flowinfo = 0;
-
-        // Need to resolve if hostname isn't provided in dotted notation
-        bool success =
-            LibSO::INetPtoN(_addr, *this) ||
-            LibSO::ResolveHostName(*this, _addr, kiwi::ToString(port));
-
-        K_ASSERT_EX(success, "Could not resolve hostname: %s", _addr.CStr());
-
-        scope = 0;
-    }
-
+    SockAddr6(const String& _addr, u16 _port = 0);
     /**
      * @brief Constructor
      *
      * @param _port Port
      */
-    explicit SockAddr6(u16 _port) {
-        len = sizeof(SOSockAddrIn6);
-        family = SO_AF_INET6;
-        port = _port;
-        flowinfo = 0;
-        std::memset(&addr, 0, sizeof(SOInAddr6));
-        scope = 0;
-    }
-
+    explicit SockAddr6(u16 _port);
     /**
      * @brief Constructor
      *
      * @param addr Socket address
      */
-    SockAddr6(const SockAddrAny& addr) {
-        K_ASSERT_EX(addr.len == sizeof(SockAddr6), "Not for this class");
-        std::memcpy(this, &addr, addr.len);
-    }
+    SockAddr6(const SockAddrAny& addr);
 
-    SockAddr6& operator=(const SockAddrAny& addr) {
-        K_ASSERT_EX(addr.len == sizeof(SockAddr6), "Not for this class");
-        std::memcpy(this, &addr, addr.len);
-        return *this;
+    /**
+     * @brief Assignment operator
+     *
+     * @param addr Other address
+     */
+    SockAddr6& operator=(const SockAddrAny& addr);
+
+    /**
+     * @brief Tests whether the address is valid
+     */
+    bool IsValid() const {
+        return len == sizeof(SOSockAddrIn6) && family == SO_AF_INET6;
     }
 };
 
@@ -278,6 +235,14 @@ struct SockAddr6 : public SOSockAddrIn6 {
  */
 K_INLINE String ToString(const SockAddrAny& t) {
     return Format("%s:%d", LibSO::INetNtoP(t).CStr(), t.port);
+}
+
+/**
+ * @brief Access data length
+ */
+template <> K_INLINE u32 IosObject<SockAddrAny>::Length() const {
+    // With SockAddrAny we can't rely on sizeof, as the class is a union
+    return Ref().len;
 }
 
 K_STATIC_ASSERT(sizeof(SockAddrAny) == sizeof(SOSockAddr));

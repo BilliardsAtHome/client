@@ -184,6 +184,14 @@ void Simulation::UserDraw() {
     /**
      * User information
      */
+    if (mIsConnected.HasValue()) {
+        kiwi::DebugPrint::PrintfOutline(
+            -0.5f, -0.8f, 0.8f, true,
+            *mIsConnected ? kiwi::Color::GREEN : kiwi::Color::YELLOW,
+            kiwi::Color::BLACK,
+            *mIsConnected ? "Connected" : "Not Connected (err:%d, stat:%d)",
+            mHttpError, mHttpStatus);
+    }
 
     kiwi::DebugPrint::PrintfOutline(-0.5f, -0.9f, 0.8f, true, kiwi::Color::RED,
                                     kiwi::Color::BLACK, "Unique ID: %06d",
@@ -390,35 +398,39 @@ void Simulation::Finish() {
     mIsFirstRun = false;
     mIsFinished = true;
 
-    // Record break results
-    if (!mIsReplay) {
-        mpCurrBreak->sunk = GetNumSunk();
-        mpCurrBreak->off = GetNumOff();
-        mpCurrBreak->foul = GetIsFoul();
-
-        // Track statistics
-        mNumBreak++;
-        mNumBall[mpCurrBreak->sunk]++;
-
-        // Upload 6+ breaks to submission server
-        if (mpCurrBreak->sunk + mpCurrBreak->off >= 6) {
-            mpCurrBreak->Upload();
-        }
-
-        // Check for new local best
-        if (mpCurrBreak->IsBetterThan(*mpBestBreak)) {
-            // Record break locally
-            mpCurrBreak->Log();
-            mpCurrBreak->Save("best.brk");
-
-            // Prepare replay
-            *mpBestBreak = *mpCurrBreak;
-            mIsReplay = true;
-        }
-    }
-    // End replay
-    else {
+    if (mIsReplay) {
         mIsReplay = false;
+        return;
+    }
+
+    // Record break results
+    mpCurrBreak->sunk = GetNumSunk();
+    mpCurrBreak->off = GetNumOff();
+    mpCurrBreak->foul = GetIsFoul();
+
+    // Track statistics
+    mNumBreak++;
+    mNumBall[mpCurrBreak->sunk]++;
+
+    bool upload = false;
+    // Always upload 6+ breaks
+    // Upload first break to test connection
+    upload |= !mIsConnected.HasValue();
+
+    // Upload information to the server
+    if (upload) {
+        mIsConnected = mpCurrBreak->Upload(mHttpError, mHttpStatus);
+    }
+
+    // Check for new local best
+    if (mpCurrBreak->IsBetterThan(*mpBestBreak)) {
+        // Record break locally
+        mpCurrBreak->Log();
+        mpCurrBreak->Save("best.brk");
+
+        // Prepare replay
+        *mpBestBreak = *mpCurrBreak;
+        mIsReplay = true;
     }
 }
 

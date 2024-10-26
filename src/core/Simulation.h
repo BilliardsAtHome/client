@@ -72,6 +72,10 @@ private:
 
 private:
     kiwi::Optional<u32> mUniqueId;
+    kiwi::Optional<bool> mIsConnected;
+
+    kiwi::EHttpErr mHttpError;
+    kiwi::EHttpStatus mHttpStatus;
 
     int mTimerUp;
     int mTimerLeft;

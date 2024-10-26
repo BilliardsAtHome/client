@@ -178,9 +178,12 @@ void BreakInfo::Save(const char* name) const {
 
 /**
  * @brief Upload break result to the submission server
+ *
+ * @param err HTTP error
+ * @param stat Response status code
+ * @return Success
  */
-void BreakInfo::Upload() const {
-    kiwi::HttpRequest request("127.0.0.1");
+bool BreakInfo::Upload(kiwi::EHttpErr& err, kiwi::EHttpStatus& stat) const {
     request.SetURI("/billiards/api");
 
     request.SetParameter("user", *Simulation::GetInstance().GetUniqueId());
@@ -204,10 +207,22 @@ void BreakInfo::Upload() const {
 
     request.SetParameter("checksum", kiwi::ToHexString(CalcChecksum()));
 
-    const kiwi::HttpResponse& resp = request.Send();
-    if (resp.error != kiwi::EHttpErr_Success) {
-        K_LOG_EX("HttpErr %d\n", resp.error);
+    // Retry a few times if the connection is unstable
+    for (int i = 0; i < 10; i++) {
+        const kiwi::HttpResponse& resp = request.Send();
+
+        err = resp.error;
+        stat = resp.status;
+
+        if (resp.error == kiwi::EHttpErr_Success &&
+            resp.status == kiwi::EHttpStatus_OK) {
+            return true;
+        }
+
+        K_LOG_EX("try:%d err:%d stat:%d\n", i, resp.error, resp.status);
     }
+
+    return false;
 }
 
 } // namespace BAH
