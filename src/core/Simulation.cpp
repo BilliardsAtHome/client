@@ -81,6 +81,9 @@ K_DYNAMIC_SINGLETON_IMPL(Simulation);
  */
 Simulation::Simulation()
     : kiwi::ISceneHook(kiwi::ESceneID_RPBilScene),
+      mHttpError(kiwi::EHttpErr_Success),
+      mHttpExError(0),
+      mHttpStatus(kiwi::EHttpStatus_Dummy),
       mTimerUp(0),
       mTimerLeft(0),
       mTimerRight(0),
@@ -185,12 +188,13 @@ void Simulation::UserDraw() {
      * User information
      */
     if (mIsConnected.HasValue()) {
-        kiwi::DebugPrint::PrintfOutline(
-            -0.5f, -0.8f, 0.8f, true,
+        // clang-format off
+        kiwi::DebugPrint::PrintfOutline(-0.5f, -0.8f, 0.8f, true,
             *mIsConnected ? kiwi::Color::GREEN : kiwi::Color::YELLOW,
             kiwi::Color::BLACK,
-            *mIsConnected ? "Connected" : "Not Connected (err:%d, stat:%d)",
-            mHttpError, mHttpStatus);
+            *mIsConnected ? "Connected" : "Not Connected (err:%d exErr:%d stat:%d)",
+            mHttpError, mHttpExError, mHttpStatus);
+        // clang-format on
     }
 
     kiwi::DebugPrint::PrintfOutline(-0.5f, -0.9f, 0.8f, true, kiwi::Color::RED,
@@ -419,7 +423,8 @@ void Simulation::Finish() {
 
     // Upload information to the server
     if (upload) {
-        mIsConnected = mpCurrBreak->Upload(mHttpError, mHttpStatus);
+        mIsConnected =
+            mpCurrBreak->Upload(mHttpError, mHttpExError, mHttpStatus);
     }
 
     // Check for new local best

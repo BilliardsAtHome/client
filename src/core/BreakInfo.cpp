@@ -180,10 +180,12 @@ void BreakInfo::Save(const char* name) const {
  * @brief Upload break result to the submission server
  *
  * @param err HTTP error
+ * @param exError HTTP extended error
  * @param stat Response status code
  * @return Success
  */
-bool BreakInfo::Upload(kiwi::EHttpErr& err, kiwi::EHttpStatus& stat) const {
+bool BreakInfo::Upload(kiwi::EHttpErr& err, s32& exError,
+                       kiwi::EHttpStatus& stat) const {
     request.SetURI("/billiards/api");
 
     request.SetParameter("user", *Simulation::GetInstance().GetUniqueId());
@@ -212,6 +214,7 @@ bool BreakInfo::Upload(kiwi::EHttpErr& err, kiwi::EHttpStatus& stat) const {
         const kiwi::HttpResponse& resp = request.Send();
 
         err = resp.error;
+        exError = resp.exError;
         stat = resp.status;
 
         if (resp.error == kiwi::EHttpErr_Success &&

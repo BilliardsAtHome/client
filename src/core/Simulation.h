@@ -75,6 +75,7 @@ private:
     kiwi::Optional<bool> mIsConnected;
 
     kiwi::EHttpErr mHttpError;
+    s32 mHttpExError;
     kiwi::EHttpStatus mHttpStatus;
 
     int mTimerUp;

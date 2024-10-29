@@ -166,9 +166,16 @@ void HttpRequest::SendImpl() {
             break;
         }
 
-        // Timeout while connecting
-        if (w.Elapsed() >= mTimeOut) {
+        // Connection failure
+        if (LibSO::GetLastError() != SO_EWOULDBLOCK) {
             mResponse.error = EHttpErr_CantConnect;
+            mResponse.exError = LibSO::GetLastError();
+        }
+
+        // Connection timeout
+        if (w.Elapsed() >= mTimeOut) {
+            mResponse.error = EHttpErr_TimedOut;
+            mResponse.exError = 0;
             break;
         }
     }
