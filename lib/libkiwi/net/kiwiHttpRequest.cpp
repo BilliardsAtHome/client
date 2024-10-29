@@ -175,7 +175,7 @@ void HttpRequest::SendImpl() {
         // Connection timeout
         if (w.Elapsed() >= mTimeOut) {
             mResponse.error = EHttpErr_TimedOut;
-            mResponse.exError = 0;
+            mResponse.exError = LibSO::GetLastError();
             break;
         }
     }
@@ -276,14 +276,14 @@ bool HttpRequest::Receive() {
             // Server has terminated the connection
             if (*nrecv == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
                 mResponse.error = EHttpErr_Closed;
-                mResponse.exError = 0;
+                mResponse.exError = LibSO::GetLastError();
                 return false;
             }
         }
 
         if (w.Elapsed() >= mTimeOut) {
             mResponse.error = EHttpErr_TimedOut;
-            mResponse.exError = 0;
+            mResponse.exError = LibSO::GetLastError();
             return false;
         }
     }
@@ -300,7 +300,7 @@ bool HttpRequest::Receive() {
     // Needs at least one line (for status code)
     if (lines.Empty()) {
         mResponse.error = EHttpErr_BadResponse;
-        mResponse.exError = 0;
+        mResponse.exError = LibSO::GetLastError();
         return false;
     }
 
@@ -309,7 +309,7 @@ bool HttpRequest::Receive() {
         std::sscanf(lines[0], PROTOCOL_VERSION + " %d", &mResponse.status);
     if (num != 1) {
         mResponse.error = EHttpErr_BadResponse;
-        mResponse.exError = 0;
+        mResponse.exError = LibSO::GetLastError();
         return false;
     }
 
@@ -324,7 +324,7 @@ bool HttpRequest::Receive() {
             // If this isn't one of the trailing newlines, we have a problem
             if (lines[i] != "\r\n") {
                 mResponse.error = EHttpErr_BadResponse;
-                mResponse.exError = 0;
+                mResponse.exError = LibSO::GetLastError();
                 return false;
             }
 
@@ -375,7 +375,7 @@ bool HttpRequest::Receive() {
                 }
 
                 mResponse.error = EHttpErr_Closed;
-                mResponse.exError = 0;
+                mResponse.exError = LibSO::GetLastError();
                 return false;
             }
         }
@@ -387,7 +387,7 @@ bool HttpRequest::Receive() {
     };
 
     mResponse.error = EHttpErr_Success;
-    mResponse.exError = 0;
+    mResponse.exError = LibSO::GetLastError();
     return true;
 }
 

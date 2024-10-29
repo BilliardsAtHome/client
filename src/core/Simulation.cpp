@@ -192,7 +192,7 @@ void Simulation::UserDraw() {
         kiwi::DebugPrint::PrintfOutline(-0.5f, -0.8f, 0.8f, true,
             *mIsConnected ? kiwi::Color::GREEN : kiwi::Color::YELLOW,
             kiwi::Color::BLACK,
-            *mIsConnected ? "Connected" : "Not Connected (err:%d exErr:%d stat:%d)",
+            *mIsConnected ? "Online" : "Offline (err:%d ex:%d stat:%d)",
             mHttpError, mHttpExError, mHttpStatus);
         // clang-format on
     }

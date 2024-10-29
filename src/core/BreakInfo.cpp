@@ -222,7 +222,8 @@ bool BreakInfo::Upload(kiwi::EHttpErr& err, s32& exError,
             return true;
         }
 
-        K_LOG_EX("try:%d err:%d stat:%d\n", i, resp.error, resp.status);
+        K_LOG_EX("try:%d err:%d ex:%d stat:%d\n", i, resp.error, resp.exError,
+                 resp.status);
     }
 
     return false;
