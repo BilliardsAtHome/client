@@ -16,11 +16,14 @@ const String HttpRequest::PROTOCOL_VERSION = "HTTP/1.1";
  * @brief Constructor
  *
  * @param rHost Server hostname
+ * @param port Connection port
  */
-HttpRequest::HttpRequest(const String& rHost) {
+HttpRequest::HttpRequest(const String& rHost, u16 port) {
+    // Socket is owned by this request
     mIsUserSocket = false;
     mpSocket = new SyncSocket(SO_PF_INET, SO_SOCK_STREAM);
     K_ASSERT(mpSocket != nullptr);
+    K_ASSERT(mpSocket->IsOpen());
 
     // Timeout requires non-blocking
     bool success = mpSocket->SetBlocking(false);
@@ -30,9 +33,38 @@ HttpRequest::HttpRequest(const String& rHost) {
     success = mpSocket->Bind();
     K_ASSERT(success);
 
-    mHostName = rHost;
+    mHost = rHost;
+    mPort = port;
 
     Init();
+}
+
+/**
+ * @brief Constructor
+ *
+ * @param pSocket Socket connected to the server
+ */
+HttpRequest::HttpRequest(SocketBase* pSocket) {
+    // TODO: How can we test here that the socket is connected?
+    K_ASSERT(pSocket != nullptr);
+    K_ASSERT(pSocket->IsOpen());
+
+    // Socket is owned by the caller
+    mIsUserSocket = true;
+    mpSocket = pSocket;
+
+    // Timeout requires non-blocking
+    K_WARN_EX(mpSocket->IsBlocking(),
+              "Blocking will be disabled on this socket.\n");
+    bool success = mpSocket->SetBlocking(false);
+    K_ASSERT(success);
+
+    // TODO: How can we get the hostname/port from the socket?
+    mHost = "";
+    mPort = 0;
+
+    // TODO: Need state machine for request/receive (can reuse for synchronous)
+    K_ASSERT_EX(false, "Not implemented.");
 }
 
 /**
@@ -46,6 +78,8 @@ HttpRequest::~HttpRequest() {
     if (!mIsUserSocket) {
         delete mpSocket;
     }
+
+    mpSocket = nullptr;
 }
 
 /**
@@ -59,7 +93,7 @@ void HttpRequest::Init() {
     mpCallback = nullptr;
     mpCallbackArg = nullptr;
 
-    mHeader["Host"] = mHostName;
+    mHeader["Host"] = mHost;
     mHeader["User-Agent"] = "libkiwi";
 }
 
@@ -99,7 +133,9 @@ void HttpRequest::SendAsync(Callback pCallback, void* pArg, EMethod method) {
     mpCallback = pCallback;
     mpCallbackArg = pArg;
 
-    Thread t(SendImpl, *this);
+    // TODO: Need state machine for request/receive (can reuse for synchronous)
+    K_ASSERT_EX(false, "Not implemented.");
+    // Thread t(SendImpl, *this);
 }
 
 /**
@@ -110,6 +146,7 @@ void HttpRequest::SendImpl() {
     K_ASSERT(mpSocket != nullptr);
     K_ASSERT(mpSocket->IsOpen());
 
+    // Beginning timestamp
     Watch w;
     w.Start();
 
@@ -117,12 +154,12 @@ void HttpRequest::SendImpl() {
     while (true) {
         bool connected = true;
 
-        // Need to establish our own connection
+        // Request-owned sockets won't have a connection yet
         if (!mIsUserSocket) {
-            SockAddr4 addr(mHostName, PORT);
-            connected = mpSocket->Connect(addr);
+            connected = mpSocket->Connect(SockAddr4(mHost, mPort));
         }
 
+        // After connection we can perform the request
         if (connected) {
             (void)Request();
             (void)Receive();
@@ -136,12 +173,15 @@ void HttpRequest::SendImpl() {
         }
     }
 
+    // Dispatch user callback
     if (mpCallback != nullptr) {
         mpCallback(mResponse, mpCallbackArg);
     }
 
     // Signal to destructor
+#ifndef NDEBUG
     mpCallback = nullptr;
+#endif
 }
 
 /**
@@ -180,8 +220,10 @@ bool HttpRequest::Request() {
     Optional<u32> sent = mpSocket->Send(request);
     bool success = sent && *sent == request.Length();
 
+    // Record socket library error if it failed
     if (!success) {
         mResponse.error = EHttpErr_Socket;
+        mResponse.exError = LibSO::GetLastError();
     }
 
     return success;
@@ -211,27 +253,30 @@ bool HttpRequest::Receive() {
         char buffer[TEMP_BUFFER_SIZE] = "";
         Optional<u32> nrecv = mpSocket->RecvBytes(buffer, TEMP_BUFFER_SIZE - 1);
 
+        // Record socket library error if it failed
         if (!nrecv) {
             mResponse.error = EHttpErr_Socket;
+            mResponse.exError = LibSO::GetLastError();
             return false;
         }
 
         if (nrecv) {
             // Continue to build string
             work += buffer;
-
             // Response header ends in double newline
             end = work.Find("\r\n\r\n");
 
             // Server has terminated the connection
             if (*nrecv == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
                 mResponse.error = EHttpErr_Closed;
+                mResponse.exError = 0;
                 return false;
             }
         }
 
         if (w.Elapsed() >= mTimeOut) {
             mResponse.error = EHttpErr_TimedOut;
+            mResponse.exError = 0;
             return false;
         }
     }
@@ -244,9 +289,11 @@ bool HttpRequest::Receive() {
      * Build header dictionary
      */
     TVector<String> lines = headers.Split("\r\n");
+
+    // Needs at least one line (for status code)
     if (lines.Empty()) {
-        // Needs at least one line (for status code)
         mResponse.error = EHttpErr_BadResponse;
+        mResponse.exError = 0;
         return false;
     }
 
@@ -255,6 +302,7 @@ bool HttpRequest::Receive() {
         std::sscanf(lines[0], PROTOCOL_VERSION + " %d", &mResponse.status);
     if (num != 1) {
         mResponse.error = EHttpErr_BadResponse;
+        mResponse.exError = 0;
         return false;
     }
 
@@ -269,6 +317,7 @@ bool HttpRequest::Receive() {
             // If this isn't one of the trailing newlines, we have a problem
             if (lines[i] != "\r\n") {
                 mResponse.error = EHttpErr_BadResponse;
+                mResponse.exError = 0;
                 return false;
             }
 
@@ -300,8 +349,10 @@ bool HttpRequest::Receive() {
         char buffer[TEMP_BUFFER_SIZE] = "";
         Optional<u32> nrecv = mpSocket->RecvBytes(buffer, TEMP_BUFFER_SIZE - 1);
 
+        // Record socket library error if it failed
         if (!nrecv) {
             mResponse.error = EHttpErr_Socket;
+            mResponse.exError = LibSO::GetLastError();
             return false;
         }
 
@@ -317,17 +368,19 @@ bool HttpRequest::Receive() {
                 }
 
                 mResponse.error = EHttpErr_Closed;
+                mResponse.exError = 0;
                 return false;
             }
         }
 
+        // Timeout may be the only way to end the body, so not a failure
         if (w.Elapsed() >= mTimeOut) {
-            // May be the only way to end the body, so not a failure
             break;
         }
     };
 
     mResponse.error = EHttpErr_Success;
+    mResponse.exError = 0;
     return true;
 }
 
