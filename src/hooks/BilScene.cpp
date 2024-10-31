@@ -8,7 +8,12 @@
 namespace BAH {
 
 /**
- * @brief Scene logic
+ * @brief Remove "Press B" layout
+ */
+KM_WRITE_32(0x802d25f4, 0x4E800020);
+
+/**
+ * @brief Logic step
  */
 void BilScene::CalculateEx() {
     // Wait for the initial fade-in
@@ -24,7 +29,7 @@ void BilScene::CalculateEx() {
     }
 
     // Stop context switches
-    kiwi::AutoInterruptLock lock;
+    // kiwi::AutoInterruptLock lock;
 
     // Need to reset early if this is the first break
     if (Simulation::GetInstance().IsFirstRun()) {
@@ -45,10 +50,5 @@ void BilScene::CalculateEx() {
     Simulation::GetInstance().AfterReset();
 }
 KM_BRANCH_MF(0x802ba1e0, BilScene, CalculateEx);
-
-/**
- * @brief Remove "Press B" layout
- */
-KM_WRITE_32(0x802d25f4, 0x4E800020);
 
 } // namespace BAH

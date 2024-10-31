@@ -14,15 +14,6 @@ namespace BAH {
 class LoginScene : public kiwi::IScene {
 public:
     /**
-     * @brief Constructor
-     */
-    LoginScene() {}
-    /**
-     * @brief Destructor
-     */
-    virtual ~LoginScene() {}
-
-    /**
      * @brief Get the scene's name
      */
     virtual kiwi::String GetName() const {
@@ -52,23 +43,30 @@ public:
      */
     virtual void OnConfigure();
     /**
-     * @brief Reload scene
+     * @brief Reset scene
      */
     virtual void OnReset();
     /**
-     * @brief Scene logic
+     * @brief Update scene
      */
     virtual void OnCalculate();
     /**
-     * @brief User-level draw
+     * @brief Standard draw pass
      */
     virtual void OnUserDraw();
 
 private:
-    static void KeypadOkCallback(const kiwi::String& result, void* arg);
+    /**
+     * @brief Keypad submit ('OK') callback
+     *
+     * @param rResult Keypad result sequence
+     * @param pArg User argument
+     */
+    static void KeypadOkCallback(const kiwi::String& rResult, void* pArg);
 
 private:
-    Keypad mKeypad; // Unique ID keypad
+    //! Unique ID keypad
+    Keypad mKeypad;
 };
 
 } // namespace BAH

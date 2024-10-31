@@ -1,6 +1,11 @@
 #ifndef BAH_CLIENT_HOOKS_BIL_MAIN_H
 #define BAH_CLIENT_HOOKS_BIL_MAIN_H
-#include <Pack/RPParty.h>
+
+// Implementation visible to this class
+#define private protected
+#include <Pack/RPParty/RPBilScene/RPBilMain.h>
+#undef private
+
 #include <types.h>
 
 namespace BAH {
@@ -10,6 +15,9 @@ namespace BAH {
  */
 class BilMain : private RPBilMain {
 public:
+    /**
+     * @brief Shot end callback
+     */
     void OnEndShot();
 };
 

@@ -86,6 +86,7 @@ HttpRequest::~HttpRequest() {
  * @brief Performs common initialization
  */
 void HttpRequest::Init() {
+    mIsSent = false;
     mMethod = EMethod_Max;
     mResource = "/";
     mTimeOut = OS_MSEC_TO_TICKS(DEFAULT_TIMEOUT);
@@ -95,6 +96,7 @@ void HttpRequest::Init() {
 
     mHeader["Host"] = mHost;
     mHeader["User-Agent"] = "libkiwi";
+    mHeader["Connection"] = "close";
 }
 
 /**
@@ -146,6 +148,20 @@ void HttpRequest::SendImpl() {
     K_ASSERT(mpSocket != nullptr);
     K_ASSERT(mpSocket->IsOpen());
 
+    /**
+     * Because the request contains a socket,
+     * you should not re-send the same request multiple times.
+     * (The socket may be in an unusable state due to errors.)
+     */
+    K_ASSERT_EX(!mIsSent, "Please don't re-send the same request object.");
+    if (mIsSent) {
+        mResponse.error = EHttpErr_Usage;
+        return;
+    }
+
+    // Prevent future usage of this object
+    mIsSent = true;
+
     // Beginning timestamp
     Watch w;
     w.Start();
@@ -162,6 +178,10 @@ void HttpRequest::SendImpl() {
         // After connection we can perform the request
         if (connected) {
             (void)Request();
+
+            bool success = mpSocket->Shutdown(SO_SHUT_WR);
+            K_ASSERT(success);
+
             (void)Receive();
             break;
         }
@@ -267,20 +287,20 @@ bool HttpRequest::Receive() {
             return false;
         }
 
-        if (nrecv) {
-            // Continue to build string
-            work += buffer;
-            // Response header ends in double newline
-            end = work.Find("\r\n\r\n");
-
-            // Server has terminated the connection
-            if (*nrecv == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
-                mResponse.error = EHttpErr_Closed;
-                mResponse.exError = LibSO::GetLastError();
-                return false;
-            }
+        // Server has terminated the connection
+        if (mpSocket->CanRecv() && *nrecv == 0 &&
+            LibSO::GetLastError() != SO_EWOULDBLOCK) {
+            mResponse.error = EHttpErr_Closed;
+            mResponse.exError = /* LibSO::GetLastError() */ 254; // TODO
+            return false;
         }
 
+        // Continue to build string
+        work += buffer;
+        // Response header ends in double newline
+        end = work.Find("\r\n\r\n");
+
+        // Connection timeout
         if (w.Elapsed() >= mTimeOut) {
             mResponse.error = EHttpErr_TimedOut;
             mResponse.exError = LibSO::GetLastError();
@@ -340,9 +360,9 @@ bool HttpRequest::Receive() {
     /**
      * Receive response body
      */
+    // If we were given the length, we can be 100% sure
     Optional<u32> len;
     if (mResponse.header.Contains("Content-Length")) {
-        // If we were given the length, we can be 100% sure
         len = ksl::strtoul(*mResponse.header.Find("Content-Length"));
     }
 
@@ -363,22 +383,21 @@ bool HttpRequest::Receive() {
             return false;
         }
 
-        if (nrecv) {
-            // Continue building string
-            mResponse.body += buffer;
-
-            // Server is likely done and has terminated the connection
-            if (*nrecv == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
-                // This is only okay if we've read enough of the body
-                if (!len || mResponse.body.Length() >= *len) {
-                    break;
-                }
-
-                mResponse.error = EHttpErr_Closed;
-                mResponse.exError = LibSO::GetLastError();
-                return false;
+        // Server is likely done and has terminated the connection
+        if (mpSocket->CanRecv() && *nrecv == 0 &&
+            LibSO::GetLastError() != SO_EWOULDBLOCK) {
+            // This is only okay if we've read enough of the body
+            if (!len || mResponse.body.Length() >= *len) {
+                break;
             }
+
+            mResponse.error = EHttpErr_Closed;
+            mResponse.exError = /* LibSO::GetLastError() */ 255; // TODO
+            return false;
         }
+
+        // Continue building string
+        mResponse.body += buffer;
 
         // Timeout may be the only way to end the body, so not a failure
         if (w.Elapsed() >= mTimeOut) {

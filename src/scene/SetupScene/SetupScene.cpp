@@ -16,36 +16,34 @@ K_SCENE_DECL(SetupScene);
  * @brief Setup scene
  */
 void SetupScene::OnConfigure() {
-    LoadAssets();
-    SetupGame();
-}
-
-/**
- * @brief Reload scene
- */
-void SetupScene::OnReset() {
-    RP_GET_INSTANCE(RPPartyGameMgr)->Reset();
+    // Setup game globals
+    Setup();
+    // Ask engine to start our async task
+    setTaskAsync();
 
     // Reset display clear color to black
     RPGrpRenderer::SetEfbClearColor(0, 0, 0);
+}
 
-    // Skip login if UID existed as a file
+/**
+ * @brief Update scene
+ */
+void SetupScene::OnCalculate() {
+    // Wait for resources to finish loading
+    if (!isTaskAsyncFinish()) {
+        return;
+    }
+
+    // Skip login if unique ID already existed
     kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(
-        Simulation::GetInstance().GetUniqueId() ? kiwi::ESceneID_RPBilScene
+        Simulation::GetInstance().GetUniqueID() ? kiwi::ESceneID_RPBilScene
                                                 : ESceneID_LoginScene);
 }
 
 /**
- * @brief Exit scene
+ * @brief Asynchronous tasks
  */
-void SetupScene::OnExit() {
-    RPPartyGameMgr::DestroyInstance();
-}
-
-/**
- * @brief Load static assets
- */
-void SetupScene::LoadAssets() {
+void SetupScene::taskAsync() {
     // Global archives
     RP_GET_INSTANCE(RPSysResourceManager)->LoadStaticArchives();
     RP_GET_INSTANCE(RPSysResourceManager)->LoadCacheArchives();
@@ -56,7 +54,7 @@ void SetupScene::LoadAssets() {
     RP_GET_INSTANCE(RPSysPauseMgr)->LoadResource();
     RP_GET_INSTANCE(RPSysHomeMenuMgr)->LoadResource();
 
-    // Misc. resources
+    // Miscellaneous resources
     RP_GET_INSTANCE(RPSysKokeshiManager)->LoadStaticResource();
     RP_GET_INSTANCE(RPSysEffectMgr)->LoadResource();
     RP_GET_INSTANCE(RPSysSaveDataMgr)->initBanner();
@@ -66,7 +64,7 @@ void SetupScene::LoadAssets() {
 /**
  * @brief Setup game globals
  */
-void SetupScene::SetupGame() {
+void SetupScene::Setup() {
     // Stop potential save data corruption
     RP_GET_INSTANCE(RPSysSaveDataMgr)->setSaveDisable(true);
 
@@ -75,7 +73,11 @@ void SetupScene::SetupGame() {
     RP_GET_INSTANCE(RPSysPlayerMgr)->setPlayerNum(1);
     RP_GET_INSTANCE(RPSysPlayerMgr)->setControllerNum(1);
 
+    // Configure Party Pack game manager
     RPPartyGameMgr::CreateInstance();
+    RP_GET_INSTANCE(RPPartyGameMgr)->Reset();
+
+    // Create Billiards bruteforcer
     Simulation::CreateInstance();
 }
 

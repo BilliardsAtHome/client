@@ -18,77 +18,77 @@ const f32 KEYPAD_Y = 0.2f;
 Keypad::Keypad() {
     for (int i = 0; i <= EKey_9; i++) {
         mKeys[i].code = '1' + i;
-        mKeys[i].callback = NumericKeyCallback;
-        mKeys[i].arg = this;
+        mKeys[i].pCallback = NumericKeyCallback;
+        mKeys[i].pArg = this;
     }
 
     mKeys[EKey_0].code = '0';
-    mKeys[EKey_0].callback = NumericKeyCallback;
-    mKeys[EKey_0].arg = this;
+    mKeys[EKey_0].pCallback = NumericKeyCallback;
+    mKeys[EKey_0].pArg = this;
 
     mKeys[EKey_Back].code = "Back";
-    mKeys[EKey_Back].callback = BackKeyCallback;
-    mKeys[EKey_Back].arg = this;
+    mKeys[EKey_Back].pCallback = BackKeyCallback;
+    mKeys[EKey_Back].pArg = this;
 
     mKeys[EKey_Ok].code = "OK";
-    mKeys[EKey_Ok].callback = OkKeyCallback;
-    mKeys[EKey_Ok].arg = this;
+    mKeys[EKey_Ok].pCallback = OkKeyCallback;
+    mKeys[EKey_Ok].pArg = this;
 
     Reset();
 }
 
 /**
- * @brief Update reset
+ * @brief Reset state
  */
 void Keypad::Reset() {
+    mKeyNo = 0;
     mBuffer = "";
-    mSelectedKey = 0;
 }
 
 /**
- * @brief Update logic
+ * @brief Logic step
  */
 void Keypad::Calculate() {
-    const kiwi::WiiCtrl& ctrl =
+    const kiwi::WiiCtrl& rCtrl =
         kiwi::CtrlMgr::GetInstance().GetWiiCtrl(kiwi::EPlayer_1);
 
-    if (!ctrl.IsConnected()) {
+    if (!rCtrl.IsConnected()) {
         return;
     }
 
     // Assume we probably will move the cursor
-    mKeys[mSelectedKey].hover = false;
+    mKeys[mKeyNo].hover = false;
 
     // Move right/left (column change)
-    if (ctrl.IsTrig(kiwi::EButton_Left)) {
-        mSelectedKey = kiwi::Max<s32>(0, mSelectedKey - 1);
+    if (rCtrl.IsTrig(kiwi::EButton_Left)) {
+        mKeyNo = kiwi::Max<s32>(0, mKeyNo - 1);
 
-    } else if (ctrl.IsTrig(kiwi::EButton_Right)) {
-        mSelectedKey = kiwi::Min<s32>(mKeys.Length() - 1, mSelectedKey + 1);
+    } else if (rCtrl.IsTrig(kiwi::EButton_Right)) {
+        mKeyNo = kiwi::Min<s32>(mKeys.Length() - 1, mKeyNo + 1);
     }
 
     // Move up/down (row change)
-    if (ctrl.IsTrig(kiwi::EButton_Up)) {
-        mSelectedKey = kiwi::Max<s32>(0, mSelectedKey - 3);
-    } else if (ctrl.IsTrig(kiwi::EButton_Down)) {
-        mSelectedKey = kiwi::Min<s32>(mKeys.Length() - 1, mSelectedKey + 3);
+    if (rCtrl.IsTrig(kiwi::EButton_Up)) {
+        mKeyNo = kiwi::Max<s32>(0, mKeyNo - 3);
+    } else if (rCtrl.IsTrig(kiwi::EButton_Down)) {
+        mKeyNo = kiwi::Min<s32>(mKeys.Length() - 1, mKeyNo + 3);
     }
 
     // Now the cursor reflects the right one
-    mKeys[mSelectedKey].hover = true;
+    mKeys[mKeyNo].hover = true;
 
     // A button to press key
-    if (ctrl.IsTrig(kiwi::EButton_A)) {
-        Key& k = mKeys[mSelectedKey];
+    if (rCtrl.IsTrig(kiwi::EButton_A)) {
+        Key& rKey = mKeys[mKeyNo];
 
-        if (k.callback != NULL) {
-            k.callback(k.code, k.arg);
+        if (rKey.pCallback != nullptr) {
+            rKey.pCallback(rKey.code, rKey.pArg);
         }
     }
 }
 
 /**
- * @brief User-level draw
+ * @brief Standard draw pass
  */
 void Keypad::UserDraw() const {
     f32 x = KEYPAD_X;
@@ -96,14 +96,14 @@ void Keypad::UserDraw() const {
 
     // Draw keys
     for (int i = 0; i < mKeys.Length(); i++) {
-        const Key& k = mKeys[i];
+        const Key& rKey = mKeys[i];
 
         // Emphasize selected key
-        f32 scale = k.hover ? 1.25f : 1.0f;
-        kiwi::Color color = k.hover ? kiwi::Color::RED : kiwi::Color::WHITE;
+        f32 scale = rKey.hover ? 1.25f : 1.0f;
+        kiwi::Color color = rKey.hover ? kiwi::Color::RED : kiwi::Color::WHITE;
 
         kiwi::DebugPrint::PrintfOutline(x, y, 1.5f, true, color,
-                                        kiwi::Color::GREY, k.code);
+                                        kiwi::Color::GREY, rKey.code);
 
         // Next column
         x += KEY_SIZE;
@@ -122,53 +122,54 @@ void Keypad::UserDraw() const {
 }
 
 /**
- * @brief Numeric keypress callback
+ * @brief Numeric key callback
  *
- * @param code Key code
- * @param arg Parent keypad
+ * @param rCode Key code
+ * @param pArg User argument (parent keypad)
  */
-void Keypad::NumericKeyCallback(const kiwi::String& code, void* arg) {
-    Keypad* self = static_cast<Keypad*>(arg);
-    ASSERT(self != NULL);
+void Keypad::NumericKeyCallback(const kiwi::String& rCode, void* pArg) {
+    ASSERT(pArg != nullptr);
+    Keypad* p = static_cast<Keypad*>(pArg);
 
     // Append key code
-    if (self->mBuffer.Length() + code.Length() <= BUFFER_LEN) {
-        self->mBuffer += code;
+    if (p->mBuffer.Length() + rCode.Length() <= CHARS_MAX) {
+        p->mBuffer += rCode;
     }
 }
 
 /**
- * @brief Backspace keypress callback
+ * @brief Backspace key callback
  *
- * @param code Key code
- * @param arg Parent keypad
+ * @param rCode Key code
+ * @param pArg User argument (parent keypad)
  */
-void Keypad::BackKeyCallback(const kiwi::String& code, void* arg) {
-#pragma unused(code)
+void Keypad::BackKeyCallback(const kiwi::String& rCode, void* pArg) {
+#pragma unused(rCode)
 
-    Keypad* self = static_cast<Keypad*>(arg);
-    ASSERT(self != NULL);
+    ASSERT(pArg != nullptr);
+    Keypad* p = static_cast<Keypad*>(pArg);
 
     // Trim off one character
-    if (!self->mBuffer.Empty()) {
-        self->mBuffer = self->mBuffer.SubStr(0, self->mBuffer.Length() - 1);
+    if (!p->mBuffer.Empty()) {
+        p->mBuffer = p->mBuffer.SubStr(0, p->mBuffer.Length() - 1);
     }
 }
 
 /**
- * @brief OK keypress callback
+ * @brief 'OK' key callback
  *
- * @param code Key code
- * @param arg Parent keypad
+ * @param rCode Key code
+ * @param pArg User argument (parent keypad)
  */
-void Keypad::OkKeyCallback(const kiwi::String& code, void* arg) {
-#pragma unused(code)
+void Keypad::OkKeyCallback(const kiwi::String& rCode, void* pArg) {
+#pragma unused(rCode)
 
-    Keypad* self = static_cast<Keypad*>(arg);
-    ASSERT(self != NULL);
+    ASSERT(pArg != nullptr);
+    Keypad* p = static_cast<Keypad*>(pArg);
 
-    if (self->mpCallback != NULL) {
-        self->mpCallback(self->mBuffer, self->mpCallbackArg);
+    // Hand off to user callback
+    if (p->mpOkCallback != nullptr) {
+        p->mpOkCallback(p->mBuffer, p->mpOkCallbackArg);
     }
 }
 

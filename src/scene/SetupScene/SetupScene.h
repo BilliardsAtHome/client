@@ -13,15 +13,6 @@ namespace BAH {
 class SetupScene : public kiwi::IScene {
 public:
     /**
-     * @brief Constructor
-     */
-    SetupScene() {}
-    /**
-     * @brief Destructor
-     */
-    virtual ~SetupScene() {}
-
-    /**
      * @brief Get the scene's name
      */
     virtual kiwi::String GetName() const {
@@ -49,7 +40,7 @@ public:
      * @brief Get the scene's exit type
      */
     virtual kiwi::EExitType GetExitType() const {
-        return kiwi::EExitType_Child;
+        return kiwi::EExitType_3;
     }
 
     /**
@@ -57,16 +48,20 @@ public:
      */
     virtual void OnConfigure();
     /**
-     * @brief Reload scene
+     * @brief Update scene
      */
-    virtual void OnReset();
-    /**
-     * @brief Exit scene
-     */
-    virtual void OnExit();
+    virtual void OnCalculate();
 
-    void LoadAssets();
-    void SetupGame();
+    /**
+     * @brief Asynchronous tasks
+     */
+    virtual void taskAsync();
+
+private:
+    /**
+     * @brief Setup game globals
+     */
+    void Setup();
 };
 
 } // namespace BAH

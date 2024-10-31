@@ -6,26 +6,71 @@
 namespace BAH {
 
 /**
- * @brief Unique ID keypad
+ * @brief Numerical keypad
  */
 class Keypad {
+public:
+    /**
+     * @brief Submit ('OK') callback
+     *
+     * @param rResult Keypad result sequence
+     * @param pArg User argument
+     */
+    typedef void (*OkCallback)(const kiwi::String& rResult, void* pArg);
+
+public:
+    /**
+     * @brief Constructor
+     */
+    Keypad();
+
+    /**
+     * @brief Reset state
+     */
+    void Reset();
+    /**
+     * @brief Logic step
+     */
+    void Calculate();
+    /**
+     * @brief Standard draw pass
+     */
+    void UserDraw() const;
+
+    /**
+     * @brief Sets the submit ('OK') callback
+     *
+     * @param pCallback Callback function
+     * @param pArg Callback user argument
+     */
+    void SetOkCallback(OkCallback pCallback, void* pArg = nullptr) {
+        mpOkCallback = pCallback;
+        mpOkCallbackArg = pArg;
+    }
+
 private:
     /**
      * @brief Number key
      */
     struct Key {
-        typedef void (*Callback)(const kiwi::String& code, void* arg);
+        /**
+         * @brief Keypress callback
+         *
+         * @param rCode Key code
+         * @param pArg User argument
+         */
+        typedef void (*Callback)(const kiwi::String& rCode, void* pArg);
 
-        kiwi::String code; // Key code
-        bool hover;        // Hovered status
+        kiwi::String code; //!< Key code
+        bool hover;        //!< Hovered status
 
-        Callback callback; // Press callback
-        void* arg;         // Callback argument
+        Callback pCallback; //!< Press callback
+        void* pArg;         //!< Callback argument
 
         /**
          * @brief Constructor
          */
-        Key() : code(' '), hover(false), callback(NULL), arg(NULL) {}
+        Key() : hover(false), pCallback(nullptr), pArg(nullptr) {}
     };
 
     enum EKey {
@@ -41,42 +86,54 @@ private:
         EKey_8,
         EKey_9,
 
-        EKey_Back,
+        EKey_Back, //!< Backspace
         EKey_0,
-        EKey_Ok,
+        EKey_Ok, //!< Submit/OK
 
         EKey_Max
     };
 
-public:
-    typedef void (*OkCallback)(const kiwi::String& result, void* arg);
-
-public:
-    Keypad();
-
-    void SetOkCallback(OkCallback callback, void* arg = NULL) {
-        mpCallback = callback;
-        mpCallbackArg = arg;
-    }
-
-    void Reset();
-    void Calculate();
-    void UserDraw() const;
+    //! Maximum keypad result length
+    static const u32 CHARS_MAX = 8;
 
 private:
-    static void NumericKeyCallback(const kiwi::String& code, void* arg);
-    static void BackKeyCallback(const kiwi::String& code, void* arg);
-    static void OkKeyCallback(const kiwi::String& code, void* arg);
+    /**
+     * @brief Numeric key callback
+     *
+     * @param rCode Key code
+     * @param pArg User argument (parent keypad)
+     */
+    static void NumericKeyCallback(const kiwi::String& rCode, void* pArg);
+
+    /**
+     * @brief Backspace key callback
+     *
+     * @param rCode Key code
+     * @param pArg User argument (parent keypad)
+     */
+    static void BackKeyCallback(const kiwi::String& rCode, void* pArg);
+
+    /**
+     * @brief 'OK' key callback
+     *
+     * @param rCode Key code
+     * @param pArg User argument (parent keypad)
+     */
+    static void OkKeyCallback(const kiwi::String& rCode, void* pArg);
 
 private:
-    static const u32 BUFFER_LEN = 8;
+    //! Key set
+    kiwi::TArray<Key, EKey_Max> mKeys;
 
-    kiwi::TArray<Key, EKey_Max> mKeys; // Key set
-    u32 mSelectedKey;                  // Selected key index
-    kiwi::String mBuffer;              // Key buffer
+    //! Highlighted key index
+    u32 mKeyNo;
+    //! Keypad result buffer
+    kiwi::String mBuffer;
 
-    OkCallback mpCallback; // OK keypress callback
-    void* mpCallbackArg;   // OK keypress callback argument
+    //! Submit ('OK') callback
+    OkCallback mpOkCallback;
+    //! Submit ('OK') callback user argument
+    void* mpOkCallbackArg;
 };
 
 } // namespace BAH

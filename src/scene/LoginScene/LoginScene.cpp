@@ -17,55 +17,60 @@ void LoginScene::OnConfigure() {
 }
 
 /**
- * @brief Reload scene
+ * @brief Reset scene
  */
 void LoginScene::OnReset() {
     mKeypad.Reset();
 }
 
 /**
- * @brief Scene logic
+ * @brief Update scene
  */
 void LoginScene::OnCalculate() {
     mKeypad.Calculate();
 }
 
 /**
- * @brief User-level draw
+ * @brief Standard draw pass
  */
 void LoginScene::OnUserDraw() {
-    kiwi::DebugPrint::PrintfOutline(0.0f, 0.7f, 1.0f, true, kiwi::Color::WHITE,
-                                    kiwi::Color::GREY, "Enter your unique ID:");
-    kiwi::DebugPrint::PrintfOutline(0.0f, 0.6f, 1.0f, true, kiwi::Color::RED,
-                                    kiwi::Color::GREY, "(from the bot)");
+    // clang-format off
+    kiwi::DebugPrint::PrintfOutline(0.0f, 0.7f, 1.0f, true,
+                                    kiwi::Color::WHITE, kiwi::Color::GREY,
+                                    "Enter your unique ID:");
 
-    kiwi::DebugPrint::PrintfOutline(
-        0.0f, -0.6f, 0.8f, true, kiwi::Color::WHITE, kiwi::Color::GREY,
-        "Enter the number with the D-Pad/A Button.");
-    kiwi::DebugPrint::PrintfOutline(
-        0.0f, -0.7f, 0.8f, true, kiwi::Color::YELLOW, kiwi::Color::GREY,
-        "Use the /get-id bot command to check/get one.");
+    kiwi::DebugPrint::PrintfOutline(0.0f, 0.6f, 1.0f, true,
+                                    kiwi::Color::RED, kiwi::Color::GREY,
+                                    "(from the bot)");
+
+    kiwi::DebugPrint::PrintfOutline(0.0f, -0.6f, 0.8f, true,
+                                    kiwi::Color::WHITE, kiwi::Color::GREY,
+                                    "Enter the number with the D-Pad/A Button.");
+
+    kiwi::DebugPrint::PrintfOutline(0.0f, -0.7f, 0.8f, true,
+                                    kiwi::Color::YELLOW, kiwi::Color::GREY,
+                                    "Use the /get-id bot command to check/get one.");
+    // clang-format on
 
     mKeypad.UserDraw();
 }
 
 /**
- * @brief Keypad OK keypress callback
+ * @brief Keypad submit ('OK') callback
  *
- * @param result Keypad result
- * @param pArg Parent scene
+ * @param rResult Keypad result sequence
+ * @param pArg User argument
  */
-void LoginScene::KeypadOkCallback(const kiwi::String& result, void* pArg) {
-    LoginScene* self = static_cast<LoginScene*>(pArg);
-    ASSERT(self != NULL);
+void LoginScene::KeypadOkCallback(const kiwi::String& rResult, void* pArg) {
+#pragma unused(pArg)
 
     // Work buffer (byte-aligned for NAND requirements)
     kiwi::WorkBufferArg arg;
     arg.size = sizeof(u32);
-    arg.sizeAlign = arg.memAlign = 32;
     kiwi::WorkBuffer buffer(arg);
 
-    u32 uid = ksl::strtoul(result);
+    u32 uid = ksl::strtoul(rResult);
+    Simulation::GetInstance().SetUniqueID(uid);
 
     // Write unique ID to buffer
     {
@@ -81,10 +86,8 @@ void LoginScene::KeypadOkCallback(const kiwi::String& result, void* pArg) {
         strm.Write(buffer, buffer.AlignedSize());
     }
 
-    Simulation::GetInstance().SetUniqueId(uid);
-
     // Disable audio (stop the "crash sound")
-    __OSStopAudioSystem();
+    // __OSStopAudioSystem();
 
     // Exit to billiards
     kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(

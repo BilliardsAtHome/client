@@ -1,28 +1,33 @@
-#include "Simulation.h"
+#include "core/Simulation.h"
+
+#include "core/BreakInfo.h"
 
 #include <Pack/RPParty.h>
 #include <Pack/RPUtility.h>
 #include <cmath>
 #include <libkiwi.h>
 
-#define CUE_TURN_SPEED_X 0.0015707965f // pi/2000
-#define CUE_TURN_SPEED_Y 0.0062831859f // pi/500
+K_DYNAMIC_SINGLETON_IMPL(BAH::Simulation);
 
 namespace BAH {
 namespace {
 
 /**
- * @brief Count number of pocketed balls
+ * @brief Counts the number of balls sunk/pocketed
  */
-u32 GetNumSunk() {
+u32 GetSunkNum() {
     u32 num = 0;
 
     for (int i = 0; i < RPBilBallManager::BALL_MAX; i++) {
-        RPBilBall* ball = RP_GET_INSTANCE(RPBilBallManager)->GetBall(i);
-        ASSERT(ball != NULL);
+        RPBilBall* pBall = RP_GET_INSTANCE(RPBilBallManager)->GetBall(i);
+        ASSERT(pBall != nullptr);
 
         // Ignore cue ball
-        if (!ball->IsCueBall() && ball->IsState(RPBilBall::EState_Pocket)) {
+        if (pBall->IsCueBall()) {
+            continue;
+        }
+
+        if (pBall->IsState(RPBilBall::EState_Pocket)) {
             num++;
         }
     }
@@ -31,17 +36,21 @@ u32 GetNumSunk() {
 }
 
 /**
- * @brief Count number of balls shot off of the table
+ * @brief Counts the number of balls shot off of the table
  */
-u32 GetNumOff() {
+u32 GetOffNum() {
     u32 num = 0;
 
     for (int i = 0; i < RPBilBallManager::BALL_MAX; i++) {
-        RPBilBall* ball = RP_GET_INSTANCE(RPBilBallManager)->GetBall(i);
-        ASSERT(ball != NULL);
+        RPBilBall* pBall = RP_GET_INSTANCE(RPBilBallManager)->GetBall(i);
+        ASSERT(pBall != nullptr);
 
         // Ignore cue ball
-        if (!ball->IsCueBall() && ball->IsState(RPBilBall::EState_OffTable)) {
+        if (pBall->IsCueBall()) {
+            continue;
+        }
+
+        if (pBall->IsState(RPBilBall::EState_OffTable)) {
             num++;
         }
     }
@@ -50,21 +59,21 @@ u32 GetNumOff() {
 }
 
 /**
- * @brief Check whether the break shot fouled
+ * @brief Tests whether the break shot fouled
  */
-bool GetIsFoul() {
+bool GetFoul() {
     for (int i = 0; i < RPBilBallManager::BALL_MAX; i++) {
-        RPBilBall* ball = RP_GET_INSTANCE(RPBilBallManager)->GetBall(i);
-        ASSERT(ball != NULL);
+        RPBilBall* pBall = RP_GET_INSTANCE(RPBilBallManager)->GetBall(i);
+        ASSERT(pBall != nullptr);
 
         // Cue ball pocketed?
-        if (ball->IsCueBall() && ball->IsState(RPBilBall::EState_Pocket)) {
+        if (pBall->IsCueBall() && pBall->IsState(RPBilBall::EState_Pocket)) {
             ASSERT(i == 0);
             return true;
         }
 
         // Any ball shot off the table?
-        if (ball->IsState(RPBilBall::EState_OffTable)) {
+        if (pBall->IsState(RPBilBall::EState_OffTable)) {
             return true;
         }
     }
@@ -74,7 +83,21 @@ bool GetIsFoul() {
 
 } // namespace
 
-K_DYNAMIC_SINGLETON_IMPL(Simulation);
+/**
+ * @brief Horizontal turn speed
+ * @note pi/2000
+ */
+const f32 Simulation::TURN_SPEED_X = 0.0015707965f;
+/**
+ * @brief Vertical turn speed
+ * @note pi/500
+ */
+const f32 Simulation::TURN_SPEED_Y = 0.0062831859f;
+
+/**
+ * @brief Maximum cue power
+ */
+const f32 Simulation::POWER_MAX = 150.0f;
 
 /**
  * @brief Constructor
@@ -83,31 +106,32 @@ Simulation::Simulation()
     : kiwi::ISceneHook(kiwi::ESceneID_RPBilScene),
       mHttpError(kiwi::EHttpErr_Success),
       mHttpExError(0),
-      mHttpStatus(kiwi::EHttpStatus_Dummy),
+      mHttpStatus(kiwi::EHttpStatus_None),
       mTimerUp(0),
       mTimerLeft(0),
       mTimerRight(0),
-      mpCurrBreak(NULL),
-      mpBestBreak(NULL),
+      mpCurrBreak(nullptr),
+      mpBestBreak(nullptr),
       mIsFirstRun(true),
       mIsFirstTick(false),
       mIsReplay(false),
       mIsFinished(false),
-      mNumBreak(0) {
-    std::memset(mNumBall, 0, sizeof(mNumBall));
+      mBreakNum(0) {
 
-    mpCurrBreak = new (32) BreakInfo();
-    ASSERT(mpCurrBreak != NULL);
+    std::memset(mBreakBallNum, 0, sizeof(mBreakBallNum));
 
-    mpBestBreak = new (32) BreakInfo();
-    ASSERT(mpBestBreak != NULL);
+    mpCurrBreak = new (32, kiwi::EMemory_MEM2) BreakInfo();
+    ASSERT(mpCurrBreak != nullptr);
+
+    mpBestBreak = new (32, kiwi::EMemory_MEM2) BreakInfo();
+    ASSERT(mpBestBreak != nullptr);
 
     // Load previous session information
-    LoadUniqueId();
-    LoadBestBreak();
+    LoadUser();
+    LoadBreak();
 
     // Default to max power
-    mpCurrBreak->power = 150.0f;
+    mpCurrBreak->power = POWER_MAX;
 }
 
 /**
@@ -115,20 +139,25 @@ Simulation::Simulation()
  */
 Simulation::~Simulation() {
     delete mpCurrBreak;
+    mpCurrBreak = nullptr;
+
     delete mpBestBreak;
+    mpBestBreak = nullptr;
 }
 
 /**
  * @brief Configure callback
+ *
+ * @param pScene Current scene
  */
-void Simulation::Configure(RPSysScene* scene) {
-#pragma unused(scene)
+void Simulation::Configure(RPSysScene* pScene) {
+#pragma unused(pScene)
 
     RPGrpRenderer::GetCurrent()->AppendDrawObject(this);
 }
 
 /**
- * @brief User-level draw (break statistics)
+ * @brief Standard draw pass
  */
 void Simulation::UserDraw() {
     if (IsReplay()) {
@@ -138,122 +167,139 @@ void Simulation::UserDraw() {
     /**
      * Best break statistics
      */
+    // clang-format off
+    kiwi::DebugPrint::PrintfOutline(0.2f, 0.7f, 0.8f, true,
+                                    kiwi::Color::CYAN, kiwi::Color::BLACK,
+                                    "[Best break]");
 
-    kiwi::DebugPrint::PrintfOutline(0.2f, 0.7f, 0.8f, true, kiwi::Color::CYAN,
-                                    kiwi::Color::BLACK, "[Best break]");
+    kiwi::DebugPrint::PrintfOutline(0.2f, 0.6f, 0.8f, true,
+                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
+                                    "> %d balls (%d sunk, %d off)",
+                                    mpBestBreak->sunk + mpBestBreak->off,
+                                    mpBestBreak->sunk, mpBestBreak->off);
 
-    kiwi::DebugPrint::PrintfOutline(
-        0.2f, 0.6f, 0.8f, true, kiwi::Color::WHITE, kiwi::Color::BLACK,
-        "> %d balls (%d sunk, %d off)", mpBestBreak->sunk + mpBestBreak->off,
-        mpBestBreak->sunk, mpBestBreak->off);
+    kiwi::DebugPrint::PrintfOutline(0.2f, 0.5f, 0.8f, true,
+                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
+                                    "> in %03d frames (%.2f sec)",
+                                    mpBestBreak->frame,
+                                    mpBestBreak->frame / 60.0f);
 
-    kiwi::DebugPrint::PrintfOutline(
-        0.2f, 0.5f, 0.8f, true, kiwi::Color::WHITE, kiwi::Color::BLACK,
-        "> in %03d frames (%.2f sec)", mpBestBreak->frame,
-        mpBestBreak->frame / 60.0f);
+    kiwi::DebugPrint::PrintfOutline(0.2f, 0.4f, 0.8f, true,
+                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
+                                    "> %02df up, %02df left, %02df right",
+                                    mpBestBreak->up, mpBestBreak->left,
+                                    mpBestBreak->right);
 
-    kiwi::DebugPrint::PrintfOutline(
-        0.2f, 0.4f, 0.8f, true, kiwi::Color::WHITE, kiwi::Color::BLACK,
-        "> %02df up, %02df left, %02df right", mpBestBreak->up,
-        mpBestBreak->left, mpBestBreak->right);
-
-    kiwi::DebugPrint::PrintfOutline(0.2f, 0.3f, 0.8f, true, kiwi::Color::YELLOW,
-                                    kiwi::Color::BLACK, "> %s",
+    kiwi::DebugPrint::PrintfOutline(0.2f, 0.3f, 0.8f, true,
+                                    kiwi::Color::YELLOW, kiwi::Color::BLACK,
+                                    "> %s",
                                     mpBestBreak->foul ? "foul" : "no foul");
+    // clang-format on
 
     /**
      * Session statistics
      */
+    // clang-format off
+    kiwi::DebugPrint::PrintfOutline(0.2f, -0.3f, 0.8f, true,
+                                    kiwi::Color::CYAN, kiwi::Color::BLACK,
+                                    "[This session]");
 
-    kiwi::DebugPrint::PrintfOutline(0.2f, -0.3f, 0.8f, true, kiwi::Color::CYAN,
-                                    kiwi::Color::BLACK, "[This session]");
+    kiwi::DebugPrint::PrintfOutline(0.2f, -0.4f, 0.8f, true,
+                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
+                                    "> %d total breaks", mBreakNum);
 
-    kiwi::DebugPrint::PrintfOutline(0.2f, -0.4f, 0.8f, true, kiwi::Color::WHITE,
-                                    kiwi::Color::BLACK, "> %d total breaks",
-                                    mNumBreak);
+    kiwi::DebugPrint::PrintfOutline(0.2f, -0.5f, 0.8f, true,
+                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
+                                    "> distribution:");
 
-    kiwi::DebugPrint::PrintfOutline(0.2f, -0.5f, 0.8f, true, kiwi::Color::WHITE,
-                                    kiwi::Color::BLACK, "> distribution:");
+    kiwi::DebugPrint::PrintfOutline(0.2f, -0.6f, 0.8f, true,
+                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
+                                    "{%d, %d, %d, %d, %d}",
+                                    mBreakBallNum[0], mBreakBallNum[1],
+                                    mBreakBallNum[2], mBreakBallNum[3],
+                                    mBreakBallNum[4]);
+                                    
+    kiwi::DebugPrint::PrintfOutline(0.2f, -0.7f, 0.8f, true,
+                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
+                                    "{%d, %d, %d, %d, %d}",
+                                    mBreakBallNum[5], mBreakBallNum[6],
+                                    mBreakBallNum[7], mBreakBallNum[8],
+                                    mBreakBallNum[9]);
+    // clang-format on
 
-    kiwi::DebugPrint::PrintfOutline(0.2f, -0.6f, 0.8f, true, kiwi::Color::WHITE,
-                                    kiwi::Color::BLACK, "{%d, %d, %d, %d, %d}",
-                                    mNumBall[0], mNumBall[1], mNumBall[2],
-                                    mNumBall[3], mNumBall[4]);
-    kiwi::DebugPrint::PrintfOutline(0.2f, -0.7f, 0.8f, true, kiwi::Color::WHITE,
-                                    kiwi::Color::BLACK, "{%d, %d, %d, %d, %d}",
-                                    mNumBall[5], mNumBall[6], mNumBall[7],
-                                    mNumBall[8], mNumBall[9]);
-
-    /**
-     * User information
-     */
     if (mIsConnected.HasValue()) {
         // clang-format off
         kiwi::DebugPrint::PrintfOutline(-0.5f, -0.8f, 0.8f, true,
-            *mIsConnected ? kiwi::Color::GREEN : kiwi::Color::YELLOW,
-            kiwi::Color::BLACK,
-            *mIsConnected ? "Online" : "Offline (err:%d ex:%d stat:%d)",
-            mHttpError, mHttpExError, mHttpStatus);
+                                        *mIsConnected ? kiwi::Color::GREEN : kiwi::Color::YELLOW, kiwi::Color::BLACK,
+                                        *mIsConnected ? "Online" : "Offline (err:%d ex:%d stat:%d)",
+                                        mHttpError, mHttpExError, mHttpStatus);
         // clang-format on
     }
 
-    kiwi::DebugPrint::PrintfOutline(-0.5f, -0.9f, 0.8f, true, kiwi::Color::RED,
-                                    kiwi::Color::BLACK, "Unique ID: %06d",
-                                    *mUniqueId);
+    // clang-format off
+    kiwi::DebugPrint::PrintfOutline(-0.5f, -0.9f, 0.8f, true,
+                                    kiwi::Color::RED, kiwi::Color::BLACK,
+                                    "Unique ID: %06d", *mUniqueID);
+    // clang-format on
 }
 
 /**
- * @brief Load user unique ID (from DVD or NAND)
+ * @brief Loads user info (from DVD or NAND)
  */
-void Simulation::LoadUniqueId() {
-    // Try to open unique ID from the DVD (file placed by user)
+void Simulation::LoadUser() {
+    // Try to open DVD file (file placed by user)
     {
         kiwi::MemStream strm =
             kiwi::FileRipper::Open("user.txt", kiwi::EStorage_DVD);
 
         if (strm.IsOpen()) {
-            mUniqueId = ksl::strtoul(strm.Read_string());
-
-            K_LOG_EX("User from DVD: %u\n", *mUniqueId);
+            mUniqueID = ksl::strtoul(strm.Read_string());
+            K_LOG_EX("User from DVD: %u\n", *mUniqueID);
             return;
         }
     }
 
-    // Maybe it's instead on the NAND (saved from entry screen)
+    // Try to open NAND file (saved by login scene)
     {
         kiwi::MemStream strm =
             kiwi::FileRipper::Open("user.bin", kiwi::EStorage_NAND);
 
         if (strm.IsOpen()) {
-            mUniqueId = strm.Read_u32();
-
-            K_LOG_EX("User from NAND: %u\n", *mUniqueId);
+            mUniqueID = strm.Read_u32();
+            K_LOG_EX("User from NAND: %u\n", *mUniqueID);
             return;
         }
     }
 }
 
 /**
- * @brief Load best break from NAND
+ * @brief Loads break info (from NAND)
  */
-void Simulation::LoadBestBreak() {
-    ASSERT(mpBestBreak != NULL);
+void Simulation::LoadBreak() {
+    ASSERT(mpBestBreak != nullptr);
 
     kiwi::MemStream strm =
         kiwi::FileRipper::Open("best.brk", kiwi::EStorage_NAND);
 
     if (strm.IsOpen()) {
         mpBestBreak->Read(strm);
-    } else {
-        // Dummy record will instantly be broken
-        mpBestBreak->frame = ULONG_MAX;
+        return;
     }
+
+    // Dummy record will instantly be broken
+    mpBestBreak->sunk = 0;
+    mpBestBreak->off = 0;
+    mpBestBreak->foul = false;
+    mpBestBreak->frame = ULONG_MAX;
 }
 
 /**
- * @brief Scene reset (before) callback
+ * @brief Logic before scene reset
  */
 void Simulation::BeforeReset() {
+    ASSERT(mpCurrBreak != nullptr);
+    ASSERT(mpBestBreak != nullptr);
+
     mIsFinished = false;
     mIsFirstTick = true;
 
@@ -267,10 +313,13 @@ void Simulation::BeforeReset() {
 }
 
 /**
- * @brief Scene reset (after) callback
+ * @brief Logic after scene reset
  */
 void Simulation::AfterReset() {
-    // Don't randomize replay simulation
+    ASSERT(mpCurrBreak != nullptr);
+    ASSERT(mpBestBreak != nullptr);
+
+    // Replay ignores further randomization
     if (mIsReplay) {
         mTimerUp = mpBestBreak->up;
         mTimerLeft = mpBestBreak->left;
@@ -281,8 +330,8 @@ void Simulation::AfterReset() {
     // Seeded by OS clock
     kiwi::Random random;
     mpCurrBreak->kseed = random.GetSeed();
-    mpCurrBreak->frame = 0;
 
+    mpCurrBreak->frame = 0;
     mTimerUp = mpCurrBreak->up = 0;
     mTimerLeft = mpCurrBreak->left = 0;
     mTimerRight = mpCurrBreak->right = 0;
@@ -291,7 +340,7 @@ void Simulation::AfterReset() {
     EStyle style = static_cast<EStyle>(random.NextU32(EStyle_Max));
 
     switch (style) {
-    case EStyle_Normal:
+    case EStyle_Normal: {
         // 50% chance to aim up
         if (random.CoinFlip()) {
             // Randomize aiming UP frames -> [0f, 35f]
@@ -321,8 +370,9 @@ void Simulation::AfterReset() {
         // Randomize Y pos -> [+0.15, +0.30]
         mpCurrBreak->pos.y += random.NextF32(0.15f);
         break;
+    }
 
-    case EStyle_Jump:
+    case EStyle_Jump: {
         // Randomize aiming UP frames -> [40f, 55f]
         mTimerUp = mpCurrBreak->up = random.NextU32(40, 55);
 
@@ -350,74 +400,84 @@ void Simulation::AfterReset() {
         mpCurrBreak->pos.y += random.NextF32(0.20f);
         break;
     }
+    }
 }
 
 /**
- * @brief Run simulation tick
+ * @brief Update logic
  */
 void Simulation::Tick() {
+    ASSERT(mpCurrBreak != nullptr);
+    ASSERT(mpBestBreak != nullptr);
+
     mpCurrBreak->frame++;
 
-    // For some reason, CanCtrl is wrong on the very first scene tick
-    RPBilCtrl* ctrl = RP_GET_INSTANCE(RPBilCtrlManager)->GetCtrl();
-    if (ctrl->CanCtrl() && !mIsFirstTick) {
+    RPBilCtrl* pCtrl = RP_GET_INSTANCE(RPBilCtrlManager)->GetCtrl();
+
+    // TODO: CanCtrl is wrong on the very first scene tick, why?
+    if (pCtrl->CanCtrl() && !mIsFirstTick) {
         // Aim up
         if (mTimerUp > 0) {
-            ctrl->TurnY(-CUE_TURN_SPEED_Y);
             mTimerUp--;
+            pCtrl->TurnY(-TURN_SPEED_Y);
         }
 
         // Aim left
         if (mTimerLeft > 0) {
-            ctrl->TurnX(CUE_TURN_SPEED_X);
             mTimerLeft--;
+            pCtrl->TurnX(TURN_SPEED_X);
         }
         // Aim right
         else if (mTimerRight > 0) {
-            ctrl->TurnX(-CUE_TURN_SPEED_X);
             mTimerRight--;
+            pCtrl->TurnX(-TURN_SPEED_X);
         }
     }
 
-    // Controller IR coordinates
+    // Pointer coordinates
     f32 x = mIsReplay ? mpBestBreak->pos.x : mpCurrBreak->pos.x;
     f32 y = mIsReplay ? mpBestBreak->pos.y : mpCurrBreak->pos.y;
 
     // Map to screen position
-    EGG::Vector2f aim(x * (EGG::Screen::GetSizeXMax() / 2),
+    EGG::Vector2f pos(x * (EGG::Screen::GetSizeXMax() / 2),
                       -y * (EGG::Screen::GetSizeYMax() / 2));
 
     // Update cue cursor
-    RPBilCue* cue = RP_GET_INSTANCE(RPBilCueManager)->GetCue(0);
-    ASSERT(cue != NULL);
-    cue->SetAimPosition(aim);
+    RPBilCue* pCue = RP_GET_INSTANCE(RPBilCueManager)->GetCue(0);
+    ASSERT(pCue != nullptr);
+    pCue->SetAimPosition(pos);
 
     mIsFirstTick = false;
 }
 
 /**
- * @brief End of break shot
+ * @brief Commits break results
  */
 void Simulation::Finish() {
+    ASSERT(mpCurrBreak != nullptr);
+    ASSERT(mpBestBreak != nullptr);
+
     mIsFirstRun = false;
     mIsFinished = true;
 
+    // Nothing to do if this is a replay
     if (mIsReplay) {
         mIsReplay = false;
         return;
     }
 
     // Record break results
-    mpCurrBreak->sunk = GetNumSunk();
-    mpCurrBreak->off = GetNumOff();
-    mpCurrBreak->foul = GetIsFoul();
+    mpCurrBreak->sunk = GetSunkNum();
+    mpCurrBreak->off = GetOffNum();
+    mpCurrBreak->foul = GetFoul();
 
     // Track statistics
-    mNumBreak++;
-    mNumBall[mpCurrBreak->sunk]++;
+    mBreakNum++;
+    mBreakBallNum[mpCurrBreak->sunk + mpCurrBreak->off]++;
 
     bool upload = false;
     // Always upload 6+ breaks
+    upload |= mpCurrBreak->sunk + mpCurrBreak->off >= 6;
     // Upload first break to test connection
     upload |= !mIsConnected.HasValue();
 

@@ -39,12 +39,6 @@ void IScene::LoadResource() {
  * @brief Reload scene
  */
 void IScene::Reset() {
-// TODO: Required for WS2 also?
-#if defined(PACK_SPORTS) || defined(PACK_PLAY)
-    RP_GET_INSTANCE(RPSysCursorDrawMgr)->startDpdCheck();
-    RP_GET_INSTANCE(RPSysCursorDrawMgr)->createActiveCursor();
-#endif
-
     // User state function
     OnReset();
 }

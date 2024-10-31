@@ -6,7 +6,6 @@
 #include <Pack/RPParty/RPBilScene/RPBilCue.h>
 #undef private
 
-#include <Pack/RPParty.h>
 #include <types.h>
 
 namespace BAH {
@@ -16,9 +15,18 @@ namespace BAH {
  */
 class BilCue : private RPBilCue {
 public:
+    /**
+     * @brief Logic step
+     */
     void CalculateEx();
 
+    /**
+     * @brief HOLD state logic
+     */
     void State_HOLD_calc_Ex();
+    /**
+     * @brief WAIT state logic
+     */
     void State_WAIT_calc_Ex();
 };
 

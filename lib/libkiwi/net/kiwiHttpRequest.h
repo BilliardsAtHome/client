@@ -22,6 +22,7 @@ enum EHttpErr {
     EHttpErr_TimedOut,    // Connection timed out
     EHttpErr_Closed,      // Connection closed
     EHttpErr_Socket,      // Misc. socket error
+    EHttpErr_Usage,       // Invalid usage
 };
 
 /**
@@ -29,7 +30,7 @@ enum EHttpErr {
  */
 enum EHttpStatus {
     // TODO: Determine which additional codes are useful here
-    EHttpStatus_Dummy = -1,
+    EHttpStatus_None = -1,
 
     // Informational
     EHttpStatus_SwitchProto = 101, // Switching Protocols
@@ -62,7 +63,7 @@ struct HttpResponse {
      * @brief Constructor
      */
     HttpResponse()
-        : error(EHttpErr_Success), exError(0), status(EHttpStatus_Dummy) {}
+        : error(EHttpErr_Success), exError(0), status(EHttpStatus_None) {}
 
     EHttpErr error;              //!< Error code
     s32 exError;                 //!< Internal error code
@@ -225,7 +226,7 @@ private:
     //! Default connection timeout, in milliseconds
     static const u32 DEFAULT_TIMEOUT = 2000;
     //! Size of temporary buffer when receiving a response
-    static const int TEMP_BUFFER_SIZE = 512;
+    static const int TEMP_BUFFER_SIZE = 256;
 
     //! HTTP request method names
     static const String METHOD_NAMES[EMethod_Max];
@@ -233,6 +234,8 @@ private:
     static const String PROTOCOL_VERSION;
 
 private:
+    bool mIsSent; //!< Whether this request object has been used
+
     String mHost; //!< Server host name
     u16 mPort;    //!< Server port
 

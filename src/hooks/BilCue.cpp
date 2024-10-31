@@ -5,6 +5,28 @@
 #include <libkiwi.h>
 
 namespace BAH {
+namespace {
+
+/**
+ * @brief Force PULL -> HIT transition
+ */
+KM_WRITE_32(0x802be88c, 0x4800002C);
+KM_WRITE_32(0x802be9a0, 0x60000000);
+KM_WRITE_32(0x802be9ac, 0x60000000);
+KM_WRITE_32(0x802be9b8, 0x60000000);
+KM_WRITE_32(0x802bead0, 0x60000000);
+
+/**
+ * @brief Redirect cue power calculation to the simulated value
+ */
+f32 bil_cue_get_power() {
+    return Simulation::GetInstance().GetCuePower();
+}
+KM_CALL(0x802beff8, bil_cue_get_power);
+KM_CALL(0x802bf070, bil_cue_get_power);
+KM_CALL(0x802bf080, bil_cue_get_power);
+
+} // namespace
 
 /**
  * @brief Logic step
@@ -17,16 +39,16 @@ void BilCue::CalculateEx() {
 KM_BRANCH_MF(0x802c0390, BilCue, CalculateEx);
 
 /**
- * @brief HOLD state logic (extension)
+ * @brief HOLD state logic
  */
 void BilCue::State_HOLD_calc_Ex() {
-    ASSERT(mpStateMachine != NULL);
+    ASSERT(mpStateMachine != nullptr);
     mpStateMachine->ChangeState(EState_Wait);
 }
 KM_BRANCH_MF(0x802bf754, BilCue, State_HOLD_calc_Ex);
 
 /**
- * @brief WAIT state logic (extension)
+ * @brief WAIT state logic
  */
 void BilCue::State_WAIT_calc_Ex() {
     // Wait until game state expects input
@@ -50,33 +72,11 @@ void BilCue::State_WAIT_calc_Ex() {
     CalcForce();
 
     // Wait until simulation has finished aiming
-    if (Simulation::GetInstance().IsDoneAiming()) {
-        ASSERT(mpStateMachine != NULL);
+    if (Simulation::GetInstance().IsAimFinish()) {
+        ASSERT(mpStateMachine != nullptr);
         mpStateMachine->ChangeState(EState_Pull);
     }
 }
 KM_BRANCH_MF(0x802bf9d4, BilCue, State_WAIT_calc_Ex);
 
-namespace {
-
-/**
- * @brief Force PULL -> HIT transition
- */
-KM_WRITE_32(0x802be88c, 0x4800002C);
-KM_WRITE_32(0x802be9a0, 0x60000000);
-KM_WRITE_32(0x802be9ac, 0x60000000);
-KM_WRITE_32(0x802be9b8, 0x60000000);
-KM_WRITE_32(0x802bead0, 0x60000000);
-
-/**
- * @brief Redirect cue power calculation to the simulated value
- */
-f32 bil_cue_get_power() {
-    return Simulation::GetInstance().GetCuePower();
-}
-KM_CALL(0x802beff8, bil_cue_get_power);
-KM_CALL(0x802bf070, bil_cue_get_power);
-KM_CALL(0x802bf080, bil_cue_get_power);
-
-} // namespace
 } // namespace BAH

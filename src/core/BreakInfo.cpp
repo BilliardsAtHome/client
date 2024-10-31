@@ -1,6 +1,6 @@
-#include "BreakInfo.h"
+#include "core/BreakInfo.h"
 
-#include "Simulation.h"
+#include "core/Simulation.h"
 
 #include <libkiwi.h>
 
@@ -24,24 +24,24 @@ BreakInfo::BreakInfo()
       checksum(0) {}
 
 /**
- * @brief Deserialize from stream
+ * @brief Deserializes break from stream
  *
- * @param strm Stream
+ * @param rStrm Stream
  */
-void BreakInfo::Read(kiwi::MemStream& strm) {
-    seed = strm.Read_u32();
-    kseed = strm.Read_u32();
-    sunk = strm.Read_u32();
-    off = strm.Read_u32();
-    frame = strm.Read_u32();
-    up = strm.Read_s32();
-    left = strm.Read_s32();
-    right = strm.Read_s32();
-    pos.x = strm.Read_f32();
-    pos.y = strm.Read_f32();
-    power = strm.Read_f32();
-    foul = strm.Read_s32();
-    checksum = strm.Read_u32();
+void BreakInfo::Read(kiwi::MemStream& rStrm) {
+    seed = rStrm.Read_u32();
+    kseed = rStrm.Read_u32();
+    sunk = rStrm.Read_u32();
+    off = rStrm.Read_u32();
+    frame = rStrm.Read_u32();
+    up = rStrm.Read_s32();
+    left = rStrm.Read_s32();
+    right = rStrm.Read_s32();
+    pos.x = rStrm.Read_f32();
+    pos.y = rStrm.Read_f32();
+    power = rStrm.Read_f32();
+    foul = rStrm.Read_s32();
+    checksum = rStrm.Read_u32();
 
     u32 expected = CalcChecksum();
     K_WARN_EX(checksum != expected,
@@ -50,71 +50,28 @@ void BreakInfo::Read(kiwi::MemStream& strm) {
 }
 
 /**
- * @brief Serialize to stream
+ * @brief Serializes break to stream
  *
- * @param strm Stream
+ * @param rStrm Stream
  */
-void BreakInfo::Write(kiwi::MemStream& strm) const {
-    strm.Write_u32(seed);
-    strm.Write_u32(kseed);
-    strm.Write_u32(sunk);
-    strm.Write_u32(off);
-    strm.Write_u32(frame);
-    strm.Write_s32(up);
-    strm.Write_s32(left);
-    strm.Write_s32(right);
-    strm.Write_f32(pos.x);
-    strm.Write_f32(pos.y);
-    strm.Write_f32(power);
-    strm.Write_s32(foul);
-    strm.Write_u32(CalcChecksum());
+void BreakInfo::Write(kiwi::MemStream& rStrm) const {
+    rStrm.Write_u32(seed);
+    rStrm.Write_u32(kseed);
+    rStrm.Write_u32(sunk);
+    rStrm.Write_u32(off);
+    rStrm.Write_u32(frame);
+    rStrm.Write_s32(up);
+    rStrm.Write_s32(left);
+    rStrm.Write_s32(right);
+    rStrm.Write_f32(pos.x);
+    rStrm.Write_f32(pos.y);
+    rStrm.Write_f32(power);
+    rStrm.Write_s32(foul);
+    rStrm.Write_u32(CalcChecksum());
 }
 
 /**
- * @brief Calculate data checksum
- */
-u32 BreakInfo::CalcChecksum() const {
-    kiwi::Checksum crc;
-    // Don't include 'checksum' member
-    crc.Process(this, offsetof(BreakInfo, checksum));
-    return crc.Result();
-}
-
-/**
- * @brief Compare break results
- *
- * @param other Comparison target
- */
-bool BreakInfo::IsBetterThan(const BreakInfo& other) const {
-    u32 myTotal = sunk + off;
-    u32 otherTotal = other.sunk + other.off;
-
-    // Compare total balls out of play
-    if (myTotal != otherTotal) {
-        return myTotal > otherTotal;
-    }
-
-    // Compare balls pocketed
-    if (sunk != other.sunk) {
-        return sunk > other.sunk;
-    }
-
-    // Compare foul
-    if (foul != other.foul) {
-        return foul == false;
-    }
-
-    // Compare frame count
-    if (frame != other.frame) {
-        return frame < other.frame;
-    }
-
-    // Tie, discard
-    return false;
-}
-
-/**
- * @brief Log break result to the console
+ * @brief Logs break to the console
  */
 void BreakInfo::Log() const {
     // clang-format off
@@ -135,22 +92,63 @@ void BreakInfo::Log() const {
 }
 
 /**
- * @brief Save break result to the NAND
+ * @brief Calculates data checksum
+ */
+u32 BreakInfo::CalcChecksum() const {
+    kiwi::Checksum crc;
 
- * @param name File name
+    // Don't include 'checksum' member
+    crc.Process(this, offsetof(BreakInfo, checksum));
+    return crc.Result();
+}
+
+/**
+ * @brief Compares break results
+ *
+ * @param rOther Comparison target
+ */
+bool BreakInfo::IsBetterThan(const BreakInfo& rOther) const {
+    u32 myTotal = sunk + off;
+    u32 otherTotal = rOther.sunk + rOther.off;
+
+    // Compare total balls out of play
+    if (myTotal != otherTotal) {
+        return myTotal > otherTotal;
+    }
+
+    // Compare balls pocketed
+    if (sunk != rOther.sunk) {
+        return sunk > rOther.sunk;
+    }
+
+    // Compare foul
+    if (foul != rOther.foul) {
+        return foul == false;
+    }
+
+    // Compare frame count
+    if (frame != rOther.frame) {
+        return frame < rOther.frame;
+    }
+
+    // Tie, discard
+    return false;
+}
+
+/**
+ * @brief Saves break result to the NAND
+ *
+ * @param rName File name
  * @return Success
  */
-void BreakInfo::Save(const char* name) const {
-    // Work buffer (byte-aligned for NAND requirements)
+void BreakInfo::Save(const kiwi::String& rName) const {
     kiwi::WorkBufferArg arg;
     arg.size = sizeof(BreakInfo);
-    arg.sizeAlign = arg.memAlign = 32;
     kiwi::WorkBuffer buffer(arg);
 
     // Write break info to buffer
     {
         kiwi::MemStream strm(buffer);
-        ASSERT(strm.IsOpen());
         Write(strm);
     }
 
@@ -158,10 +156,9 @@ void BreakInfo::Save(const char* name) const {
     {
         kiwi::NandStream strm(kiwi::EOpenMode_Write);
 
-        while (true) {
+        for (int i = 0; i < NAND_RETRY_NUM; i++) {
             // Attempt to open file
-            bool success = strm.Open(name);
-            if (success) {
+            if (strm.Open(rName)) {
                 break;
             }
 
@@ -172,50 +169,47 @@ void BreakInfo::Save(const char* name) const {
             }
         }
 
+        ASSERT_EX(strm.IsOpen(), "NAND error");
         strm.Write(buffer, buffer.AlignedSize());
     }
 }
 
 /**
- * @brief Upload break result to the submission server
+ * @brief Uploads break result to the submission server
  *
- * @param err HTTP error
- * @param exError HTTP extended error
- * @param stat Response status code
+ * @param rError HTTP error
+ * @param rExError HTTP extended error
+ * @param rStatus Response status code
  * @return Success
  */
-bool BreakInfo::Upload(kiwi::EHttpErr& err, s32& exError,
-                       kiwi::EHttpStatus& stat) const {
-    request.SetURI("/billiards/api");
+bool BreakInfo::Upload(kiwi::EHttpErr& rError, s32& rExError,
+                       kiwi::EHttpStatus& rStatus) const {
+    for (int i = 0; i < WIFI_RETRY_NUM; i++) {
+        kiwi::HttpRequest request("192.168.0.227");
+        request.SetURI("/billiards/api");
 
-    request.SetParameter("user", *Simulation::GetInstance().GetUniqueId());
+        // clang-format off
+        request.SetParameter("user",     *Simulation::GetInstance().GetUniqueID());
+        request.SetParameter("seed",     kiwi::ToHexString(seed));
+        request.SetParameter("kseed",    kiwi::ToHexString(kseed));
+        request.SetParameter("sunk",     sunk);
+        request.SetParameter("off",      off);
+        request.SetParameter("frame",    frame);
+        request.SetParameter("up",       up);
+        request.SetParameter("left",     left);
+        request.SetParameter("right",    right);
+        request.SetParameter("posx",     kiwi::ToHexString(pos.x));
+        request.SetParameter("posy",     kiwi::ToHexString(pos.y));
+        request.SetParameter("power",    kiwi::ToHexString(power));
+        request.SetParameter("foul",     kiwi::ToHexString(foul));
+        request.SetParameter("checksum", kiwi::ToHexString(CalcChecksum()));
+        // clang-format on
 
-    request.SetParameter("seed", kiwi::ToHexString(seed));
-    request.SetParameter("kseed", kiwi::ToHexString(kseed));
-
-    request.SetParameter("sunk", sunk);
-    request.SetParameter("off", off);
-    request.SetParameter("frame", frame);
-
-    request.SetParameter("up", up);
-    request.SetParameter("left", left);
-    request.SetParameter("right", right);
-
-    request.SetParameter("posx", kiwi::ToHexString(pos.x));
-    request.SetParameter("posy", kiwi::ToHexString(pos.y));
-
-    request.SetParameter("power", kiwi::ToHexString(power));
-    request.SetParameter("foul", kiwi::ToHexString(foul));
-
-    request.SetParameter("checksum", kiwi::ToHexString(CalcChecksum()));
-
-    // Retry a few times if the connection is unstable
-    for (int i = 0; i < 10; i++) {
         const kiwi::HttpResponse& resp = request.Send();
 
-        err = resp.error;
-        exError = resp.exError;
-        stat = resp.status;
+        rError = resp.error;
+        rExError = resp.exError;
+        rStatus = resp.status;
 
         if (resp.error == kiwi::EHttpErr_Success &&
             resp.status == kiwi::EHttpStatus_OK) {
