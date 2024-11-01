@@ -30,7 +30,7 @@ struct BreakInfo {
     //! Maximum attempts at NAND operations
     static const int NAND_RETRY_NUM = 10;
     //! Maximum attempts at Wi-Fi operations
-    static const int WIFI_RETRY_NUM = 5;
+    static const int WIFI_RETRY_NUM = 3;
 
     /**
      * @brief Constructor

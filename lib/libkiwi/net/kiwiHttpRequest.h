@@ -224,7 +224,7 @@ private:
     //! Default port for HTTP connections
     static const u16 DEFAULT_PORT = 80;
     //! Default connection timeout, in milliseconds
-    static const u32 DEFAULT_TIMEOUT = 2000;
+    static const u32 DEFAULT_TIMEOUT = 10000;
     //! Size of temporary buffer when receiving a response
     static const int TEMP_BUFFER_SIZE = 512;
 
