@@ -178,10 +178,6 @@ void HttpRequest::SendImpl() {
         // After connection we can perform the request
         if (connected) {
             (void)Request();
-
-            bool success = mpSocket->Shutdown(SO_SHUT_WR);
-            K_ASSERT(success);
-
             (void)Receive();
             break;
         }
@@ -243,9 +239,17 @@ bool HttpRequest::Request() {
     // Request ends with extra newline
     request += "\n";
 
+    // Socket needs memory allocated in MEM2
+    WorkBufferArg arg;
+    arg.region = EMemory_MEM2;
+    arg.size = request.Length();
+
+    WorkBuffer buffer(arg);
+    std::memcpy(buffer.Contents(), request.CStr(), request.Length());
+
     // Send request data
-    Optional<u32> sent = mpSocket->Send(request);
-    bool success = sent && *sent == request.Length();
+    Optional<u32> sent = mpSocket->SendBytes(buffer.Contents(), buffer.Size());
+    bool success = sent && *sent == buffer.Size();
 
     // Record socket library error if it failed
     if (!success) {
@@ -270,15 +274,24 @@ bool HttpRequest::Receive() {
     Watch w;
     w.Start();
 
-    /**
+    /******************************************************************************
      * Receive response headers
-     */
-    String work = "";
-    size_t end = String::npos;
+     ******************************************************************************/
+    // Buffer for headers
+    String work;
+    // Try to avoid reallocation
+    work.Reserve(TEMP_BUFFER_SIZE * 2);
 
+    // Socket needs memory allocated in MEM2
+    WorkBufferArg arg;
+    arg.region = EMemory_MEM2;
+    arg.size = TEMP_BUFFER_SIZE;
+    WorkBuffer buffer(arg);
+
+    size_t end = String::npos;
     while (end == String::npos) {
-        char buffer[TEMP_BUFFER_SIZE] = "";
-        Optional<u32> nrecv = mpSocket->RecvBytes(buffer, TEMP_BUFFER_SIZE - 1);
+        Optional<u32> nrecv =
+            mpSocket->RecvBytes(buffer.Contents(), buffer.AlignedSize() - 1);
 
         // Record socket library error if it failed
         if (!nrecv) {
@@ -288,17 +301,20 @@ bool HttpRequest::Receive() {
         }
 
         // Server has terminated the connection
-        if (mpSocket->CanRecv() && *nrecv == 0 &&
-            LibSO::GetLastError() != SO_EWOULDBLOCK) {
+        if (*nrecv == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
             mResponse.error = EHttpErr_Closed;
-            mResponse.exError = /* LibSO::GetLastError() */ 254; // TODO
+            mResponse.exError = LibSO::GetLastError();
             return false;
         }
 
-        // Continue to build string
-        work += buffer;
-        // Response header ends in double newline
-        end = work.Find("\r\n\r\n");
+        if (*nrecv > 0) {
+            // Continue to build string
+            buffer.Contents()[*nrecv] = '\0';
+            work += reinterpret_cast<char*>(buffer.Contents());
+
+            // Response header ends in double newline
+            end = work.Find("\r\n\r\n");
+        }
 
         // Connection timeout
         if (w.Elapsed() >= mTimeOut) {
@@ -312,9 +328,9 @@ bool HttpRequest::Receive() {
     end += sizeof("\r\n\r\n") - 1;
     String headers = work.SubStr(0, end);
 
-    /**
+    /******************************************************************************
      * Build header dictionary
-     */
+     ******************************************************************************/
     TVector<String> lines = headers.Split("\r\n");
 
     // Needs at least one line (for status code)
@@ -357,9 +373,9 @@ bool HttpRequest::Receive() {
         mResponse.header.Insert(key, value);
     }
 
-    /**
+    /******************************************************************************
      * Receive response body
-     */
+     ******************************************************************************/
     // If we were given the length, we can be 100% sure
     Optional<u32> len;
     if (mResponse.header.Contains("Content-Length")) {
@@ -373,8 +389,8 @@ bool HttpRequest::Receive() {
 
     // Receive the rest of the body
     while (true) {
-        char buffer[TEMP_BUFFER_SIZE] = "";
-        Optional<u32> nrecv = mpSocket->RecvBytes(buffer, TEMP_BUFFER_SIZE - 1);
+        Optional<u32> nrecv =
+            mpSocket->RecvBytes(buffer.Contents(), buffer.AlignedSize() - 1);
 
         // Record socket library error if it failed
         if (!nrecv) {
@@ -384,20 +400,20 @@ bool HttpRequest::Receive() {
         }
 
         // Server is likely done and has terminated the connection
-        if (mpSocket->CanRecv() && *nrecv == 0 &&
-            LibSO::GetLastError() != SO_EWOULDBLOCK) {
+        if (*nrecv == 0 && LibSO::GetLastError() != SO_EWOULDBLOCK) {
             // This is only okay if we've read enough of the body
             if (!len || mResponse.body.Length() >= *len) {
                 break;
             }
 
             mResponse.error = EHttpErr_Closed;
-            mResponse.exError = /* LibSO::GetLastError() */ 255; // TODO
+            mResponse.exError = LibSO::GetLastError();
             return false;
         }
 
         // Continue building string
-        mResponse.body += buffer;
+        buffer.Contents()[*nrecv] = '\0';
+        mResponse.body += reinterpret_cast<char*>(buffer.Contents());
 
         // Timeout may be the only way to end the body, so not a failure
         if (w.Elapsed() >= mTimeOut) {

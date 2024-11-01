@@ -254,19 +254,15 @@ Optional<u32> SocketBase::RecvBytes(void* pDst, u32 len, Callback pCallback,
                                     void* pArg) {
     K_ASSERT(IsOpen());
     K_ASSERT(pDst != nullptr);
+    K_ASSERT(OSIsMEM2Region(pDst));
     K_ASSERT(len > 0);
 
     // Implementation version is responsible for using the callback
     u32 nrecv = 0;
     SOResult result = RecvImpl(pDst, len, nrecv, nullptr, pCallback, pArg);
 
-    if (result == SO_SUCCESS) {
+    if (result == SO_SUCCESS || result == SO_EWOULDBLOCK) {
         return nrecv;
-    }
-
-    // Blocking is OK, just say zero bytes
-    if (result == SO_EWOULDBLOCK) {
-        return 0;
     }
 
     return kiwi::nullopt;
@@ -286,19 +282,15 @@ Optional<u32> SocketBase::RecvBytesFrom(void* pDst, u32 len, SockAddrAny& rAddr,
                                         Callback pCallback, void* pArg) {
     K_ASSERT(IsOpen());
     K_ASSERT(pDst != nullptr);
+    K_ASSERT(OSIsMEM2Region(pDst));
     K_ASSERT(len > 0);
 
     // Implementation version is responsible for using the callback
     u32 nrecv = 0;
     SOResult result = RecvImpl(pDst, len, nrecv, &rAddr, pCallback, pArg);
 
-    if (result == SO_SUCCESS) {
+    if (result == SO_SUCCESS || result == SO_EWOULDBLOCK) {
         return nrecv;
-    }
-
-    // Blocking is OK, just say zero bytes
-    if (result == SO_EWOULDBLOCK) {
-        return 0;
     }
 
     return kiwi::nullopt;
@@ -317,19 +309,15 @@ Optional<u32> SocketBase::SendBytes(const void* pSrc, u32 len,
                                     Callback pCallback, void* pArg) {
     K_ASSERT(IsOpen());
     K_ASSERT(pSrc != nullptr);
+    K_ASSERT(OSIsMEM2Region(pSrc));
     K_ASSERT(len > 0);
 
     // Implementation version is responsible for using the callback
     u32 nsend = 0;
     SOResult result = SendImpl(pSrc, len, nsend, nullptr, pCallback, pArg);
 
-    if (result == SO_SUCCESS) {
+    if (result == SO_SUCCESS || result == SO_EWOULDBLOCK) {
         return nsend;
-    }
-
-    // Blocking is OK, just say zero bytes
-    if (result == SO_EWOULDBLOCK) {
-        return 0;
     }
 
     return kiwi::nullopt;
@@ -350,19 +338,15 @@ Optional<u32> SocketBase::SendBytesTo(const void* pSrc, u32 len,
                                       Callback pCallback, void* pArg) {
     K_ASSERT(IsOpen());
     K_ASSERT(pSrc != nullptr);
+    K_ASSERT(OSIsMEM2Region(pSrc));
     K_ASSERT(len > 0);
 
     // Implementation version is responsible for using the callback
     u32 nsend = 0;
     SOResult result = SendImpl(pSrc, len, nsend, &rAddr, pCallback, pArg);
 
-    if (result == SO_SUCCESS) {
+    if (result == SO_SUCCESS || result == SO_EWOULDBLOCK) {
         return nsend;
-    }
-
-    // Blocking is OK, just say zero bytes
-    if (result == SO_EWOULDBLOCK) {
-        return 0;
     }
 
     return kiwi::nullopt;

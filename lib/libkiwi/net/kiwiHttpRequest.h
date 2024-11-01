@@ -226,7 +226,7 @@ private:
     //! Default connection timeout, in milliseconds
     static const u32 DEFAULT_TIMEOUT = 2000;
     //! Size of temporary buffer when receiving a response
-    static const int TEMP_BUFFER_SIZE = 256;
+    static const int TEMP_BUFFER_SIZE = 512;
 
     //! HTTP request method names
     static const String METHOD_NAMES[EMethod_Max];

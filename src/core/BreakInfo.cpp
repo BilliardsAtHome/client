@@ -185,7 +185,7 @@ void BreakInfo::Save(const kiwi::String& rName) const {
 bool BreakInfo::Upload(kiwi::EHttpErr& rError, s32& rExError,
                        kiwi::EHttpStatus& rStatus) const {
     for (int i = 0; i < WIFI_RETRY_NUM; i++) {
-        kiwi::HttpRequest request("192.168.0.227");
+        kiwi::HttpRequest request("127.0.0.1");
         request.SetURI("/billiards/api");
 
         // clang-format off
@@ -205,19 +205,19 @@ bool BreakInfo::Upload(kiwi::EHttpErr& rError, s32& rExError,
         request.SetParameter("checksum", kiwi::ToHexString(CalcChecksum()));
         // clang-format on
 
-        const kiwi::HttpResponse& resp = request.Send();
+        const kiwi::HttpResponse& rResp = request.Send();
 
-        rError = resp.error;
-        rExError = resp.exError;
-        rStatus = resp.status;
+        rError = rResp.error;
+        rExError = rResp.exError;
+        rStatus = rResp.status;
 
-        if (resp.error == kiwi::EHttpErr_Success &&
-            resp.status == kiwi::EHttpStatus_OK) {
+        if (rResp.error == kiwi::EHttpErr_Success &&
+            rResp.status == kiwi::EHttpStatus_OK) {
             return true;
         }
 
-        K_LOG_EX("try:%d err:%d ex:%d stat:%d\n", i, resp.error, resp.exError,
-                 resp.status);
+        K_LOG_EX("try:%d err:%d ex:%d stat:%d\n", i, rResp.error, rResp.exError,
+                 rResp.status);
     }
 
     return false;
