@@ -1,5 +1,5 @@
-#ifndef BAH_CLIENT_BREAK_INFO_H
-#define BAH_CLIENT_BREAK_INFO_H
+#ifndef BAH_CLIENT_CORE_BREAK_INFO_H
+#define BAH_CLIENT_CORE_BREAK_INFO_H
 #include <libkiwi.h>
 #include <types.h>
 

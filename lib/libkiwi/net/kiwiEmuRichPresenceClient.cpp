@@ -17,21 +17,12 @@ enum {
 };
 
 /**
- * @brief Constructor
- *
- * @param rClient Client app ID
- */
-EmuRichPresence::EmuRichPresence(const String& rClient)
-    : IRichPresence(rClient) {
-    // Dolphin provides an emulated device
-    mDevDolphin.Open("/dev/dolphin");
-}
-
-/**
  * @brief Retreives the current Unix epoch time (in seconds)
  */
-u64 EmuRichPresence::GetTimeNow() const {
-    K_ASSERT(IsConnected());
+u64 EmuRichPresenceClient::GetTimeNow() const {
+    if (!IsConnected()) {
+        return;
+    }
 
     TVector<IosVector> input;
     TVector<IosVector> output;
@@ -49,24 +40,30 @@ u64 EmuRichPresence::GetTimeNow() const {
 /**
  * @brief Updates Discord client/app ID
  */
-void EmuRichPresence::UpdateClient() const {
-    K_ASSERT(IsConnected());
+void EmuRichPresenceClient::UpdateApp() const {
+    if (!IsConnected()) {
+        return;
+    }
 
     TVector<IosVector> input;
     TVector<IosVector> output;
 
-    IosString<char> client(mClient);
+    IosString<char> client(mAppID);
     input.PushBack(client);
 
     s32 result = mDevDolphin.IoctlV(IoctlV_DiscordSetClient, input, output);
     K_ASSERT_EX(result >= 0, "IoctlV_DiscordSetClient failed: %d", result);
+
+    K_LOG_EX("IoctlV_DiscordSetClient returned: %d\n", result);
 }
 
 /**
  * @brief Updates Discord presence status
  */
-void EmuRichPresence::UpdatePresence() const {
-    K_ASSERT(IsConnected());
+void EmuRichPresenceClient::UpdateActivity() const {
+    if (!IsConnected()) {
+        return;
+    }
 
     TVector<IosVector> input;
     TVector<IosVector> output;
@@ -103,6 +100,8 @@ void EmuRichPresence::UpdatePresence() const {
 
     s32 result = mDevDolphin.IoctlV(IoctlV_DiscordSetPresence, input, output);
     K_ASSERT_EX(result >= 0, "IoctlV_DiscordSetPresence failed: %d", result);
+
+    K_LOG_EX("IoctlV_DiscordSetPresence returned: %d\n", result);
 }
 
 } // namespace kiwi

@@ -1,7 +1,7 @@
-#ifndef LIBKIWI_NET_EMU_RICH_PRESENCE_H
-#define LIBKIWI_NET_EMU_RICH_PRESENCE_H
+#ifndef LIBKIWI_NET_EMU_RICH_PRESENCE_CLIENT_H
+#define LIBKIWI_NET_EMU_RICH_PRESENCE_CLIENT_H
 #include <libkiwi/k_types.h>
-#include <libkiwi/net/kiwiIRichPresence.h>
+#include <libkiwi/net/kiwiIRichPresenceClient.h>
 #include <libkiwi/util/kiwiIosDevice.h>
 
 namespace kiwi {
@@ -9,16 +9,17 @@ namespace kiwi {
 //! @{
 
 /**
- * @brief Rich presence implementation for Dolphin Emulator
+ * @brief Discord rich presence client for Dolphin Emulator
  */
-class EmuRichPresence : public IRichPresence {
+class EmuRichPresenceClient : public IRichPresenceClient {
 public:
     /**
      * @brief Constructor
-     *
-     * @param rClient Client app ID
      */
-    explicit EmuRichPresence(const String& rClient);
+    explicit EmuRichPresenceClient() {
+        // Dolphin provides an emulated device
+        mDevDolphin.Open("/dev/dolphin");
+    }
 
     /**
      * @brief Tests whether there is a connection established
@@ -35,12 +36,12 @@ public:
     /**
      * @brief Updates Discord client/app ID
      */
-    virtual void UpdateClient() const;
+    virtual void UpdateApp() const;
 
     /**
      * @brief Updates Discord presence status
      */
-    virtual void UpdatePresence() const;
+    virtual void UpdateActivity() const;
 
 private:
     IosDevice mDevDolphin; // Handle to Dolphin device

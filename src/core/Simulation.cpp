@@ -1,6 +1,7 @@
 #include "core/Simulation.h"
 
 #include "core/BreakInfo.h"
+#include "core/RichPresenceProfile.h"
 
 #include <Pack/RPParty.h>
 #include <Pack/RPUtility.h>
@@ -153,7 +154,11 @@ Simulation::~Simulation() {
 void Simulation::Configure(RPSysScene* pScene) {
 #pragma unused(pScene)
 
+    // Add to renderer for debug display
     RPGrpRenderer::GetCurrent()->AppendDrawObject(this);
+
+    // Start up Discord rich presence
+    kiwi::RichPresenceMgr::GetInstance().SetProfile(new RichPresenceProfile());
 }
 
 /**
@@ -479,7 +484,7 @@ void Simulation::Finish() {
     // Always upload 6+ breaks
     upload |= mpCurrBreak->sunk + mpCurrBreak->off >= 6;
     // Upload first break to test connection
-    upload |= !mIsConnected.HasValue();
+    // upload |= !mIsConnected.HasValue();
 
     // Upload information to the server
     if (upload) {

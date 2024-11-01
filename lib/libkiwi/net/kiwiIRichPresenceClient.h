@@ -1,5 +1,5 @@
-#ifndef LIBKIWI_NET_I_RICH_PRESENCE_H
-#define LIBKIWI_NET_I_RICH_PRESENCE_H
+#ifndef LIBKIWI_NET_I_RICH_PRESENCE_CLIENT_H
+#define LIBKIWI_NET_I_RICH_PRESENCE_CLIENT_H
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
 
@@ -10,24 +10,18 @@ namespace kiwi {
 /**
  * @brief Rich presence interface
  */
-class IRichPresence {
+class IRichPresenceClient {
 public:
     /**
      * @brief Constructor
-     *
-     * @param rClient Client app ID
      */
-    explicit IRichPresence(const String& rClient)
-        : mClient(rClient),
-          mStartTime(0),
-          mEndTime(0),
-          mPartyNum(0),
-          mPartyMax(0) {}
+    explicit IRichPresenceClient()
+        : mStartTime(0), mEndTime(0), mPartyNum(0), mPartyMax(0) {}
 
     /**
      * @brief Destructor
      */
-    virtual ~IRichPresence() {}
+    virtual ~IRichPresenceClient() {}
 
     /**
      * @brief Tests whether there is a connection established
@@ -42,12 +36,26 @@ public:
     /**
      * @brief Updates Discord client/app ID
      */
-    virtual void UpdateClient() const = 0;
-
+    virtual void UpdateApp() const = 0;
     /**
      * @brief Updates Discord presence status
      */
-    virtual void UpdatePresence() const = 0;
+    virtual void UpdateActivity() const = 0;
+
+    /**
+     * @brief Sets the activity's application ID
+     *
+     * @param rAppID
+     */
+    void SetAppID(const String& rAppID) {
+        mAppID = rAppID;
+    }
+    /**
+     * @brief Gets the activity's application ID
+     */
+    String GetAppID() const {
+        return mAppID;
+    }
 
     /**
      * @brief Sets the activity's details
@@ -146,7 +154,7 @@ public:
     }
 
 protected:
-    String mClient; // Client ID
+    String mAppID; // Application ID
 
     String mDetails; // Presence details
     String mState;   // Presence state

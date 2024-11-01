@@ -1,5 +1,5 @@
-#ifndef BAH_CLIENT_SIMULATION_H
-#define BAH_CLIENT_SIMULATION_H
+#ifndef BAH_CLIENT_CORE_SIMULATION_H
+#define BAH_CLIENT_CORE_SIMULATION_H
 #include "core/BreakInfo.h"
 
 #include <Pack/RPGraphics.h>

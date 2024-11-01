@@ -1,7 +1,6 @@
 #ifndef LIBKIWI_UTIL_IOS_VECTOR_H
 #define LIBKIWI_UTIL_IOS_VECTOR_H
 #include <libkiwi/k_types.h>
-
 #include <revolution/IPC.h>
 #include <revolution/OS.h>
 
@@ -41,7 +40,7 @@ public:
      * @param _length Memory size
      */
     void Set(const void* _base, u32 _length) {
-        // K_ASSERT(_base == nullptr || OSIsMEM2Region(_base));
+        K_ASSERT(_base == nullptr || OSIsMEM2Region(_base));
         base = const_cast<void*>(_base);
         length = _length;
     }
