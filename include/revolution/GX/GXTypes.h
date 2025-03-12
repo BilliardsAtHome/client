@@ -5,9 +5,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_gx
-//! @{
-
 /**
  * Pack value into bitfield.
  * Value is shifted to the specified bit position.
@@ -47,12 +44,13 @@ extern "C" {
  * here. Everything is organized in alphabetical order.
  */
 
-//! Differentiate between 8-byte and boolean values. Real name! (from patent)
+// Differentiate between 8-byte and boolean values
+// Real name! (from patent)
 typedef unsigned char GXBool;
 
-//
-// Common structs
-//
+/**
+ * Common structs
+ */
 
 typedef struct _GXColor {
     u8 r, g, b, a;
@@ -62,9 +60,9 @@ typedef struct _GXColorS10 {
     s16 r, g, b, a;
 } GXColorS10;
 
-//
-// Common enums
-//
+/**
+ * Common enums
+ */
 
 typedef enum _GXAlphaOp {
     GX_AOP_AND,
@@ -90,42 +88,47 @@ typedef enum _GXAttnFn {
 } GXAttnFn;
 
 typedef enum _GXAttr {
-    GX_VA_PNMTXIDX,
-    GX_VA_TEX0MTXIDX,
-    GX_VA_TEX1MTXIDX,
-    GX_VA_TEX2MTXIDX,
-    GX_VA_TEX3MTXIDX,
-    GX_VA_TEX4MTXIDX,
-    GX_VA_TEX5MTXIDX,
-    GX_VA_TEX6MTXIDX,
-    GX_VA_TEX7MTXIDX,
-    GX_VA_POS,
-    GX_VA_NRM,
-    GX_VA_CLR0,
-    GX_VA_CLR1,
-    GX_VA_TEX0,
-    GX_VA_TEX1,
-    GX_VA_TEX2,
-    GX_VA_TEX3,
-    GX_VA_TEX4,
-    GX_VA_TEX5,
-    GX_VA_TEX6,
-    GX_VA_TEX7,
+    GX_VA_PNMTXIDX,   // Position/Normal matrix index
+    GX_VA_TEX0MTXIDX, // GX_TEXCOORD0 matrix index
+    GX_VA_TEX1MTXIDX, // GX_TEXCOORD1 matrix index
+    GX_VA_TEX2MTXIDX, // GX_TEXCOORD2 matrix index
+    GX_VA_TEX3MTXIDX, // GX_TEXCOORD3 matrix index
+    GX_VA_TEX4MTXIDX, // GX_TEXCOORD4 matrix index
+    GX_VA_TEX5MTXIDX, // GX_TEXCOORD5 matrix index
+    GX_VA_TEX6MTXIDX, // GX_TEXCOORD6 matrix index
+    GX_VA_TEX7MTXIDX, // GX_TEXCOORD7 matrix index
+
+    GX_VA_POS, // Position
+    GX_VA_NRM, // Normal
+
+    GX_VA_CLR0, // Color 0
+    GX_VA_CLR1, // Color 1
+
+    GX_VA_TEX0, // Texture Coordinate 0
+    GX_VA_TEX1, // Texture Coordinate 1
+    GX_VA_TEX2, // Texture Coordinate 2
+    GX_VA_TEX3, // Texture Coordinate 3
+    GX_VA_TEX4, // Texture Coordinate 4
+    GX_VA_TEX5, // Texture Coordinate 5
+    GX_VA_TEX6, // Texture Coordinate 6
+    GX_VA_TEX7, // Texture Coordinate 7
+
     GX_POS_MTX_ARRAY,
     GX_NRM_MTX_ARRAY,
     GX_TEX_MTX_ARRAY,
     GX_LIGHT_ARRAY,
-    GX_VA_NBT, //!< All three normal elements (normal/binormal/tangent)
+
+    GX_VA_NBT, // All three normal elements (normal/binormal/tangent)
 
     GX_VA_MAX_ATTR,
     GX_VA_NULL = 255
 } GXAttr;
 
 typedef enum _GXAttrType {
-    GX_NONE,   //!< No data sent
-    GX_DIRECT, //!< Data sent directly to FIFO
-    GX_INDEX8, //!< 8-bit index sent to FIFO
-    GX_INDEX16 //!< 16-bit index sent to FIFO
+    GX_NONE,   // No data sent
+    GX_DIRECT, // Data sent directly to FIFO
+    GX_INDEX8, // 8-bit index sent to FIFO
+    GX_INDEX16 // 16-bit index sent to FIFO
 } GXAttrType;
 
 typedef enum _GXBlendFactor {
@@ -842,6 +845,30 @@ typedef enum _GXTexWrapMode {
     GX_MAX_TEXWRAPMODE
 } GXTexWrapMode;
 
+typedef enum _GXTlut {
+    GX_TLUT0,
+    GX_TLUT1,
+    GX_TLUT2,
+    GX_TLUT3,
+    GX_TLUT4,
+    GX_TLUT5,
+    GX_TLUT6,
+    GX_TLUT7,
+    GX_TLUT8,
+    GX_TLUT9,
+    GX_TLUT10,
+    GX_TLUT11,
+    GX_TLUT12,
+    GX_TLUT13,
+    GX_TLUT14,
+    GX_TLUT15,
+
+    GX_BIGTLUT0,
+    GX_BIGTLUT1,
+    GX_BIGTLUT2,
+    GX_BIGTLUT3,
+} GXTlut;
+
 typedef enum _GXTlutFmt {
     GX_TL_IA8,
     GX_TL_RGB565,
@@ -878,8 +905,6 @@ typedef enum _GXZTexOp {
 
     GX_MAX_ZTEXOP
 } GXZTexOp;
-
-//! @}
 
 #ifdef __cplusplus
 }

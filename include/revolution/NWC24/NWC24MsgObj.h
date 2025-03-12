@@ -7,9 +7,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_nwc24
-//! @{
-
 #define NWC24_MSG_RECIPIENT_MAX 8
 #define NWC24_MSG_ATTACHMENT_MAX 2
 
@@ -83,8 +80,6 @@ NWC24Err NWC24SetMsgFaceData(NWC24MsgObj* msg, const struct RFLCharData* data);
 NWC24Err NWC24SetMsgAltName(NWC24MsgObj* msg, const wchar_t* name, u32 len);
 NWC24Err NWC24SetMsgMBNoReply(NWC24MsgObj* msg, BOOL enable);
 NWC24Err NWC24SetMsgMBRegDate(NWC24MsgObj* msg, u16 year, u8 month, u8 day);
-
-//! @}
 
 #ifdef __cplusplus
 }

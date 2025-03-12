@@ -6,13 +6,10 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_os
-//! @{
-
 // General-purpose typedef
 typedef void* OSMessage;
 
-typedef enum { OS_MSG_PERSISTENT = (1 << 0) } OSMessageFlags;
+typedef enum { OS_MSG_BLOCKING = (1 << 0) } OSMessageFlags;
 
 typedef struct OSMessageQueue {
     OSThreadQueue sendQueue; // at 0x0
@@ -27,8 +24,6 @@ void OSInitMessageQueue(OSMessageQueue* queue, OSMessage* buffer, s32 capacity);
 BOOL OSSendMessage(OSMessageQueue* queue, OSMessage mesg, u32 flags);
 BOOL OSReceiveMessage(OSMessageQueue* queue, OSMessage* mesg, u32 flags);
 BOOL OSJamMessage(OSMessageQueue* queue, OSMessage mesg, u32 flags);
-
-//! @}
 
 #ifdef __cplusplus
 }

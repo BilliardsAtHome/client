@@ -13,9 +13,9 @@ void Disable();
 bool Lock();
 void Unlock();
 
-void LoadBlocks(void* dst, void* src, u32 size);
-void StoreBlocks(void* dst, void* src, u32 size);
-void StoreData(void* dst, void* src, u32 size);
+void LoadBlocks(void* pDst, void* pSrc, u32 blocks);
+void StoreBlocks(void* pDst, void* pSrc, u32 blocks);
+void StoreData(void* pDst, void* pSrc, u32 size);
 
 inline void* GetBase() {
     return reinterpret_cast<void*>(OS_CACHE_BASE);

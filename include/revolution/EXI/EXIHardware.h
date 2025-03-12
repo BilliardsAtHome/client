@@ -6,9 +6,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_exi
-//! @{
-
 typedef struct EXIChannelParam {
     u32 cpr;    // at 0x0
     void* mar;  // at 0x4
@@ -19,8 +16,7 @@ typedef struct EXIChannelParam {
 
 volatile EXIChannelParam EXI_CHAN_PARAMS[EXI_MAX_CHAN] : 0xCD006800;
 
-//! @name CPR - Channel Parameter Register
-/**@{*/
+// CPR - Channel Parameter Register
 #define EXI_CPR_EXIINTMASK (1 << 0)
 #define EXI_CPR_EXIINT (1 << 1)
 #define EXI_CPR_TCINTMASK (1 << 2)
@@ -33,17 +29,12 @@ volatile EXIChannelParam EXI_CHAN_PARAMS[EXI_MAX_CHAN] : 0xCD006800;
 #define EXI_CPR_EXTINT (1 << 11)
 #define EXI_CPR_EXT (1 << 12)
 #define EXI_CPR_ROMDIS (1 << 13)
-/**@}*/
 
-//! @name CR - Control Register
-/**@{*/
+// CR - Control Register
 #define EXI_CR_TSTART (1 << 0)
 #define EXI_CR_DMA (1 << 1)
 #define EXI_CR_RW (1 << 2 | 1 << 3)
 #define EXI_CR_TLEN (1 << 4 | 1 << 5)
-/**@}*/
-
-//! @}
 
 #ifdef __cplusplus
 }

@@ -35,8 +35,13 @@ public:
 public:
     static void Initialize(const u16*, const u16*, Screen*);
     static void CalcRatio();
+
     static void SetTVMode(TVMode);
     static void SetTVModeDefault();
+
+    static TVMode GetTVMode() {
+        return sTVMode;
+    }
 
     static u16 GetSizeXMax() {
         return sTVModeWidths[sTVMode];

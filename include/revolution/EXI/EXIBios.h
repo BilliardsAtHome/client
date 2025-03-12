@@ -6,9 +6,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_exi
-//! @{
-
 typedef struct EXIItem {
     u32 dev;              // at 0x0
     EXICallback callback; // at 0x4
@@ -46,8 +43,6 @@ void EXIInit(void);
 BOOL EXILock(EXIChannel chan, u32 dev, EXICallback callback);
 BOOL EXIUnlock(EXIChannel chan);
 s32 EXIGetID(EXIChannel chan, u32 dev, u32* out);
-
-//! @}
 
 #ifdef __cplusplus
 }

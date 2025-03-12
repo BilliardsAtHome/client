@@ -5,8 +5,9 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_mem
-//! @{
+#define MEM_EXP_HEAP_MIN_SIZE                                                  \
+    (sizeof(MEMiHeapHead) + sizeof(MEMiExpHeapHead) +                          \
+     sizeof(MEMiExpHeapMBlock) + 4)
 
 // Forward declarations
 typedef struct MEMiHeapHead;
@@ -71,8 +72,6 @@ static void* MEMAllocFromExpHeap(struct MEMiHeapHead* heap, u32 size) {
 static u32 MEMGetAllocatableSizeForExpHeap(struct MEMiHeapHead* heap) {
     return MEMGetAllocatableSizeForExpHeapEx(heap, 4);
 }
-
-//! @}
 
 #ifdef __cplusplus
 }

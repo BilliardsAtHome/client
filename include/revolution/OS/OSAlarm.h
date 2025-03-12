@@ -5,9 +5,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_os
-//! @{
-
 // Forward declarations
 typedef struct OSAlarm;
 typedef struct OSContext;
@@ -17,12 +14,12 @@ typedef void (*OSAlarmHandler)(struct OSAlarm* alarm, struct OSContext* ctx);
 typedef struct OSAlarm {
     OSAlarmHandler handler; // at 0x0
     u32 tag;                // at 0x4
-    s64 end;
-    struct OSAlarm* prev; // at 0x10
-    struct OSAlarm* next; // at 0x14
-    s64 period;           // at 0x18
-    s64 start;            // at 0x20
-    void* userData;       // at 0x28
+    s64 end;                // at 0x8
+    struct OSAlarm* prev;   // at 0x10
+    struct OSAlarm* next;   // at 0x14
+    s64 period;             // at 0x18
+    s64 start;              // at 0x20
+    void* userData;         // at 0x28
 } OSAlarm;
 
 typedef struct OSAlarmQueue {
@@ -39,8 +36,6 @@ void OSCancelAlarm(OSAlarm* alarm);
 void OSSetAlarmTag(OSAlarm* alarm, u32 tag);
 void OSSetAlarmUserData(OSAlarm* alarm, void* userData);
 void* OSGetAlarmUserData(const OSAlarm* alarm);
-
-//! @}
 
 #ifdef __cplusplus
 }

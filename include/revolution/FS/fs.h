@@ -6,9 +6,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_fs
-//! @{
-
 #define FS_MAX_PATH 64
 
 typedef void (*FSAsyncCallback)(s32 result, void* arg);
@@ -17,6 +14,7 @@ typedef struct FSStats {
     char UNK_0x0[0x1C];
 } FSStats;
 
+// Could be more fields, but not larger than 32B
 typedef struct FSFileStats {
     u32 length;   // at 0x0
     u32 position; // at 0x4
@@ -68,8 +66,6 @@ s32 ISFS_WriteAsync(s32 fd, const void* src, s32 len, FSAsyncCallback callback,
 s32 ISFS_Close(s32 fd);
 s32 ISFS_CloseAsync(s32 fd, FSAsyncCallback callback, void* callbackArg);
 s32 ISFS_ShutdownAsync(FSAsyncCallback callback, void* callbackArg);
-
-//! @}
 
 #ifdef __cplusplus
 }

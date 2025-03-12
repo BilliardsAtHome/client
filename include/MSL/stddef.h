@@ -11,6 +11,7 @@ extern "C" {
 #define offsetof(ST, M) ((size_t) & (((ST*)0)->M))
 
 typedef signed long ptrdiff_t;
+
 typedef unsigned long size_t;
 
 #ifndef __cplusplus

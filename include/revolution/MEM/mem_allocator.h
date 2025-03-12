@@ -5,9 +5,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_mem
-//! @{
-
 // Forward declarations
 typedef struct MEMAllocator;
 typedef struct MEMiHeapHead;
@@ -36,8 +33,6 @@ void MEMInitAllocatorForExpHeap(MEMAllocator* allocator,
                                 struct MEMiHeapHead* heap, s32 align);
 void MEMInitAllocatorForFrmHeap(MEMAllocator* allocator,
                                 struct MEMiHeapHead* heap, s32 align);
-
-//! @}
 
 #ifdef __cplusplus
 }

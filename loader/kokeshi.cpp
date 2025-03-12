@@ -29,9 +29,11 @@ void Report(const char* pMsg, ...) {
     std::vprintf(pMsg, list);
     va_end(list);
 }
-KOKESHI_BY_PACK(KM_BRANCH(0x80183f18, Report), // Wii Sports
-                KM_BRANCH(0x80183b50, Report), // Wii Play
-                KOKESHI_NOTIMPLEMENTED);       // Wii Sports Resort
+// clang-format off
+KOKESHI_BY_PACK(KM_BRANCH(0x80183f18, Report),  // Wii Sports
+                KM_BRANCH(0x80183b50, Report),  // Wii Play
+                KM_BRANCH(0x80235cc8, Report)); // Wii Sports Resort
+// clang-format on
 
 /**
  * @brief Loads Kamek module and applies patches
@@ -39,9 +41,11 @@ KOKESHI_BY_PACK(KM_BRANCH(0x80183f18, Report), // Wii Sports
 void Load() {
     kamek::loadKamekBinaryFromDisc(&cLoaderFunctions, BINARY_PATH);
 }
-KOKESHI_BY_PACK(KM_BRANCH(0x80183098, Load), // Wii Sports
-                KM_BRANCH(0x80182d6c, Load), // Wii Play
-                KOKESHI_NOTIMPLEMENTED);     // Wii Sports Resort
+// clang-format off
+KOKESHI_BY_PACK(KM_BRANCH(0x80183098, Load),  // Wii Sports
+                KM_BRANCH(0x80182d6c, Load),  // Wii Play
+                KM_BRANCH(0x8022d980, Load)); // Wii Sports Resort
+// clang-format on
 
 } // namespace
 
@@ -52,10 +56,14 @@ KOKESHI_BY_PACK(KM_BRANCH(0x80183098, Load), // Wii Sports
  * @param sys Use system (MEM1) heap
  */
 void* Alloc(size_t size, bool sys) {
+    EGG::Heap* pMem1Heap = RPSysSystem::getRootHeapMem1();
+    EGG::Heap* pMem2Heap = RPSysSystem::getRootHeapMem2();
+
+    OS_ASSERT(pMem1Heap != nullptr, "MEM1 heap is NULL");
+    OS_ASSERT(pMem2Heap != nullptr, "MEM2 heap is NULL");
+
     return RP_GET_INSTANCE(RPSysSystem)
-        ->alloc(sys ? RPSysSystem::getRootHeapMem1()
-                    : RPSysSystem::getRootHeapMem2(),
-                size, 32);
+        ->alloc(sys ? pMem1Heap : pMem2Heap, size, 32);
 }
 
 /**
@@ -65,10 +73,14 @@ void* Alloc(size_t size, bool sys) {
  * @param sys Use system (MEM1) heap
  */
 void Free(void* pBlock, bool sys) {
+    EGG::Heap* pMem1Heap = RPSysSystem::getRootHeapMem1();
+    EGG::Heap* pMem2Heap = RPSysSystem::getRootHeapMem2();
+
+    OS_ASSERT(pMem1Heap != nullptr, "MEM1 heap is NULL");
+    OS_ASSERT(pMem2Heap != nullptr, "MEM2 heap is NULL");
+
     return RP_GET_INSTANCE(RPSysSystem)
-        ->free(sys ? RPSysSystem::getRootHeapMem1()
-                   : RPSysSystem::getRootHeapMem2(),
-               pBlock);
+        ->free(sys ? pMem1Heap : pMem2Heap, pBlock);
 }
 
 } // namespace kokeshi

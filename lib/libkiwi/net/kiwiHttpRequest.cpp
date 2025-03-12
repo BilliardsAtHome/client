@@ -1,5 +1,7 @@
 #include <libkiwi.h>
 
+#include <cstdlib>
+
 namespace kiwi {
 
 /**
@@ -221,7 +223,7 @@ bool HttpRequest::Request() {
     String request = mResource;
 
     // URL parameter string
-    K_FOREACH(mParams) {
+    K_FOREACH (mParams) {
         // Parameters delimited by ampersand
         String fmt = it == mParams.Begin() ? "?%s=%s" : "&%s=%s";
         request += Format(fmt, it.Key().CStr(), it.Value().CStr());
@@ -232,7 +234,7 @@ bool HttpRequest::Request() {
                      PROTOCOL_VERSION.CStr());
 
     // Build header fields
-    K_FOREACH(mHeader) {
+    K_FOREACH (mHeader) {
         request += Format("%s: %s\n", it.Key().CStr(), it.Value().CStr());
     }
 
@@ -379,7 +381,7 @@ bool HttpRequest::Receive() {
     // If we were given the length, we can be 100% sure
     Optional<u32> len;
     if (mResponse.header.Contains("Content-Length")) {
-        len = ksl::strtoul(*mResponse.header.Find("Content-Length"));
+        len = std::strtoul(*mResponse.header.Find("Content-Length"), nullptr, 0);
     }
 
     // We may have read some of the body earlier

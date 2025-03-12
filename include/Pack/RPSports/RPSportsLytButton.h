@@ -5,6 +5,10 @@
 #include <egg/types_egg.h>
 #include <nw4r/types_nw4r.h>
 
+class RPSysLayout;
+class RPSysLytBounding;
+class RPSysLytResAccessor;
+
 class RPSportsLytButton {
 public:
     struct Arg {

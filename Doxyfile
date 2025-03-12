@@ -76,11 +76,14 @@ STRIP_FROM_INC_PATH    = include/MSL/ loader/ include/ lib/
 # with the commands \{ and \} for these it is advised to use the version @{ and
 # @} or use a double escape (\\{ and \\})
 
-ALIASES                += wfuname="^^<b>(Name from Wii Fit U)</b>^^"
-ALIASES                += wscname="^^<b>(Name from Wii Sports Club)</b>^^"
-ALIASES                += customname="^^<b>(Name custom or derived from official symbol)</b>^^"
-ALIASES 			   += typo="\xrefitem typo \"\" \"Known Typo Errors\" "
-ALIASES                += extview{1}="\note This class cannot be instantiated. It is an extension of \1."
+ALIASES                += wfuname="\note Type name from Wii Fit U."
+ALIASES                += wscname="\note Type name from Wii Sports Club."
+ALIASES 			   += typo="\attention This identifier contains a known typo that is preserved for accuracy."
+ALIASES                += extension{1}="\note This class cannot be instantiated. It is an extension of \1."
+ALIASES                += history="\attention"
+ALIASES                += unused="\note This functionality is unused."
+ALIASES                += stubbed="\note This functionality is removed from retail builds."
+ALIASES                += ws2="\note This functionality was added to the engine for Wii Sports Resort."
 
 # The NUM_PROC_THREADS specifies the number threads doxygen is allowed to use
 # during processing. When set to 0 doxygen will based this on the number of
@@ -218,6 +221,9 @@ SHOW_USED_FILES        = NO
 
 # KOKESHI: Enabled for customization.
 LAYOUT_FILE            = docs/layout.xml
+
+# KOKESHI: Disabled for consistentency.
+CASE_SENSE_NAMES       = YES
 
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
@@ -494,10 +500,13 @@ GENERATE_LATEX         = NO
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
 # KOKESHI: Add CodeWarrior macros, C++11
-PREDEFINED             = __MWCC__ __MWERKS__ LIBKIWI_CPP1X __DOXYGEN PACK_SPORTS PACK_PLAY PACK_RESORT
+PREDEFINED             = __MWCC__ __MWERKS__ LIBKIWI_CPP1X KOKESHI_PARSED_BY_DOXYGEN PACK_SPORTS LIBKIWI_KAMEK_PUBLIC
 
 # KOKESHI: Expand some codegen macros for documentation purposes.
 MACRO_EXPANSION        = YES
 
 # KOKESHI: Clean up underscore prefixed structures in RVL SDK.
 TYPEDEF_HIDES_STRUCT = YES
+
+# KOKESHI: Hide Kamek macros
+EXCLUDE_SYMBOLS = "KOKESHI_BY_PACK*" "KM_*"

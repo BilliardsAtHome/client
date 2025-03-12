@@ -7,9 +7,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_esp
-//! @{
-
 typedef enum {
     ES_IOCTLV_LAUNCH_TITLE = 8,
     ES_IOCTLV_READ_CONTENT_FILE = 10,
@@ -30,8 +27,6 @@ typedef struct ESPTmd {
 
 s32 ESP_ReadContentFile(s32 fd, void* dst, u32 len);
 s32 ESP_SeekContentFile(s32 fd, s32 offset, s32 origin);
-
-//! @}
 
 #ifdef __cplusplus
 }

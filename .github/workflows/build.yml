@@ -1,0 +1,33 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  KAMEK_RELEASE: https://github.com/PackProject/Kamek/releases/download/v1.0.0/KamekRelease_net6.0.zip
+  KAMEK_SOLUTION: tools/Kamek/Kamek/Kamek.sln
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout Kokeshi repository
+      uses: actions/checkout@v3
+
+    - name: Install Kamek
+      run: |
+        curl -L ${{env.KAMEK_RELEASE}} -o kamek.zip
+        unzip kamek.zip -d tools
+
+    - name: Download compilers
+      run: curl -L '${{ secrets.COMPILERS }}' | tar -xvf- -C tools
+    - name: Install CW for Wii 1.7
+      run: mv tools/Wii/1.7/* tools
+
+    - name: Build the code
+      run: make CI=1

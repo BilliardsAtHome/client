@@ -8,9 +8,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_mem
-//! @{
-
 typedef enum {
     MEM_HEAP_OPT_CLEAR_ALLOC = (1 << 0),
     MEM_HEAP_OPT_DEBUG_FILL = (1 << 1),
@@ -92,8 +89,6 @@ static void FillAllocMemory(MEMiHeapHead* heap, void* memBlock, u32 size) {
 static s32 MEMGetHeapTotalSize(MEMiHeapHead* heap) {
     return GetOffsetFromPtr(heap, heap->end);
 }
-
-//! @}
 
 #ifdef __cplusplus
 }

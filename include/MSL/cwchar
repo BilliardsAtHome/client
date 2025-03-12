@@ -13,7 +13,10 @@ using ::wcschr;
 using ::wcscmp;
 using ::wcscpy;
 using ::wcslen;
+using ::wcsncat;
+using ::wcsncmp;
 using ::wcsncpy;
+using ::wcsstr;
 using ::wcstombs;
 } // namespace std
 

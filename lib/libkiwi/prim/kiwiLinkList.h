@@ -114,7 +114,7 @@ public:
          * @param pNode Iterator node
          */
         explicit ConstIterator(TListNode<T>* pNode) : mpNode(pNode) {
-            K_ASSERT(mpNode);
+            K_ASSERT(mpNode != nullptr);
         }
 
         /**
@@ -123,7 +123,7 @@ public:
          * @param iter Iterator
          */
         ConstIterator(Iterator iter) : mpNode(iter.mpNode) {
-            K_ASSERT(mpNode);
+            K_ASSERT(mpNode != nullptr);
         }
 
         /**
@@ -224,7 +224,7 @@ public:
     /**
      * @brief Gets list size
      */
-    u32 GetSize() const {
+    u32 Size() const {
         return mSize;
     }
 
@@ -232,7 +232,7 @@ public:
      * @brief Tests whether list is empty
      */
     bool Empty() const {
-        return GetSize() == 0;
+        return Size() == 0;
     }
 
     /**

@@ -11,7 +11,7 @@ public:
     virtual ~DrawDirectionalStrategy() {}               // at 0x8
     virtual UNKTYPE GetCalcAheadFunc(ParticleManager*); // at 0x18
 
-    void Draw(const DrawInfo&, ParticleManager*);
+    virtual void Draw(const DrawInfo&, ParticleManager*);
 };
 } // namespace ef
 } // namespace nw4r

@@ -1,6 +1,7 @@
+#include <libkiwi.h>
+
 #include <cstdio>
 #include <cstring>
-#include <libkiwi.h>
 
 namespace ksl {
 
@@ -9,7 +10,7 @@ namespace ksl {
  *
  * @param c Character
  */
-bool isdigit(char c) {
+int isdigit(char c) {
     return c >= '0' && c <= '9';
 }
 
@@ -18,7 +19,7 @@ bool isdigit(char c) {
  *
  * @param c Character
  */
-bool isalpha(char c) {
+int isalpha(char c) {
     return isupper(c) || islower(c);
 }
 
@@ -27,7 +28,7 @@ bool isalpha(char c) {
  *
  * @param c Character
  */
-bool isupper(char c) {
+int isupper(char c) {
     return c >= 'A' && c <= 'Z';
 }
 
@@ -36,7 +37,7 @@ bool isupper(char c) {
  *
  * @param c Character
  */
-bool islower(char c) {
+int islower(char c) {
     return c >= 'a' && c <= 'z';
 }
 
@@ -357,6 +358,44 @@ const wchar_t* wcsstr(const wchar_t* pwStr, const wchar_t* pwSeq) {
     }
 
     return nullptr;
+}
+
+// Internal STL declarations
+extern "C" int __wpformatter(UNKTYPE* pWriteFunc, void* pArgs,
+                             const wchar_t* pwFmt, std::va_list args);
+extern "C" void __wStringWrite(UNKTYPE);
+
+/**
+ * @brief Applies the specified arguments to the specified wide-char format
+ * string, placing the result in the output buffer.
+ *
+ * @param[out] pwDst Destination buffer
+ * @param maxlen Buffer size
+ * @param pwFmt Format string
+ * @param args Format arguments
+ * @return int Number of characters written
+ */
+int vswprintf(wchar_t* pwDst, size_t maxlen, const wchar_t* pwFmt,
+              std::va_list args) {
+    struct FmtArgs {
+        wchar_t* pwDst;
+        size_t maxlen;
+        u32 _08;
+    };
+
+    FmtArgs fmtArgs = {pwDst, maxlen, 0};
+    int n = __wpformatter(__wStringWrite, &fmtArgs, pwFmt, args);
+
+    if (n >= 0) {
+        if (n < maxlen) {
+            pwDst[n] = L'\0';
+        } else {
+            pwDst[maxlen - 1] = L'\0';
+            return -1;
+        }
+    }
+
+    return n;
 }
 
 } // namespace ksl

@@ -6,9 +6,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_ax
-//! @{
-
 #define AX_SAMPLE_RATE 32000
 #define AX_VOICE_MAX 96
 
@@ -75,8 +72,6 @@ void AXSetVoiceAddr(AXVPB* vpb, AXPBADDR* addr);
 void AXGetLpfCoefs(u16 freq, u16* a, u16* b);
 void AXSetMaxDspCycles(u32 num);
 s32 AXGetMaxVoices(void);
-
-//! @}
 
 #ifdef __cplusplus
 }

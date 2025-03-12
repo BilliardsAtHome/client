@@ -95,7 +95,7 @@ GOOD_HASHES = {
     "play": [
         "0da5e7e51135219f580ad011d1b635bc83569bb9"  # Wii Play (US, Rev 1)
     ],
-    "sports2": [
+    "resort": [
         "e3e22a9de62f6e11ded52e9a7e6933892963b219"  # Wii Sports Resort (US)
     ]
 }
@@ -132,6 +132,8 @@ def main() -> None:
     if not success:
         exit(1)
 
+    print(f"[INFO] Success!")
+
 
 def build(args) -> bool:
     """Attempt to build the mod
@@ -158,7 +160,6 @@ def build(args) -> bool:
         if not install_romfs(args):
             return False
 
-    print(f"[INFO] Success!")
     return True
 
 
@@ -511,13 +512,16 @@ def install_romfs(args) -> bool:
             {disc_root}""")
             return False
 
-    # Install loader (sys/main.dol patch)
-    copyfile(f"{BUILD_DIR}/main_{args.game}.dol",
-             f"{partition_root}/sys/main.dol")
+    try:
+        # Install loader (sys/main.dol patch)
+        copyfile(f"{BUILD_DIR}/main_{args.game}.dol",
+                 f"{partition_root}/sys/main.dol")
 
-    # Install module & mapfile
-    copytree(f"{BUILD_DIR}/{MODULES_DIR}",
-             f"{partition_root}/files/{MODULES_DIR}", dirs_exist_ok=True)
+        # Install module & mapfile
+        copytree(f"{BUILD_DIR}/{MODULES_DIR}",
+                 f"{partition_root}/files/{MODULES_DIR}", dirs_exist_ok=True)
+    except Exception:
+        return False
 
     return True
 

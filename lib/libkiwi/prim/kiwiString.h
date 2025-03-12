@@ -90,15 +90,7 @@ public:
     /**
      * @brief Destructor
      */
-    ~StringImpl() {
-        // Don't delete static memory
-        if (mpBuffer == scEmptyCStr) {
-            return;
-        }
-
-        delete[] mpBuffer;
-        mpBuffer = nullptr;
-    }
+    ~StringImpl();
 
     /**
      * @brief Implicit conversion operator to C-style string
@@ -235,6 +227,16 @@ public:
      */
     TVector<StringImpl> Split(const StringImpl& rDelim) const;
 
+    /**
+     * @brief Convert this string to a multi-byte string
+     */
+    StringImpl<char> ToMultiByte() const;
+
+    /**
+     * @brief Convert this string to a wide-char string
+     */
+    StringImpl<wchar_t> ToWideChar() const;
+
     // clang-format off
     StringImpl& operator=(const StringImpl& rStr) { Assign(rStr); return *this; }
     StringImpl& operator=(const T* pStr)          { K_ASSERT(pStr != nullptr); Assign(pStr); return *this; }
@@ -333,23 +335,14 @@ typedef StringImpl<wchar_t> WString;
  * @param args Format arguments
  */
 template <typename T>
-K_INLINE StringImpl<T> VFormat(const StringImpl<T>& rFmt, std::va_list args) {
-    char buffer[1024];
-    std::vsnprintf(buffer, sizeof(buffer), rFmt, args);
-    return StringImpl<T>(buffer);
-}
+StringImpl<T> VFormat(const StringImpl<T>& rFmt, std::va_list args);
 /**
  * @brief Creates a new string from format arguments
  *
  * @param pFmt Format C-style string
  * @param args Format arguments
  */
-template <typename T>
-K_INLINE StringImpl<T> VFormat(const T* pFmt, std::va_list args) {
-    char buffer[1024];
-    std::vsnprintf(buffer, sizeof(buffer), pFmt, args);
-    return StringImpl<T>(buffer);
-}
+template <typename T> StringImpl<T> VFormat(const T* pFmt, std::va_list args);
 
 /**
  * @brief Creates a new string from format arguments
@@ -357,29 +350,14 @@ K_INLINE StringImpl<T> VFormat(const T* pFmt, std::va_list args) {
  * @param rFmt Format string
  * @param ... Format arguments
  */
-template <typename T>
-K_INLINE StringImpl<T> Format(const StringImpl<T>& rFmt, ...) {
-    std::va_list list;
-    va_start(list, rFmt);
-    StringImpl<T> str = VFormat(rFmt, list);
-    va_end(list);
-
-    return str;
-}
+template <typename T> StringImpl<T> Format(const StringImpl<T>& rFmt, ...);
 /**
  * @brief Creates a new string from format arguments
  *
  * @param pFmt Format C-style string
  * @param ... Format arguments
  */
-template <typename T> K_INLINE StringImpl<T> Format(const T* pFmt, ...) {
-    std::va_list list;
-    va_start(list, pFmt);
-    StringImpl<T> str = VFormat(pFmt, list);
-    va_end(list);
-
-    return str;
-}
+template <typename T> StringImpl<T> Format(const T* pFmt, ...);
 
 /**
  * @brief Hashes a key of any type

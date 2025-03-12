@@ -5,9 +5,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_sc
-//! @{
-
 typedef enum { SC_ASPECT_STD, SC_ASPECT_WIDE } SCAspectRatio;
 
 typedef enum { SC_EURGB_50_HZ, SC_EURGB_60_HZ } SCEuRgb60Mode;
@@ -62,8 +59,6 @@ void SCSetWpadMotorMode(u8 mode);
 u8 SCGetWpadSensorBarPosition(void);
 u8 SCGetWpadSpeakerVolume(void);
 void SCSetWpadSpeakerVolume(u8 vol);
-
-//! @}
 
 #ifdef __cplusplus
 }

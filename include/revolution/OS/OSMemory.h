@@ -5,9 +5,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_os
-//! @{
-
 #define OS_MEM_B_TO_KB(mb) ((mb) / 1024)
 #define OS_MEM_B_TO_MB(mb) ((mb) / 1024 / 1024)
 
@@ -22,8 +19,6 @@ u32 OSGetPhysicalMem2Size(void);
 u32 OSGetConsoleSimulatedMem1Size(void);
 u32 OSGetConsoleSimulatedMem2Size(void);
 void __OSInitMemoryProtection(void);
-
-//! @}
 
 #ifdef __cplusplus
 }

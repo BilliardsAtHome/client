@@ -1,5 +1,6 @@
 #include <Pack/RPGraphics.h>
 #include <Pack/RPKernel.h>
+
 #include <libkiwi.h>
 
 namespace kiwi {
@@ -17,7 +18,7 @@ void IScene::Configure() {
     // Setup renderer view
     RPGrpScreen* pScreen = new RPGrpScreen();
     K_ASSERT(pScreen != nullptr);
-    pScreen->SetCanvasMode(RPGrpScreen::CANVASMODE_0);
+    pScreen->SetCanvasMode(RPGrpScreen::CANVASMODE_CC);
 
     RPGrpRenderer::GetCurrent()->CreateView2D(1, pScreen);
     RPGrpRenderer::GetCurrent()->CorrectView();

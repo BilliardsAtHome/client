@@ -10,7 +10,7 @@ public:
     DrawLineStrategy();
     virtual ~DrawLineStrategy() {} // at 0x8
 
-    UNKTYPE Draw(const DrawInfo&, ParticleManager*);
+    virtual UNKTYPE Draw(const DrawInfo&, ParticleManager*);
 };
 } // namespace ef
 } // namespace nw4r

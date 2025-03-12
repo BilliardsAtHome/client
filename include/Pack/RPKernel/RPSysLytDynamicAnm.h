@@ -101,7 +101,7 @@ private:
     // @brief Animation end position
     EGG::Vector3f mDestPos; // at 0x24
     // @brief Node for linked list
-    nw4r::ut::Node mNode; // at 0x30
+    nw4r::ut::Link mNode; // at 0x30
 };
 
 #endif

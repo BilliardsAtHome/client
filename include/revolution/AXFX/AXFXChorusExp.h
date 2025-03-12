@@ -5,9 +5,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_axfx
-//! @{
-
 // Forward declarations
 typedef struct AXFX_BUS;
 typedef struct AXFX_BUFFERUPDATE;
@@ -56,8 +53,6 @@ void AXFXChorusExpShutdown(AXFX_CHORUS_EXP* fx);
 BOOL AXFXChorusExpSettings(AXFX_CHORUS_EXP* fx);
 void AXFXChorusExpCallback(struct AXFX_BUFFERUPDATE* update,
                            AXFX_CHORUS_EXP* fx);
-
-//! @}
 
 #ifdef __cplusplus
 }

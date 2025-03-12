@@ -19,20 +19,28 @@ f32 FLog(f32 x);
 f32 FrSqrt(f32 x);
 
 inline f32 FAbs(register f32 x) {
+    register f32 absx;
+
     // clang-format off
     asm {
-        fabs x, x
+        fabs absx, x
     }
     // clang-format on
 
-    return x;
+    return absx;
 }
 
-inline f32 FCeil(f32 x) { return std::ceilf(x); }
+inline f32 FCeil(f32 x) {
+    return std::ceilf(x);
+}
 
-inline f32 FExp(f32 x) { return detail::FExp(x); }
+inline f32 FExp(f32 x) {
+    return detail::FExp(x);
+}
 
-inline f32 FFloor(f32 x) { return std::floorf(x); }
+inline f32 FFloor(f32 x) {
+    return std::floorf(x);
+}
 
 inline f32 FInv(register f32 x) {
     register f32 work0, work1, work2, work3;
@@ -52,20 +60,20 @@ inline f32 FInv(register f32 x) {
     return work0;
 }
 
-inline f32 FMod(f32 x, f32 y) { return std::fmodf(x, y); }
+inline f32 FMod(f32 x, f32 y) {
+    return std::fmodf(x, y);
+}
 
-inline f32 FModf(f32 x, f32* y) { return std::modff(x, y); }
+inline f32 FModf(f32 x, f32* pY) {
+    return std::modff(x, pY);
+}
 
 inline f32 FSqrt(f32 x) {
-    if (x < 0.0f) {
-        return 0.0f;
-    }
-
-    return x * FrSqrt(x);
+    return x <= 0.0f ? 0.0f : x * FrSqrt(x);
 }
 
 inline f32 FLog(f32 x) {
-    if (x >= 0.0f) {
+    if (x > 0.0f) {
         return detail::FLog(x);
     }
 
@@ -109,9 +117,13 @@ inline s16 F32ToS16(f32 arg) {
     return ret;
 }
 
-inline u32 F32AsU32(f32 arg) { return *reinterpret_cast<u32*>(&arg); }
+inline u32 F32AsU32(f32 arg) {
+    return *reinterpret_cast<u32*>(&arg);
+}
 
-inline f32 U32AsF32(u32 arg) { return *reinterpret_cast<f32*>(&arg); }
+inline f32 U32AsF32(u32 arg) {
+    return *reinterpret_cast<f32*>(&arg);
+}
 
 inline s32 FGetExpPart(f32 x) {
     s32 s = F32AsU32(x);

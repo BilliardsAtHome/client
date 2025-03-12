@@ -7,9 +7,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_nwc24
-//! @{
-
 #define NWC24_DL_TASK_MAX 120
 #define NWC24_DL_SUBTASK_MAX 32
 
@@ -99,8 +96,6 @@ NWC24DlHeader* NWC24iGetCachedDlHeader(void);
 NWC24Err NWC24iCheckHeaderConsistency(NWC24DlHeader* header,
                                       BOOL clear) DECOMP_DONT_INLINE;
 NWC24Err NWC24iLoadDlHeader(void);
-
-//! @}
 
 #ifdef __cplusplus
 }

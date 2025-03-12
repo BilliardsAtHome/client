@@ -39,7 +39,7 @@ public:
     void changeScene();
 
 private:
-    char UNK_0x0[0x928];
+    char UNK_0x898[0x90];
     nw4r::snd::SoundHandle mSndHandle; // at 0x928
 };
 

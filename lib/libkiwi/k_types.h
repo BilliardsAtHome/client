@@ -76,7 +76,7 @@ typedef void (*funcptr_t)(void);
  * @param rContainer Container reference
  */
 #define K_FOREACH(rContainer)                                                  \
-    for (DECLTYPE(rContainer.Begin()) it = rContainer.Begin();                 \
+    for (K_DECLTYPE(rContainer.Begin()) it = rContainer.Begin();               \
          it != rContainer.End(); ++it)
 
 #endif // LIBKIWI_TYPES_H

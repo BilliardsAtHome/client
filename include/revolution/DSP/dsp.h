@@ -5,13 +5,10 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_dsp
-//! @{
-
 // Forward declarations
 typedef struct DSPTask;
 
-//! General-purpose typedef
+// General-purpose typedef
 typedef void* DSPMail;
 
 BOOL DSPCheckMailToDSP(void);
@@ -23,8 +20,6 @@ void DSPInit(void);
 BOOL DSPCheckInit(void);
 struct DSPTask* DSPAddTask(struct DSPTask* task);
 struct DSPTask* DSPAssertTask(struct DSPTask* task);
-
-//! @}
 
 #ifdef __cplusplus
 }

@@ -14,7 +14,7 @@ public:
     ~ExternalSoundPlayer();
 
     int GetPlayableSoundCount() const {
-        return mPlayableSoundCount;
+        return mPlayableCount;
     }
     void SetPlayableSoundCount(int count);
 
@@ -27,11 +27,11 @@ public:
     }
     BasicSound* GetLowestPrioritySound();
 
-    void InsertSoundList(BasicSound* sound);
-    void RemoveSoundList(BasicSound* sound);
+    void InsertSoundList(BasicSound* pSound);
+    void RemoveSoundList(BasicSound* pSound);
 
     template <typename TForEachFunc>
-    TForEachFunc ForEachSound(TForEachFunc func, bool reverse) {
+    TForEachFunc ForEachSound(TForEachFunc pFunction, bool reverse) {
         if (reverse) {
             BasicSoundExtPlayList::RevIterator it =
                 mSoundList.GetBeginReverseIter();
@@ -41,30 +41,25 @@ public:
 
                 SoundHandle handle;
                 handle.detail_AttachSoundAsTempHandle(&*curr);
-                func(handle);
+                pFunction(handle);
 
                 if (handle.IsAttachedSound()) {
                     ++it;
                 }
             }
         } else {
-            BasicSoundExtPlayList::Iterator it = mSoundList.GetBeginIter();
-
-            while (it != mSoundList.GetEndIter()) {
-                BasicSoundExtPlayList::Iterator curr = it++;
-
-                SoundHandle handle;
-                handle.detail_AttachSoundAsTempHandle(&*curr);
-                func(handle);
-            }
+            NW4R_UT_LIST_SAFE_FOREACH(
+                mSoundList, SoundHandle handle;
+                handle.detail_AttachSoundAsTempHandle(&*it);
+                pFunction(handle););
         }
 
-        return func;
+        return pFunction;
     }
 
 private:
     BasicSoundExtPlayList mSoundList; // at 0x0
-    u16 mPlayableSoundCount;          // at 0xC
+    u16 mPlayableCount;               // at 0xC
     f32 mVolume;                      // at 0x10
 };
 

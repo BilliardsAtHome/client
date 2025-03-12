@@ -6,13 +6,9 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_ax
-//! @{
-
 #define AX_PRIORITY_FREE 0
 #define AX_PRIORITY_MIN 1
 #define AX_PRIORITY_MAX 31
-#define AX_PRIORITY_NORMAL (AX_PRIORITY_MAX / 2 + 1)
 
 AXVPB* __AXGetStackHead(u32 prio);
 void __AXServiceCallbackStack(void);
@@ -28,8 +24,6 @@ AXVPB* __AXPopStackFromBottom(u32 prio);
 void AXFreeVoice(AXVPB* vpb);
 AXVPB* AXAcquireVoice(u32 prio, AXVoiceCallback callback, u32 userContext);
 void AXSetVoicePriority(AXVPB* vpb, u32 prio);
-
-//! @}
 
 #ifdef __cplusplus
 }

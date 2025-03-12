@@ -5,13 +5,12 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_mem
-//! @{
+#define MEM_FRM_HEAP_MIN_SIZE (sizeof(MEMiHeapHead) + sizeof(MEMiFrmHeapHead))
 
 // Forward declarations
 typedef struct MEMiHeapHead;
 
-//! Specify how to free memory
+// Specify how to free memory
 typedef enum {
     MEM_FRM_HEAP_FREE_TO_HEAD = (1 << 0),
     MEM_FRM_HEAP_FREE_TO_TAIL = (1 << 1),
@@ -55,8 +54,6 @@ static void* MEMAllocFromFrmHeap(struct MEMiHeapHead* heap, u32 size) {
 static u32 MEMGetAllocatableSizeForFrmHeap(struct MEMiHeapHead* heap) {
     return MEMGetAllocatableSizeForFrmHeapEx(heap, 4);
 }
-
-//! @}
 
 #ifdef __cplusplus
 }

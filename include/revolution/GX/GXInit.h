@@ -6,9 +6,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_gx
-//! @{
-
 typedef struct _GXData {
     union {
         UNKWORD WORD_0x0;
@@ -85,8 +82,6 @@ extern GXData* const __GXData;
 #define gxdt __GXData
 
 GXFifoObj* GXInit(void*, u32);
-
-//! @}
 
 #ifdef __cplusplus
 }

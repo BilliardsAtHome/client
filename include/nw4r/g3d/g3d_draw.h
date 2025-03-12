@@ -5,11 +5,29 @@
 
 namespace nw4r {
 namespace g3d {
-struct DrawResMdlReplacement {};
+
+struct DrawResMdlReplacement {
+    u8* visArray;                               // at 0x0
+    ResTexObjData* texObjDataArray;             // at 0x4
+    ResTlutObjData* tlutObjDataArray;           // at 0x8
+    ResTexSrtData* texSrtDataArray;             // at 0xC
+    ResChanData* chanDataArray;                 // at 0x10
+    ResGenModeData* genModeDataArray;           // at 0x14
+    ResMatMiscData* matMiscDataArray;           // at 0x18
+    ResPixDL* pixDLArray;                       // at 0x1C
+    ResTevColorDL* tevColorDLArray;             // at 0x20
+    ResIndMtxAndScaleDL* indMtxAndScaleDLArray; // at 0x24
+    ResTexCoordGenDL* texCoordGenDLArray;       // at 0x28
+    ResTevData* tevDataArray;                   // at 0x2C
+    ResVtxPosData** vtxPosTable;                // at 0x30
+    ResVtxNrmData** vtxNrmTable;                // at 0x34
+    ResVtxClrData** vtxClrTable;                // at 0x38
+};
 
 void DrawResMdlDirectly(ResMdl, const math::MTX34*, const math::MTX33*,
                         const math::MTX34*, const u8*, const u8*,
                         DrawResMdlReplacement*, u32);
+
 } // namespace g3d
 } // namespace nw4r
 

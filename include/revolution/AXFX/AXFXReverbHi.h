@@ -6,9 +6,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_axfx
-//! @{
-
 typedef struct AXFX_REVERBHI {
     AXFX_REVERBHI_EXP exp; // at 0x0
     f32 coloration;        // at 0x148
@@ -24,8 +21,6 @@ BOOL AXFXReverbHiInit(AXFX_REVERBHI* fx);
 BOOL AXFXReverbHiShutdown(AXFX_REVERBHI* fx);
 BOOL AXFXReverbHiSettings(AXFX_REVERBHI* fx);
 void AXFXReverbHiCallback(void* chans, void* context);
-
-//! @}
 
 #ifdef __cplusplus
 }

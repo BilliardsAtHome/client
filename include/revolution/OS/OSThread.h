@@ -6,9 +6,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_os
-//! @{
-
 #define OS_PRIORITY_MIN 0
 #define OS_PRIORITY_MAX 31
 
@@ -87,8 +84,6 @@ void OSWakeupThread(OSThreadQueue* queue);
 BOOL OSSetThreadPriority(OSThread* thread, s32 prio);
 void OSClearStack(u8 val);
 void OSSleepTicks(s64 ticks);
-
-//! @}
 
 #ifdef __cplusplus
 }

@@ -5,10 +5,7 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_dvd
-//! @{
-
-//! OS sets MSB to signal that the device code was successfully read
+// OS sets MSB to signal that the device code was successfully read
 #define DVD_DEVICE_CODE_READ (1 << 15)
 #define MAKE_DVD_DEVICE_CODE(x) (DVD_DEVICE_CODE_READ | (x))
 
@@ -114,8 +111,6 @@ BOOL __DVDTestAlarm(const struct OSAlarm* alarm);
 BOOL __DVDLowBreak(void);
 BOOL __DVDStopMotorAsync(DVDCommandBlock* block, DVDCommandCallback callback);
 void __DVDRestartMotor(void);
-
-//! @}
 
 #ifdef __cplusplus
 }

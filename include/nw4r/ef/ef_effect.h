@@ -33,8 +33,8 @@ struct Effect : ReferencedObject {
     virtual void Calc(bool);
     virtual void Draw(const DrawInfo&);
 
-    bool SendClosing();
-    UNKTYPE DestroyFunc();
+    virtual bool SendClosing();
+    virtual UNKTYPE DestroyFunc();
     bool Closing(Emitter*);
     Emitter* CreateEmitter(EmitterResource*, u8, u16);
     bool RetireEmitter(Emitter*);

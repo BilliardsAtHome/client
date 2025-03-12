@@ -4,6 +4,9 @@
 
 #include <egg/types_egg.h>
 
+class RPUtlLytFrameCursor;
+class RPSportsLytButton;
+
 class RPSportsLytCursorBase {
 public:
     RPSportsLytCursorBase();

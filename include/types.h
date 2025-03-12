@@ -5,7 +5,7 @@
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>
-#include <kamek.hpp>
+#include <new>
 #else
 #include <stdarg.h>
 #include <stddef.h>
@@ -13,6 +13,7 @@
 #endif
 
 #include <decomp.h>
+#include <kamek.hpp>
 #include <macros.h>
 
 typedef unsigned long long u64;

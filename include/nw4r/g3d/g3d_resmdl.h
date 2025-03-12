@@ -1,92 +1,194 @@
 #ifndef NW4R_G3D_RESMDL_H
 #define NW4R_G3D_RESMDL_H
-#include "g3d_rescommon.h"
-#include "g3d_resdict.h"
-#include "g3d_resnode.h"
-#include "types_nw4r.h"
+#include <nw4r/g3d/g3d_rescommon.h>
+#include <nw4r/g3d/g3d_resdict.h>
+#include <nw4r/g3d/g3d_resmat.h>
+#include <nw4r/g3d/g3d_resnode.h>
+#include <nw4r/g3d/g3d_resshp.h>
+#include <nw4r/g3d/g3d_resvtx.h>
+#include <nw4r/math.h>
+#include <nw4r/types_nw4r.h>
 
 namespace nw4r {
 namespace g3d {
-struct ResMdlData {
-    char kind[4];       // "MDL0"
-    u32 size;           // at 0x4
-    u32 revision;       // at 0x8
-    s32 resFileOfs;     // at 0xC
-    u32 byteCodeOfs;    // at 0x10
-    u32 nodeOfs;        // at 0x14
-    u32 vtxPosOfs;      // at 0x18
-    u32 vtxNrmOfs;      // at 0x1C
-    u32 vtxClrOfs;      // at 0x20
-    u32 vtxTxcOfs;      // at 0x24
-    u32 matOfs;         // at 0x28
-    u32 tevOfs;         // at 0x2C
-    u32 shpOfs;         // at 0x30
-    u32 plttTexInfoOfs; // at 0x34
+
+/******************************************************************************
+ *
+ * ResMdlInfo
+ *
+ ******************************************************************************/
+struct ResMdlInfoDataTypedef {
+    enum TexMatrixMode {
+        TEXMATRIXMODE_MAYA,
+        TEXMATRIXMODE_XSI,
+        TEXMATRIXMODE_3DSMAX
+    };
+
+    enum EnvelopeMatrixMode {
+        EVPMATRIXMODE_NORMAL,
+        EVPMATRIXMODE_APPROX,
+        EVPMATRIXMODE_EXACT
+    };
 };
 
-struct ResMdl {
-    enum { REVISION = 9 };
+enum ScalingRule {
+    SCALINGRULE_STANDARD,
+    SCALINGRULE_SOFTIMAGE,
+    SCALINGRULE_MAYA
+};
 
-    ResCommon<ResMdlData> mMdl;
+struct ResMtxIDToNodeIDData {
+    u32 numMtxID; // at 0x0
+    s32 table[1]; // at 0x4
+};
 
-    inline ResMdl(void* vptr) : mMdl(vptr) {}
-    bool IsValid() const {
-        return mMdl.IsValid();
+struct ResMdlInfoData : ResMdlInfoDataTypedef {
+    u32 size;                   // at 0x0
+    s32 toResMdlData;           // at 0x4
+    ScalingRule scaling_rule;   // at 0x8
+    TexMatrixMode tex_mtx_mode; // at 0xC
+    s32 vertex_size;            // at 0x10
+    s32 triangle_size;          // at 0x14
+    s32 original_path;          // at 0x18
+    u32 numViewMtx;             // at 0x1C
+    bool need_nrm_mtx_array;    // at 0x20
+    bool need_tex_mtx_array;    // at 0x21
+    bool is_valid_volume;       // at 0x22
+    u8 envelope_mtx_mode;       // at 0x23
+    s32 toMtxIDToNodeID;        // at 0x24
+    math::_VEC3 volume_min;     // at 0x28
+    math::_VEC3 volume_max;     // at 0x34
+};
+
+class ResMdlInfo : public ResCommon<ResMdlInfoData>,
+                   public ResMdlInfoDataTypedef {
+public:
+    NW4R_G3D_RESOURCE_FUNC_DEF(ResMdlInfo);
+
+    ScalingRule GetScalingRule() const {
+        return ref().scaling_rule;
     }
 
-    u8* GetResByteCode(const char*) const;
+    u32 GetNumViewMtx() const {
+        return ref().numViewMtx;
+    }
 
-    ResNode GetResNode(const char*) const;
-    ResNode GetResNode(ResName) const;
-    ResNode GetResNode(int) const;
-    ResNode GetResNode(u32) const;
-    u32 GetResNodeNumEntries() const;
+    EnvelopeMatrixMode GetEnvelopeMatrixMode() const {
+        return static_cast<EnvelopeMatrixMode>(ref().envelope_mtx_mode);
+    }
 
-    ResVtxPos GetResVtxPos(ResName) const;
-    ResVtxPos GetResVtxPos(int) const;
-    ResVtxPos GetResVtxPos(u32) const;
-    u32 GetResVtxPosNumEntries() const;
+    u32 GetNumPosNrmMtx() const {
+        const ResMtxIDToNodeIDData* pData =
+            reinterpret_cast<const ResMtxIDToNodeIDData*>(
+                reinterpret_cast<const u8*>(&ref()) + ref().toMtxIDToNodeID);
 
-    ResVtxNrm GetResVtxNrm(ResName) const;
-    ResVtxNrm GetResVtxNrm(int) const;
-    ResVtxNrm GetResVtxNrm(u32) const;
-    u32 GetResVtxNrmNumEntries() const;
+        return pData->numMtxID;
+    }
 
-    ResVtxClr GetResVtxClr(ResName) const;
-    ResVtxClr GetResVtxClr(int) const;
-    ResVtxClr GetResVtxClr(u32) const;
-    u32 GetResVtxClrNumEntries() const;
+    s32 GetNodeIDFromMtxID(u32 id) const {
+        const s32* pArray =
+            reinterpret_cast<const ResMtxIDToNodeIDData*>(
+                reinterpret_cast<const u8*>(&ref()) + ref().toMtxIDToNodeID)
+                ->table;
 
-    ResVtxTexCoord GetResVtxTexCoord(int) const;
+        return pArray[id];
+    }
+};
 
-    ResMat GetResMat(const char*) const;
-    ResMat GetResMat(ResName) const;
-    ResMat GetResMat(int) const;
-    ResMat GetResMat(u32) const;
-    u32 GetResMatNumEntries() const;
+/******************************************************************************
+ *
+ * ResMdl
+ *
+ ******************************************************************************/
+struct ResMdlData {
+    ResBlockHeaderData header;         // at 0x0
+    u32 revision;                      // at 0x8
+    s32 toResFileData;                 // at 0xC
+    s32 toResByteCodeDic;              // at 0x10
+    s32 toResNodeDic;                  // at 0x14
+    s32 toResVtxPosDic;                // at 0x18
+    s32 toResVtxNrmDic;                // at 0x1C
+    s32 toResVtxClrDic;                // at 0x20
+    s32 toResVtxTexCoordDic;           // at 0x24
+    s32 toResMatDic;                   // at 0x28
+    s32 toResTevDic;                   // at 0x2C
+    s32 toResShpDic;                   // at 0x30
+    s32 toResTexNameToTexPlttInfoDic;  // at 0x34
+    s32 toResPlttNameToTexPlttInfoDic; // at 0x38
+    s32 name;                          // at 0x3C
+    ResMdlInfoData info;               // at 0x40
+};
 
-    ResShp GetResShp(const char*) const;
-    ResShp GetResShp(int) const;
-    ResShp GetResShp(u32) const;
-    u32 GetResShpNumEntries() const;
+class ResMdl : public ResCommon<ResMdlData> {
+public:
+    static const u32 SIGNATURE = 'MDL0';
+    static const int REVISION = 9;
 
-    ResTexPlttInfo GetResTexPlttInfoOffsetFromTexName(int) const;
-    u32 GetResTexPlttInfoOffsetFromTexNameNumEntries() const;
+public:
+    NW4R_G3D_RESOURCE_FUNC_DEF(ResMdl);
 
-    bool Bind(ResFile);
-    void Release();
     void Init();
     void Terminate();
 
-    inline bool CheckRevision() const {
-        return mMdl.ref().revision == REVISION;
+    bool Bind(const ResFile file);
+    void Release();
+
+    u32 GetRevision() const {
+        return ref().revision;
     }
 
-    inline u32 GetResVtxTexCoordNumEntries() const {
-        ResMdlData& ref = mMdl.ref();
-        return mMdl.ofs_to_obj<ResDic>(ref.vtxTxcOfs).GetNumData();
+    bool CheckRevision() const {
+        return GetRevision() == REVISION;
+    }
+
+    const u8* GetResByteCode(const char* pName) const;
+
+    ResNode GetResNode(const char* pName) const;
+    ResNode GetResNode(ResName name) const;
+    ResNode GetResNode(int i) const;
+    ResNode GetResNode(u32 i) const;
+    u32 GetResNodeNumEntries() const;
+
+    ResVtxPos GetResVtxPos(ResName name) const;
+    ResVtxPos GetResVtxPos(int i) const;
+    ResVtxPos GetResVtxPos(u32 i) const;
+    u32 GetResVtxPosNumEntries() const;
+
+    ResVtxNrm GetResVtxNrm(ResName name) const;
+    ResVtxNrm GetResVtxNrm(int i) const;
+    ResVtxNrm GetResVtxNrm(u32 i) const;
+    u32 GetResVtxNrmNumEntries() const;
+
+    ResVtxClr GetResVtxClr(ResName name) const;
+    ResVtxClr GetResVtxClr(int i) const;
+    ResVtxClr GetResVtxClr(u32 i) const;
+    u32 GetResVtxClrNumEntries() const;
+
+    ResVtxTexCoord GetResVtxTexCoord(int i) const;
+    u32 GetResVtxTexCoordNumEntries() const;
+
+    ResMat GetResMat(const char* pName) const;
+    ResMat GetResMat(ResName name) const;
+    ResMat GetResMat(int i) const;
+    ResMat GetResMat(u32 i) const;
+    u32 GetResMatNumEntries() const;
+
+    ResShp GetResShp(const char* pName) const;
+    ResShp GetResShp(int i) const;
+    ResShp GetResShp(u32 i) const;
+    u32 GetResShpNumEntries() const;
+
+    ResTexPlttInfo GetResTexPlttInfoOffsetFromTexName(int i) const;
+    u32 GetResTexPlttInfoOffsetFromTexNameNumEntries() const;
+
+    ResMdlInfo GetResMdlInfo() {
+        return ResMdlInfo(&ref().info);
+    }
+    ResMdlInfo GetResMdlInfo() const {
+        return ResMdlInfo(const_cast<ResMdlInfoData*>(&ref().info));
     }
 };
+
 } // namespace g3d
 } // namespace nw4r
 

@@ -6,9 +6,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_gx
-//! @{
-
 void GXBeginDisplayList(void* list, u32 size);
 u32 GXEndDisplayList(void);
 void GXCallDisplayList(void* list, u32 size);
@@ -18,8 +15,6 @@ static void GXFastCallDisplayList(void* list, u32 size) {
     WGPIPE.p = list;
     WGPIPE.i = size;
 }
-
-//! @}
 
 #ifdef __cplusplus
 }

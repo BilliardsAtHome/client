@@ -10,7 +10,7 @@ public:
     DrawPointStrategy();
     virtual ~DrawPointStrategy() {} // at 0x8
 
-    void Draw(const DrawInfo&, ParticleManager*);
+    virtual void Draw(const DrawInfo&, ParticleManager*);
     void InitGraphics(const DrawInfo&, ParticleManager*);
 };
 } // namespace ef

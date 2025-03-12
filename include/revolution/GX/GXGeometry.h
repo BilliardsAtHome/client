@@ -6,9 +6,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_gx
-//! @{
-
 void GXBegin(GXPrimitive prim, GXVtxFmt fmt, u16 verts);
 static void GXEnd(void) {}
 
@@ -22,8 +19,6 @@ void GXSetCoPlanar(GXBool coplanar);
 void __GXSetDirtyState(void);
 void __GXSendFlushPrim(void);
 void __GXSetGenMode(void);
-
-//! @}
 
 #ifdef __cplusplus
 }

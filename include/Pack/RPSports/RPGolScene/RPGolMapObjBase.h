@@ -5,6 +5,9 @@
 
 #include <nw4r/math/math_types.h>
 
+class RPGrpModelG3D;
+class RPUtlMapObject;
+
 /**
  * @brief Base class for Pack Map objects in the golf scene
  * @todo Document all of the functions

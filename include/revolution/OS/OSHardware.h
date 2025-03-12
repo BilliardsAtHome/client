@@ -1,12 +1,9 @@
-// clang-format off
-//
-// For more details, see:
-//
-// https://www.gc-forever.com/yagcd/chap4.html#sec4
-// https://www.gc-forever.com/yagcd/chap13.html#sec13
-// https://wiibrew.org/wiki/Memory_map
-//
-// clang-format on
+/**
+ * For more details, see:
+ * https://www.gc-forever.com/yagcd/chap4.html#sec4
+ * https://www.gc-forever.com/yagcd/chap13.html#sec13
+ * https://wiibrew.org/wiki/Memory_map
+ */
 
 #ifndef RVL_SDK_OS_HARDWARE_H
 #define RVL_SDK_OS_HARDWARE_H
@@ -18,34 +15,31 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_os_global
-//! @{
-
 // Forward declarations
 typedef struct OSContext;
 typedef struct OSExecParams;
 
-//! Derive offsets for use with OSAddress functions
+// Derive offsets for use with OSAddress functions
 #define __DEF_ADDR_OFFSETS(name, addr)                                         \
     static const u32 OS_PHYS_##name = (addr) - 0x80000000;                     \
     static const u32 OS_CACHED_##name = (addr);                                \
     static const u32 OS_UNCACHED_##name = (addr) + (0xC0000000 - 0x80000000);
 
-//! Define a global variable in *CACHED* MEM1.
-//! Can be accessed directly or with OSAddress functions.
+// Define a global variable in *CACHED* MEM1.
+// Can be accessed directly or with OSAddress functions.
 #define OS_DEF_GLOBAL_VAR(type, name, addr)                                    \
     /* Memory-mapped value for direct access */                                \
     type OS_##name : (addr);                                                   \
     __DEF_ADDR_OFFSETS(name, addr)
 
-//! Define a global array in *CACHED* MEM1.
-//! Can be accessed directly or with OSAddress functions.
+// Define a global array in *CACHED* MEM1.
+// Can be accessed directly or with OSAddress functions.
 #define OS_DEF_GLOBAL_ARR(type, name, arr, addr)                               \
     /* Memory-mapped value for direct access */                                \
     type OS_##name arr : (addr);                                               \
     __DEF_ADDR_OFFSETS(name, addr)
 
-//! Define an global variable in the hardware-register range.
+// Define an global variable in the hardware-register range.
 #define OS_DEF_HW_REG(type, name, addr)                                        \
     /* Memory-mapped value for direct access */                                \
     type OS_##name : (addr);
@@ -90,9 +84,8 @@ typedef struct OSBI2 {
 } OSBI2;
 
 /**
- * @name 0x80000000 - 0x80000100
+ * 0x80000000 - 0x80000100
  */
-/**@{*/
 // clang-format off
 OS_DEF_GLOBAL_VAR(OSBootInfo, BOOT_INFO,                   0x80000000);
 OS_DEF_GLOBAL_VAR(OSDebugInterface, DEBUG_INTERFACE,       0x80000040);
@@ -113,12 +106,10 @@ OS_DEF_GLOBAL_VAR(OSBI2*, DVD_BI2,                         0x800000F4);
 OS_DEF_GLOBAL_VAR(u32, BUS_CLOCK_SPEED,                    0x800000F8);
 OS_DEF_GLOBAL_VAR(u32, CPU_CLOCK_SPEED,                    0x800000FC);
 // clang-format on
-/**@}*/
 
 /**
- * @name 0x80003000 - 0x80003F00
+ * 0x80003000 - 0x80003F00
  */
-/**@{*/
 // clang-format off
 OS_DEF_GLOBAL_ARR(void*, EXCEPTION_TABLE, [15],          0x80003000);
 OS_DEF_GLOBAL_VAR(void*, INTR_HANDLER_TABLE,             0x80003040);
@@ -165,15 +156,9 @@ OS_DEF_GLOBAL_ARR(u8, NWC24_USER_ID_BUFFER, [32],        0x800031C0);
 OS_DEF_GLOBAL_VAR(u64, NWC24_USER_ID,                    0x800031C0);
 OS_DEF_GLOBAL_ARR(u8, SC_PRDINFO, [0x100],               0x80003800);
 // clang-format on
-/**@}*/
-
-//! @}
-
-//! @addtogroup rvl_os
-//! @{
 
 /**
- * @brief PI hardware globals
+ * PI hardware globals
  */
 volatile u32 PI_HW_REGS[] : 0xCC003000;
 typedef enum {
@@ -190,8 +175,7 @@ typedef enum {
     // . . .
 } PIHwReg;
 
-//! @name INTSR - Interrupt Cause Register
-/**@{*/
+// INTSR - Interrupt Cause Register
 #define PI_INTSR_ERROR (1 << 0)
 #define PI_INTSR_RSW (1 << 1)
 #define PI_INTSR_DI (1 << 2)
@@ -208,10 +192,8 @@ typedef enum {
 #define PI_INTSR_HSP (1 << 13)
 #define PI_INTSR_ACR (1 << 14)
 #define PI_INTSR_RSWST (1 << 16)
-/**@}*/
 
-//! @name INTMR - Interrupt Mask Register
-/**@{*/
+// INTMR - Interrupt Mask Register
 #define PI_INTMR_ERROR (1 << 0)
 #define PI_INTMR_RSW (1 << 1)
 #define PI_INTMR_DI (1 << 2)
@@ -227,10 +209,9 @@ typedef enum {
 #define PI_INTMR_DEBUG (1 << 12)
 #define PI_INTMR_HSP (1 << 13)
 #define PI_INTMR_ACR (1 << 14)
-/**@}*/
 
 /**
- * @brief MI hardware registers
+ * MI hardware registers
  */
 volatile u16 MI_HW_REGS[] : 0xCC004000;
 typedef enum {
@@ -258,43 +239,37 @@ typedef enum {
     // . . .
 } MIHwReg;
 
-//! @name INTMR - Interrupt Mask Register
-/**@{*/
+// INTMR - Interrupt Mask Register
 #define MI_INTMR_MEM0 (1 << 0)
 #define MI_INTMR_MEM1 (1 << 1)
 #define MI_INTMR_MEM2 (1 << 2)
 #define MI_INTMR_MEM3 (1 << 3)
 #define MI_INTMR_ADDR (1 << 4)
-/**@}*/
 
-//! @name INTSR - Interrupt Cause Register
-/**@{*/
+// INTSR - Interrupt Cause Register
 #define MI_INTSR_MEM0 (1 << 0)
 #define MI_INTSR_MEM1 (1 << 1)
 #define MI_INTSR_MEM2 (1 << 2)
 #define MI_INTSR_MEM3 (1 << 3)
 #define MI_INTSR_ADDR (1 << 4)
-/**@}*/
 
+/**
+ * DI hardware globals
+ */
 // clang-format off
-//! @name DI hardware globals
-/**@{*/
 OS_DEF_HW_REG(volatile u32, DI_DMA_ADDR, 0xCD006014);
 OS_DEF_HW_REG(volatile u32, DI_CONFIG,   0xCD006024);
-/**@}*/
 // clang-format on
 
+/**
+ * Misc/unknown globals
+ */
 // clang-format off
-//! @name Misc/unknown globals
-/**@{*/
 OS_DEF_HW_REG(volatile u32, UNK_CD000034, 0xCD000034);
 OS_DEF_HW_REG(volatile u32, UNK_CD800180, 0xCD800180);
 OS_DEF_HW_REG(volatile u32, UNK_CD8001CC, 0xCD8001CC);
 OS_DEF_HW_REG(volatile u32, UNK_CD8001D0, 0xCD8001D0);
-/**@}*/
 // clang-format on
-
-//! @}
 
 #ifdef __cplusplus
 }

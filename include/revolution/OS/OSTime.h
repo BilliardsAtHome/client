@@ -6,9 +6,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_os
-//! @{
-
 // Time base frequency = 1/4 bus clock
 #define OS_TIME_SPEED (OS_BUS_CLOCK_SPEED / 4)
 
@@ -48,8 +45,6 @@ s64 __OSTimeToSystemTime(s64 time);
 
 void OSTicksToCalendarTime(s64 time, OSCalendarTime* cal);
 s64 OSCalendarTimeToTicks(const OSCalendarTime* cal);
-
-//! @}
 
 #ifdef __cplusplus
 }

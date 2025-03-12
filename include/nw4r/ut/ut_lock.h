@@ -8,37 +8,37 @@ namespace nw4r {
 namespace ut {
 namespace detail {
 
-inline void Lock(OSMutex& mutex) {
-    OSLockMutex(&mutex);
+inline void Lock(OSMutex& rMutex) {
+    OSLockMutex(&rMutex);
 }
-inline void Unlock(OSMutex& mutex) {
-    OSUnlockMutex(&mutex);
+inline void Unlock(OSMutex& rMutex) {
+    OSUnlockMutex(&rMutex);
 }
 
 template <typename T> class AutoLock : private NonCopyable {
 public:
-    AutoLock(T& obj) : mMutex(obj) {
-        Lock(mMutex);
+    AutoLock(T& rLockObj) : mLockObj(rLockObj) {
+        Lock(mLockObj);
     }
     ~AutoLock() {
-        Unlock(mMutex);
+        Unlock(mLockObj);
     }
 
 private:
-    T& mMutex; // at 0x0
+    T& mLockObj; // at 0x0
 };
 
 } // namespace detail
 
 class AutoInterruptLock : private NonCopyable {
 public:
-    AutoInterruptLock() : mEnabled(OSDisableInterrupts()) {}
+    AutoInterruptLock() : mOldState(OSDisableInterrupts()) {}
     ~AutoInterruptLock() {
-        OSRestoreInterrupts(mEnabled);
+        OSRestoreInterrupts(mOldState);
     }
 
 private:
-    BOOL mEnabled; // at 0x0
+    BOOL mOldState; // at 0x0
 };
 
 } // namespace ut

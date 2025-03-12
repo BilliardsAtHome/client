@@ -6,9 +6,6 @@
 extern "C" {
 #endif
 
-//! @addtogroup rvl_nand
-//! @{
-
 typedef enum {
     NAND_CHECK_TOO_MANY_APP_BLOCKS = (1 << 0),
     NAND_CHECK_TOO_MANY_APP_FILES = (1 << 1),
@@ -17,8 +14,6 @@ typedef enum {
 } NANDCheckFlags;
 
 s32 NANDCheck(u32 neededBlocks, u32 neededFiles, u32* answer);
-
-//! @}
 
 #ifdef __cplusplus
 }

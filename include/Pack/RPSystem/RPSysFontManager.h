@@ -1,7 +1,6 @@
 #ifndef RP_SYSTEM_FONT_MANAGER_H
 #define RP_SYSTEM_FONT_MANAGER_H
 #include "RPTypes.h"
-
 #include <nw4r/ut/ut_ResFont.h>
 #include <nw4r/ut/ut_RomFont.h>
 
@@ -48,8 +47,8 @@ public:
     void* GetResFontData(const char* name) const;
 
     // @brief Access RomFont (for text writer)
-    nw4r::ut::RomFont& GetRomFont() const {
-        return *mRomFont;
+    nw4r::ut::RomFont* GetRomFont() const {
+        return mRomFont;
     }
 
 private:

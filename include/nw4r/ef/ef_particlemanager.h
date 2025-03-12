@@ -24,8 +24,8 @@ struct ParticleManager : ReferencedObject {
     UNKTYPE BeginCalc(bool);
     UNKTYPE EndCalc();
 
-    bool SendClosing();
-    UNKTYPE DestroyFunc();
+    virtual bool SendClosing();
+    virtual UNKTYPE DestroyFunc();
     virtual bool Initialize(Emitter*, EmitterResource*);
     virtual UNKTYPE CreateParticle(u16, math::VEC3, math::VEC3,
                                    const math::MTX34*, float,
