@@ -1,6 +1,7 @@
 #ifndef NW4R_SND_REMOTE_SPEAKER_H
 #define NW4R_SND_REMOTE_SPEAKER_H
 #include <nw4r/types_nw4r.h>
+
 #include <revolution/OS.h>
 #include <revolution/WENC.h>
 #include <revolution/WPAD.h>
@@ -10,23 +11,6 @@ namespace snd {
 
 class RemoteSpeaker {
 public:
-    enum SpeakerState {
-        STATE_INVALID,
-        STATE_EXEC_SPEAKER_ON,
-        STATE_SPEAKER_ON,
-        STATE_EXEC_SPEAKER_PLAY,
-        STATE_SPEAKER_PLAY,
-        STATE_EXEC_SPEAKER_OFF,
-        STATE_SPEAKER_OFF
-    };
-
-    enum SpeakerCommand {
-        COMMAND_NONE,
-        COMMAND_SPEAKER_ON,
-        COMMAND_SPEAKER_PLAY,
-        COMMAND_SPEAKER_OFF
-    };
-
     static const int SAMPLES_PER_AUDIO_PACKET = 40;
 
 public:
@@ -51,6 +35,23 @@ public:
     }
 
 private:
+    enum SpeakerState {
+        STATE_INVALID,
+        STATE_EXEC_SPEAKER_ON,
+        STATE_SPEAKER_ON,
+        STATE_EXEC_SPEAKER_PLAY,
+        STATE_SPEAKER_PLAY,
+        STATE_EXEC_SPEAKER_OFF,
+        STATE_SPEAKER_OFF
+    };
+
+    enum SpeakerCommand {
+        COMMAND_NONE,
+        COMMAND_SPEAKER_ON,
+        COMMAND_SPEAKER_PLAY,
+        COMMAND_SPEAKER_OFF
+    };
+
     static const int SAMPLES_PER_ENCODED_PACKET =
         (SAMPLES_PER_AUDIO_PACKET + 1) / 2;
 

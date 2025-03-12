@@ -15,7 +15,7 @@ class RemoteSpeakerManager {
 public:
     static RemoteSpeakerManager& GetInstance();
 
-    RemoteSpeaker& GetRemoteSpeaker(int i);
+    RemoteSpeaker& GetRemoteSpeaker(int idx);
 
     void Setup();
     void Shutdown();
@@ -24,8 +24,7 @@ private:
     static const int SPEAKER_ALARM_HZ = 150;
 
     static const int SPEAKER_ALARM_PERIOD_NSEC =
-        static_cast<int>((1.0l / static_cast<f64>(SPEAKER_ALARM_HZ)) * 1000.0l *
-                         1000.0l * 1000.0l);
+        static_cast<int>(1.0f / SPEAKER_ALARM_HZ * 1000 * 1000 * 1000);
 
 private:
     RemoteSpeakerManager();

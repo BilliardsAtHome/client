@@ -2,7 +2,6 @@
 #define RP_SPORTS_GOL_FIELD_MANAGER_H
 #include "RPSysUnknownBase.h"
 #include "RPTypes.h"
-
 #include <RPGolScene/RPGolMapObjPin.h>
 #include <nw4r/math/math_types.h>
 

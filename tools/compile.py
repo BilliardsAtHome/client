@@ -41,6 +41,7 @@ CFLAGS_COMMON = " ".join([
     "-sdata 0",                   # We can't use small data sections in relocatable code
     "-sdata2 0",                  # We can't use small data sections in relocatable code
     "-pragma \"cpp1x on\"",       # Enable C++11 features
+    "-DREVOLUTION",               # For BTE library
 ])
 
 # Flags applied only to the module

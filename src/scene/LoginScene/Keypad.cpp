@@ -102,8 +102,8 @@ void Keypad::UserDraw() const {
         f32 scale = rKey.hover ? 1.25f : 1.0f;
         kiwi::Color color = rKey.hover ? kiwi::Color::RED : kiwi::Color::WHITE;
 
-        kiwi::DebugPrint::PrintfOutline(x, y, 1.5f, true, color,
-                                        kiwi::Color::GREY, rKey.code);
+        // kiwi::DebugPrint::PrintfOutline(x, y, 1.5f, true, color,
+        //                                 kiwi::Color::GREY, rKey.code);
 
         // Next column
         x += KEY_SIZE;
@@ -116,9 +116,9 @@ void Keypad::UserDraw() const {
     }
 
     // Draw buffer
-    kiwi::DebugPrint::PrintfOutline(0.0f, BUFFER_Y, 1.5f, true,
-                                    kiwi::Color::WHITE, kiwi::Color::GREY,
-                                    mBuffer);
+    // kiwi::DebugPrint::PrintfOutline(0.0f, BUFFER_Y, 1.5f, true,
+    //                                 kiwi::Color::WHITE, kiwi::Color::GREY,
+    //                                 mBuffer);
 }
 
 /**

@@ -1,8 +1,10 @@
 #ifndef NW4R_SND_FX_REVERB_HI_H
 #define NW4R_SND_FX_REVERB_HI_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_AxfxImpl.h>
 #include <nw4r/snd/snd_FxBase.h>
-#include <nw4r/types_nw4r.h>
+
 #include <revolution/AXFX.h>
 
 namespace nw4r {

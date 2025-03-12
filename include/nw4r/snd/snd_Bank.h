@@ -1,8 +1,9 @@
 #ifndef NW4R_SND_BANK_H
 #define NW4R_SND_BANK_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_BankFile.h>
 #include <nw4r/snd/snd_NoteOnCallback.h>
-#include <nw4r/types_nw4r.h>
 
 namespace nw4r {
 namespace snd {

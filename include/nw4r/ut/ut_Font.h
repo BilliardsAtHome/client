@@ -1,7 +1,9 @@
 #ifndef NW4R_UT_FONT_H
 #define NW4R_UT_FONT_H
 #include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut/ut_CharStrmReader.h>
+
 #include <revolution/GX.h>
 
 namespace nw4r {
@@ -33,6 +35,11 @@ struct Glyph {
     u16 cellY;          // at 0x12
 };
 
+/******************************************************************************
+ *
+ * Font
+ *
+ ******************************************************************************/
 class Font {
 public:
     enum Type { TYPE_NULL, TYPE_ROM, TYPE_RESOURCE, TYPE_PAIR };

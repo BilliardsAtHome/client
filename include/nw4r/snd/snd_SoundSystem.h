@@ -1,12 +1,16 @@
 #ifndef NW4R_SND_SOUND_SYSTEM_H
 #define NW4R_SND_SOUND_SYSTEM_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_AxManager.h>
 #include <nw4r/snd/snd_RemoteSpeakerManager.h>
 #include <nw4r/snd/snd_TaskThread.h>
-#include <nw4r/types_nw4r.h>
 
 namespace nw4r {
 namespace snd {
+
+// Forward declarations
+class FxBase;
 
 class SoundSystem {
 public:
@@ -48,8 +52,9 @@ public:
         detail::AxManager::GetInstance().SetMasterVolume(volume, frame);
     }
 
-    static RemoteSpeaker& GetRemoteSpeaker(int i) {
-        return detail::RemoteSpeakerManager::GetInstance().GetRemoteSpeaker(i);
+    static RemoteSpeaker& GetRemoteSpeaker(int idx) {
+        return detail::RemoteSpeakerManager::GetInstance().GetRemoteSpeaker(
+            idx);
     }
 
     static void AppendEffect(AuxBus bus, FxBase* pFx) {

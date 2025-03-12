@@ -2,7 +2,6 @@
 #define RP_SPORTS_GOL_MAP_OBJ_BASE_H
 #include "RPSysUnknownBase.h"
 #include "RPTypes.h"
-
 #include <nw4r/math/math_types.h>
 
 class RPGrpModelG3D;

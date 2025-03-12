@@ -1,7 +1,8 @@
 #ifndef NW4R_G3D_BASIC_H
 #define NW4R_G3D_BASIC_H
-#include <nw4r/math.h>
 #include <nw4r/types_nw4r.h>
+
+#include <nw4r/math.h>
 
 namespace nw4r {
 namespace g3d {

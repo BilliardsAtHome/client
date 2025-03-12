@@ -1,21 +1,27 @@
-#ifndef NW4R_G3D_ANMSCN_H
-#define NW4R_G3D_ANMSCN_H
+#ifndef NW4R_G3D_ANM_SCN_H
+#define NW4R_G3D_ANM_SCN_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/g3d/g3d_anmobj.h>
 #include <nw4r/g3d/g3d_camera.h>
 #include <nw4r/g3d/g3d_fog.h>
 #include <nw4r/g3d/g3d_light.h>
 #include <nw4r/g3d/g3d_obj.h>
-#include <nw4r/types_nw4r.h>
 
 namespace nw4r {
 namespace g3d {
 
 // Forward declarations
+struct AmbLightAnmResult;
 class AnmScnRes;
+struct CameraAnmResult;
+struct FogAnmResult;
+struct LightAnmResult;
+class LightSetting;
 
 class AnmScn : public G3dObj {
 public:
-    AnmScn(MEMAllocator* pAllocator);
+    explicit AnmScn(MEMAllocator* pAllocator);
     virtual ~AnmScn(); // at 0x10
 
     virtual void SetFrame(f32 frame) = 0; // at 0x1C
@@ -61,9 +67,6 @@ public:
                                              u32 refNumber) = 0; // at 0x8C
 
     void GetLightSetting(LightSetting* pSetting);
-
-private:
-    // static const int MAX_CHILD =
 
 private:
     NW4R_G3D_RTTI_DECL_DERIVED(AnmScn, G3dObj);

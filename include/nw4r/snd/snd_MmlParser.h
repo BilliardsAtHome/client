@@ -1,7 +1,8 @@
 #ifndef NW4R_SND_MML_PARSER_H
 #define NW4R_SND_MML_PARSER_H
-#include <nw4r/snd/snd_SeqTrack.h>
 #include <nw4r/types_nw4r.h>
+
+#include <nw4r/snd/snd_SeqTrack.h>
 
 namespace nw4r {
 namespace snd {
@@ -34,7 +35,7 @@ public:
     ParseResult Parse(MmlSeqTrack* pTrack, bool doNoteOn) const;
 
     volatile s16* GetVariablePtr(SeqPlayer* pPlayer, SeqTrack* pTrack,
-                                 int i) const;
+                                 int idx) const;
 
     static void EnablePrintVar(bool enable) {
         mPrintVarEnabledFlag = enable;

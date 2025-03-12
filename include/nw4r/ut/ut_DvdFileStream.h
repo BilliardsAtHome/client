@@ -1,7 +1,9 @@
 #ifndef NW4R_UT_DVD_FILE_STREAM_H
 #define NW4R_UT_DVD_FILE_STREAM_H
 #include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut/ut_FileStream.h>
+
 #include <revolution/DVD.h>
 
 namespace nw4r {

@@ -1,8 +1,11 @@
 #ifndef NW4R_SND_SOUND_INSTANCE_MANAGER_H
 #define NW4R_SND_SOUND_INSTANCE_MANAGER_H
-#include <nw4r/snd/snd_InstancePool.h>
 #include <nw4r/types_nw4r.h>
+
+#include <nw4r/snd/snd_InstancePool.h>
+
 #include <nw4r/ut.h>
+
 #include <revolution/OS.h>
 
 namespace nw4r {
@@ -10,9 +13,6 @@ namespace snd {
 namespace detail {
 
 template <typename T> class SoundInstanceManager {
-private:
-    NW4R_UT_LIST_TYPEDEF_DECL_EX(T, Prio);
-
 public:
     SoundInstanceManager() {
         OSInitMutex(&mMutex);
@@ -86,17 +86,18 @@ public:
         return static_cast<T*>(&mPriorityList.GetFront());
     }
 
-    // void InsertPriorityList(T* pSound, int priority) {
-    //     TPrioList::Iterator it = mPriorityList.GetBeginIter();
+    void InsertPriorityList(T* pSound, int priority) {
+        __decltype__(mPriorityList.GetBeginIter()) it =
+            mPriorityList.GetBeginIter();
 
-    //     for (; it != mPriorityList.GetEndIter(); ++it) {
-    //         if (priority < it->CalcCurrentPlayerPriority()) {
-    //             break;
-    //         }
-    //     }
+        for (; it != mPriorityList.GetEndIter(); ++it) {
+            if (priority < it->CalcCurrentPlayerPriority()) {
+                break;
+            }
+        }
 
-    //     mPriorityList.Insert(it, pSound);
-    // }
+        mPriorityList.Insert(it, pSound);
+    }
 
     void RemovePriorityList(T* pSound) {
         mPriorityList.Erase(pSound);
@@ -127,6 +128,9 @@ public:
         RemovePriorityList(pSound);
         InsertPriorityList(pSound, priority);
     }
+
+private:
+    NW4R_UT_LINKLIST_TYPEDEF_DECL_EX(T, Prio);
 
 private:
     MemoryPool<T> mPool;     // at 0x0

@@ -1,12 +1,17 @@
 #ifndef NW4R_SND_SEQ_TRACK_H
 #define NW4R_SND_SEQ_TRACK_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_Channel.h>
 #include <nw4r/snd/snd_Lfo.h>
-#include <nw4r/types_nw4r.h>
+
 #include <revolution/WPAD.h>
 
 namespace nw4r {
 namespace snd {
+
+// Forward declarations
+class SeqPlayer;
 
 enum SeqMute { MUTE_OFF, MUTE_NO_STOP, MUTE_RELEASE, MUTE_STOP };
 
@@ -105,7 +110,7 @@ public:
         return mParserTrackParam;
     }
 
-    volatile s16* GetVariablePtr(int i);
+    volatile s16* GetVariablePtr(int idx);
 
     SeqPlayer* GetSeqPlayer() {
         return mPlayer;

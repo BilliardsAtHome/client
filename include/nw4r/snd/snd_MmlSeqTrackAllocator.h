@@ -1,8 +1,9 @@
 #ifndef NW4R_SND_MML_SEQ_TRACK_ALLOCATOR_H
 #define NW4R_SND_MML_SEQ_TRACK_ALLOCATOR_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_InstancePool.h>
 #include <nw4r/snd/snd_SeqTrackAllocator.h>
-#include <nw4r/types_nw4r.h>
 
 namespace nw4r {
 namespace snd {
@@ -10,12 +11,13 @@ namespace detail {
 
 // Forward declarations
 class MmlParser;
+class MmlSeqTrack;
 class SeqPlayer;
 class SeqTrack;
 
 class MmlSeqTrackAllocator : public SeqTrackAllocator {
 public:
-    MmlSeqTrackAllocator(MmlParser* pParser) : mParser(pParser) {}
+    explicit MmlSeqTrackAllocator(MmlParser* pParser) : mParser(pParser) {}
 
     virtual SeqTrack* AllocTrack(SeqPlayer* pPlayer); // at 0xC
     virtual void FreeTrack(SeqTrack* pTrack);         // at 0x10

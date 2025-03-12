@@ -2,13 +2,16 @@
 #define NW4R_SND_UTIL_H
 #include <nw4r/types_nw4r.h>
 
-#include <nw4r/snd/snd_Common.h>
-
 namespace nw4r {
 namespace snd {
 namespace detail {
 namespace Util {
 
+/******************************************************************************
+ *
+ * Pan info
+ *
+ ******************************************************************************/
 enum PanCurve {
     PAN_CURVE_SQRT,
     PAN_CURVE_SINCOS,
@@ -23,6 +26,11 @@ struct PanInfo {
     PanInfo() : curve(PAN_CURVE_SQRT), centerZero(false), zeroClamp(false) {}
 };
 
+/******************************************************************************
+ *
+ * DataRef
+ *
+ ******************************************************************************/
 enum RefType {
     REFTYPE_ADDRESS,
     REFTYPE_OFFSET,
@@ -45,11 +53,21 @@ struct DataRef {
     u32 value;    // at 0x4
 };
 
+/******************************************************************************
+ *
+ * Table
+ *
+ ******************************************************************************/
 template <typename T> struct Table {
     u32 count;  // at 0x0
     T items[1]; // at 0x4
 };
 
+/******************************************************************************
+ *
+ * DataRef accessor functions
+ *
+ ******************************************************************************/
 template <typename T0, typename T1, typename T2, typename T3>
 inline const T0* GetDataRefAddress0(const DataRef<T0, T1, T2, T3>& rRef,
                                     const void* pBase) {
@@ -78,6 +96,11 @@ inline const T3* GetDataRefAddress3(const DataRef<T0, T1, T2, T3>& rRef,
         static_cast<RefType>(rRef.refType), rRef.value, pBase));
 }
 
+/******************************************************************************
+ *
+ * Read big endian value
+ *
+ ******************************************************************************/
 #ifdef NW4R_LITLE_ENDIAN
 inline u16 ReadBigEndian(u16 x) {
     return x >> 8 | x << 8;
@@ -97,6 +120,11 @@ inline u32 ReadBigEndian(u32 x) {
 }
 #endif
 
+/******************************************************************************
+ *
+ * Utility functions
+ *
+ ******************************************************************************/
 f32 CalcPitchRatio(int pitch);
 f32 CalcVolumeRatio(f32 db);
 f32 CalcPanRatio(f32 pan, const PanInfo& rInfo);

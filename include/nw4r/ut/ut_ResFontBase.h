@@ -1,6 +1,7 @@
 #ifndef NW4R_UT_RES_FONT_BASE_H
 #define NW4R_UT_RES_FONT_BASE_H
 #include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut/ut_Font.h>
 
 namespace nw4r {
@@ -40,7 +41,7 @@ struct FontCodeMap {
     u16 mappingMethod;  // at 0x4
     u16 reserved;       // at 0x6
     FontCodeMap* pNext; // at 0x8
-    u16 mapInfo[];      // at 0xc
+    u16 mapInfo[];      // at 0xC
 };
 
 struct FontInformation {
@@ -59,6 +60,11 @@ struct FontInformation {
 
 namespace detail {
 
+/******************************************************************************
+ *
+ * ResFontBase
+ *
+ ******************************************************************************/
 class ResFontBase : public Font {
 public:
     static const u16 GLYPH_INDEX_NOT_FOUND = 0xFFFF;
@@ -115,8 +121,6 @@ private:
 private:
     void* mResource;            // at 0x10
     FontInformation* mFontInfo; // at 0x14
-    u16 mLastCharCode;          // at 0x18
-    u16 mLastGlyphIndex;        // at 0x18
 };
 
 } // namespace detail

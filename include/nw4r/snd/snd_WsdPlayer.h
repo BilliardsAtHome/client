@@ -1,17 +1,22 @@
 #ifndef NW4R_SND_WSD_PLAYER_H
 #define NW4R_SND_WSD_PLAYER_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_BasicPlayer.h>
 #include <nw4r/snd/snd_Channel.h>
 #include <nw4r/snd/snd_DisposeCallback.h>
 #include <nw4r/snd/snd_Lfo.h>
 #include <nw4r/snd/snd_SoundThread.h>
 #include <nw4r/snd/snd_WsdFile.h>
-#include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut.h>
 
 namespace nw4r {
 namespace snd {
 namespace detail {
+
+// Forward declarations
+struct WaveData;
 
 class WsdPlayer : public BasicPlayer,
                   public DisposeCallback,

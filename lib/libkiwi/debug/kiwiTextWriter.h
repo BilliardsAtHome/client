@@ -156,10 +156,10 @@ enum ETextFlag {
     ETextFlag_TextLeft = 0,
 
     //! Align text to the middle of the screen
-    ETextFlag_TextCenter = nw4r::ut::DRAWFLAG_ALIGN_H_CENTER,
+    ETextFlag_TextCenter = nw4r::ut::WideTextWriter::DRAWFLAG_ALIGN_H_CENTER,
 
     //! Align text to the right of the screen
-    ETextFlag_TextRight = nw4r::ut::DRAWFLAG_ALIGN_H_RIGHT,
+    ETextFlag_TextRight = nw4r::ut::WideTextWriter::DRAWFLAG_ALIGN_H_RIGHT,
 };
 
 /**

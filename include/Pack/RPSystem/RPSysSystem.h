@@ -3,8 +3,11 @@
 #include <Pack/RPSystem/RPSysConfigData.h>
 #include <Pack/RPSystem/RPSysRenderMode.h>
 #include <Pack/RPTypes.h>
+
 #include <egg/core.h>
+
 #include <nw4r/ut.h>
+
 #include <revolution/GX.h>
 #include <revolution/OS.h>
 

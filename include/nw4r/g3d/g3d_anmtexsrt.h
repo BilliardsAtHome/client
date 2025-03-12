@@ -1,9 +1,10 @@
-#ifndef NW4R_G3D_ANMTEXSRT_H
-#define NW4R_G3D_ANMTEXSRT_H
-#include <nw4r/g3d/g3d_anmobj.h>
-#include <nw4r/g3d/g3d_resanmtexsrt.h>
-#include <nw4r/g3d/g3d_resmat.h>
+#ifndef NW4R_G3D_ANM_TEX_SRT_H
+#define NW4R_G3D_ANM_TEX_SRT_H
 #include <nw4r/types_nw4r.h>
+
+#include <nw4r/g3d/g3d_anmobj.h>
+#include <nw4r/g3d/res/g3d_resanmtexsrt.h>
+#include <nw4r/g3d/res/g3d_resmat.h>
 
 namespace nw4r {
 namespace g3d {
@@ -33,18 +34,18 @@ public:
     virtual void SetUpdateRate(f32 rate) = 0; // at 0x28
     virtual f32 GetUpdateRate() const = 0;    // at 0x2C
 
-    virtual bool Bind(ResMdl mdl) = 0; // at 0x30
-    virtual void Release();            // at 0x34
+    virtual bool Bind(const ResMdl mdl) = 0; // at 0x30
+    virtual void Release();                  // at 0x34
 
     virtual const TexSrtAnmResult* GetResult(TexSrtAnmResult* pResult,
-                                             u32 i) = 0; // at 0x38
+                                             u32 idx) = 0; // at 0x38
 
-    virtual AnmObjTexSrtRes* Attach(int i, AnmObjTexSrtRes* pRes); // at 0x3C
-    virtual AnmObjTexSrtRes* Detach(int i);                        // at 0x40
-    virtual void DetachAll();                                      // at 0x44
+    virtual AnmObjTexSrtRes* Attach(int idx, AnmObjTexSrtRes* pRes); // at 0x3C
+    virtual AnmObjTexSrtRes* Detach(int idx);                        // at 0x40
+    virtual void DetachAll();                                        // at 0x44
 
-    bool TestExistence(u32 i) const;
-    bool TestDefined(u32 i) const;
+    bool TestExistence(u32 idx) const;
+    bool TestDefined(u32 idx) const;
 
 protected:
     enum BindingFlag {
@@ -56,6 +57,7 @@ protected:
 protected:
     static const int MAX_CHILD = 4;
 
+protected:
     int mNumBinding;      // at 0x10
     u16* const mpBinding; // at 0x14
 
@@ -81,12 +83,12 @@ public:
     virtual void SetUpdateRate(f32 rate); // at 0x28
     virtual f32 GetUpdateRate() const;    // at 0x2C
 
-    virtual bool Bind(ResMdl mdl); // at 0x30
-    virtual void Release();        // at 0x34
+    virtual bool Bind(const ResMdl mdl); // at 0x30
+    virtual void Release();              // at 0x34
 
-    virtual AnmObjTexSrtRes* Attach(int i, AnmObjTexSrtRes* pRes); // at 0x3C
-    virtual AnmObjTexSrtRes* Detach(int i);                        // at 0x40
-    virtual void DetachAll();                                      // at 0x44
+    virtual AnmObjTexSrtRes* Attach(int idx, AnmObjTexSrtRes* pRes); // at 0x3C
+    virtual AnmObjTexSrtRes* Detach(int idx);                        // at 0x40
+    virtual void DetachAll();                                        // at 0x44
 
 protected:
     int mChildrenArraySize;            // at 0x18
@@ -113,7 +115,7 @@ class AnmObjTexSrtOverride : public AnmObjTexSrtNode {
     virtual ~AnmObjTexSrtOverride() {} // at 0x10
 
     virtual const TexSrtAnmResult* GetResult(TexSrtAnmResult* pResult,
-                                             u32 i); // at 0x38
+                                             u32 idx); // at 0x38
 
     NW4R_G3D_RTTI_DECL_DERIVED(AnmObjTexSrtOverride, AnmObjTexSrtNode);
 };
@@ -141,10 +143,10 @@ public:
     virtual void SetUpdateRate(f32 rate); // at 0x28
     virtual f32 GetUpdateRate() const;    // at 0x2C
 
-    virtual bool Bind(ResMdl mdl); // at 0x30
+    virtual bool Bind(const ResMdl mdl); // at 0x30
 
     virtual const TexSrtAnmResult* GetResult(TexSrtAnmResult* pResult,
-                                             u32 i); // at 0x38
+                                             u32 idx); // at 0x38
 
     void UpdateCache();
 

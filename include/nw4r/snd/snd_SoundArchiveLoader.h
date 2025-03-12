@@ -1,20 +1,28 @@
 #ifndef NW4R_SND_SOUND_ARCHIVE_LOADER_H
 #define NW4R_SND_SOUND_ARCHIVE_LOADER_H
 #include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut.h>
+
 #include <revolution/OS.h>
 
 namespace nw4r {
 namespace snd {
 
 // Forward declarations
+class SoundArchive;
 class SoundMemoryAllocatable;
 
 namespace detail {
 
+/******************************************************************************
+ *
+ * FileStreamHandle
+ *
+ ******************************************************************************/
 class FileStreamHandle {
 public:
-    FileStreamHandle(ut::FileStream* pFileStream) : mStream(pFileStream) {}
+    FileStreamHandle(ut::FileStream* pStream) : mStream(pStream) {}
 
     ~FileStreamHandle() {
         if (mStream != NULL) {
@@ -38,6 +46,11 @@ private:
     ut::FileStream* mStream; // at 0x0
 };
 
+/******************************************************************************
+ *
+ * SoundArchiveLoader
+ *
+ ******************************************************************************/
 class SoundArchiveLoader {
 public:
     explicit SoundArchiveLoader(const SoundArchive& rArchive);

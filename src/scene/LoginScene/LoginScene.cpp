@@ -1,8 +1,8 @@
 #include "scene/LoginScene/LoginScene.h"
 
 #include "core/Simulation.h"
-
 #include <Pack/RPAudio.h>
+
 #include <libkiwi.h>
 
 namespace BAH {
@@ -35,21 +35,21 @@ void LoginScene::OnCalculate() {
  */
 void LoginScene::OnUserDraw() {
     // clang-format off
-    kiwi::DebugPrint::PrintfOutline(0.0f, 0.7f, 1.0f, true,
-                                    kiwi::Color::WHITE, kiwi::Color::GREY,
-                                    "Enter your unique ID:");
+    // kiwi::DebugPrint::PrintfOutline(0.0f, 0.7f, 1.0f, true,
+    //                                 kiwi::Color::WHITE, kiwi::Color::GREY,
+    //                                 "Enter your unique ID:");
 
-    kiwi::DebugPrint::PrintfOutline(0.0f, 0.6f, 1.0f, true,
-                                    kiwi::Color::RED, kiwi::Color::GREY,
-                                    "(from the bot)");
+    // kiwi::DebugPrint::PrintfOutline(0.0f, 0.6f, 1.0f, true,
+    //                                 kiwi::Color::RED, kiwi::Color::GREY,
+    //                                 "(from the bot)");
 
-    kiwi::DebugPrint::PrintfOutline(0.0f, -0.6f, 0.8f, true,
-                                    kiwi::Color::WHITE, kiwi::Color::GREY,
-                                    "Enter the number with the D-Pad/A Button.");
+    // kiwi::DebugPrint::PrintfOutline(0.0f, -0.6f, 0.8f, true,
+    //                                 kiwi::Color::WHITE, kiwi::Color::GREY,
+    //                                 "Enter the number with the D-Pad/A Button.");
 
-    kiwi::DebugPrint::PrintfOutline(0.0f, -0.7f, 0.8f, true,
-                                    kiwi::Color::YELLOW, kiwi::Color::GREY,
-                                    "Use the /get-id bot command to check/get one.");
+    // kiwi::DebugPrint::PrintfOutline(0.0f, -0.7f, 0.8f, true,
+    //                                 kiwi::Color::YELLOW, kiwi::Color::GREY,
+    //                                 "Use the /get-id bot command to check/get one.");
     // clang-format on
 
     mKeypad.UserDraw();

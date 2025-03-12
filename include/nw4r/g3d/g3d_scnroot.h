@@ -1,11 +1,12 @@
-#ifndef NW4R_G3D_SCNROOT_H
-#define NW4R_G3D_SCNROOT_H
+#ifndef NW4R_G3D_SCN_ROOT_H
+#define NW4R_G3D_SCN_ROOT_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/g3d/g3d_camera.h>
 #include <nw4r/g3d/g3d_fog.h>
 #include <nw4r/g3d/g3d_light.h>
 #include <nw4r/g3d/g3d_scnobj.h>
 #include <nw4r/g3d/g3d_state.h>
-#include <nw4r/types_nw4r.h>
 
 namespace nw4r {
 namespace g3d {
@@ -41,12 +42,12 @@ public:
     virtual void G3dProc(u32 task, u32 param, void* pInfo); // at 0xC
     virtual ~ScnRoot();                                     // at 0x10
 
-    Camera GetCamera(int i);
+    Camera GetCamera(int idx);
     Camera GetCurrentCamera();
-    void SetCurrentCamera(int i);
+    void SetCurrentCamera(int idx);
 
-    Fog GetFog(int i);
-    LightSet GetLightSet(int i);
+    Fog GetFog(int idx);
+    LightSet GetLightSet(int idx);
 
     void UpdateFrame();
     void SetGlbSettings();
@@ -86,9 +87,9 @@ private:
     ResMdlDrawMode mDrawMode;                 // at 0xEC
     u32 mScnRootFlags;                        // at 0xF0
     u8 mCurrentCameraID;                      // at 0xF4
-    u8 _0;                                    // at 0xF5
-    u8 _1;                                    // at 0xF6
-    u8 _2;                                    // at 0xF7
+    u8 PADDING_0xF5;                          // at 0xF5
+    u8 PADDING_0xF6;                          // at 0xF6
+    u8 PADDING_0xF7;                          // at 0xF7
     CameraData mCamera[G3DState::NUM_CAMERA]; // at 0xF8
     FogData mFog[G3DState::NUM_FOG];          // at 0x2278
     LightSetting mLightSetting;               // at 0x2878

@@ -1,3 +1,4 @@
+#include "scene/SceneId.h"
 #include <Pack/RPSystem.h>
 
 #include <libkiwi.h>
@@ -25,7 +26,8 @@ void KokeshiMain() {
               "the console settings.");
 
     // Change to bootup scene
-    kiwi::SceneCreator::GetInstance().ChangeBootScene();
+    kiwi::SceneCreator::GetInstance().ChangeSceneAfterFade(
+        BAH::ESceneID_SetupScene);
 
     // Enter game loop
     RP_GET_INSTANCE(RPSysSystem)->mainLoop();

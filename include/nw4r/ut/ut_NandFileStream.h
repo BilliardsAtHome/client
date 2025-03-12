@@ -1,7 +1,9 @@
 #ifndef NW4R_UT_NAND_FILE_STREAM_H
 #define NW4R_UT_NAND_FILE_STREAM_H
 #include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut/ut_FileStream.h>
+
 #include <revolution/NAND.h>
 
 namespace nw4r {
@@ -17,8 +19,8 @@ public:
     virtual ~NandFileStream(); // at 0xC
 
     bool Open(const char* pPath, u32 mode);
-    bool Open(const NANDFileInfo* pInfo, u32 mode,
-              bool enableClose) DECOMP_DONT_INLINE;
+    bool Open(const NANDFileInfo* pInfo, u32 mode, bool enableClose)
+        DECOMP_DONT_INLINE;
 
     virtual void Close(); // at 0x10
 

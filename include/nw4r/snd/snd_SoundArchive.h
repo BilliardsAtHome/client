@@ -1,11 +1,18 @@
 #ifndef NW4R_SND_SOUND_ARCHIVE_H
 #define NW4R_SND_SOUND_ARCHIVE_H
-#include <nw4r/snd/snd_Common.h>
 #include <nw4r/types_nw4r.h>
+
+#include <nw4r/snd/snd_Types.h>
+
 #include <nw4r/ut.h>
 
 namespace nw4r {
 namespace snd {
+
+// Forward declarations
+namespace detail {
+class SoundArchiveFileReader;
+} // namespace detail
 
 enum SoundType {
     SOUND_TYPE_INVALID,

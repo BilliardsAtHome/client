@@ -1,13 +1,20 @@
 #ifndef NW4R_SND_SOUND_3D_MANAGER_H
 #define NW4R_SND_SOUND_3D_MANAGER_H
-#include <nw4r/math.h>
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_BasicSound.h>
 #include <nw4r/snd/snd_InstancePool.h>
 #include <nw4r/snd/snd_SoundArchive.h>
-#include <nw4r/types_nw4r.h>
+
+#include <nw4r/math.h>
 
 namespace nw4r {
 namespace snd {
+
+// Forward declarations
+class Sound3DListener;
+class SoundHandle;
+struct SoundParam;
 
 class Sound3DManager : public detail::BasicSound::AmbientParamUpdateCallback,
                        public detail::BasicSound::AmbientArgAllocaterCallback {

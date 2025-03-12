@@ -1,7 +1,9 @@
 #ifndef NW4R_SND_SEQ_SOUND_HANDLE_H
 #define NW4R_SND_SEQ_SOUND_HANDLE_H
-#include <nw4r/snd/snd_SeqSound.h>
 #include <nw4r/types_nw4r.h>
+
+#include <nw4r/snd/snd_SeqSound.h>
+
 #include <nw4r/ut.h>
 
 namespace nw4r {
@@ -35,9 +37,9 @@ public:
         }
     }
 
-    void WriteVariable(int i, s16 value) {
+    void WriteVariable(int idx, s16 value) {
         if (IsAttachedSound()) {
-            mSound->WriteVariable(i, value);
+            mSound->WriteVariable(idx, value);
         }
     }
 

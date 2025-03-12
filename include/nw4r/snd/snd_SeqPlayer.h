@@ -1,9 +1,11 @@
 #ifndef NW4R_SND_SEQ_PLAYER_H
 #define NW4R_SND_SEQ_PLAYER_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_BasicPlayer.h>
 #include <nw4r/snd/snd_DisposeCallback.h>
 #include <nw4r/snd/snd_SoundThread.h>
-#include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut.h>
 
 namespace nw4r {
@@ -12,7 +14,7 @@ namespace detail {
 
 // Forward declarations
 class Channel;
-class NoteOnInfo;
+struct NoteOnInfo;
 class NoteOnCallback;
 class SeqTrack;
 class SeqTrackAllocator;
@@ -91,14 +93,14 @@ public:
     void SetChannelPriority(int priority);
     void SetReleasePriorityFix(bool flag);
 
-    void SetLocalVariable(int i, s16 value);
-    static void SetGlobalVariable(int i, s16 value);
+    void SetLocalVariable(int idx, s16 value);
+    static void SetGlobalVariable(int idx, s16 value);
 
     void SetTrackVolume(u32 trackFlags, f32 volume);
     void SetTrackPitch(u32 trackFlags, f32 pitch);
 
-    SeqTrack* GetPlayerTrack(int i);
-    volatile s16* GetVariablePtr(int i);
+    SeqTrack* GetPlayerTrack(int idx);
+    volatile s16* GetVariablePtr(int idx);
     void Update();
 
     Channel* NoteOn(int bankNo, const NoteOnInfo& rInfo);
@@ -150,8 +152,8 @@ private:
     static const int MAX_SKIP_TICK_PER_FRAME = 768;
 
 private:
-    void CloseTrack(int i);
-    void SetPlayerTrack(int i, SeqTrack* pTrack);
+    void CloseTrack(int idx);
+    void SetPlayerTrack(int idx, SeqTrack* pTrack);
 
     void FinishPlayer();
     void UpdateChannelParam();
@@ -181,7 +183,7 @@ private:
     u32 mTickCounter;                                // at 0x118
 
     static volatile s16 mGlobalVariable[LOCAL_VARIABLE_NUM];
-    static bool mGobalVariableInitialized; // TYPO
+    static bool mGobalVariableInitialized; // @typo
 };
 
 } // namespace detail

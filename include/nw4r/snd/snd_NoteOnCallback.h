@@ -1,7 +1,8 @@
 #ifndef NW4R_SND_NOTE_ON_CALLBACK_H
 #define NW4R_SND_NOTE_ON_CALLBACK_H
-#include <nw4r/snd/snd_Channel.h>
 #include <nw4r/types_nw4r.h>
+
+#include <nw4r/snd/snd_Channel.h>
 
 namespace nw4r {
 namespace snd {
@@ -10,6 +11,11 @@ namespace detail {
 // Forward declarations
 class SeqPlayer;
 
+/******************************************************************************
+ *
+ * NoteOnInfo
+ *
+ ******************************************************************************/
 struct NoteOnInfo {
     int prgNo;                                // at 0x0
     int key;                                  // at 0x4
@@ -22,6 +28,11 @@ struct NoteOnInfo {
     u32 channelCallbackData;                  // at 0x20
 };
 
+/******************************************************************************
+ *
+ * NoteOnCallback
+ *
+ ******************************************************************************/
 class NoteOnCallback {
 public:
     virtual ~NoteOnCallback() {} // at 0x8

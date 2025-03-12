@@ -1,12 +1,19 @@
 #ifndef NW4R_UT_CHAR_WRITER_H
 #define NW4R_UT_CHAR_WRITER_H
-#include <nw4r/math.h>
 #include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut/ut_Color.h>
+
+#include <nw4r/math.h>
+
 #include <revolution/GX.h>
 
 namespace nw4r {
 namespace ut {
+
+// Forward declarations
+class Font;
+struct Glyph;
 
 class CharWriter {
 public:
@@ -185,17 +192,17 @@ private:
     }
 
 private:
-    ColorMapping mColorMapping; // at 0x0
-    VertexColor mVertexColor;   // at 0x8
-    TextColor mTextColor;       // at 0x18
-    math::VEC2 mScale;          // at 0x24
-    math::VEC3 mCursorPos;      // at 0x2C
-    TextureFilter mFilter;      // at 0x38
-    u8 padding[2];              // at 0x40
-    u8 mAlpha;                  // at 0x42
-    bool mIsWidthFixed;         // at 0x43
-    f32 mFixedWidth;            // at 0x44
-    const Font* mFont;          // at 0x48
+    ColorMapping mColorMapping;   // at 0x0
+    VertexColor mVertexColor;     // at 0x8
+    TextColor mTextColor;         // at 0x18
+    math::VEC2 mScale;            // at 0x24
+    math::VEC3 mCursorPos;        // at 0x2C
+    TextureFilter mFilter;        // at 0x38
+    u8 PADDING_0x40[0x42 - 0x40]; // at 0x40
+    u8 mAlpha;                    // at 0x42
+    bool mIsWidthFixed;           // at 0x43
+    f32 mFixedWidth;              // at 0x44
+    const Font* mFont;            // at 0x48
 
     static LoadingTexture mLoadingTexture;
 };

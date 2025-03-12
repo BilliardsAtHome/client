@@ -1,8 +1,10 @@
 #ifndef RVL_SDK_GX_PIXEL_H
 #define RVL_SDK_GX_PIXEL_H
-#include <revolution/GX/GXTypes.h>
-#include <revolution/MTX.h>
 #include <types.h>
+
+#include <revolution/GX/GXTypes.h>
+
+#include <revolution/MTX.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

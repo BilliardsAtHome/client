@@ -1,6 +1,7 @@
 #ifndef NW4R_SND_ADPCM_H
 #define NW4R_SND_ADPCM_H
 #include <nw4r/types_nw4r.h>
+
 #include <revolution/AX.h>
 
 namespace nw4r {

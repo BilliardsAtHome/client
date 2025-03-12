@@ -1,13 +1,25 @@
 #ifndef NW4R_SND_BANK_FILE_H
 #define NW4R_SND_BANK_FILE_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_Util.h>
 #include <nw4r/snd/snd_WaveFile.h>
-#include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut.h>
 
 namespace nw4r {
 namespace snd {
 namespace detail {
+
+inline u8 ReadByte(const void* pAddr) {
+    return *static_cast<const u8*>(pAddr);
+}
+
+/******************************************************************************
+ *
+ * RBNK binary format
+ *
+ ******************************************************************************/
 namespace BankFile {
 
 struct InstParam {
@@ -58,6 +70,11 @@ struct WaveBlock {
 
 } // namespace BankFile
 
+/******************************************************************************
+ *
+ * BankFileReader
+ *
+ ******************************************************************************/
 struct InstInfo {
     s32 waveIndex;  // at 0x0
     u8 attack;      // at 0x4
@@ -69,10 +86,6 @@ struct InstInfo {
     u8 volume;      // at 0xA
     f32 tune;       // at 0xC
 };
-
-inline u8 ReadByte(const void* pAddr) {
-    return *static_cast<const u8*>(pAddr);
-}
 
 class BankFileReader {
 public:

@@ -1,8 +1,10 @@
 #ifndef NW4R_SND_SOUND_ARCHIVE_FILE_H
 #define NW4R_SND_SOUND_ARCHIVE_FILE_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_SoundArchive.h>
 #include <nw4r/snd/snd_Util.h>
-#include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut.h>
 
 namespace nw4r {
@@ -188,6 +190,11 @@ static const int HEADER_AREA_SIZE = ROUND_UP(sizeof(Header), 32) + 40;
 
 } // namespace SoundArchiveFile
 
+/******************************************************************************
+ *
+ * SoundArchiveFileReader
+ *
+ ******************************************************************************/
 class SoundArchiveFileReader {
 public:
     static const u32 SIGNATURE = 'RSAR';
@@ -263,8 +270,8 @@ private:
                                const char* pLabel) const;
 
     const SoundArchiveFile::SoundCommonInfo* impl_GetSoundInfo(u32 id) const;
-    SoundArchiveFile::SoundInfoOffset
-    impl_GetSoundInfoOffset(u32 id) const DECOMP_DONT_INLINE;
+    SoundArchiveFile::SoundInfoOffset impl_GetSoundInfoOffset(u32 id) const
+        DECOMP_DONT_INLINE;
 
     const SoundArchiveFile::SeqSoundInfo* impl_GetSeqSoundInfo(u32 id) const;
     const SoundArchiveFile::StrmSoundInfo* impl_GetStrmSoundInfo(u32 id) const;

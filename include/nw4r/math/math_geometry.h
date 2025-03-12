@@ -1,10 +1,14 @@
 #ifndef NW4R_MATH_GEOMETRY_H
 #define NW4R_MATH_GEOMETRY_H
-#include <nw4r/math/math_types.h>
 #include <nw4r/types_nw4r.h>
+
+#include <nw4r/math/math_types.h>
 
 namespace nw4r {
 namespace math {
+
+// Forward declarations
+struct AABB;
 
 enum IntersectionResult {
     INTERSECTION_NONE,
@@ -20,6 +24,13 @@ enum IntersectionResult {
     INTERSECTION_INTERSECT
 };
 
+bool IntersectionAABB(const AABB* pA, const AABB* pB);
+
+/******************************************************************************
+ *
+ * Plane
+ *
+ ******************************************************************************/
 struct PLANE {
     PLANE() {}
 
@@ -33,6 +44,11 @@ struct PLANE {
     f32 d;  // at 0xC
 };
 
+/******************************************************************************
+ *
+ * Axis-aligned bounding box
+ *
+ ******************************************************************************/
 struct AABB {
     AABB() {}
 
@@ -43,6 +59,11 @@ struct AABB {
     VEC3 max; // at 0xC
 };
 
+/******************************************************************************
+ *
+ * Frustum
+ *
+ ******************************************************************************/
 class FRUSTUM {
 private:
     enum Point {
@@ -87,8 +108,6 @@ private:
     AABB mBox;                // at 0x78
     PLANE mPlanes[PLANE_MAX]; // at 0x90
 };
-
-bool IntersectionAABB(const AABB* pA, const AABB* pB);
 
 } // namespace math
 } // namespace nw4r

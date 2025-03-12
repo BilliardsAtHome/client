@@ -2,11 +2,12 @@
 
 #include "core/BreakInfo.h"
 #include "core/RichPresenceProfile.h"
-
 #include <Pack/RPParty.h>
 #include <Pack/RPUtility.h>
-#include <cmath>
+
 #include <libkiwi.h>
+
+#include <cmath>
 
 K_DYNAMIC_SINGLETON_IMPL(BAH::Simulation);
 
@@ -169,83 +170,86 @@ void Simulation::UserDraw() {
         return;
     }
 
-    /**
-     * Best break statistics
-     */
-    // clang-format off
-    kiwi::DebugPrint::PrintfOutline(0.2f, 0.7f, 0.8f, true,
-                                    kiwi::Color::CYAN, kiwi::Color::BLACK,
-                                    "[Best break]");
+    // /**
+    //  * Best break statistics
+    //  */
+    // // clang-format off
+    // kiwi::DebugPrint::PrintfOutline(0.2f, 0.7f, 0.8f, true,
+    //                                 kiwi::Color::CYAN, kiwi::Color::BLACK,
+    //                                 "[Best break]");
 
-    kiwi::DebugPrint::PrintfOutline(0.2f, 0.6f, 0.8f, true,
-                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
-                                    "> %d balls (%d sunk, %d off)",
-                                    mpBestBreak->sunk + mpBestBreak->off,
-                                    mpBestBreak->sunk, mpBestBreak->off);
+    // kiwi::DebugPrint::PrintfOutline(0.2f, 0.6f, 0.8f, true,
+    //                                 kiwi::Color::WHITE, kiwi::Color::BLACK,
+    //                                 "> %d balls (%d sunk, %d off)",
+    //                                 mpBestBreak->sunk + mpBestBreak->off,
+    //                                 mpBestBreak->sunk, mpBestBreak->off);
 
-    kiwi::DebugPrint::PrintfOutline(0.2f, 0.5f, 0.8f, true,
-                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
-                                    "> in %03d frames (%.2f sec)",
-                                    mpBestBreak->frame,
-                                    mpBestBreak->frame / 60.0f);
+    // kiwi::DebugPrint::PrintfOutline(0.2f, 0.5f, 0.8f, true,
+    //                                 kiwi::Color::WHITE, kiwi::Color::BLACK,
+    //                                 "> in %03d frames (%.2f sec)",
+    //                                 mpBestBreak->frame,
+    //                                 mpBestBreak->frame / 60.0f);
 
-    kiwi::DebugPrint::PrintfOutline(0.2f, 0.4f, 0.8f, true,
-                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
-                                    "> %02df up, %02df left, %02df right",
-                                    mpBestBreak->up, mpBestBreak->left,
-                                    mpBestBreak->right);
+    // kiwi::DebugPrint::PrintfOutline(0.2f, 0.4f, 0.8f, true,
+    //                                 kiwi::Color::WHITE, kiwi::Color::BLACK,
+    //                                 "> %02df up, %02df left, %02df right",
+    //                                 mpBestBreak->up, mpBestBreak->left,
+    //                                 mpBestBreak->right);
 
-    kiwi::DebugPrint::PrintfOutline(0.2f, 0.3f, 0.8f, true,
-                                    kiwi::Color::YELLOW, kiwi::Color::BLACK,
-                                    "> %s",
-                                    mpBestBreak->foul ? "foul" : "no foul");
-    // clang-format on
+    // kiwi::DebugPrint::PrintfOutline(0.2f, 0.3f, 0.8f, true,
+    //                                 kiwi::Color::YELLOW, kiwi::Color::BLACK,
+    //                                 "> %s",
+    //                                 mpBestBreak->foul ? "foul" : "no foul");
+    // // clang-format on
 
-    /**
-     * Session statistics
-     */
-    // clang-format off
-    kiwi::DebugPrint::PrintfOutline(0.2f, -0.3f, 0.8f, true,
-                                    kiwi::Color::CYAN, kiwi::Color::BLACK,
-                                    "[This session]");
+    // /**
+    //  * Session statistics
+    //  */
+    // // clang-format off
+    // kiwi::DebugPrint::PrintfOutline(0.2f, -0.3f, 0.8f, true,
+    //                                 kiwi::Color::CYAN, kiwi::Color::BLACK,
+    //                                 "[This session]");
 
-    kiwi::DebugPrint::PrintfOutline(0.2f, -0.4f, 0.8f, true,
-                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
-                                    "> %d total breaks", mBreakNum);
+    // kiwi::DebugPrint::PrintfOutline(0.2f, -0.4f, 0.8f, true,
+    //                                 kiwi::Color::WHITE, kiwi::Color::BLACK,
+    //                                 "> %d total breaks", mBreakNum);
 
-    kiwi::DebugPrint::PrintfOutline(0.2f, -0.5f, 0.8f, true,
-                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
-                                    "> distribution:");
+    // kiwi::DebugPrint::PrintfOutline(0.2f, -0.5f, 0.8f, true,
+    //                                 kiwi::Color::WHITE, kiwi::Color::BLACK,
+    //                                 "> distribution:");
 
-    kiwi::DebugPrint::PrintfOutline(0.2f, -0.6f, 0.8f, true,
-                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
-                                    "{%d, %d, %d, %d, %d}",
-                                    mBreakBallNum[0], mBreakBallNum[1],
-                                    mBreakBallNum[2], mBreakBallNum[3],
-                                    mBreakBallNum[4]);
-                                    
-    kiwi::DebugPrint::PrintfOutline(0.2f, -0.7f, 0.8f, true,
-                                    kiwi::Color::WHITE, kiwi::Color::BLACK,
-                                    "{%d, %d, %d, %d, %d}",
-                                    mBreakBallNum[5], mBreakBallNum[6],
-                                    mBreakBallNum[7], mBreakBallNum[8],
-                                    mBreakBallNum[9]);
-    // clang-format on
+    // kiwi::DebugPrint::PrintfOutline(0.2f, -0.6f, 0.8f, true,
+    //                                 kiwi::Color::WHITE, kiwi::Color::BLACK,
+    //                                 "{%d, %d, %d, %d, %d}",
+    //                                 mBreakBallNum[0], mBreakBallNum[1],
+    //                                 mBreakBallNum[2], mBreakBallNum[3],
+    //                                 mBreakBallNum[4]);
 
-    if (mIsConnected.HasValue()) {
-        // clang-format off
-        kiwi::DebugPrint::PrintfOutline(-0.5f, -0.8f, 0.8f, true,
-                                        *mIsConnected ? kiwi::Color::GREEN : kiwi::Color::YELLOW, kiwi::Color::BLACK,
-                                        *mIsConnected ? "Online" : "Offline (err:%d ex:%d stat:%d)",
-                                        mHttpError, mHttpExError, mHttpStatus);
-        // clang-format on
-    }
+    // kiwi::DebugPrint::PrintfOutline(0.2f, -0.7f, 0.8f, true,
+    //                                 kiwi::Color::WHITE, kiwi::Color::BLACK,
+    //                                 "{%d, %d, %d, %d, %d}",
+    //                                 mBreakBallNum[5], mBreakBallNum[6],
+    //                                 mBreakBallNum[7], mBreakBallNum[8],
+    //                                 mBreakBallNum[9]);
+    // // clang-format on
 
-    // clang-format off
-    kiwi::DebugPrint::PrintfOutline(-0.5f, -0.9f, 0.8f, true,
-                                    kiwi::Color::RED, kiwi::Color::BLACK,
-                                    "Unique ID: %06d", *mUniqueID);
-    // clang-format on
+    // if (mIsConnected.HasValue()) {
+    //     // clang-format off
+    //     kiwi::DebugPrint::PrintfOutline(-0.5f, -0.8f, 0.8f, true,
+    //                                     *mIsConnected ? kiwi::Color::GREEN :
+    //                                     kiwi::Color::YELLOW,
+    //                                     kiwi::Color::BLACK, *mIsConnected ?
+    //                                     "Online" : "Offline (err:%d ex:%d
+    //                                     stat:%d)", mHttpError, mHttpExError,
+    //                                     mHttpStatus);
+    //     // clang-format on
+    // }
+
+    // // clang-format off
+    // kiwi::DebugPrint::PrintfOutline(-0.5f, -0.9f, 0.8f, true,
+    //                                 kiwi::Color::RED, kiwi::Color::BLACK,
+    //                                 "Unique ID: %06d", *mUniqueID);
+    // // clang-format on
 }
 
 /**
@@ -418,6 +422,7 @@ void Simulation::Tick() {
     mpCurrBreak->frame++;
 
     RPBilCtrl* pCtrl = RP_GET_INSTANCE(RPBilCtrlManager)->GetCtrl();
+    ASSERT(pCtrl != nullptr);
 
     // TODO: CanCtrl is wrong on the very first scene tick, why?
     if (pCtrl->CanCtrl() && !mIsFirstTick) {
@@ -484,7 +489,7 @@ void Simulation::Finish() {
     // Always upload 6+ breaks
     upload |= mpCurrBreak->sunk + mpCurrBreak->off >= 6;
     // Upload first break to test connection
-    // upload |= !mIsConnected.HasValue();
+    upload |= !mIsConnected.HasValue();
 
     // Upload information to the server
     if (upload) {

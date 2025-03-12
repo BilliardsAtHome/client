@@ -1,7 +1,8 @@
 #ifndef RVL_SDK_GX_DISPLAY_LIST_H
 #define RVL_SDK_GX_DISPLAY_LIST_H
-#include <revolution/GX/GXHardware.h>
 #include <types.h>
+
+#include <revolution/GX/GXHardware.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -13,7 +14,7 @@ void GXCallDisplayList(void* list, u32 size);
 static void GXFastCallDisplayList(void* list, u32 size) {
     WGPIPE.c = GX_FIFO_CMD_CALL_DL;
     WGPIPE.p = list;
-    WGPIPE.i = size;
+    WGPIPE.ui = size;
 }
 
 #ifdef __cplusplus

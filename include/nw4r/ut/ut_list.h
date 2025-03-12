@@ -1,5 +1,5 @@
-#ifndef NW4R_UT_LIST_H
-#define NW4R_UT_LIST_H
+#ifndef NW4R_UT_LINKLIST_H
+#define NW4R_UT_LINKLIST_H
 #include <nw4r/types_nw4r.h>
 
 namespace nw4r {
@@ -57,6 +57,75 @@ inline const void* List_GetLastConst(const List* pList) {
 inline u16 List_GetSize(const List* pList) {
     return pList->numObjects;
 }
+
+/**
+ * Gets the underlying Link within the specified object.
+ *
+ * @param LIST Reference to list
+ * @param OBJ Pointer to list object
+ */
+#define NW4R_UT_LIST_GET_LINK(LIST, OBJ)                                       \
+    reinterpret_cast<nw4r::ut::Link*>((u8*)(OBJ) + (LIST).offset)
+
+/**
+ * List for-each macro.
+ *
+ * @param TYPE Element type
+ * @param NAME Element name
+ * @param LIST Reference to list
+ * @param ... Statement(s) to execute
+ */
+#define NW4R_UT_LIST_FOREACH(TYPE, NAME, LIST, ...)                            \
+    {                                                                          \
+        TYPE* NAME = NULL;                                                     \
+                                                                               \
+        while ((NAME = static_cast<TYPE*>(                                     \
+                    nw4r::ut::List_GetNext(&(LIST), NAME))) != NULL) {         \
+                                                                               \
+            __VA_ARGS__;                                                       \
+        }                                                                      \
+    }
+/**
+ * List for-each macro (reverse order).
+ *
+ * @param TYPE Element type
+ * @param NAME Element name
+ * @param LIST Reference to list
+ * @param ... Statement(s) to execute
+ */
+#define NW4R_UT_LIST_FOREACH_REV(TYPE, NAME, LIST, ...)                        \
+    {                                                                          \
+        TYPE* NAME = NULL;                                                     \
+                                                                               \
+        while ((NAME = static_cast<TYPE*>(                                     \
+                    nw4r::ut::List_GetPrev(&(LIST), NAME))) != NULL) {         \
+                                                                               \
+            __VA_ARGS__;                                                       \
+        }                                                                      \
+    }
+
+/**
+ * List for-each macro, with robust iteration.
+ *
+ * @param TYPE Element type
+ * @param NAME Element name
+ * @param LIST Reference to list
+ * @param ... Statement(s) to execute
+ */
+#define NW4R_UT_LIST_FOREACH_SAFE(TYPE, NAME, LIST, ...)                       \
+    {                                                                          \
+        TYPE* NAME;                                                            \
+        TYPE* __next__;                                                        \
+                                                                               \
+        for (NAME = static_cast<TYPE*>(nw4r::ut::List_GetFirst(&(LIST)));      \
+             NAME != NULL; NAME = __next__) {                                  \
+                                                                               \
+            __next__ =                                                         \
+                static_cast<TYPE*>(nw4r::ut::List_GetNext(&(LIST), NAME));     \
+                                                                               \
+            __VA_ARGS__;                                                       \
+        }                                                                      \
+    }
 
 } // namespace ut
 } // namespace nw4r

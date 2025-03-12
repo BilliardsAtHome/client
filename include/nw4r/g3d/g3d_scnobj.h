@@ -1,8 +1,10 @@
-#ifndef NW4R_G3D_SCNOBJ_H
-#define NW4R_G3D_SCNOBJ_H
-#include <nw4r/g3d/g3d_obj.h>
-#include <nw4r/math.h>
+#ifndef NW4R_G3D_SCN_OBJ_H
+#define NW4R_G3D_SCN_OBJ_H
 #include <nw4r/types_nw4r.h>
+
+#include <nw4r/g3d/g3d_obj.h>
+
+#include <nw4r/math.h>
 
 namespace nw4r {
 namespace g3d {
@@ -53,7 +55,7 @@ public:
         BOUNDINGVOLUME_MAX
     };
 
-#define OPT(KEY, VALUE) OPTION_##KEY = (0x00000 | (VALUE))
+#define OPT(KEY, VALUE) OPTID_##KEY = (0x00000 | (VALUE))
     enum ScnObjOption {
         OPT(NONE, 0),
         OPT(DISABLE_GATHER_SCNOBJ, 1),
@@ -83,7 +85,7 @@ public:
     };
 
 public:
-    ScnObj(MEMAllocator* pAllocator);
+    explicit ScnObj(MEMAllocator* pAllocator);
 
     virtual void G3dProc(u32 task, u32 param, void* pInfo) = 0; // at 0xC
     virtual ~ScnObj();                                          // at 0x10
@@ -188,8 +190,8 @@ private:
     u32 mScnObjFlags;               // at 0xCC
     u8 mPriorityDrawOpa;            // at 0xD0
     u8 mPriorityDrawXlu;            // at 0xD1
-    u8 _0;                          // at 0xD2
-    u8 _1;                          // at 0xD3
+    u8 PADDING_0xD2;                // at 0xD2
+    u8 PADDING_0xD3;                // at 0xD3
     IScnObjCallback* mpFuncObjExec; // at 0xD4
     u8 mCallbackTiming;             // at 0xD8
     u8 mCallbackDeleteOption;       // at 0xD9
@@ -317,7 +319,7 @@ public:
         NONUNIFORM_SCALED,
     };
 
-#define OPT(KEY, VALUE) OPTION_##KEY = (0x10000 | (VALUE))
+#define OPT(KEY, VALUE) OPTID_##KEY = (0x10000 | (VALUE))
     enum ScnLeafOption {
         OPT(NONE, 0),
         OPT(DISABLE_DRAW_ALL, 1),
@@ -325,7 +327,7 @@ public:
 #undef OPT
 
 public:
-    ScnLeaf(MEMAllocator* pAllocator)
+    explicit ScnLeaf(MEMAllocator* pAllocator)
         : ScnObj(pAllocator), mScale(1.0f, 1.0f, 1.0f) {}
 
     virtual void G3dProc(u32 task, u32 param, void* pInfo) = 0; // at 0xC
@@ -366,9 +368,9 @@ public:
     virtual ForEachResult ForEach(ForEachFunc pFunc, void* pInfo,
                                   bool postOrder); // at 0x1C
 
-    virtual bool Insert(u32 i, ScnObj* pObj); // at 0x34
-    virtual ScnObj* Remove(u32 i);            // at 0x38
-    virtual bool Remove(ScnObj* pObj);        // at 0x3C
+    virtual bool Insert(u32 idx, ScnObj* pObj); // at 0x34
+    virtual ScnObj* Remove(u32 idx);            // at 0x38
+    virtual bool Remove(ScnObj* pObj);          // at 0x3C
 
     ScnObj** Begin() {
         return mpScnObjArray;
@@ -377,8 +379,8 @@ public:
         return mpScnObjArray + mNumScnObj;
     }
 
-    ScnObj* operator[](u32 i) {
-        return mpScnObjArray[i];
+    ScnObj* operator[](u32 idx) {
+        return mpScnObjArray[idx];
     }
 
     u32 Size() const {

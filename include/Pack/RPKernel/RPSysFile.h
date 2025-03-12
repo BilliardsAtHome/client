@@ -1,7 +1,9 @@
 #ifndef RP_KERNEL_FILE_H
 #define RP_KERNEL_FILE_H
 #include <Pack/RPTypes.h>
+
 #include <egg/core.h>
+
 #include <nw4r/ut.h>
 
 /**

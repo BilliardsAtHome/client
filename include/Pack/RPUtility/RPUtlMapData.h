@@ -1,6 +1,7 @@
 #ifndef RP_UTILITY_MAP_DATA_H
 #define RP_UTILITY_MAP_DATA_H
 #include <Pack/RPTypes.h>
+
 #include <egg/core.h>
 
 //! @addtogroup rp_system

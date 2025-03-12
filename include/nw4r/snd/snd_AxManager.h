@@ -1,10 +1,13 @@
 #ifndef NW4R_SND_AX_MANAGER_H
 #define NW4R_SND_AX_MANAGER_H
-#include <nw4r/snd/snd_Common.h>
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_FxBase.h>
 #include <nw4r/snd/snd_MoveValue.h>
-#include <nw4r/types_nw4r.h>
+#include <nw4r/snd/snd_Types.h>
+
 #include <nw4r/ut.h>
+
 #include <revolution/AI.h>
 #include <revolution/AX.h>
 
@@ -15,11 +18,11 @@ namespace detail {
 class AxManager {
 public:
     struct CallbackListNode {
-        NW4R_UT_LIST_NODE_DECL(); // at 0x0
-        AXOutCallback callback;   // at 0x8
+        NW4R_UT_LINKLIST_NODE_DECL(); // at 0x0
+        AXOutCallback callback;       // at 0x8
     };
 
-    NW4R_UT_LIST_TYPEDEF_DECL(CallbackListNode);
+    NW4R_UT_LINKLIST_TYPEDEF_DECL(CallbackListNode);
 
 public:
     static AxManager& GetInstance();

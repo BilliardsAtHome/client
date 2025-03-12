@@ -1,10 +1,13 @@
 #ifndef NW4R_SND_VOICE_H
 #define NW4R_SND_VOICE_H
-#include <nw4r/snd/snd_AxVoice.h>
-#include <nw4r/snd/snd_Common.h>
-#include <nw4r/snd/snd_DisposeCallback.h>
 #include <nw4r/types_nw4r.h>
+
+#include <nw4r/snd/snd_AxVoice.h>
+#include <nw4r/snd/snd_DisposeCallback.h>
+#include <nw4r/snd/snd_Types.h>
+
 #include <nw4r/ut.h>
+
 #include <revolution/WPAD.h>
 
 namespace nw4r {
@@ -179,10 +182,10 @@ private:
     PanCurve mPanCurve;                         // at 0x120
 
 public:
-    NW4R_UT_LIST_NODE_DECL(); // at 0x124
+    NW4R_UT_LINKLIST_NODE_DECL(); // at 0x124
 };
 
-NW4R_UT_LIST_TYPEDEF_DECL(Voice);
+NW4R_UT_LINKLIST_TYPEDEF_DECL(Voice);
 
 } // namespace detail
 } // namespace snd

@@ -6,14 +6,20 @@ namespace nw4r {
 namespace ut {
 namespace detail {
 
+/******************************************************************************
+ *
+ * RuntimeTypeInfo
+ *
+ ******************************************************************************/
 struct RuntimeTypeInfo {
-    RuntimeTypeInfo(const RuntimeTypeInfo* pBase) : mParentTypeInfo(pBase) {}
+    explicit RuntimeTypeInfo(const RuntimeTypeInfo* pBase)
+        : mParentTypeInfo(pBase) {}
 
-    bool IsDerivedFrom(const RuntimeTypeInfo* pBase) const {
+    bool IsDerivedFrom(const RuntimeTypeInfo* pInfo) const {
         for (const RuntimeTypeInfo* pIt = this; pIt != NULL;
              pIt = pIt->mParentTypeInfo) {
 
-            if (pIt == pBase) {
+            if (pIt == pInfo) {
                 return true;
             }
         }
@@ -25,18 +31,23 @@ struct RuntimeTypeInfo {
 };
 
 template <typename T>
-inline const RuntimeTypeInfo* GetTypeInfoFromPtr_(T* pPtr) {
-    return &pPtr->typeInfo;
+inline const RuntimeTypeInfo* GetTypeInfoFromPtr_(T* /* pPtr */) {
+    return &T::typeInfo;
 }
 
 } // namespace detail
 
+/******************************************************************************
+ *
+ * DynamicCast
+ *
+ ******************************************************************************/
 template <typename TDerived, typename TBase>
 inline TDerived DynamicCast(TBase* pPtr) {
     const detail::RuntimeTypeInfo* pDerivedTypeInfo =
         detail::GetTypeInfoFromPtr_(static_cast<TDerived>(NULL));
 
-    // Downcast if possible
+    // Downcast only if possible
     if (pPtr->GetRuntimeTypeInfo()->IsDerivedFrom(pDerivedTypeInfo)) {
         return static_cast<TDerived>(pPtr);
     }
@@ -47,6 +58,11 @@ inline TDerived DynamicCast(TBase* pPtr) {
 } // namespace ut
 } // namespace nw4r
 
+/******************************************************************************
+ *
+ * Macros
+ *
+ ******************************************************************************/
 /**
  * Declare type RTTI and accessor function.
  */

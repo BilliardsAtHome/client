@@ -1,7 +1,9 @@
 #ifndef NW4R_UT_DVD_LOCKED_FILE_STREAM_H
 #define NW4R_UT_DVD_LOCKED_FILE_STREAM_H
 #include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut/ut_DvdFileStream.h>
+
 #include <revolution/OS.h>
 
 namespace nw4r {
@@ -21,6 +23,7 @@ public:
     virtual bool ReadAsync(void* /* pDst */, u32 /* size */,
                            StreamCallback /* pCallback */,
                            void* /* pCallbackArg */) {
+
         return false;
     } // at 0x18
 
@@ -29,6 +32,7 @@ public:
     virtual bool PeekAsync(void* /* pDst */, u32 /* size */,
                            StreamCallback /* pCallback */,
                            void* /* pCallbackArg */) {
+
         return false;
     } // at 0x60
 

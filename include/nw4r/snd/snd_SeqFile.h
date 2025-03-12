@@ -1,11 +1,18 @@
 #ifndef NW4R_SND_SEQ_FILE_H
 #define NW4R_SND_SEQ_FILE_H
 #include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut.h>
 
 namespace nw4r {
 namespace snd {
 namespace detail {
+
+/******************************************************************************
+ *
+ * RSEQ binary layout
+ *
+ ******************************************************************************/
 namespace SeqFile {
 
 struct Header {
@@ -23,6 +30,11 @@ struct DataBlock {
 
 } // namespace SeqFile
 
+/******************************************************************************
+ *
+ * SeqFileReader
+ *
+ ******************************************************************************/
 class SeqFileReader {
 public:
     static const u32 SIGNATURE = 'RSEQ';

@@ -1,12 +1,18 @@
 #ifndef NW4R_SND_SOUND_ACTOR_H
 #define NW4R_SND_SOUND_ACTOR_H
-#include <climits>
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_ExternalSoundPlayer.h>
 #include <nw4r/snd/snd_SoundStartable.h>
-#include <nw4r/types_nw4r.h>
+
+#include <climits>
 
 namespace nw4r {
 namespace snd {
+
+// Forward declarations
+class SoundHandle;
+
 namespace detail {
 
 class SoundActor : public SoundStartable {
@@ -25,25 +31,25 @@ public:
         return mStartable.detail_ConvertLabelStringToSoundId(pLabel);
     } // at 0x10
 
-    ExternalSoundPlayer* detail_GetActorSoundPlayer(int i) {
-        if (i < 0 || i >= ACTOR_PLAYER_COUNT) {
+    ExternalSoundPlayer* detail_GetActorSoundPlayer(int idx) {
+        if (idx < 0 || idx >= ACTOR_PLAYER_COUNT) {
             return NULL;
         }
 
-        return &mActorPlayer[i];
+        return &mActorPlayer[idx];
     }
 
     template <typename TForEachFunc>
-    TForEachFunc ForEachSound(TForEachFunc pFunction, bool reverse) {
+    TForEachFunc ForEachSound(TForEachFunc pFunc, bool reverse) {
         int i;
         ExternalSoundPlayer* pPlayer = detail_GetActorSoundPlayer(0);
 
         for (i = 0; i < ACTOR_PLAYER_COUNT; i++) {
-            pPlayer->ForEachSound(pFunction, reverse);
+            pPlayer->ForEachSound(pFunc, reverse);
             pPlayer++;
         }
 
-        return pFunction;
+        return pFunc;
     }
 
 private:

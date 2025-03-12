@@ -1,9 +1,11 @@
 #ifndef RP_AUDIO_SND_AUDIO_MGR_H
 #define RP_AUDIO_SND_AUDIO_MGR_H
-#include <RPTypes.h>
 #include <egg/audio.h>
 #include <egg/core.h>
+
 #include <nw4r/snd.h>
+
+#include <RPTypes.h>
 
 //! @addtogroup rp_audio
 //! @{

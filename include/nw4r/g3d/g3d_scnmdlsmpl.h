@@ -1,9 +1,12 @@
-#ifndef NW4R_G3D_SCNMDLSMPL_H
-#define NW4R_G3D_SCNMDLSMPL_H
-#include <nw4r/g3d/g3d_resmdl.h>
-#include <nw4r/g3d/g3d_scnobj.h>
-#include <nw4r/math.h>
+#ifndef NW4R_G3D_SCN_MDL_SMPL_H
+#define NW4R_G3D_SCN_MDL_SMPL_H
 #include <nw4r/types_nw4r.h>
+
+#include <nw4r/g3d/g3d_calcview.h>
+#include <nw4r/g3d/g3d_scnobj.h>
+#include <nw4r/g3d/res/g3d_resmdl.h>
+
+#include <nw4r/math.h>
 
 namespace nw4r {
 namespace g3d {
@@ -38,7 +41,7 @@ public:
         BYTE_CODE_DRAW_XLU,
     };
 
-#define OPT(KEY, VALUE) OPTION_##KEY = (0x20000 | (VALUE))
+#define OPT(KEY, VALUE) OPTID_##KEY = (0x20000 | (VALUE))
     enum ScnMdlSimpleOption {
         OPT(NONE, 0),
         OPT(IGNORE_ANMCHR_TRANS, 1),
@@ -66,7 +69,7 @@ public:
     virtual AnmObj* GetAnmObj(AnmObjType type);             // at 0x40
     virtual const AnmObj* GetAnmObj(AnmObjType type) const; // at 0x44
 
-    bool GetScnMtxPos(math::MTX34* pMtx, ScnObjMtxType type, u32 i) const;
+    bool GetScnMtxPos(math::MTX34* pMtx, ScnObjMtxType type, u32 idx) const;
 
     void UpdateFrame();
 
@@ -161,7 +164,8 @@ protected:
     static const int VIEW_MAX = 16;
 
     static const int MTX_CACHE_MIN = 8;
-    static const int MTX_CACHE_MAX = (0x4000 / sizeof(math::MTX34)) + 1;
+    static const int MTX_CACHE_MAX =
+        sizeof(detail::MtxCacheMap) / sizeof(math::MTX34) + 1;
 
 protected:
     void ScnMdlSmpl_CalcPosture(u32 param, const math::MTX34* pParent);

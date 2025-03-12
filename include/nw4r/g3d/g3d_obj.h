@@ -1,27 +1,12 @@
 #ifndef NW4R_G3D_OBJ_H
 #define NW4R_G3D_OBJ_H
-#include <nw4r/g3d/g3d_rtti.h>
 #include <nw4r/types_nw4r.h>
-#include <revolution/MEM.h>
+
+#include <nw4r/g3d/g3d_rtti.h>
+#include <nw4r/g3d/platform/g3d_allocator.h>
 
 namespace nw4r {
 namespace g3d {
-namespace detail {
-
-/******************************************************************************
- *
- * Memory
- *
- ******************************************************************************/
-inline void* AllocFromAllocator(MEMAllocator* pAllocator, u32 size) {
-    return MEMAllocFromAllocator(pAllocator, size);
-}
-inline void FreeToAllocator(MEMAllocator* pAllocator, void* pBlock) {
-    return MEMFreeToAllocator(pAllocator, pBlock);
-}
-
-} // namespace detail
-
 namespace {
 
 /******************************************************************************
@@ -60,7 +45,7 @@ public:
 
     public:
         template <u32 N>
-        TypeObj(const ResNameDataT<N>& rName)
+        explicit TypeObj(const ResNameDataT<N>& rName)
             : mName(reinterpret_cast<const ResNameDataPT*>(&rName)) {}
 
         u32 GetTypeID() const {

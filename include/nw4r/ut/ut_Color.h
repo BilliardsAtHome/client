@@ -1,6 +1,7 @@
 #ifndef NW4R_UT_COLOR_H
 #define NW4R_UT_COLOR_H
 #include <nw4r/types_nw4r.h>
+
 #include <revolution/GX.h>
 
 namespace nw4r {
@@ -20,6 +21,7 @@ public:
     Color(const GXColor& rColor) {
         *this = rColor;
     }
+
     ~Color() {}
 
     void Set(int red, int green, int blue, int alpha) {

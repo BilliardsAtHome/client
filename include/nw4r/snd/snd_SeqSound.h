@@ -1,10 +1,13 @@
 #ifndef NW4R_SND_SEQ_SOUND_H
 #define NW4R_SND_SEQ_SOUND_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_BasicSound.h>
 #include <nw4r/snd/snd_SeqPlayer.h>
 #include <nw4r/snd/snd_Task.h>
-#include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut.h>
+
 #include <revolution/OS.h>
 
 namespace nw4r {
@@ -14,9 +17,12 @@ namespace snd {
 class SeqSoundHandle;
 
 namespace detail {
-
-// Forward declarations
+class NoteOnCallback;
+class SeqTrackAllocator;
 template <typename T> class SoundInstanceManager;
+} // namespace detail
+
+namespace detail {
 
 class SeqSound : public BasicSound {
     friend class SeqSoundHandle;
@@ -65,8 +71,8 @@ public:
     void SetTrackVolume(u32 trackFlags, f32 volume);
     void SetTrackPitch(u32 trackFlags, f32 pitch);
 
-    bool WriteVariable(int i, s16 value);
-    static bool WriteGlobalVariable(int i, s16 value);
+    bool WriteVariable(int idx, s16 value);
+    static bool WriteGlobalVariable(int idx, s16 value);
 
     void* GetFileStreamBuffer() {
         return mFileStreamBuffer;
@@ -79,6 +85,9 @@ private:
     typedef void (*SeqLoadCallback)(bool success, const void* pBase,
                                     void* pCallbackArg);
 
+    /******************************************************************************
+     * SeqLoadTask
+     ******************************************************************************/
     struct SeqLoadTask : public Task {
         SeqLoadTask();
 

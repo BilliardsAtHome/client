@@ -1,7 +1,10 @@
 #ifndef NW4R_G3D_LIGHT_H
 #define NW4R_G3D_LIGHT_H
-#include <nw4r/g3d/g3d_rescommon.h>
 #include <nw4r/types_nw4r.h>
+
+#include <nw4r/g3d/g3d_state.h>
+#include <nw4r/g3d/res/g3d_rescommon.h>
+
 #include <revolution/GX.h>
 
 namespace nw4r {
@@ -52,24 +55,33 @@ public:
     }
 
     bool IsEnable() const {
-        return mFlag & FLAG_ENABLE_LIGHT;
+        return (mFlag & FLAG_ENABLE_LIGHT) ? true : false;
     }
 
     bool IsSpotLight() const {
-        return mFlag & FLAG_SPOT;
+        return (mFlag & FLAG_SPOT) ? true : false;
     }
     bool IsSpecularLight() const {
-        return mFlag & FLAG_SPECULAR;
+        return (mFlag & FLAG_SPECULAR) ? true : false;
     }
     bool IsSpecularDir() const {
-        return mFlag & FLAG_SPECULAR_DIR;
+        return (mFlag & FLAG_SPECULAR_DIR) ? true : false;
     }
+
     bool IsColorEnable() const {
-        return mFlag & FLAG_ENABLE_COLOR;
+        return !(mFlag & FLAG_DISABLE_COLOR);
     }
+    void DisableColor() {
+        mFlag |= FLAG_DISABLE_COLOR;
+    }
+
     bool IsAlphaEnable() const {
-        return mFlag & FLAG_ENABLE_ALPHA;
+        return !(mFlag & FLAG_DISABLE_ALPHA);
     }
+    void DisableAlpha() {
+        mFlag |= FLAG_DISABLE_ALPHA;
+    }
+
     bool IsDiffuseLight() const {
         return !IsSpotLight() && !IsSpecularLight();
     }
@@ -80,8 +92,8 @@ private:
         FLAG_SPECULAR = (1 << 1),
         FLAG_ENABLE_LIGHT = (1 << 2),
         FLAG_SPECULAR_DIR = (1 << 3),
-        FLAG_ENABLE_COLOR = (1 << 4),
-        FLAG_ENABLE_ALPHA = (1 << 5)
+        FLAG_DISABLE_COLOR = (1 << 4),
+        FLAG_DISABLE_ALPHA = (1 << 5)
     };
 
 private:
@@ -95,11 +107,11 @@ private:
  *
  ******************************************************************************/
 struct LightSetData {
-    static const int NUM_LIGHT_IDX = 8;
+    static const int IDX_INVALID_LIGHT = -1;
 
-    s8 idxLight[NUM_LIGHT_IDX]; // at 0x0
-    s8 idxAmbLight;             // at 0x8
-    u8 _[0xC - 0X9];            // at 0x9
+    s8 idxLight[G3DState::NUM_LIGHT_IN_LIGHT_SET]; // at 0x0
+    s8 idxAmbLight;                                // at 0x8
+    u8 PADDING_0x9[0xC - 0X9];                     // at 0x9
 };
 
 class LightSet {
@@ -153,9 +165,9 @@ public:
         return mpAmbLightObjArray;
     }
 
-    LightSet GetLightSet(int i) {
-        if (i < mNumLightSet && i >= 0) {
-            return LightSet(this, &mpLightSetDataArray[i]);
+    LightSet GetLightSet(int idx) {
+        if (idx < mNumLightSet && idx >= 0) {
+            return LightSet(this, &mpLightSetDataArray[idx]);
         }
 
         return LightSet(this, NULL);

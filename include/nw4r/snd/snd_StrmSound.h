@@ -1,8 +1,10 @@
 #ifndef NW4R_SND_STRM_SOUND_H
 #define NW4R_SND_STRM_SOUND_H
+#include <nw4r/types_nw4r.h>
+
 #include <nw4r/snd/snd_BasicSound.h>
 #include <nw4r/snd/snd_StrmPlayer.h>
-#include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut.h>
 
 namespace nw4r {
@@ -12,9 +14,11 @@ namespace snd {
 class StrmSoundHandle;
 
 namespace detail {
-
-// Forward declarations
 template <typename T> class SoundInstanceManager;
+class StrmBufferPool;
+} // namespace detail
+
+namespace detail {
 
 class StrmSound : public BasicSound {
     friend class StrmSoundHandle;

@@ -1,6 +1,7 @@
 #ifndef NW4R_UT_IO_STREAM_H
 #define NW4R_UT_IO_STREAM_H
 #include <nw4r/types_nw4r.h>
+
 #include <nw4r/ut/ut_RuntimeTypeInfo.h>
 
 namespace nw4r {
