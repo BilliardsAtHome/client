@@ -26,9 +26,9 @@ void RichPresenceProfile::SceneCallback(kiwi::IRichPresenceClient& rClient,
                                         s32 scene) {
 #pragma unused(scene)
 
-    // Assume the scene is always Billiards
     rClient.SetStartTimeNow();
-    rClient.SetDetails("Bruteforcing away!");
+    rClient.SetState("Bruteforcing away!");
+    rClient.SetDetails("Looking for the perfect break!");
 }
 
 /**

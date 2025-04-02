@@ -1,4 +1,5 @@
 #include <libkiwi.h>
+
 #include <revolution/OS.h>
 
 namespace kiwi {
@@ -45,6 +46,7 @@ void RichPresenceMgr::SetProfile(IRichPresenceProfile* pProfile) {
 
     K_ASSERT(mpClient != nullptr);
     mpClient->SetAppID(pProfile->GetAppID());
+    mpClient->UpdateApp();
 }
 
 /**
@@ -92,7 +94,6 @@ void RichPresenceMgr::AlarmCallbackFunc(OSAlarm* pAlarm, OSContext* pCtx) {
     r.mpProfile->AlarmCallback(*r.mpClient);
 
     // Display most recent activity data
-    r.mpClient->UpdateApp();
     r.mpClient->UpdateActivity();
 }
 

@@ -6,7 +6,7 @@ namespace kiwi {
  * @brief Attempt to open this device
  *
  * @param path Virtual file path
- * @param timeOut Time-out period, in milliseconds
+ * @param timeOut Time-out period, in microseconds
  * @return Success
  */
 bool IosDevice::Open(const String& path, u32 timeOut) {
@@ -17,7 +17,7 @@ bool IosDevice::Open(const String& path, u32 timeOut) {
         if (IsOpen()) {
             return true;
         }
-    } while (OSGetTick() - start < OS_MSEC_TO_TICKS(timeOut));
+    } while (OSGetTick() - start < OS_USEC_TO_TICKS(timeOut));
 
     return false;
 }

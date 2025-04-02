@@ -159,8 +159,7 @@ void Simulation::Configure(RPSysScene* pScene) {
     RPGrpRenderer::GetCurrent()->AppendDrawObject(this);
 
     // Start up Discord rich presence
-    // kiwi::RichPresenceMgr::GetInstance().SetProfile(new
-    // RichPresenceProfile());
+    kiwi::RichPresenceMgr::GetInstance().SetProfile(new RichPresenceProfile());
 }
 
 /**

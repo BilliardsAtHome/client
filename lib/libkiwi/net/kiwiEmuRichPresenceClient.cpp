@@ -1,7 +1,9 @@
+#include <libkiwi.h>
+
+#include <revolution/IPC.h>
+
 #include <cstdlib>
 #include <cstring>
-#include <libkiwi.h>
-#include <revolution/IPC.h>
 
 namespace kiwi {
 
@@ -88,7 +90,7 @@ void EmuRichPresenceClient::UpdateActivity() const {
 
     // Gameplay timestamps
     IosObject<u64> startTime(mStartTime);
-    IosObject<u64> endTime(mStartTime);
+    IosObject<u64> endTime(mEndTime);
     input.PushBack(startTime);
     input.PushBack(endTime);
 

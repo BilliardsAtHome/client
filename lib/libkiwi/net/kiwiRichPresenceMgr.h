@@ -4,6 +4,7 @@
 #include <libkiwi/k_types.h>
 #include <libkiwi/prim/kiwiString.h>
 #include <libkiwi/util/kiwiStaticSingleton.h>
+
 #include <revolution/OS.h>
 
 namespace kiwi {
