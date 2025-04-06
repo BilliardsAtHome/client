@@ -2,23 +2,16 @@
 
 #include <libkiwi.h>
 
-#include <egg/core.h>
-
 #include <nw4r/math.h>
 
-#include <cstring>
+#include <revolution/GX.h>
 
 namespace kiwi {
 
 /**
- * @brief Base text scale applied to styles
- */
-const f32 TextWriter::BASE_FONT_SCALE = 0.75f;
-
-/**
  * @brief Constructor
  */
-TextWriter::TextWriter() {
+TextWriter::TextWriter() : mIsRendering(false), mOldDrawFlags(0) {
     bool success = SetFont("pac_nRodDb_32_I4.brfnt");
     K_ASSERT_EX(success, "Could not prepare resource font");
 }
@@ -31,7 +24,7 @@ TextWriter::TextWriter() {
  * @param rName Font name
  * @return Success
  */
-bool TextWriter::SetFont(const kiwi::String& rName) {
+bool TextWriter::SetFont(const String& rName) {
     void* pFontData = RP_GET_INSTANCE(RPSysFontManager)->GetResFontData(rName);
     K_ASSERT(pFontData != nullptr);
 
@@ -70,30 +63,44 @@ bool TextWriter::SetFont(const nw4r::ut::Font& rFont) {
     }
 
     ClearFont();
-    nw4r::ut::TextWriterBase<wchar_t>::SetFont(rFont);
+    nw4r::ut::WideTextWriter::SetFont(rFont);
     return true;
 }
 
 /**
- * @brief Prints formatted text to the screen (internal implementation)
+ * @brief Sets up GX rendering state for printing
+ */
+void TextWriter::Begin() {
+    SetupGX();
+    mIsRendering = true;
+    mOldDrawFlags = GetDrawFlag();
+}
+
+/**
+ * @brief Tears down GX rendering state
+ */
+void TextWriter::End() {
+    mIsRendering = false;
+    SetDrawFlag(mOldDrawFlags);
+}
+
+/**
+ * @brief Prints formatted text to the screen
  * @details XY coordinates are normalized so they appear the same across
  * aspect ratios.
  *
  * @param x X position [0.0 - 1.0]
  * @param y Y position [0.0 - 1.0]
- * @param rStyle Text style
  * @param rStr Text string (UTF-16)
  */
 template <typename T>
-void TextWriter::Print(f32 x, f32 y, const Style& rStyle,
-                       const kiwi::StringImpl<T>& rStr) {
+void TextWriter::Print(f32 x, f32 y, const StringImpl<T>& rStr) {
+    K_ASSERT_EX(mIsRendering, "Please call TextWriter::Begin before printing");
 
     K_ASSERT_EX(0.0f <= x && x <= 1.0f,
                 "X position is out of range [0, 1] (%.2f)", x);
     K_ASSERT_EX(0.0f <= y && y <= 1.0f,
                 "Y position is out of range [0, 1] (%.2f)", y);
-
-    K_ASSERT(rStyle.scale > 0.0f);
 
     // Don't clobber unrelated renderer passes
     if (!RPGrpRenderer::IsLytDraw()) {
@@ -101,53 +108,46 @@ void TextWriter::Print(f32 x, f32 y, const Style& rStyle,
     }
 
     // Convert to screen pixels
-    x *= EGG::Screen::GetSizeXMax();
-    y *= EGG::Screen::GetSizeYMax();
+    x *= RPGrpScreen::GetSizeXMax();
+    y *= RPGrpScreen::GetSizeYMax();
 
     // Correct for centered canvas mode
     if (RPGrpRenderer::GetActiveScreen()->GetCanvasMode() ==
-        EGG::Frustum::CANVASMODE_CC) {
+        RPGrpScreen::CANVASMODE_CC) {
 
         // Convert to top-left origin
-        x -= EGG::Screen::GetSizeXMax() / 2.0f;
-        y -= EGG::Screen::GetSizeYMax() / 2.0f;
+        x -= RPGrpScreen::GetSizeXMax() / 2.0f;
+        y -= RPGrpScreen::GetSizeYMax() / 2.0f;
     }
 
     SetCursor(x, y);
-    SetScale(rStyle.scale * BASE_FONT_SCALE, rStyle.scale * BASE_FONT_SCALE);
-    SetTextColor(rStyle.color);
-
-    u32 drawFlag = GetDrawFlag();
-    SetDrawFlag(rStyle.flags);
-
-    SetupGX();
 
     // ASCII text must be converted to UTF-16
-    nw4r::ut::TextWriterBase<wchar_t>::Print(rStr.ToWideChar(), rStr.Length());
-
-    SetDrawFlag(drawFlag);
+    nw4r::ut::WideTextWriter::Print(rStr.ToWideChar(), rStr.Length());
 }
 
 /**
  * @brief Release font memory and resources
  */
 void TextWriter::ClearFont() {
-    const nw4r::ut::Font* pFont = nw4r::ut::TextWriterBase<wchar_t>::GetFont();
+    const nw4r::ut::Font* pFont = nw4r::ut::WideTextWriter::GetFont();
     if (pFont == nullptr) {
         return;
     }
 
     // ROM font is owned by the font manager
-    if (pFont != RP_GET_INSTANCE(RPSysFontManager)->GetRomFont()) {
-        delete pFont;
+    if (pFont == RP_GET_INSTANCE(RPSysFontManager)->GetRomFont()) {
+        return;
     }
+
+    delete pFont;
 }
 
 /**
  * @brief Sets up GX rendering state
  */
 void TextWriter::SetupGX() {
-    nw4r::ut::TextWriterBase<wchar_t>::SetupGX();
+    nw4r::ut::WideTextWriter::SetupGX();
 
     GXSetZMode(FALSE, GX_ALWAYS, FALSE);
 
@@ -156,7 +156,7 @@ void TextWriter::SetupGX() {
 
     // Correct for centered canvas mode
     if (RPGrpRenderer::GetActiveScreen()->GetCanvasMode() ==
-        EGG::Frustum::CANVASMODE_CC) {
+        RPGrpScreen::CANVASMODE_CC) {
 
         posMtx._01 = -posMtx._01;
         posMtx._11 = -posMtx._11;
@@ -167,104 +167,10 @@ void TextWriter::SetupGX() {
     GXSetCurrentMtx(GX_PNMTX0);
 }
 
-/**
- * @brief Prints formatted text to the screen
- * @details XY coordinates are normalized so they appear the same across aspect
- * ratios.
- *
- * @param x X position [0.0 - 1.0]
- * @param y Y position [0.0 - 1.0]
- * @param rStyle Text style
- * @param rFmt Format string
- * @param ... Format arguments
- */
-template <typename T>
-void Text(f32 x, f32 y, const Style& rStyle, const kiwi::StringImpl<T>& rFmt,
-          ...) {
-
-    std::va_list list;
-    va_start(list, rFmt);
-    StringImpl<T> str = VFormat(rFmt, list);
-    va_end(list);
-
-    TextWriter::GetInstance().Print(x, y, rStyle, str);
-}
-
-/**
- * @brief Prints formatted text to the screen
- * @details XY coordinates are normalized so they appear the same across aspect
- * ratios.
- *
- * @param x X position [0.0 - 1.0]
- * @param y Y position [0.0 - 1.0]
- * @param rStyle Text style
- * @param pFmt Format string
- * @param ... Format arguments
- */
-template <typename T>
-void Text(f32 x, f32 y, const Style& rStyle, const T* pFmt, ...) {
-    std::va_list list;
-    va_start(list, pFmt);
-    StringImpl<T> str = VFormat(pFmt, list);
-    va_end(list);
-
-    TextWriter::GetInstance().Print(x, y, rStyle, str);
-}
-
-/**
- * @brief Prints formatted text to the screen
- * @details XY coordinates are normalized so they appear the same across aspect
- * ratios.
- *
- * @param x X position [0.0 - 1.0]
- * @param y Y position [0.0 - 1.0]
- * @param rStyle Text style
- * @param rFmt Format string
- * @param args Format arguments
- */
-
-template <typename T>
-void Text(f32 x, f32 y, const Style& rStyle, const kiwi::StringImpl<T>& rFmt,
-          std::va_list args) {
-
-    StringImpl<T> str = VFormat(rFmt, args);
-    TextWriter::GetInstance().Print(x, y, rStyle, str);
-}
-
-/**
- * @brief Prints formatted text to the screen
- * @details XY coordinates are normalized so they appear the same across aspect
- * ratios.
- *
- * @param x X position [0.0 - 1.0]
- * @param y Y position [0.0 - 1.0]
- * @param rStyle Text style
- * @param pFmt Format string
- * @param ... Format arguments
- */
-
-template <typename T>
-void Text(f32 x, f32 y, const Style& rStyle, const T* pFmt, std::va_list args) {
-    StringImpl<T> str = VFormat(pFmt, args);
-    TextWriter::GetInstance().Print(x, y, rStyle, str);
-}
-
-// clang-format off
-
-// Instantiate functions
-template void TextWriter::Print<char>(f32 x, f32 y, const Style& rStyle, const kiwi::StringImpl<char>& rStr);
-template void TextWriter::Print<wchar_t>(f32 x, f32 y, const Style& rStyle, const kiwi::StringImpl<wchar_t>& rStr);
-
-template void Text<char>(f32 x, f32 y, const Style& rStyle, const kiwi::StringImpl<char>& rFmt, ...);
-template void Text<char>(f32 x, f32 y, const Style& rStyle, const char* pFmt, ...);
-template void Text<char>(f32 x, f32 y, const Style& rStyle, const kiwi::StringImpl<char>& rFmt, std::va_list args);
-template void Text<char>(f32 x, f32 y, const Style& rStyle, const char* pFmt, std::va_list args);
-
-template void Text<wchar_t>(f32 x, f32 y, const Style& rStyle, const kiwi::StringImpl<wchar_t>& rFmt, ...);
-template void Text<wchar_t>(f32 x, f32 y, const Style& rStyle, const wchar_t* pFmt, ...);
-template void Text<wchar_t>(f32 x, f32 y, const Style& rStyle, const kiwi::StringImpl<wchar_t>& rFmt, std::va_list args);
-template void Text<wchar_t>(f32 x, f32 y, const Style& rStyle, const wchar_t* pFmt, std::va_list args);
-
-// clang-format on
+// Instantiate function templates
+template void TextWriter::Print<char>(f32 x, f32 y,
+                                      const StringImpl<char>& rStr);
+template void TextWriter::Print<wchar_t>(f32 x, f32 y,
+                                         const StringImpl<wchar_t>& rStr);
 
 } // namespace kiwi

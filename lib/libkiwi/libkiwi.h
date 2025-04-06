@@ -30,6 +30,7 @@
 #include <libkiwi/debug/kiwiNw4rDirectPrint.h>
 #include <libkiwi/debug/kiwiNw4rException.h>
 #include <libkiwi/debug/kiwiStackChecker.h>
+#include <libkiwi/debug/kiwiTextBuilder.h>
 #include <libkiwi/debug/kiwiTextWriter.h>
 #include <libkiwi/fun/kiwiGameCorruptor.h>
 #include <libkiwi/math/kiwiAlgorithm.h>

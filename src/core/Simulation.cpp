@@ -159,7 +159,8 @@ void Simulation::Configure(RPSysScene* pScene) {
     RPGrpRenderer::GetCurrent()->AppendDrawObject(this);
 
     // Start up Discord rich presence
-    kiwi::RichPresenceMgr::GetInstance().SetProfile(new RichPresenceProfile());
+    // kiwi::RichPresenceMgr::GetInstance().SetProfile(new
+    // RichPresenceProfile());
 }
 
 /**
@@ -173,45 +174,42 @@ void Simulation::UserDraw() {
     /**
      * Best break statistics
      */
-    // clang-format off
-    kiwi::Text(0.55, 0.05,
-               kiwi::Style(0.8, kiwi::Color::CYAN, kiwi::ETextFlag_TextLeft),
-               "[Best break]");
+    kiwi::Text("[Best break]")
+        .SetPosition(0.70f, 0.10f)
+        .SetTextColor(kiwi::Color::CYAN)
+        .SetStrokeType(kiwi::ETextStroke_Outline)
+        .SetDrawFlags(kiwi::ETextFlag_TextCenter);
 
-    kiwi::Text(0.55, 0.1,
-               kiwi::Style(0.8, kiwi::Color::WHITE, kiwi::ETextFlag_TextLeft),
-               "> %d balls (%d sunk, %d off)\n"
+    kiwi::Text("> %d balls (%d sunk, %d off)\n"
                "> in %03d frames (%.2f sec)\n"
                "> %02df up, %02df left, %02df right\n",
                // > %d balls (%d sunk, %d off)
-               mpBestBreak->sunk + mpBestBreak->off,
-               mpBestBreak->sunk,
+               mpBestBreak->sunk + mpBestBreak->off, mpBestBreak->sunk,
                mpBestBreak->off,
                // > in %03d frames (%.2f sec)
-               mpBestBreak->frame,
-               mpBestBreak->frame / 60.0f,
+               mpBestBreak->frame, mpBestBreak->frame / 60.0f,
                // > %02df up, %02df left, %02df right
-               mpBestBreak->up,
-               mpBestBreak->left,
-               mpBestBreak->right);
+               mpBestBreak->up, mpBestBreak->left, mpBestBreak->right)
+        .SetPosition(0.70f, 0.15f)
+        .SetStrokeType(kiwi::ETextStroke_Outline)
+        .SetDrawFlags(kiwi::ETextFlag_TextCenter);
 
-    kiwi::Text(0.55, 0.23,
-               kiwi::Style(0.8, kiwi::Color::YELLOW, kiwi::ETextFlag_TextLeft),
-               "> %s",
-               mpBestBreak->foul ? "foul" : "no foul");
-    // clang-format on
+    kiwi::Text("> %s", mpBestBreak->foul ? "foul" : "no foul")
+        .SetPosition(0.70f, 0.30f)
+        .SetTextColor(kiwi::Color::YELLOW)
+        .SetStrokeType(kiwi::ETextStroke_Outline)
+        .SetDrawFlags(kiwi::ETextFlag_TextCenter);
 
     /**
      * Session statistics
      */
-    // clang-format off
-    kiwi::Text(0.55, 0.7,
-               kiwi::Style(0.8, kiwi::Color::CYAN, kiwi::ETextFlag_TextLeft),
-               "[This session]");
+    kiwi::Text("[This session]")
+        .SetPosition(0.70f, 0.65f)
+        .SetTextColor(kiwi::Color::CYAN)
+        .SetStrokeType(kiwi::ETextStroke_Outline)
+        .SetDrawFlags(kiwi::ETextFlag_TextCenter);
 
-    kiwi::Text(0.55, 0.75,
-               kiwi::Style(0.8, kiwi::Color::WHITE, kiwi::ETextFlag_TextLeft),
-               "> %d total breaks\n"
+    kiwi::Text("> %d total breaks\n"
                "> distribution:\n"
                "{%d, %d, %d, %d, %d}\n"
                "{%d, %d, %d, %d, %d}\n",
@@ -219,37 +217,33 @@ void Simulation::UserDraw() {
                mBreakNum,
                // > distribution:
                // {%d, %d, %d, %d, %d}
-               mBreakBallNum[0],
-               mBreakBallNum[1],
-               mBreakBallNum[2],
-               mBreakBallNum[3],
-               mBreakBallNum[4],
+               mBreakBallNum[0], mBreakBallNum[1], mBreakBallNum[2],
+               mBreakBallNum[3], mBreakBallNum[4],
                // {%d, %d, %d, %d, %d}
-               mBreakBallNum[5],
-               mBreakBallNum[6],
-               mBreakBallNum[7],
-               mBreakBallNum[8],
-               mBreakBallNum[9]);
-    // clang-format on
+               mBreakBallNum[5], mBreakBallNum[6], mBreakBallNum[7],
+               mBreakBallNum[8], mBreakBallNum[9])
+        .SetPosition(0.70f, 0.70f)
+        .SetStrokeType(kiwi::ETextStroke_Outline)
+        .SetDrawFlags(kiwi::ETextFlag_TextCenter);
 
+    /**
+     * Network information
+     */
     if (mIsConnected.HasValue()) {
-        // clang-format off
-        kiwi::Text(0.25, 0.85,
-                   kiwi::Style(0.8, *mIsConnected ?
-                               kiwi::Color::GREEN : kiwi::Color::YELLOW,
-                               kiwi::ETextFlag_TextCenter),
-                   *mIsConnected ? "Online" : "Offline (err:%d ex:%d stat:%d)",
-                   mHttpError,
-                   mHttpExError,
-                   mHttpStatus);
-        // clang-format on
+        kiwi::Text(*mIsConnected ? "Online" : "Offline (err:%d ex:%d stat:%d) ",
+                   mHttpError, mHttpExError, mHttpStatus)
+            .SetPosition(0.20f, 0.80f)
+            .SetTextColor(*mIsConnected ? kiwi::Color::GREEN
+                                        : kiwi::Color::YELLOW)
+            .SetStrokeType(kiwi::ETextStroke_Outline)
+            .SetDrawFlags(kiwi::ETextFlag_TextCenter);
     }
 
-    // clang-format off
-    kiwi::Text(0.25, 0.9,
-               kiwi::Style(0.8, kiwi::Color::RED, kiwi::ETextFlag_TextCenter),
-               "Unique ID: %06d", *mUniqueID);
-    // clang-format on
+    kiwi::Text("Unique ID: %06d", *mUniqueID)
+        .SetPosition(0.20f, 0.85f)
+        .SetTextColor(kiwi::Color::RED)
+        .SetStrokeType(kiwi::ETextStroke_Outline)
+        .SetDrawFlags(kiwi::ETextFlag_TextCenter);
 }
 
 /**
