@@ -443,8 +443,8 @@ void Simulation::Tick() {
     f32 y = mIsReplay ? mpBestBreak->pos.y : mpCurrBreak->pos.y;
 
     // Map to screen position
-    EGG::Vector2f pos(x * (EGG::Screen::GetSizeXMax() / 2),
-                      -y * (EGG::Screen::GetSizeYMax() / 2));
+    EGG::Vector2f pos(x * (RPGrpScreen::GetSizeXMax() / 2),
+                      -y * (RPGrpScreen::GetSizeYMax() / 2));
 
     // Update cue cursor
     RPBilCue* pCue = RP_GET_INSTANCE(RPBilCueManager)->GetCue(0);
